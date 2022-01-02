@@ -42,4 +42,4 @@ client.on('ready', async () => {
     console.log(`>>> App Loaded In: ${(Date.now() - startTime)}ms\n`);
 });
 
-client.login(bot.token);
+client.login(process.env.BOT_TOKEN);
