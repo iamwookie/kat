@@ -1,11 +1,13 @@
 // This is the command handler, CODENAME: Commander v1.1.0
+// Last Update: added music subscription collection
 const Discord = require('discord.js');
 const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
 const path = require('path');
 // -----------------------------------
 const groups = [
-    'Misc'
+    'Misc',
+    'Music'
 ]
 
 module.exports = (client) => {
@@ -20,6 +22,9 @@ module.exports = (client) => {
     client.cooldowns = new Discord.Collection();
     client.groups = new Discord.Collection();
     client.modules = new Discord.Collection();
+
+    // Music
+    client.subscriptions = new Discord.Collection();
     
     groups.forEach((g) => {
         if(client.groups.has(g)) return;
