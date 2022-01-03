@@ -1,6 +1,5 @@
 module.exports = {
     name: 'stop',
-    hidden: true,
     description: 'Clear the queue and leave.',
     group: 'Music',
     cooldown: 5,
