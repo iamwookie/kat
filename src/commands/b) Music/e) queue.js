@@ -2,20 +2,37 @@ module.exports = {
     name: 'queue',
     description: 'View the queue.',
     group: 'Music',
+    cooldown: 5,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId)
+        let filler = ''
 
-        if (!subscription) return msg.channel.send("There is no queue!")
+        if (!subscription) return msg.reply('There is no queue!')
 
-        let queue = subscription.queueString()
-
-        if (queue) {
-            let res = ''
-            if (subscription.playing) res += `Now Playing: **${subscription.playing.title} [${subscription.playing.duration}]**\n\n`
-            res += queue
-            return msg.channel.send(res)
+        if (subscription.isDestroyed()) {
+            filler = 'Next Up'
         } else {
-            return msg.channel.send("The queue is empty!")
+            filler = 'Now Playing'
+        }
+
+
+        if (subscription.queue.length || subscription.isDestroyed()) {
+            let res = ''
+
+            if (subscription.playing) res += `${filler}: **${subscription.playing.title} [${subscription.playing.duration}]**\n\n`
+            
+            if (subscription.queue.length) {
+                res += 'Queue: \n'
+                let c = 1
+                for (const track of subscription.queue) {
+                    res += `\`${c}) ${track.title} [${track.duration}]\`\n`
+                    c++
+                }
+            }
+            
+            return msg.reply(res)
+        } else {
+            return msg.reply('The queue is empty!')
         }
     }
 };

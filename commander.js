@@ -1,5 +1,5 @@
-// This is the command handler, CODENAME: Commander v1.1.0
-// Last Update: added music subscription collection
+// This is the command handler, CODENAME: Commander v1.1.2
+// Last Update: added client subscription collection
 const Discord = require('discord.js');
 const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
@@ -91,7 +91,7 @@ module.exports = (client) => {
             if (usages.has(command.name)) {
                 let expire = usages.get(command.name) + cooldown
                 if (now < expire) {
-                    let wait = failEmbed(client, `Please wait \`${((expire - now) / 1000).toFixed()}\` seconds before using that command again!`, msg.author)
+                    let wait = failEmbed(`Please wait \`${((expire - now) / 1000).toFixed()}\` seconds before using that command again!`, msg.author)
                     return msg.reply({embeds: [wait]});
                 }
             }

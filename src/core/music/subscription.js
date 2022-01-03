@@ -5,67 +5,122 @@ class VoiceSubscription {
 		this.client = client;
 		this.voice = voiceConnection;
 		this.channel = channel;
+		this.guild = channel.guild;
 		this.player = DiscordVoice.createAudioPlayer();
-		this.queueLocked = false;
 		this.queue = [];
 
+		// Configure voice connection
 		this.voice.on('stateChange', async (_, newState) => {
 			if (newState.status == DiscordVoice.VoiceConnectionStatus.Disconnected) {
+				console.log('MUSIC >> Connection Disconnected')
 				if (newState.reason == DiscordVoice.VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
 					console.log('MUSIC >> Connection Disconnected (Code 4014)')
-					try {
-						await DiscordVoice.entersState(this.voice, DiscordVoice.VoiceConnectionStatus.Connecting, 5000);
-						console.log('MUSIC >> Connection Ready')
-					} catch {
-						this.voice.destroy();
-					}
+					await this.ready(5000);
 				} else if (this.voice.rejoinAttempts < 5) {
-					await wait((this.voice.rejoinAttempts + 1) * 5_000);
+					this.voice.rejoinAttempts + 1
 					this.voice.rejoin();
 				} else {
 					this.voice.destroy();
 				}
 			} else if (newState.status == DiscordVoice.VoiceConnectionStatus.Destroyed) {
-				console.log('MUSIC >> Connection Destroyed')
-				this.clear();
-				this.client.subscriptions.delete(this.channel.guildId);
+				console.log('MUSIC >> Connection Destroyed\n')
 			} else if (!this.readyLock && (newState.status == DiscordVoice.VoiceConnectionStatus.Connecting || newState.status == DiscordVoice.VoiceConnectionStatus.Signalling)) {
 				console.log('MUSIC >> Connection Connecting / Signalling')
-				this.readyLock = true;
-				try {
-					await DiscordVoice.entersState(this.voice, DiscordVoice.VoiceConnectionStatus.Ready, 20_000);
-					console.log('MUSIC >> Connection Ready')
-				} catch {
-					if (this.voice.state.status !== DiscordVoice.VoiceConnectionStatus.Destroyed) this.voice.destroy();
-				} finally {
-					this.readyLock = false;
-				}
+				await this.ready(20000)
 			}
 		});
 
 		// Configure audio player
 		this.player.on('stateChange', (oldState, newState) => {
 			if (newState.status == DiscordVoice.AudioPlayerStatus.Idle && oldState.status !== DiscordVoice.AudioPlayerStatus.Idle) {
+				console.log('MUSIC >> Player Finished')
+
 				this.playing = null;
 				oldState.resource.metadata.onFinish();
-				this.refresh();
+
+				if (this.queue.length == 0) {
+					this.voice.destroy();
+				} else {
+					this.refresh();
+				}
 			} else if (newState.status == DiscordVoice.AudioPlayerStatus.Playing) {
-				// If the Playing state has been entered, then a new track has started playback.
+				console.log('MUSIC >> Player Playing')
+				console.log(this.playing)
+				
 				newState.resource.metadata.onStart();
 			}
 		});
 
-		voiceConnection.subscribe(this.player);
+		this.voice.subscribe(this.player);
+	}
+
+	async ready(timeout) {
+		if (!this.readyLock) {
+			this.readyLock = true;
+			try {
+				await DiscordVoice.entersState(this.voice, DiscordVoice.VoiceConnectionStatus.Ready, timeout);
+				console.log('MUSIC >> Connection Ready')
+			} catch(err) {
+				if (this.voice.state.status !== DiscordVoice.VoiceConnectionStatus.Destroyed) this.voice.destroy();
+			} finally {
+				this.readyLock = false;
+			}
+		}
+	}
+
+	destruct() {
+		this.voice.destroy();
+        this.client.subscriptions.delete(this.guild.id);
+		return console.log('MUSIC >> Subscription Destroyed\n')
+	}
+
+	async refresh() {
+		if (this.queueLocked || this.player.state.status !== DiscordVoice.AudioPlayerStatus.Idle) return;
+
+		this.queueLocked = true;
+
+		const track = this.queue.shift();
+
+		try {
+			const resource = await track.createResource();
+			this.player.play(resource);
+			return this.playing = track;
+		} catch (err) {
+			console.log('MUSIC >> ERROR PLAYING TRACK');
+			console.log(err)
+			return this.refresh();
+		} finally {
+			this.queueLocked = false;
+		}
+	}
+
+	merge(sub) {
+		if (sub.isDestroyed()) {
+			this.queue.push(sub.playing);
+			this.queue = this.queue.concat(sub.queue);
+			this.refresh();
+			return console.log('MUSIC >> Subsciptions Merged')
+		}
+	}
+
+	isReady() {
+		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Ready);
+	}
+
+	isDestroyed() {
+		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Destroyed);
+	}
+
+	isPaused() {
+		return (this.player.state.status == DiscordVoice.AudioPlayerStatus.Paused);
 	}
 
 	pause() {
-		this.player.pause();
-		return this.paused = true;
+		return this.player.pause();
 	}
 
 	unpause() {
-		this.player.unpause();
-		return this.paused = false
+		return this.player.unpause();
 	}
 
 	add(track) {
@@ -76,41 +131,6 @@ class VoiceSubscription {
 	clear() {
 		this.queue = [];
 		return this.player.stop(true);
-	}
-
-	async refresh() {
-		if (this.queueLocked || this.player.state.status !== DiscordVoice.AudioPlayerStatus.Idle || this.queue.length == 0) {
-			return;
-		}
-
-		this.queueLocked = true;
-
-		const track = this.queue.shift();
-
-		try {
-			const resource = await track.createResource();
-			this.player.play(resource);
-			this.queueLocked = false;
-			return this.playing = track;
-		} catch (err) {
-			console.log("MUSIC >> ERROR PLAYING TRACK");
-			console.log(err)
-			this.queueLocked = false;
-			return this.refresh();
-		}
-	}
-
-	queueString() {
-		if (this.queue.length) {
-			let res = ''
-			let c = 1
-            res += 'Queue: \n'
-            for (const track of this.queue) {
-                res += `${c}) ${track.title} [${track.duration}]\n`
-                c++
-            }
-			return res
-		}
 	}
 }
 
