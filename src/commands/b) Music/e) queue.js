@@ -7,7 +7,7 @@ module.exports = {
         let subscription = client.subscriptions.get(msg.guildId)
         let filler = ''
 
-        if (!subscription) return msg.reply('There is no queue!')
+        if (!subscription) return msg.reply('The queue is empty!')
 
         if (subscription.isVoiceDestroyed()) {
             filler = 'Next Up'
@@ -15,8 +15,7 @@ module.exports = {
             filler = 'Now Playing'
         }
 
-
-        if (subscription.queue.length || subscription.isVoiceDestroyed()) {
+        if (subscription.queue.length || subscription.playing) {
             let res = ''
 
             if (subscription.playing) res += `${filler}: **${subscription.playing.title} [${subscription.playing.duration}]**\n\n`

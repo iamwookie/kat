@@ -18,10 +18,11 @@ module.exports = {
             if (subscription) {
                 if (subscription.isVoiceDestroyed()) {
                     msg.reply('Resuming the queue!')
-                    return createNewSub(subscription);
+                    VoiceSubscription.create(client, channel, subscription);
+                    return
                 }
 
-                if (subscription.isReady() && subscription.channel !== msg.member.voice.channel) {
+                if (subscription.isVoiceReady() && subscription.channel !== msg.member.voice.channel) {
                     if (subscription.channel.members.size > 1) {
                         return msg.reply('I\'m busy with others!')
                     } else {
@@ -38,7 +39,7 @@ module.exports = {
         }
 
         if (!subscription || subscription.isVoiceDestroyed()) {
-            subscription = createNewSub(subscription);
+            subscription = await VoiceSubscription.create(client, channel, subscription);
         } else {
             await subscription.ready(20000)
         }
@@ -63,25 +64,6 @@ module.exports = {
 		} catch (err) {
 			console.error(err);
 			return reply.edit('Failed to play track, please try again later!');
-		}
-
-        function createNewSub(cached) {
-            sub = new VoiceSubscription(
-                client,
-                DiscordVoice.joinVoiceChannel({
-                    channelId: channel.id,
-                    guildId: channel.guild.id,
-                    adapterCreator: channel.guild.voiceAdapterCreator,
-                }),
-                channel
-            );
-
-            if (cached) sub.merge(cached)
-
-            sub.voice.on('error', console.error);
-            client.subscriptions.set(msg.guildId, sub);
-            
-            return sub;
         }
     }
 };
