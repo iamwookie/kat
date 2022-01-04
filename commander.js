@@ -1,5 +1,5 @@
-// This is the command handler, CODENAME: Commander v1.1.2
-// Last Update: added client subscription collection
+// This is the command handler, CODENAME: Commander v1.1.3
+// Last Update: added user restrictions to commands
 const Discord = require('discord.js');
 const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
@@ -72,7 +72,7 @@ module.exports = (client) => {
     
         const command = client.commands.get(commandText) || client.commands.get(client.aliases.get(commandText));
 
-        if (!command || command.disabled) return;
+        if (!command || command.disabled || (command.users && !command.users.includes(id))) return;
 
         if (command.guildOnly && msg.channel.type == 'DM') {
             let notGuild = failEmbed(client, 'This command can not be used in DMs!', msg.author);
