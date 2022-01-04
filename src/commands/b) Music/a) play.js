@@ -16,7 +16,7 @@ module.exports = {
 
         if (!args) {
             if (subscription) {
-                if (subscription.isDestroyed()) {
+                if (subscription.isVoiceDestroyed()) {
                     msg.reply('Resuming the queue!')
                     return createNewSub(subscription);
                 }
@@ -27,7 +27,7 @@ module.exports = {
                     } else {
                        return this.reconnect(channel)
                     }
-                } else if (subscription.isPaused()) {
+                } else if (subscription.isPlayerPaused()) {
                     return subscription.unpause()
                 } else {
                     return msg.reply('Already playing!')
@@ -37,7 +37,7 @@ module.exports = {
             }
         }
 
-        if (!subscription || subscription.isDestroyed()) {
+        if (!subscription || subscription.isVoiceDestroyed()) {
             subscription = createNewSub(subscription);
         } else {
             await subscription.ready(20000)

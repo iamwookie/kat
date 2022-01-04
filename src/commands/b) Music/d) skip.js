@@ -6,7 +6,7 @@ module.exports = {
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId)
 
-        if (!subscription || subscription.isPaused()) return msg.reply('I\'m not playing anything!')
+        if (!subscription || subscription.isPlayerPaused()) return msg.reply('I\'m not playing anything!')
 
         if (subscription.queue.length == 0) return msg.reply('Nothing to skip to! This is the last song!.')
 

@@ -69,7 +69,7 @@ class VoiceSubscription {
 	}
 
 	destruct() {
-		this.voice.destroy();
+		if (!this.isVoiceDestroyed()) this.voice.destroy();
         this.client.subscriptions.delete(this.guild.id);
 		return console.log('MUSIC >> Subscription Destroyed\n')
 	}
@@ -95,7 +95,7 @@ class VoiceSubscription {
 	}
 
 	merge(sub) {
-		if (sub.isDestroyed()) {
+		if (sub.isVoiceDestroyed()) {
 			this.queue.push(sub.playing);
 			this.queue = this.queue.concat(sub.queue);
 			this.refresh();
@@ -103,15 +103,15 @@ class VoiceSubscription {
 		}
 	}
 
-	isReady() {
+	isVoiceReady() {
 		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Ready);
 	}
 
-	isDestroyed() {
+	isVoiceDestroyed() {
 		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Destroyed);
 	}
 
-	isPaused() {
+	isPlayerPaused() {
 		return (this.player.state.status == DiscordVoice.AudioPlayerStatus.Paused);
 	}
 

@@ -9,14 +9,14 @@ module.exports = {
 
         if (!subscription) return msg.reply('There is no queue!')
 
-        if (subscription.isDestroyed()) {
+        if (subscription.isVoiceDestroyed()) {
             filler = 'Next Up'
         } else {
             filler = 'Now Playing'
         }
 
 
-        if (subscription.queue.length || subscription.isDestroyed()) {
+        if (subscription.queue.length || subscription.isVoiceDestroyed()) {
             let res = ''
 
             if (subscription.playing) res += `${filler}: **${subscription.playing.title} [${subscription.playing.duration}]**\n\n`
