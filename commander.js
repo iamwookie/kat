@@ -1,5 +1,5 @@
-// This is the command handler, CODENAME: Commander v1.1.3
-// Last Update: added user restrictions to commands
+// This is the command handler, CODENAME: Commander v1.1.4
+// Last Update: Added warning for unknown command groups.
 const Discord = require('discord.js');
 const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
@@ -28,17 +28,24 @@ module.exports = (client) => {
     
     groups.forEach((g) => {
         if(client.groups.has(g)) return;
+
         client.groups.set(g, new Discord.Collection())
     })
 
     for (const folder of commandFolders) {
         const commandFiles = fs.readdirSync(`${cPath}/${folder}`).filter(file => file.endsWith('.js'));
+
         for (const file of commandFiles) {
             const command = require(`${cPath}/${folder}/${file}`);
+
             client.commands.set(command.name, command);
+
             if (client.groups.has(command.group)) {
                 client.groups.get(command.group).set(command.name, command)
+            } else {
+                console.warn(`Commander (WARNING) >> Command Group Does Not Exist: ${command.group} (${command.name})`)
             }
+
             if (command.aliases) {
                 command.aliases.forEach((alias) => client.aliases.set(alias, command.name))
             }
@@ -47,12 +54,15 @@ module.exports = (client) => {
 
     for (const folder of moduleFolders) {
         const moduleFiles = fs.readdirSync(`${mPath}/${folder}`).filter(file => file.endsWith('.js'));
+
         for (const file of moduleFiles) {
             const module = require(`${mPath}/${folder}/${file}`);
+
             client.modules.set(module.name, module);
+
             try {
                 module.run(client)
-                console.log(">>> Loaded Module: " + module.name)
+                console.log("Commander >> Loaded Module: " + module.name)
             } catch(error) {
                 handleError(error);
             }
