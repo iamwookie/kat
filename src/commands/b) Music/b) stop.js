@@ -11,7 +11,7 @@ module.exports = {
         }
 
         try {
-			subscription.destruct();
+			subscription.destroy();
             return msg.reply('Stopped playing! Cya!');
 		} catch (err) {
 			return console.error(err);

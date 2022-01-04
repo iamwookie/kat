@@ -68,7 +68,7 @@ class VoiceSubscription {
 		}
 	}
 
-	destruct() {
+	destroy() {
 		if (!this.isVoiceDestroyed()) this.voice.destroy();
         this.client.subscriptions.delete(this.guild.id);
 		return console.log('MUSIC >> Subscription Destroyed\n')
@@ -103,18 +103,6 @@ class VoiceSubscription {
 		}
 	}
 
-	isVoiceReady() {
-		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Ready);
-	}
-
-	isVoiceDestroyed() {
-		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Destroyed);
-	}
-
-	isPlayerPaused() {
-		return (this.player.state.status == DiscordVoice.AudioPlayerStatus.Paused);
-	}
-
 	pause() {
 		return this.player.pause();
 	}
@@ -131,6 +119,18 @@ class VoiceSubscription {
 	clear() {
 		this.queue = [];
 		return this.player.stop(true);
+	}
+
+	isVoiceReady() {
+		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Ready);
+	}
+
+	isVoiceDestroyed() {
+		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Destroyed);
+	}
+
+	isPlayerPaused() {
+		return (this.player.state.status == DiscordVoice.AudioPlayerStatus.Paused);
 	}
 }
 
