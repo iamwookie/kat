@@ -15,10 +15,11 @@ module.exports = {
         let channel = msg.member.voice.channel;
         if (!channel) return msg.reply('You are not in a voice channel!');
 
+        if (subscription && subscription.isVoiceDestroyed()) msg.reply('Resuming the queue!')
+
         if (!args) {
             if (subscription) {
                 if (subscription.isVoiceDestroyed()) {
-                    msg.reply('Resuming the queue!')
                     VoiceSubscription.create(client, channel, subscription);
                     return
                 }
@@ -57,7 +58,7 @@ module.exports = {
                 }
             )
 			
-            console.log('MUSIC >> Playing / Added Track:')
+            console.log('MUSIC >> Added Track:')
             console.log(track);
 
 			subscription.add(track);
