@@ -8,6 +8,7 @@ module.exports = {
     description: 'Play a track or add it to the queue.',
     group: 'Music',
     cooldown: 5,
+    guildOnly: true,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId);
         

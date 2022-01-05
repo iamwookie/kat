@@ -12,9 +12,9 @@ const usageCount = io.counter({
 // Simple command for PP size, this is hidden just a fun command, IGNORE THIS initially.
 module.exports = {
     name: 'pp',
-    hidden: true,
     description: 'How big is it?',
     group: 'Misc',
+    guildOnly: true,
     async run(client, msg, args) {
         // usageCount.inc();
         // ------------

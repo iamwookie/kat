@@ -2,6 +2,7 @@ module.exports = {
     name: 'stop',
     description: 'Clear the queue and leave.',
     group: 'Music',
+    guildOnly: true,
     cooldown: 5,
     async run(client, msg) {
         let subscription = client.subscriptions.get(msg.guildId)
