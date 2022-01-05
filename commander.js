@@ -1,5 +1,5 @@
-// This is the command handler, CODENAME: Commander v1.1.4
-// Last Update: Added warning for unknown command groups.
+// This is the command handler, CODENAME: Commander v1.1.5
+// Last Update: Added support for multi guilds.
 const Discord = require('discord.js');
 const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
@@ -11,11 +11,11 @@ const groups = [
 ]
 
 module.exports = (client) => {
-    const prefix = client.commandPrefix
-    const cPath = path.join(__dirname, 'src', 'commands')
-    const mPath = path.join(__dirname, "src", 'modules')
+    const prefix = client.prefix;
+    const cPath = path.join(__dirname, 'src', 'commands');
+    const mPath = path.join(__dirname, "src", 'modules');
     const commandFolders = fs.readdirSync(cPath);
-    const moduleFolders = fs.readdirSync(mPath)
+    const moduleFolders = fs.readdirSync(mPath);
     
     client.commands = new Discord.Collection();
     client.aliases = new Discord.Collection();
@@ -74,15 +74,13 @@ module.exports = (client) => {
     client.on('messageCreate', async msg => {
         if (!msg.content.startsWith(prefix) || msg.author.bot) return;
 
-        const id = msg.author.id
         const content = msg.content.slice(prefix.length).trim().split(/ +/);
         const commandText = content.shift().toLowerCase();
         const args = content.join(' ')
         const now = Date.now();
     
         const command = client.commands.get(commandText) || client.commands.get(client.aliases.get(commandText));
-
-        if (!command || command.disabled || (command.users && !command.users.includes(id))) return;
+        if (!command || command.disabled || (command.users && !command.users.includes(msg.author.id))) return;
 
         if (command.guildOnly && msg.channel.type == 'DM') {
             let notGuild = failEmbed(client, 'This command can not be used in DMs!', msg.author);
@@ -91,13 +89,12 @@ module.exports = (client) => {
 
         if (command.cooldown) {
             let cooldown = command.cooldown * 1000;
+            if (!client.cooldowns.has(msg.guildId)) client.cooldowns.set(msg.guildId, new Discord.Collection());
 
-            if (!client.cooldowns.has(id)) {
-                client.cooldowns.set(id, new Discord.Collection());
-            }
-
-            let usages = client.cooldowns.get(id)
-
+            let cooldowns = client.cooldowns.get(msg.guildId);
+            if (!cooldowns.has(msg.author.id)) cooldowns.set(msg.author.id, new Discord.Collection());
+            
+            let usages = cooldowns.get(msg.author.id);
             if (usages.has(command.name)) {
                 let expire = usages.get(command.name) + cooldown
                 if (now < expire) {
@@ -107,6 +104,7 @@ module.exports = (client) => {
             }
 
             usages.set(command.name, now)
+
             setTimeout(() => usages.delete(command.name), cooldown);
         }
 
