@@ -5,7 +5,6 @@ module.exports = {
     cooldown: 5,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId)
-
         if (!subscription) {
             return msg.reply('I\'m not playing anything!')
         }

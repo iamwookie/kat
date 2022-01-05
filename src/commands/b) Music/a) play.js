@@ -10,9 +10,9 @@ module.exports = {
     cooldown: 5,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId);
+        
         let channel = msg.member.voice.channel;
-
-        if (!msg.member.voice.channel) return msg.reply('You are not in a voice channel!');
+        if (!channel) return msg.reply('You are not in a voice channel!');
 
         if (!args) {
             if (subscription) {

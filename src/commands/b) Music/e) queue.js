@@ -5,8 +5,8 @@ module.exports = {
     cooldown: 5,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId)
-        let filler = ''
 
+        let filler = ''
         if (!subscription) return msg.reply('The queue is empty!')
 
         if (subscription.isVoiceDestroyed()) {

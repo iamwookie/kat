@@ -15,6 +15,7 @@ module.exports = {
             let reply = '';
             group.forEach(async x => {
                 if (x.hidden || x.disabled) return;
+                
                 if (x.aliases) {
                     // If command has aliases, it builds reply like this for every command that has alias.
                     var aliasmsg = "";
