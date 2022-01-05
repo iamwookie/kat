@@ -30,7 +30,7 @@ const client = new Client({
         ]
     }
 });
-client.commandPrefix = bot.prefix,
+client.prefix = bot.prefix,
 client.owner = '244662779745665026'
 
 console.log('>>> Loading...\n');
