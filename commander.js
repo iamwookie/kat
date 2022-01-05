@@ -1,5 +1,5 @@
-// This is the command handler, CODENAME: Commander v1.1.5
-// Last Update: Added support for multi guilds.
+// This is the command handler, CODENAME: Commander v1.1.6
+// Last Update: Fixed reply error for DM only commands
 const Discord = require('discord.js');
 const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
@@ -83,7 +83,7 @@ module.exports = (client) => {
         if (!command || command.disabled || (command.users && !command.users.includes(msg.author.id))) return;
 
         if (command.guildOnly && msg.channel.type == 'DM') {
-            let notGuild = failEmbed(client, 'This command can not be used in DMs!', msg.author);
+            let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
             return msg.reply({embeds: [notGuild]});
         }
 
