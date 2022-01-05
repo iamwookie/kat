@@ -15,17 +15,17 @@ module.exports = {
             let reply = '';
             group.forEach(async x => {
                 if (x.hidden || x.disabled) return;
-                
+
                 if (x.aliases) {
                     // If command has aliases, it builds reply like this for every command that has alias.
                     var aliasmsg = "";
                     x.aliases.forEach(alias => {
-                        aliasmsg += `, ${client.commandPrefix}${alias}`
+                        aliasmsg += `, ${client.prefix}${alias}`
                     })
-                    reply += `\`\`${client.commandPrefix}${x.name}${aliasmsg}${x.format ? ` ${x.format}` : ''}\`\` → ${x.description}\n`
+                    reply += `\`\`${client.prefix}${x.name}${aliasmsg}${x.format ? ` ${x.format}` : ''}\`\` → ${x.description}\n`
                 } else {
                     // // If command has no aliases, it builds reply like this for every command that has no aliases.
-                    reply += `\`\`${client.commandPrefix}${x.name}${x.format ? ` ${x.format}` : ''}\`\` → ${x.description}\n`
+                    reply += `\`\`${client.prefix}${x.name}${x.format ? ` ${x.format}` : ''}\`\` → ${x.description}\n`
                 }
             })
             replyEmbed.addField(key + ' Commands', reply)
