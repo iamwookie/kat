@@ -46,7 +46,6 @@ class VoiceSubscription {
 				}
 			} else if (newState.status == DiscordVoice.AudioPlayerStatus.Playing && oldState.status !== DiscordVoice.AudioPlayerStatus.AutoPaused) {
 				console.log(this.playing)
-				
 				newState.resource.metadata.onStart();
 			}
 		});
@@ -73,7 +72,8 @@ class VoiceSubscription {
 		});
 
 		client.subscriptions.set(channel.guild.id, sub);
-		
+
+		console.log('\nMUSIC >> Created A New Subscription: ' + channel.guild.id)
 		return sub;
 	}
 
