@@ -116,7 +116,7 @@ module.exports = (client) => {
     });
 }
 
-async function handleError(err, msg, args = null) {
+function handleError(err, msg, args = null) {
     let dev = 'Wookie#2907'
     let time = Date.now()
     let errorObject = {
