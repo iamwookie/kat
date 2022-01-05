@@ -69,7 +69,7 @@ module.exports = (client) => {
         }
     }
 
-    console.log('\n>>> Commander Initialized');
+    console.log('>>> Commander Initialized');
 
     client.on('messageCreate', async msg => {
         if (!msg.content.startsWith(prefix) || msg.author.bot) return;
