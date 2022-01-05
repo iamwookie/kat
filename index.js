@@ -39,7 +39,7 @@ client.on('ready', async () => {
     // ------------------------------------
     loadCommander(client);
     // ------------------------------------
-    console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id})`);
+    console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`);
     console.log(`>>> App Loaded In: ${(Date.now() - startTime)}ms\n`);
 });
 
