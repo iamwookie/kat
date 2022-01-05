@@ -120,6 +120,7 @@ class VoiceSubscription {
 		} catch (err) {
 			console.log('MUSIC >> ERROR PLAYING TRACK');
 			console.log(err)
+			track.onError(err);
 			return this.refresh();
 		} finally {
 			this.queueLocked = false;
