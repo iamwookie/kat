@@ -1,3 +1,5 @@
+const { MusicEmbed } = require('@utils/embeds');
+
 module.exports = {
     name: 'pause',
     description: 'Pause the track.',
@@ -7,12 +9,16 @@ module.exports = {
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId)
         if (!subscription) {
-            return msg.reply('I\'m not playing anything!')
+            let embed = new MusicEmbed(client, msg).setTitle('I\'m not playing anything!');
+            return msg.reply({ embeds: [embed] });
         }
 
         try {
+            let track = subscription.playing;
             subscription.pause()
-            return msg.reply('Paused the audio.')
+
+            let embed = new MusicEmbed(client, msg, 'paused', track);
+            return msg.reply({ embeds: [embed] });
         } catch(err) {
             return console.error(err)
         }

@@ -1,7 +1,7 @@
-const DiscordVoice = require('@discordjs/voice');
 const VoiceSubscription = require('@music/subscription');
 const Track = require('@music/track');
 const play = require('play-dl');
+const { MusicEmbed } = require('@utils/embeds');
 
 module.exports = {
     name: 'play',
@@ -13,59 +13,68 @@ module.exports = {
         let subscription = client.subscriptions.get(msg.guildId);
         
         let channel = msg.member.voice.channel;
-        if (!channel) return msg.reply('You are not in a voice channel!');
+        if (!channel) {
+            let embed = new MusicEmbed(client, msg).setTitle('You are not in a channel!');
+            return msg.reply({ embeds: [embed] });
+        } 
 
-        if (subscription && subscription.isVoiceDestroyed()) msg.reply('Resuming the queue!')
+        if (subscription && subscription.isPlayerPaused()) {
+            let track = subscription.playing;
 
-        if (!args) {
-            if (subscription) {
-                if (subscription.isVoiceDestroyed()) {
-                    VoiceSubscription.create(client, channel, subscription);
-                    return
-                }
+            let embed = new MusicEmbed(client, msg, 'unpaused', track);
+            msg.reply({ embeds: [embed] });
 
-                if (subscription.isVoiceReady() && subscription.channel !== msg.member.voice.channel) {
-                    if (subscription.channel.members.size > 1) {
-                        return msg.reply('I\'m busy with others!')
-                    } else {
-                       return this.reconnect(channel)
-                    }
-                } else if (subscription.isPlayerPaused()) {
-                    return subscription.unpause()
-                } else {
-                    return msg.reply('Already playing!')
-                }
-            } else {
-                return msg.reply('What should I play?')
-            }
+            subscription.unpause();
+
+            if(!args) return;
         }
 
-        if (!subscription || subscription.isVoiceDestroyed()) {
-            subscription = await VoiceSubscription.create(client, channel, subscription);
+        if (!args) {
+            let embed = new MusicEmbed(client, msg).setTitle('What should I play?');
+            return msg.reply({ embeds: [embed] });
+        }
+
+        if (!subscription) {
+            subscription = await VoiceSubscription.create(client, channel);
         } else {
             await subscription.ready(20000)
         }
 
         try {
-            const reply = await msg.reply('Searching...')
+            let embed = new MusicEmbed(client, msg, 'searching');
+            const reply = await msg.reply({ embeds: [embed] });
             const search = await play.search(args, { limit : 1 });
-            const vid = search[0]
+            const vid = search[0];
+
+            if (!vid) {
+                let notFound = new MusicEmbed(client, msg).setTitle('Couldn\'t find your search result. Try again!');
+                return reply.edit({ embeds: [notFound] });
+            }
 
 			const track = new Track(
                 vid,
+                msg.author,
                 function onStart() {
-                    msg.channel.send(`Now Playing: **${this.title} [${this.duration}]**`)
+                    let embed = new MusicEmbed(client, msg, 'playing', this);
+                    msg.channel.send({ embeds: [embed] });
                 }
             )
 			
-            console.log('MUSIC >> Added Track:')
-            console.log(track);
+            console.log('MUSIC >> Added Track:');
+            console.log({
+                Title: track.title,
+                Duration: track.duration,
+                URL: track.url
+            });
 
 			subscription.add(track);
-			return reply.edit(`Enqueued: **${track.title} [${track.duration}]**`);
+            embed = new MusicEmbed(client, msg, 'enqueued', track);
+			return reply.edit({ embeds: [embed] });
 		} catch (err) {
+            console.log('MUSIC (COMMAND) >> PLAY ERROR')
 			console.error(err);
-			return reply.edit('Failed to play track, please try again later!');
+            let embed = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
+            return msg.reply({ embeds: [embed] });
         }
     }
 };

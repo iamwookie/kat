@@ -2,13 +2,16 @@ const DiscordVoice = require('@discordjs/voice');
 const play = require('play-dl');
 
 class Track {
-    constructor(video, onStart, onFinish, onError) {
-        this.url = video.url
-        this.title = video.title
-        this.duration = video.durationRaw
-        this.onStart = onStart ? onStart : () => {} 
-        this.onFinish = onFinish ? onFinish : () => {}
-        this.onError = onError ? onError : () => {}
+    constructor(video, author, onStart, onFinish, onError) {
+        this.video = video;
+        this.title = video.title;
+        this.url = video.url;
+        this.duration = video.durationRaw;
+        this.durationRaw = video.durationInSec;
+        this.author = author;
+        this.onStart = onStart ? onStart : () => {};
+        this.onFinish = onFinish ? onFinish : () => {};
+        this.onError = onError ? onError : () => {};
     }
 
     async createResource() {

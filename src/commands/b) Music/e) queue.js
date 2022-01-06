@@ -1,3 +1,6 @@
+const progressbar = require('string-progressbar');
+const { MusicEmbed } = require('@utils/embeds');
+
 module.exports = {
     name: 'queue',
     description: 'View the queue.',
@@ -6,33 +9,36 @@ module.exports = {
     cooldown: 5,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId)
+        let empty = new MusicEmbed(client, msg).setTitle('The queue is empty!');
 
-        let filler = ''
-        if (!subscription) return msg.reply('The queue is empty!')
-
-        if (subscription.isVoiceDestroyed()) {
-            filler = 'Next Up'
-        } else {
-            filler = 'Now Playing'
+        if (!subscription) {
+            return msg.reply({ embeds: [empty] });
         }
 
         if (subscription.queue.length || subscription.playing) {
             let res = ''
 
-            if (subscription.playing) res += `${filler}: **${subscription.playing.title} [${subscription.playing.duration}]**\n\n`
+            if (subscription.playing) {
+                let track = subscription.playing
+                let playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000)
+                res += `Now Playing: **${track.title} [${track.duration}]**\n`
+                res += `${progressbar.splitBar(track.durationRaw, playbackDuration, 30)[0]}\n\n`
+            }
             
             if (subscription.queue.length) {
-                res += 'Queue: \n'
                 let c = 1
                 for (const track of subscription.queue) {
-                    res += `\`${c}) ${track.title} [${track.duration}]\`\n`
+                    res += `**${c})** \`${track.title} [${track.duration}]\`\n`
                     c++
                 }
             }
+
+            let embed = new MusicEmbed(client, msg, 'queue')
+            embed.setDescription(res)
             
-            return msg.reply(res)
+            return msg.reply({ embeds: [embed] })
         } else {
-            return msg.reply('The queue is empty!')
+            return msg.reply({ embeds: [empty] });
         }
     }
 };

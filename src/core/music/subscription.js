@@ -23,7 +23,8 @@ class VoiceSubscription {
 					this.voice.destroy();
 				}
 			} else if (newState.status == DiscordVoice.VoiceConnectionStatus.Destroyed) {
-				console.log('MUSIC >> (VOICE) Connection Destroyed\n')
+				console.log('MUSIC >> (VOICE) Connection Destroyed\n');
+				this.destroy();
 			} else if (!this.readyLock && (newState.status == DiscordVoice.VoiceConnectionStatus.Connecting || newState.status == DiscordVoice.VoiceConnectionStatus.Signalling)) {
 				console.log('MUSIC >> (VOICE) Connection Connecting / Signalling')
 				await this.ready(20000)
@@ -45,7 +46,11 @@ class VoiceSubscription {
 					this.refresh();
 				}
 			} else if (newState.status == DiscordVoice.AudioPlayerStatus.Playing && oldState.status !== DiscordVoice.AudioPlayerStatus.AutoPaused) {
-				console.log(this.playing)
+				console.log({
+					Title: this.playing.title,
+					Duration: this.playing.duration,
+					URL: this.playing.url
+				});
 				newState.resource.metadata.onStart();
 			}
 		});
@@ -54,6 +59,8 @@ class VoiceSubscription {
 	}
 
 	static async create(client, channel, cached) {
+		console.log('\nMUSIC >> Created A New Subscription: ' + channel.guild.id)
+
 		let sub = new VoiceSubscription(
 			client,
 			DiscordVoice.joinVoiceChannel({
@@ -64,7 +71,7 @@ class VoiceSubscription {
 			channel
 		);
 
-		if (cached && (cached.playing || cached.queue.length)) sub.merge(cached)
+		// if (cached && (cached.playing || cached.queue.length)) sub.merge(cached)
 
 		sub.voice.on('error', (err) => {
 			console.log('MUSIC (VOICE) >> VOICE ERROR')
@@ -73,7 +80,6 @@ class VoiceSubscription {
 
 		client.subscriptions.set(channel.guild.id, sub);
 
-		console.log('\nMUSIC >> Created A New Subscription: ' + channel.guild.id)
 		return sub;
 	}
 
@@ -97,14 +103,14 @@ class VoiceSubscription {
 		return console.log('MUSIC >> Subscription Destroyed\n')
 	}
 
-	async merge(sub) {
+	/*async merge(sub) {
 		if (sub.isVoiceDestroyed()) {
 			this.queue.push(sub.playing);
 			this.queue = this.queue.concat(sub.queue);
 			await this.refresh();
 			return console.log('MUSIC >> Subsciptions Merged')
 		}
-	}
+	}*/
 
 	async refresh() {
 		if (this.queueLocked || this.player.state.status !== DiscordVoice.AudioPlayerStatus.Idle) return;
@@ -118,7 +124,7 @@ class VoiceSubscription {
 			this.player.play(resource);
 			return this.playing = track;
 		} catch (err) {
-			console.log('MUSIC >> ERROR PLAYING TRACK');
+			console.log('MUSIC (ERROR) >> ERROR PLAYING TRACK');
 			console.log(err)
 			track.onError(err);
 			return this.refresh();
