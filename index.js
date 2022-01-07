@@ -1,9 +1,9 @@
 require('dotenv').config()
 require('module-alias/register');
 // ------------------------------------
-const loadCommander = require('./commander');
-// ------------------------------------
 const { Client, Intents } = require('discord.js');
+// ------------------------------------
+const Commander = require('./commander');
 const { bot } = require('./config.json');
 const startTime = Date.now();
 // ------------------------------------
@@ -37,10 +37,14 @@ console.log('>>> Loading...\n');
 
 client.on('ready', async () => {
     // ------------------------------------
-    loadCommander(client);
+    Commander.initialize(client);
     // ------------------------------------
     console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`);
     console.log(`>>> App Loaded In: ${(Date.now() - startTime)}ms\n`);
 });
+
+client.on('error', (err) => {
+    Commander.handleError(client, err);
+})
 
 client.login(process.env.BOT_TOKEN);
