@@ -5,12 +5,14 @@ const { MusicEmbed } = require('@utils/embeds');
 
 module.exports = {
     name: 'play',
-    description: 'Play a track or add it to the queue.',
+    description: 'Search for a track and play it or add it to the queue.',
+    format: '<search> / [prefix]play[aliases] spotify <url>',
     group: 'Music',
     guildOnly: true,
     cooldown: 5,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId);
+        let argsArray = args.split(' ');
         
         let channel = msg.member.voice.channel;
         if (!channel) {
@@ -41,14 +43,37 @@ module.exports = {
         }
 
         try {
-            let embed = new MusicEmbed(client, msg, 'searching');
-            const reply = await msg.reply({ embeds: [embed] });
-            const search = await play.search(args, { limit : 1 });
-            const vid = search[0];
+            if (argsArray[0].toLowerCase() == 'spotify') {
+                let embed = new MusicEmbed(client, msg, 'searching-spotify');
+                reply = await msg.reply({ embeds: [embed] });
+                try {
+                    if (play.is_expired()) await play.refreshToken();
+                    let search = await play.spotify(argsArray[1]);
+                    query = search.name + ' - ' + search.artists[0].name;
+                } catch(err) {
+                    console.log('MUSIC (COMMAND) >> PLAY SPOTIFY SEARCH ERROR');
+                    console.log(err);
+                    console.log('<------------------------------------------->')
+
+                    let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid Spotify URL!');
+                    reply.edit({ embeds: [notFound] });
+                    return subscription.destroy();
+                }
+            } else {
+                let embed = new MusicEmbed(client, msg, 'searching');
+                reply = await msg.reply({ embeds: [embed] });
+                query = args;
+            }
+
+            let search = await play.search(query, { limit : 1, source: { youtube: 'video' } });
+            vid = search[0];
+
+            console.log(vid)
 
             if (!vid) {
                 let notFound = new MusicEmbed(client, msg).setTitle('Couldn\'t find your search result. Try again!');
-                return reply.edit({ embeds: [notFound] });
+                reply.edit({ embeds: [notFound] });
+                return subscription.destroy();
             }
 
 			const track = new Track(
@@ -73,6 +98,8 @@ module.exports = {
 		} catch (err) {
             console.log('MUSIC (COMMAND) >> PLAY ERROR')
 			console.error(err);
+            console.log('<------------------------------------------->')
+            
             let embed = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
             return msg.reply({ embeds: [embed] });
         }

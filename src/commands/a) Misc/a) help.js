@@ -22,10 +22,10 @@ module.exports = {
                     x.aliases.forEach(alias => {
                         aliasmsg += `, ${client.prefix}${alias}`
                     })
-                    reply += `\`\`${client.prefix}${x.name}${aliasmsg}${x.format ? ` ${x.format}` : ''}\`\` → ${x.description}\n`
+                    reply += `\`\`${client.prefix}${x.name}${aliasmsg}${x.format ? ` ${x.format.replace('[prefix]', client.prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${x.description}\n`
                 } else {
                     // // If command has no aliases, it builds reply like this for every command that has no aliases.
-                    reply += `\`\`${client.prefix}${x.name}${x.format ? ` ${x.format}` : ''}\`\` → ${x.description}\n`
+                    reply += `\`\`${client.prefix}${x.name}${x.format ? ` ${x.format.replace('[prefix]', client.prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${x.description}\n`
                 }
             })
             replyEmbed.addField(key + ' Commands', reply)

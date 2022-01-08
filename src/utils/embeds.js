@@ -16,11 +16,17 @@ class MusicEmbed extends Discord.MessageEmbed {
     }
 
     setType(type) {
+        // EMOJIS
+        let loading = '<a:loading:928668691997012028>'
+        
         switch(type) {
             case 'searching':
-                let loading = '<a:loading:928668691997012028>'
                 this.setAuthor(`${this.author.tag}`, this.author.avatarURL({ dynamic: true }));
                 this.setTitle(`${loading} \u200b Searching...`);
+                break;
+            case 'searching-spotify':
+                this.setAuthor(`${this.author.tag}`, this.author.avatarURL({ dynamic: true }));
+                this.setTitle(`${loading} \u200b Searching Spotify...`);
                 break;
             case 'enqueued':
                 this.setAuthor(`Requested By: ${this.track.author.tag}`, this.track.author.avatarURL({ dynamic: true }));

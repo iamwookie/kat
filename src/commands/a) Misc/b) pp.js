@@ -13,6 +13,7 @@ const usageCount = io.counter({
 module.exports = {
     name: 'pp',
     description: 'How big is it?',
+    format: '/ [prefix]pp[aliases] <@mention>',
     group: 'Misc',
     guildOnly: true,
     async run(client, msg, args) {

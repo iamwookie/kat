@@ -9,7 +9,7 @@ module.exports = {
     cooldown: 5,
     async run(client, msg) {
         let subscription = client.subscriptions.get(msg.guildId)
-        if (!subscription) {
+        if (!subscription || !subscription.isPlayerPlaying()) {
             let embed = new MusicEmbed(client, msg).setTitle('I\'m not playing anything!');
             return msg.reply({ embeds: [embed] });
         }
