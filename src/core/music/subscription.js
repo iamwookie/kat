@@ -159,6 +159,10 @@ class VoiceSubscription {
 		return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Destroyed);
 	}
 
+	isPlayerPlaying() {
+		return (this.player.state.status == DiscordVoice.AudioPlayerStatus.Playing);
+	}
+
 	isPlayerPaused() {
 		return (this.player.state.status == DiscordVoice.AudioPlayerStatus.Paused);
 	}
