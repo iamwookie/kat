@@ -68,8 +68,6 @@ module.exports = {
             let search = await play.search(query, { limit : 1, source: { youtube: 'video' } });
             vid = search[0];
 
-            console.log(vid)
-
             if (!vid) {
                 let notFound = new MusicEmbed(client, msg).setTitle('Couldn\'t find your search result. Try again!');
                 reply.edit({ embeds: [notFound] });
