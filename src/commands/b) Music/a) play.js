@@ -6,7 +6,7 @@ const { MusicEmbed } = require('@utils/embeds');
 module.exports = {
     name: 'play',
     description: 'Search for a track and play it or add it to the queue.',
-    format: '<search> / [prefix]play[aliases] spotify <url>',
+    format: '<search> / [prefix]play spotify <url>',
     group: 'Music',
     guildOnly: true,
     cooldown: 5,
