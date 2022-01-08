@@ -6,8 +6,8 @@ class Track {
         this.video = video;
         this.title = video.title;
         this.url = video.url;
-        this.duration = video.durationRaw;
         this.durationRaw = video.durationInSec;
+        this.duration = video.durationRaw;
         this.author = author;
         this.onStart = onStart ? onStart : () => {};
         this.onFinish = onFinish ? onFinish : () => {};
