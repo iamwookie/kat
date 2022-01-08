@@ -23,7 +23,7 @@ class VoiceSubscription {
 					this.voice.destroy();
 				}
 			} else if (newState.status == DiscordVoice.VoiceConnectionStatus.Destroyed) {
-				console.log('MUSIC >> (VOICE) Connection Destroyed\n');
+				console.log('MUSIC >> (VOICE) Connection Destroyed');
 				this.destroy();
 			} else if (!this.readyLock && (newState.status == DiscordVoice.VoiceConnectionStatus.Connecting || newState.status == DiscordVoice.VoiceConnectionStatus.Signalling)) {
 				console.log('MUSIC >> (VOICE) Connection Connecting / Signalling')
