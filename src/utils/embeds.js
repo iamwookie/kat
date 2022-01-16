@@ -21,49 +21,49 @@ class MusicEmbed extends Discord.MessageEmbed {
         
         switch(type) {
             case 'searching':
-                this.setAuthor(`${this.author.tag}`, this.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`${loading} \u200b Searching...`);
                 break;
             case 'searching-spotify':
-                this.setAuthor(`${this.author.tag}`, this.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`${loading} \u200b Searching Spotify...`);
                 break;
             case 'enqueued':
-                this.setAuthor(`Requested By: ${this.track.author.tag}`, this.track.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: `Requested By: ${this.track.author.tag}`, iconURL: this.track.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`Queue Updated`);
                 this.setDescription(`Added: [${this.track.title} [${this.track.duration}]](${this.track.url})`);
                 break;
             case 'playing':
-                this.setAuthor(`Requested By: ${this.track.author.tag}`, this.track.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: `Requested By: ${this.track.author.tag}`, iconURL: this.track.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`Now Playing`);
                 this.setDescription(`[${this.track.title} [${this.track.duration}]](${this.track.url})`);
                 break;
             case 'paused':
-                this.setAuthor(`${this.author.tag}`, this.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`Now Paused`);
                 this.setDescription(`[${this.track.title} [${this.track.duration}]](${this.track.url})`);
                 break;
             case 'queue':
-                this.setAuthor(`${this.author.tag}`, this.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`Server Queue`);
                 break;
             case 'skipped':
-                this.setAuthor(`Requested By: ${this.track.author.tag}`, this.track.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: `Requested By: ${this.track.author.tag}`, iconURL: this.track.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`Track Skipped`);
                 this.setDescription(`[${this.track.title} [${this.track.duration}]](${this.track.url})`);
                 break;
             case 'unpaused':
-                this.setAuthor(`Requested By: ${this.track.author.tag}`, this.track.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: `Requested By: ${this.track.author.tag}`, iconURL: this.track.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`Track Unpaused`);
                 this.setDescription(`[${this.track.title} [${this.track.duration}]](${this.track.url})`);
                 break;
             case 'paused':
-                this.setAuthor(`Requested By: ${this.track.author.tag}`, this.track.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: `Requested By: ${this.track.author.tag}`, iconURL: this.track.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`Track Paused`);
                 this.setDescription(`[${this.track.title} [${this.track.duration}]](${this.track.url})`);
                 break;
             default:
-                this.setAuthor(`${this.author.tag}`, this.author.avatarURL({ dynamic: true }));
+                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
         }
     }
 
@@ -75,7 +75,7 @@ class MusicEmbed extends Discord.MessageEmbed {
 module.exports = {
     successEmbed(reply, author) {
         let embed = new Discord.MessageEmbed()
-        if (author) embed.setAuthor(author.tag, author.avatarURL({ dynamic: true }));
+        if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
         embed.setColor('GREEN')
         embed.setDescription(`✅ \u200b ${reply}`);
         return embed;
@@ -83,7 +83,7 @@ module.exports = {
 
     failEmbed(reply, author) {
         let embed = new Discord.MessageEmbed()
-        if (author) embed.setAuthor(author.tag, author.avatarURL({ dynamic: true }));
+        if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
         embed.setColor('RED')
         embed.setDescription(`🚫 \u200b ${reply}`);
         return embed;

@@ -8,7 +8,7 @@ module.exports = {
         let replyEmbed = new Discord.MessageEmbed()
         .setColor('RANDOM')
         .setTitle('**Help Menu**')
-        .setAuthor(msg.author.tag, msg.author.avatarURL({dynamic: true}));
+        .setAuthor({ name: msg.author.tag, iconURL: msg.author.avatarURL({dynamic: true}) });
 
         // We build the reply here.
         client.groups.forEach((group, key) => {

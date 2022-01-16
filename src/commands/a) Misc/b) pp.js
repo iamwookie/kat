@@ -26,7 +26,7 @@ module.exports = {
         .setTitle(`${msg.author.username}\'s PP Size`)
         .setDescription(`8${body.repeat(Math.floor(Math.random() * (size - 1)))}D`)
         .setColor('RANDOM')
-        .setAuthor(msg.author.tag, msg.author.avatarURL({dynamic: true}));
+        .setAuthor({ name: msg.author.tag, iconURL: msg.author.avatarURL({dynamic: true}) });
 
         if (args) {
             let mention = msg.mentions.members.first()
