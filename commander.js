@@ -5,22 +5,54 @@ const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
 const path = require('path');
 // -----------------------------------
+const perms = [
+    // GENERAL
+    Discord.Permissions.FLAGS.VIEW_CHANNEL,
+    // TEXT
+    Discord.Permissions.FLAGS.SEND_MESSAGES,
+    Discord.Permissions.FLAGS.EMBED_LINKS,
+    Discord.Permissions.FLAGS.READ_MESSAGE_HISTORY,
+    Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
+    Discord.Permissions.FLAGS.ADD_REACTIONS,
+    // VOICE
+    Discord.Permissions.FLAGS.CONNECT,
+    Discord.Permissions.FLAGS.SPEAK,
+    Discord.Permissions.FLAGS.USE_VAD
+];
+const groups = [
+    'Misc',
+    'Music'
+];
 
 class Commander {
     constructor(client) {
         this.client = client;
         this.prefix = client.prefix;
-        this.groupsArray = [
-            'Misc',
-            'Music'
-        ]
         
         // Music
         this.client.subscriptions = new Discord.Collection();
     
         this.client.on('messageCreate', async msg => {
             if (!msg.content.startsWith(this.prefix) || msg.author.bot) return;
+
+            if (msg.guild) {
+                if (!msg.guild.me.permissions.has(perms)) {
+                    let noPerms = failEmbed('I don\'t have enough permissions in this server. Try contacting an admin!')
+                    return msg.author.send({ embeds: [noPerms] }).catch(err => {
+                        console.log('Commander (ERROR) >> Could Not Send Permission Warning To User');
+                        console.log('REASON: ' + err.message);
+                    });
+                }
     
+                if (!msg.channel.permissionsFor(this.client.user).has(perms)) {
+                    let noPerms = failEmbed('I don\'t have enough permissions to type in that channel!');
+                    return msg.author.send({ embeds: [noPerms] }).catch(err => {
+                        console.log('Commander (ERROR) >> Could Not Send Permission Warning To User');
+                        console.log('REASON: ' + err.message);
+                    });
+                };
+            }
+            
             const content = msg.content.slice(this.prefix.length).trim().split(/ +/);
             const commandText = content.shift().toLowerCase();
             const args = content.join(' ')
@@ -97,7 +129,7 @@ class Commander {
         this.cooldowns = new Discord.Collection();
         this.groups = new Discord.Collection();
 
-        this.groupsArray.forEach((g) => {
+        groups.forEach((g) => {
             if(this.groups.has(g)) return;
     
             this.groups.set(g, new Discord.Collection())
