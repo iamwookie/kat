@@ -18,7 +18,7 @@ module.exports = {
         if (!channel) {
             let embed = new MusicEmbed(client, msg).setTitle('You are not in a channel!');
             return msg.reply({ embeds: [embed] });
-        } 
+        }
 
         if (subscription && subscription.isPlayerPaused()) {
             let track = subscription.playing;
@@ -33,6 +33,11 @@ module.exports = {
 
         if (!args) {
             let embed = new MusicEmbed(client, msg).setTitle('What should I play?');
+            return msg.reply({ embeds: [embed] });
+        }
+
+        if (!channel.joinable || !channel.speakable) {
+            let embed = new MusicEmbed(client, msg).setTitle('I can\'t play in that voice channel!');
             return msg.reply({ embeds: [embed] });
         }
 
@@ -80,6 +85,11 @@ module.exports = {
                 function onStart() {
                     let embed = new MusicEmbed(client, msg, 'playing', this);
                     msg.channel.send({ embeds: [embed] });
+                },
+                function onFinish() {},
+                function onError() {
+                    let embed = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
+                    msg.reply({ embeds: [embed] });
                 }
             )
 			
