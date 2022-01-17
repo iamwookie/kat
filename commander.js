@@ -5,7 +5,7 @@ const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
 const path = require('path');
 // -----------------------------------
-const perms = [
+const perms = [ // 37047360
     // GENERAL
     Discord.Permissions.FLAGS.VIEW_CHANNEL,
     // TEXT
