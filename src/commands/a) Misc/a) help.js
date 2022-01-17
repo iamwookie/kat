@@ -12,6 +12,8 @@ module.exports = {
 
         // We build the reply here.
         client.groups.forEach((group, key) => {
+            if (key == 'CLI') return;
+
             let reply = '';
             group.forEach(async x => {
                 if (x.hidden || x.disabled) return;

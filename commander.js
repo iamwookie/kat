@@ -4,6 +4,7 @@ const Discord = require('discord.js');
 const { failEmbed } = require('@utils/embeds');
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
 // -----------------------------------
 const perms = [ // 37047360
     // GENERAL
@@ -20,6 +21,7 @@ const perms = [ // 37047360
     Discord.Permissions.FLAGS.USE_VAD
 ];
 const groups = [
+    'CLI',
     'Misc',
     'Music'
 ];
@@ -32,7 +34,28 @@ class Commander {
 
         // Music
         this.client.subscriptions = new Discord.Collection();
-    
+
+        // CLI Commands
+        let rl = readline.createInterface(process.stdin);
+
+        rl.on('line', line => {
+            if (!line.startsWith('>')) return;
+            
+            const content = line.slice(1).trim().split(/ +/);
+            const commandText = content.shift().toLowerCase();
+            const args = content.join(' ');
+
+            const command = client.groups.get('CLI').get(commandText);
+            if (!command) return;
+
+            try {
+                command.run(this.client, args);
+            } catch (err) {
+                this.constructor.handleError(this.client, err, args);
+            }
+        })
+
+        // Discord Commands
         this.client.on('messageCreate', async msg => {
             if (!msg.content.startsWith(this.prefix) || msg.author.bot) return;
 
@@ -89,9 +112,9 @@ class Commander {
             }
     
             try {
-                return command.run(this.client, msg, args);
-            } catch (error) {
-                return this.constructor.handleError(this.client, error, msg, args);
+                command.run(this.client, msg, args);
+            } catch (err) {
+                this.constructor.handleError(this.client, err, msg, args);
             }
         });
     }
@@ -104,7 +127,7 @@ class Commander {
             console.log('>>> Commander Initialized');
     
             return client.commander;
-        } catch(err) {
+        } catch (err) {
             return Commander.handleError(client, err)
         }
     }
@@ -116,7 +139,7 @@ class Commander {
             console.log('>>> Commander Reloaded');
 
             return this;
-        } catch(err) {
+        } catch (err) {
             return this.constructor.handleError(this.client, err, msg);
         }
     }
@@ -198,16 +221,16 @@ class Commander {
                         guild.modules = guild.modules || new Discord.Collection();
                         guild.modules.set(module.name, module);
 
-                        this.guilds.set(guildId, guild)
+                        this.guilds.set(guildId, guild);
                     }
                 }
 
                 this.modules.set(module.name, module);
 
                 try {
-                    module.run(this.client)
-                    console.log("Commander >> Loaded Module: " + module.name)
-                } catch(err) {
+                    module.run(this.client);
+                    console.log("Commander >> Loaded Module: " + module.name);
+                } catch (err) {
                     this.constructor.handleError(this.client, err);
                 }
             }
