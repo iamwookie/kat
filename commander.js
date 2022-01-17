@@ -28,7 +28,8 @@ class Commander {
     constructor(client) {
         this.client = client;
         this.prefix = client.prefix;
-        
+        this.guilds = new Discord.Collection();
+
         // Music
         this.client.subscriptions = new Discord.Collection();
     
@@ -142,6 +143,18 @@ class Commander {
                 delete require.cache[require.resolve(`${cPath}/${folder}/${file}`)]
 
                 const command = require(`${cPath}/${folder}/${file}`);
+
+                if (command.guilds) {
+                    for (const guildId of command.guilds) {
+                        if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${command.name}`);
+
+                        let guild = this.guilds.get(guildId) || {};
+                        guild.commands = guild.commands || new Discord.Collection();
+                        guild.commands.set(command.name, command);
+
+                        this.guilds.set(guildId, guild)
+                    }
+                }
     
                 this.commands.set(command.name, command);
     
@@ -177,8 +190,20 @@ class Commander {
 
                 const module = require(`${mPath}/${folder}/${file}`);
     
+                if (module.guilds) {
+                    for (const guildId of module.guilds) {
+                        if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${module.name}`);
+
+                        let guild = this.guilds.get(guildId) || {};
+                        guild.modules = guild.modules || new Discord.Collection();
+                        guild.modules.set(module.name, module);
+
+                        this.guilds.set(guildId, guild)
+                    }
+                }
+
                 this.modules.set(module.name, module);
-    
+
                 try {
                     module.run(this.client)
                     console.log("Commander >> Loaded Module: " + module.name)
