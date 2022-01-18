@@ -83,8 +83,8 @@ class Commander {
             const now = Date.now();
         
             const command = this.client.commands.get(commandText) || this.client.commands.get(this.client.aliases.get(commandText));
-            if (!command || command.disabled || (command.users && !command.users.includes(msg.author.id))) return;
-    
+            if (!command || command.disabled || (command.users && !command.users.includes(msg.author.id)) || (command.guilds && !command.guilds.includes(msg.guild.id))) return;
+            
             if (command.guildOnly && msg.channel.type == 'DM') {
                 let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
                 return msg.reply({embeds: [notGuild]});
