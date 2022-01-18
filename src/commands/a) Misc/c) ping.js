@@ -3,13 +3,11 @@ const Discord = require('discord.js');
 // Simple ping command, only for devs.
 module.exports = {
     name: 'ping',
-    hidden: true,
-    description: 'Check ping statistics.',
     group: 'Misc',
+    description: 'Check ping statistics.',
+    hidden: true,
     cooldown: 5,
-    users: [
-        '244662779745665026'
-    ],
+    users: ['244662779745665026'],
     run(client, msg) {
         if (msg.author.id == "130065975956471808" || msg.author.id == "244662779745665026") {
             let embed = new Discord.MessageEmbed()

@@ -3,10 +3,10 @@ const { MusicEmbed } = require('@utils/embeds');
 
 module.exports = {
     name: 'queue',
-    description: 'View the queue.',
     group: 'Music',
-    guildOnly: true,
+    description: 'View the queue.',
     cooldown: 5,
+    guildOnly: true,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId)
         let empty = new MusicEmbed(client, msg).setTitle('The queue is empty!');

@@ -2,8 +2,8 @@ const Discord = require('discord.js');
 
 module.exports = {
     name: 'help',
-    description: 'Stop it. Get some help.',
     group: 'Misc',
+    description: 'Stop it. Get some help.',
     run(client, msg) {
         let replyEmbed = new Discord.MessageEmbed()
         .setColor('RANDOM')
@@ -16,7 +16,7 @@ module.exports = {
 
             let reply = '';
             group.forEach(async x => {
-                if (x.hidden || x.disabled) return;
+                if (x.hidden || x.disabled || (x.guilds && !x.guilds.includes(msg.guild.id))) return;
 
                 if (x.aliases) {
                     // If command has aliases, it builds reply like this for every command that has alias.

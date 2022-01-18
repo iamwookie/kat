@@ -2,10 +2,10 @@ const { MusicEmbed } = require('@utils/embeds');
 
 module.exports = {
     name: 'skip',
-    description: 'Skip the track.',
     group: 'Music',
-    guildOnly: true,
+    description: 'Skip the track.',
     cooldown: 5,
+    guildOnly: true,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId);
         if (!subscription || !subscription.isPlayerPlaying()) {

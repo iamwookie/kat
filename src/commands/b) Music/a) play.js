@@ -5,11 +5,11 @@ const { MusicEmbed } = require('@utils/embeds');
 
 module.exports = {
     name: 'play',
+    group: 'Music',
     description: 'Search for a track and play it or add it to the queue.',
     format: '<search> / [prefix]play spotify <url>',
-    group: 'Music',
-    guildOnly: true,
     cooldown: 5,
+    guildOnly: true,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId);
         let argsArray = args.split(' ');

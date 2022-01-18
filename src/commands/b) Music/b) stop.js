@@ -3,10 +3,10 @@ const { MusicEmbed } = require('@utils/embeds');
 module.exports = {
     name: 'stop',
     aliases: ['dc'],
-    description: 'Clear the queue and leave.',
     group: 'Music',
-    guildOnly: true,
+    description: 'Clear the queue and leave.',
     cooldown: 5,
+    guildOnly: true,
     async run(client, msg) {
         let subscription = client.subscriptions.get(msg.guildId)
         if (!subscription || !subscription.isPlayerPlaying()) {
