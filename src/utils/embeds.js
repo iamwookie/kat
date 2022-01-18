@@ -11,7 +11,7 @@ class MusicEmbed extends Discord.MessageEmbed {
         this.track = track;
 
         this.setColor('#C167ED');
-        this.setFooter(`${this.guild.name} | 🎵 CAT Music System`, this.guild.iconURL({ dynamic: true }));
+        this.setFooter({ text: `${this.guild.name} | 🎵 CAT Music System`, iconURL: this.guild.iconURL({ dynamic: true }) });
         this.setType(this.type);
     }
 

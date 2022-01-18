@@ -264,7 +264,7 @@ class Commander {
                     { name: 'Error Code', value: `\`${code}\`` }
                 )
                 .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg')
-                .setFooter('NOTE: The bot will now shutdown until restarted by a developer! Thanks for your help!')
+                .setFooter({ text:'NOTE: The bot will now shutdown until restarted by a developer! Thanks for your help!' })
         
                 if (dev) await dev.send({embeds: [embed]});
                 if (msg) await msg.channel.send({embeds: [embed]});
