@@ -11,9 +11,7 @@ module.exports = {
         let subscription = client.subscriptions.get(msg.guildId)
         let empty = new MusicEmbed(client, msg).setTitle('The queue is empty!');
 
-        if (!subscription) {
-            return msg.reply({ embeds: [empty] });
-        }
+        if (!subscription) return msg.reply({ embeds: [empty] }).catch(() => msg.channel.send({ embeds: [empty] }));
 
         if (subscription.queue.length || subscription.playing) {
             let res = ''
@@ -36,9 +34,9 @@ module.exports = {
             let embed = new MusicEmbed(client, msg, 'queue')
             embed.setDescription(res)
             
-            return msg.reply({ embeds: [embed] })
+            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
         } else {
-            return msg.reply({ embeds: [empty] });
+            return msg.reply({ embeds: [empty] }).catch(() => msg.channel.send({ embeds: [empty] }));
         }
     }
 };

@@ -33,6 +33,6 @@ module.exports = {
             replyEmbed.addField(key + ' Commands', reply)
         });
         
-        msg.reply({embeds: [replyEmbed]});
+        msg.reply({ embeds: [replyEmbed] }).catch(() => msg.channel.send({ embeds: [replyEmbed] }));
     }
 };

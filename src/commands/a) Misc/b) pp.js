@@ -28,31 +28,34 @@ module.exports = {
         .setColor('RANDOM')
         .setAuthor({ name: msg.author.tag, iconURL: msg.author.avatarURL({dynamic: true}) });
 
+        let gif = 'https://tenor.com/view/the-biggest-one-cillian-murphy-bustle-huge-massive-gif-21987675'
+
         if (args) {
             let mention = msg.mentions.members.first()
             if(mention) {
                 reply.setTitle(`${mention.user.username}\'s PP Size`);
                 if (mention.user.id == client.user.id) {
-                    return msg.reply(':no_entry: ERROR: The measurement values are too large to send.');
+                    let res = ':no_entry: ERROR: The measurement values are too large to send.'
+                    return msg.reply(res).catch(() => msg.channel.send(res));
                 }
                 if (mention.user.id == '130065975956471808') {
-                    return msg.reply('https://tenor.com/view/the-biggest-one-cillian-murphy-bustle-huge-massive-gif-21987675');
+                    return msg.reply(gif).catch(() => msg.channel.send(gif));
                 }
                 if (mention.user.id == '438438026566172682') {
                     reply.setDescription(`8${body.repeat(Math.floor(Math.random() * 5))}D`);
                 }
             } else {
-                return msg.reply({embeds: [noMention]});
+                return msg.reply({ embeds: [noMention] }).catch(() => msg.channel.send({ embeds: [noMention] }));
             }
         } else {
             if (msg.author.id == '130065975956471808') {
-                return msg.reply('https://tenor.com/view/the-biggest-one-cillian-murphy-bustle-huge-massive-gif-21987675');
+                return msg.reply(gif).catch(() => msg.channel.send(gif));
             }
             if (msg.author.id == '438438026566172682') {
                 reply.setDescription(`8${body.repeat(Math.floor(Math.random() * 5))}D`);
             }
         }
 
-        msg.reply({embeds: [reply]})
+        msg.reply({ embeds: [reply] }).catch(() => msg.channel.send({ embeds: [reply] }))
     }
 };

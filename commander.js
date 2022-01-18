@@ -87,7 +87,7 @@ class Commander {
             
             if (command.guildOnly && msg.channel.type == 'DM') {
                 let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
-                return msg.reply({embeds: [notGuild]});
+                return msg.reply({ embeds: [notGuild] }).catch(() => msg.channel.send({ embeds: [notGuild] }));
             }
     
             if (command.cooldown) {
@@ -102,7 +102,7 @@ class Commander {
                     let expire = usages.get(command.name) + cooldown
                     if (now < expire) {
                         let wait = failEmbed(`Please wait \`${((expire - now) / 1000).toFixed()}\` seconds before using that command again!`, msg.author)
-                        return msg.reply({embeds: [wait]});
+                        return msg.reply({ embeds: [wait] }).catch(() => msg.channel.send({ embeds: [wait] }));
                     }
                 }
     
@@ -129,18 +129,6 @@ class Commander {
             return client.commander;
         } catch (err) {
             return Commander.handleError(client, err)
-        }
-    }
-
-    reload(msg) {
-        try {
-            this.registerCommands();
-            this.registerModules();
-            console.log('>>> Commander Reloaded');
-
-            return this;
-        } catch (err) {
-            return this.constructor.handleError(this.client, err, msg);
         }
     }
 
@@ -238,6 +226,20 @@ class Commander {
 
         this.client.modules = this.modules;
     }
+
+    reload(msg) {
+        try {
+            this.registerCommands();
+            this.registerModules();
+            console.log('>>> Commander Reloaded');
+
+            return this;
+        } catch (err) {
+            return this.constructor.handleError(this.client, err, msg);
+        }
+    }
+
+    // Error Handling
     
     static async handleError(client, err, msg, args = null) {
         let dev = await client.users.fetch(client.owner);

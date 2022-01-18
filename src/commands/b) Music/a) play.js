@@ -17,14 +17,14 @@ module.exports = {
         let channel = msg.member.voice.channel;
         if (!channel) {
             let embed = new MusicEmbed(client, msg).setTitle('You are not in a channel!');
-            return msg.reply({ embeds: [embed] });
+            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
         }
 
         if (subscription && subscription.isPlayerPaused()) {
             let track = subscription.playing;
 
             let embed = new MusicEmbed(client, msg, 'unpaused', track);
-            msg.reply({ embeds: [embed] });
+            msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
 
             subscription.unpause();
 
@@ -33,12 +33,12 @@ module.exports = {
 
         if (!args) {
             let embed = new MusicEmbed(client, msg).setTitle('What should I play?');
-            return msg.reply({ embeds: [embed] });
+            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
         }
 
         if (!channel.joinable || !channel.speakable) {
             let embed = new MusicEmbed(client, msg).setTitle('I can\'t play in that voice channel!');
-            return msg.reply({ embeds: [embed] });
+            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
         }
 
         if (!subscription) {
@@ -50,7 +50,7 @@ module.exports = {
         try {
             if (argsArray[0].toLowerCase() == 'spotify') {
                 let embed = new MusicEmbed(client, msg, 'searching-spotify');
-                reply = await msg.reply({ embeds: [embed] });
+                reply = await msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
                 try {
                     if (play.is_expired()) await play.refreshToken();
                     let search = await play.spotify(argsArray[1]);
@@ -66,7 +66,7 @@ module.exports = {
                 }
             } else {
                 let embed = new MusicEmbed(client, msg, 'searching');
-                reply = await msg.reply({ embeds: [embed] });
+                reply = await msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
                 query = args;
             }
 
@@ -89,7 +89,7 @@ module.exports = {
                 function onFinish() {},
                 function onError() {
                     let embed = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
-                    msg.reply({ embeds: [embed] });
+                    msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
                 }
             )
 			
@@ -109,7 +109,7 @@ module.exports = {
             console.log('<------------------------------------------->')
             
             let embed = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
-            return msg.reply({ embeds: [embed] });
+            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
         }
     }
 };

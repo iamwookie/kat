@@ -19,7 +19,7 @@ module.exports = {
             )
             .setAuthor({ name: msg.author.tag, iconURL: msg.author.avatarURL({dynamic: true}) });
         
-            msg.reply({embeds: [embed]});
+            msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
         } else {
             return;
         }
