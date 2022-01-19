@@ -272,7 +272,7 @@ class Commander {
                 let embed = new Discord.MessageEmbed()
                 .setColor('#F04947')
                 .setTitle('Uh Oh!')
-                .setDescription(`A critical error in the internal code has occured! Please DM the error code provided below to \`${dev ? dev.tag : 'the developer.'}\``)
+                .setDescription(`A critical error in the internal code has occured. The developer has already been notified. Please wait patiently until we fix the issue!`)
                 .addFields(
                     { name: 'Error Code', value: `\`${code}\`` }
                 )
