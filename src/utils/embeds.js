@@ -84,7 +84,7 @@ module.exports = {
     failEmbed(reply, author) {
         let embed = new Discord.MessageEmbed()
         if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
-        embed.setColor('BLUE')
+        embed.setColor('RED')
         embed.setDescription(`🚫 \u200b ${reply}`);
         return embed;
     },
