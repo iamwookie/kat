@@ -3,6 +3,7 @@ module.exports = {
     group: 'CLI',
     run(client) {
         console.log('----- APP STATS -----');
+        console.log('WS Ping: ' + client.ws.ping);
         console.log('Uptime: ' + formatTime(client.uptime));
         console.log('Total Guilds: ' + client.guilds.cache.size);
         console.log('Total Users: ' + client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0));
