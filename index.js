@@ -5,7 +5,7 @@ const { Client, Intents } = require('discord.js');
 // ------------------------------------
 const Commander = require('./commander');
 const { bot } = require('./config.json');
-const startTime = Date.now();
+const now = Date.now();
 // ------------------------------------
 const client = new Client({   
     intents: [
@@ -35,16 +35,18 @@ client.owner = '244662779745665026'
 
 console.log('>>> Loading...\n');
 
-client.on('ready', async () => {
+client.once('ready', async (client) => {
     // ------------------------------------
     Commander.initialize(client);
     // ------------------------------------
     console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`);
-    console.log(`>>> App Loaded In: ${(Date.now() - startTime)}ms\n`);
+    console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`);
 });
 
-client.on('error', (err) => {
+client.on('error', function TestError(err) {
     Commander.handleError(client, err);
 })
 
 client.login(process.env.BOT_TOKEN);
+
+module.exports = client;

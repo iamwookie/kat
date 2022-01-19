@@ -20,6 +20,7 @@
   },
   "_moduleAliases": {
     "@root": ".",
+    "@scripts": "scripts",
     "@src": "src",
     "@utils": "src/utils",
     "@music": "src/core/music"

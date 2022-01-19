@@ -30,15 +30,14 @@ class Commander {
     constructor(client) {
         this.client = client;
         this.prefix = client.prefix;
+        this.readline = readline.createInterface(process.stdin);
         this.guilds = new Discord.Collection();
 
         // Music
-        this.client.subscriptions = new Discord.Collection();
+        this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
 
         // CLI Commands
-        let rl = readline.createInterface(process.stdin);
-
-        rl.on('line', line => {
+        this.readline.on('line', line => {
             if (!line.startsWith('>')) return;
             
             const content = line.slice(1).trim().split(/ +/);
@@ -130,6 +129,36 @@ class Commander {
         } catch (err) {
             return Commander.handleError(client, err)
         }
+    }
+
+    static async reload(client) {
+        const corePath = path.join(__dirname, 'src', 'core');
+        const utilPath = path.join(__dirname, 'src', 'utils');
+        const coreFolders = await fs.promises.readdir(corePath);
+        const utilFiles = await fs.promises.readdir(utilPath);
+
+        for (const folder of coreFolders) {
+            const files = fs.readdirSync(`${corePath}/${folder}`);
+
+            for (const file of files) {
+                delete require.cache[require.resolve(`${corePath}/${folder}/${file}`)];
+            }
+        }
+
+        for (const file of utilFiles) {
+            delete require.cache[require.resolve(`${utilPath}/${file}`)];
+        }
+
+        for (const event in client._events) {
+            if (event == 'error') continue;
+            client.removeAllListeners(event);
+        }
+
+        client.commander.readline.removeAllListeners('line');   
+
+        const Commander = require('./commander');
+        
+        return Commander.initialize(client);
     }
 
     registerCommands() {
@@ -225,31 +254,6 @@ class Commander {
         }
 
         this.client.modules = this.modules;
-    }
-
-    async reload() {
-        const corePath = path.join(__dirname, 'src', 'core');
-        const utilPath = path.join(__dirname, 'src', 'utils');
-        const coreFolders = await fs.promises.readdir(corePath);
-        const utilFiles = await fs.promises.readdir(utilPath);
-
-        for (const folder of coreFolders) {
-            const files = fs.readdirSync(`${corePath}/${folder}`);
-
-            for (const file of files) {
-                delete require.cache[require.resolve(`${corePath}/${folder}/${file}`)];
-            }
-        }
-
-        for (const file of utilFiles) {
-            delete require.cache[require.resolve(`${utilPath}/${file}`)];
-        }
-
-        this.registerCommands();
-        this.registerModules();
-        console.log('>>> Commander Reloaded');
-
-        return this;
     }
 
     // Error Handling
