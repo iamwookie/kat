@@ -45,8 +45,8 @@ class Commander {
             const commandText = content.shift().toLowerCase();
             const args = content.join(' ');
 
-            const command = client.groups.get('CLI').get(commandText);
-            if (!command) return;
+            const command = client.groups.get('CLI').get(commandText) || client.groups.get('CLI').get(this.client.aliases.get(commandText));
+            if (!command || command.disabled) return;
 
             try {
                 command.run(this.client, args);
@@ -200,7 +200,7 @@ class Commander {
                 delete require.cache[require.resolve(`${mPath}/${folder}/${file}`)]
 
                 const module = require(`${mPath}/${folder}/${file}`);
-    
+
                 if (module.guilds) {
                     for (const guildId of module.guilds) {
                         if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${module.name}`);
@@ -227,16 +227,29 @@ class Commander {
         this.client.modules = this.modules;
     }
 
-    reload(msg) {
-        try {
-            this.registerCommands();
-            this.registerModules();
-            console.log('>>> Commander Reloaded');
+    async reload() {
+        const corePath = path.join(__dirname, 'src', 'core');
+        const utilPath = path.join(__dirname, 'src', 'utils');
+        const coreFolders = await fs.promises.readdir(corePath);
+        const utilFiles = await fs.promises.readdir(utilPath);
 
-            return this;
-        } catch (err) {
-            return this.constructor.handleError(this.client, err, msg);
+        for (const folder of coreFolders) {
+            const files = fs.readdirSync(`${corePath}/${folder}`);
+
+            for (const file of files) {
+                delete require.cache[require.resolve(`${corePath}/${folder}/${file}`)];
+            }
         }
+
+        for (const file of utilFiles) {
+            delete require.cache[require.resolve(`${utilPath}/${file}`)];
+        }
+
+        this.registerCommands();
+        this.registerModules();
+        console.log('>>> Commander Reloaded');
+
+        return this;
     }
 
     // Error Handling
