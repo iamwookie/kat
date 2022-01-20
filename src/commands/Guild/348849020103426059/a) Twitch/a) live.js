@@ -48,7 +48,7 @@ module.exports = {
                     let channel = await client.channels.fetch(channelid);
                     if (channel) channel.send({ content: "@everyone", embeds: [embed] });
                 } catch (err) {
-                    console.log(`Guild Commands (ERROR) (${this.guilds[0]}) >> live: Failed To Fetch Channel`); console.log(err);
+                    console.log(`Guild Commands (ERROR) (${this.guilds[0]}) >> live: Failed To Fetch Channel`.red); console.log(err);
                     let fail = failEmbed('Failed to send message(s)!');
                     return waitMessage.edit({ embeds: [fail] }).then((msg) => setTimeout(() => msg.delete(), 5000));
                 }

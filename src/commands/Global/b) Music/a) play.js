@@ -56,9 +56,9 @@ module.exports = {
                     let search = await play.spotify(argsArray[1]);
                     query = search.name + ' - ' + search.artists[0].name;
                 } catch(err) {
-                    console.log('MUSIC (COMMAND) >> PLAY SPOTIFY SEARCH ERROR');
+                    console.log('MUSIC (COMMAND) >> PLAY SPOTIFY SEARCH ERROR'.red);
                     console.log(err);
-                    console.log('<------------------------------------------->')
+                    console.log('<------------------------------------------->'.red);
 
                     let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid Spotify URL!');
                     reply.edit({ embeds: [notFound] });
@@ -93,7 +93,7 @@ module.exports = {
                 }
             )
 			
-            console.log('MUSIC >> Added Track:');
+            console.log('MUSIC >> Added Track:'.magenta);
             console.log({
                 Title: track.title,
                 Duration: track.duration,
@@ -104,9 +104,9 @@ module.exports = {
             embed = new MusicEmbed(client, msg, 'enqueued', track);
 			return reply.edit({ embeds: [embed] });
 		} catch (err) {
-            console.log('MUSIC (COMMAND) >> PLAY ERROR')
+            console.log('MUSIC (COMMAND) >> PLAY ERROR'.red);
 			console.error(err);
-            console.log('<------------------------------------------->')
+            console.log('<------------------------------------------->'.red);
             
             let embed = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
             return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));

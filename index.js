@@ -1,5 +1,6 @@
 require('dotenv').config()
 require('module-alias/register');
+require('colors');
 // ------------------------------------
 const { Client, Intents } = require('discord.js');
 // ------------------------------------
@@ -33,14 +34,14 @@ const client = new Client({
 client.prefix = bot.prefix,
 client.owner = '244662779745665026'
 
-console.log('>>> Loading...\n');
+console.log('>>> Loading...\n'.magenta.bold.underline);
 
 client.once('ready', async (client) => {
     // ------------------------------------
     Commander.initialize(client);
     // ------------------------------------
-    console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`);
-    console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`);
+    console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`.magenta.bold.underline);
+    console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);
 });
 
 client.on('error', function TestError(err) {

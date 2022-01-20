@@ -38,7 +38,7 @@ class Commander {
         this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
 
         // CLI Commands
-        this.readline.on('line', line => {
+        this.readline.on('line', async line => {
             if (!line.startsWith('>')) return;
             
             const content = line.slice(1).trim().split(/ +/);
@@ -49,7 +49,9 @@ class Commander {
             if (!command || command.disabled) return;
 
             try {
-                command.run(this.client, args);
+                await command.run(this.client, args);
+                // Breakline
+                console.log('');
             } catch (err) {
                 this.constructor.handleError(this.client, err, args);
             }
@@ -63,16 +65,16 @@ class Commander {
                 if (!msg.guild.me.permissions.has(perms)) {
                     let noPerms = failEmbed('I don\'t have enough permissions in this server. Try contacting an admin!')
                     return msg.author.send({ embeds: [noPerms] }).catch(err => {
-                        console.log('Commander (ERROR) >> Could Not Send Permission Warning To User');
-                        console.log('REASON: ' + err.message);
+                        console.log('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
+                        console.log(`REASON: ${err.meesage}`.red);
                     });
                 }
     
                 if (!msg.channel.permissionsFor(this.client.user).has(perms)) {
                     let noPerms = failEmbed('I don\'t have enough permissions to type in that channel!');
                     return msg.author.send({ embeds: [noPerms] }).catch(err => {
-                        console.log('Commander (ERROR) >> Could Not Send Permission Warning To User');
-                        console.log('REASON: ' + err.message);
+                        console.log('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
+                        console.log(`REASON: ${err.meesage}`.red);
                     });
                 };
             }
@@ -126,7 +128,7 @@ class Commander {
             client.commander = new Commander(client);
             client.commander.registerCommands();
             client.commander.registerModules();
-            console.log('>>> Commander Initialized');
+            console.log('>>> Commander Initialized'.brightGreen.bold.underline);
 
             return client.commander;
         } catch (err) {
@@ -160,7 +162,6 @@ class Commander {
         client.commander.readline.close();
 
         const Commander = require('./commander');
-        
         return Commander.initialize(client);
     }
 
@@ -204,7 +205,7 @@ class Commander {
     
                     const command = require(`${guildPath}/${folder}/${subFolder}/${file}`);
 
-                    if (!command.guilds || !command.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`);;
+                    if (!command.guilds || !command.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
     
                     this.setCommand(command);
                 }
@@ -220,7 +221,7 @@ class Commander {
     setCommand(command) {
         if (command.guilds) {
             for (const guildId of command.guilds) {
-                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${command.name}`);
+                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${command.name}`.yellow);
 
                 let guild = this.guilds.get(guildId) || {};
                 guild.commands = guild.commands || new Discord.Collection();
@@ -276,7 +277,7 @@ class Commander {
     
                     const module = require(`${guildPath}/${folder}/${subFolder}/${file}`);
 
-                    if (!module.guilds || !module.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Module: ${module.name}`);;
+                    if (!module.guilds || !module.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Module: ${module.name}`.yellow);
     
                     this.setModule(module);
                 }
@@ -287,9 +288,16 @@ class Commander {
     }
 
     setModule(module) {
+        if (module.events) {
+            for (const event in this.client._events) {
+                if (event == 'error' || event == 'shardDisconnect' || event == 'msgCreate') continue;
+                if (module.events.includes(event)) this.client.removeAllListeners(event);
+            }
+        }
+
         if (module.guilds) {
             for (const guildId of module.guilds) {
-                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${module.name}`);
+                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${module.name}`.yellow);
 
                 let guild = this.guilds.get(guildId) || {};
                 guild.modules = guild.modules || new Discord.Collection();
@@ -303,7 +311,7 @@ class Commander {
 
         try {
             module.run(this.client);
-            console.log(`Commander >> Loaded ${module.guilds ? 'Guild' : 'Global'} Module: ` + module.name);
+            console.log(`Commander >> Loaded ${module.guilds ? 'Guild' : 'Global'} Module: ${module.name}`.brightGreen);
         } catch (err) {
             this.constructor.handleError(this.client, err);
         }
@@ -340,7 +348,7 @@ class Commander {
                 if (msg) await msg.channel.send({embeds: [embed]});
             }
 
-            console.log('Commander (ERROR) >> Command Error! Logged to file!');
+            console.log('Commander (ERROR) >> Command Error! Logged to file!'.red);
             console.log(errorObject.errorStack);
             process.exit();
         })

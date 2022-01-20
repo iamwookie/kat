@@ -11,7 +11,7 @@ class TwitchManager {
     static initialize(client) {
         if (!client.twitch) {
             client.twitch = new TwitchManager(client);
-            console.log('>>> TwitchManager Created')
+            console.log('>>> TwitchManager Created'.brightGreen.bold.underline);
         }
 
         return client.twitch;

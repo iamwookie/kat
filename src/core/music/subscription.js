@@ -12,9 +12,9 @@ class VoiceSubscription {
 		// Configure voice connection
 		this.voice.on('stateChange', async (_, newState) => {
 			if (newState.status == DiscordVoice.VoiceConnectionStatus.Disconnected) {
-				console.log('MUSIC (VOICE) >> Connection Disconnected')
+				console.log('MUSIC (VOICE) >> Connection Disconnected'.yellow);
 				if (newState.reason == DiscordVoice.VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
-					console.log('MUSIC (VOICE) >> Connection Disconnected (Code 4014)')
+					console.log('MUSIC (VOICE) >> Connection Disconnected (Code 4014)'.yellow);
 					await this.ready(5000);
 				} else if (this.voice.rejoinAttempts < 5) {
 					this.voice.rejoinAttempts + 1
@@ -23,18 +23,18 @@ class VoiceSubscription {
 					this.voice.destroy();
 				}
 			} else if (newState.status == DiscordVoice.VoiceConnectionStatus.Destroyed) {
-				console.log('MUSIC >> (VOICE) Connection Destroyed');
+				console.log('MUSIC >> (VOICE) Connection Destroyed'.yellow);
 				this.destroy();
 			} else if (!this.readyLock && (newState.status == DiscordVoice.VoiceConnectionStatus.Connecting || newState.status == DiscordVoice.VoiceConnectionStatus.Signalling)) {
-				console.log('MUSIC >> (VOICE) Connection Connecting / Signalling')
-				await this.ready(20000)
+				console.log('MUSIC >> (VOICE) Connection Connecting / Signalling'.yellow);
+				await this.ready(20000);
 			}
 		});
 
 		// Configure audio player
 		this.player.on('stateChange', (oldState, newState) => {
-			console.log('MUSIC (PLAYER) >> Previous State: ' + oldState.status)
-			console.log('MUSIC (PLAYER) >> New State: ' + newState.status)
+			console.log(`MUSIC (PLAYER) >> Previous State: ${oldState.status}`.magenta);
+			console.log(`MUSIC (PLAYER) >> New State: ${newState.status}`.magenta);
 
 			if (newState.status == DiscordVoice.AudioPlayerStatus.Idle && oldState.status !== DiscordVoice.AudioPlayerStatus.Idle) {
 				this.playing = null;
@@ -59,7 +59,7 @@ class VoiceSubscription {
 	}
 
 	static async create(client, channel, cached) {
-		console.log('\nMUSIC >> Created A New Subscription: ' + channel.guild.id)
+		console.log(`\nMUSIC >> Created A New Subscription: ${channel.guild.id}`.magenta);
 
 		let sub = new VoiceSubscription(
 			client,
@@ -74,7 +74,7 @@ class VoiceSubscription {
 		// if (cached && (cached.playing || cached.queue.length)) sub.merge(cached)
 
 		sub.voice.on('error', (err) => {
-			console.log('MUSIC (VOICE) >> VOICE ERROR')
+			console.log('MUSIC (VOICE) >> VOICE ERROR'.red);
 			console.error(err);
 		});
 
@@ -88,7 +88,7 @@ class VoiceSubscription {
 			this.readyLock = true;
 			try {
 				await DiscordVoice.entersState(this.voice, DiscordVoice.VoiceConnectionStatus.Ready, timeout);
-				console.log('MUSIC (VOICE) >> Connection Ready')
+				console.log('MUSIC (VOICE) >> Connection Ready'.brightGreen);
 			} catch(err) {
 				if (this.voice.state.status !== DiscordVoice.VoiceConnectionStatus.Destroyed) this.voice.destroy();
 			} finally {
@@ -100,7 +100,7 @@ class VoiceSubscription {
 	destroy() {
 		if (!this.isVoiceDestroyed()) this.voice.destroy();
         this.client.subscriptions.delete(this.guild.id);
-		return console.log('MUSIC >> Subscription Destroyed\n')
+		return console.log('MUSIC >> Subscription Destroyed\n'.yellow);
 	}
 
 	/*async merge(sub) {
@@ -108,7 +108,7 @@ class VoiceSubscription {
 			this.queue.push(sub.playing);
 			this.queue = this.queue.concat(sub.queue);
 			await this.refresh();
-			return console.log('MUSIC >> Subsciptions Merged')
+			return console.log('MUSIC >> Subsciptions Merged'.brightGreen);
 		}
 	}*/
 
@@ -124,7 +124,7 @@ class VoiceSubscription {
 			this.player.play(resource);
 			return this.playing = track;
 		} catch (err) {
-			console.log('MUSIC (ERROR) >> ERROR PLAYING TRACK');
+			console.log('MUSIC (ERROR) >> ERROR PLAYING TRACK'.red);
 			console.log(err)
 			track.onError(err);
 			return this.refresh();
