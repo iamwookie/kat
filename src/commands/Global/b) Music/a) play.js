@@ -1,7 +1,7 @@
 const VoiceSubscription = require('@music/subscription');
 const Track = require('@music/track');
 const play = require('play-dl');
-const { MusicEmbed } = require('@utils/embeds');
+const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
     name: 'play',

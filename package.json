@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/voice": "^0.7.5",
+    "@twurple/api": "^5.0.13",
+    "@twurple/auth": "^5.0.13",
     "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
     "libsodium-wrappers": "^0.7.9",
@@ -22,6 +24,7 @@
     "@root": ".",
     "@scripts": "scripts",
     "@src": "src",
+    "@core": "src/core",
     "@utils": "src/utils",
     "@music": "src/core/music"
   }

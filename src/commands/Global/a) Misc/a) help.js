@@ -16,7 +16,7 @@ module.exports = {
 
             let reply = '';
             group.forEach(async x => {
-                if (x.hidden || x.disabled || (x.guilds && !x.guilds.includes(msg.guild.id))) return;
+                if (x.hidden || x.disabled || (x.guilds && (!msg.guild || !x.guilds.includes(msg.guild.id)))) return;
 
                 if (x.aliases) {
                     // If command has aliases, it builds reply like this for every command that has alias.
@@ -30,7 +30,7 @@ module.exports = {
                     reply += `\`\`${client.prefix}${x.name}${x.format ? ` ${x.format.replace('[prefix]', client.prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${x.description}\n`
                 }
             })
-            replyEmbed.addField(key + ' Commands', reply)
+            if (reply) replyEmbed.addField(key + ' Commands', reply);
         });
         
         msg.reply({ embeds: [replyEmbed] }).catch(() => msg.channel.send({ embeds: [replyEmbed] }));

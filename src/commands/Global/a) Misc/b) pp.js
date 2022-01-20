@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { failEmbed } = require('@utils/embeds');
+const { failEmbed } = require('@utils/other/embeds');
 
 /*
 const io = require('@pm2/io');

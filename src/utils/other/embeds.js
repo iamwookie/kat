@@ -74,18 +74,33 @@ class MusicEmbed extends Discord.MessageEmbed {
 
 module.exports = {
     successEmbed(reply, author) {
-        let embed = new Discord.MessageEmbed()
+        let embed = new Discord.MessageEmbed();
+
         if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
         embed.setColor('GREEN')
         embed.setDescription(`✅ \u200b ${reply}`);
+        
         return embed;
     },
 
     failEmbed(reply, author) {
-        let embed = new Discord.MessageEmbed()
+        let embed = new Discord.MessageEmbed();
+
         if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
         embed.setColor('RED')
         embed.setDescription(`🚫 \u200b ${reply}`);
+
+        return embed;
+    },
+
+    loadEmbed(reply, author) {
+        let loading = '<a:loading:928668691997012028>'
+        let embed = new Discord.MessageEmbed()
+
+        if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
+        embed.setColor('YELLOW')
+        embed.setDescription(`${loading} \u200b ${reply}`);
+
         return embed;
     },
 

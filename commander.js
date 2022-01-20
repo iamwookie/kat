@@ -1,7 +1,7 @@
 // This is the command handler, CODENAME: Commander v2.0.0
 // Last Update: Conversion to class
 const Discord = require('discord.js');
-const { failEmbed } = require('@utils/embeds');
+const { failEmbed } = require('@utils/other/embeds');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
@@ -23,7 +23,8 @@ const perms = [ // 37047360
 const groups = [
     'CLI',
     'Misc',
-    'Music'
+    'Music',
+    'Twitch'
 ];
 
 class Commander {
@@ -82,7 +83,9 @@ class Commander {
             const now = Date.now();
         
             const command = this.client.commands.get(commandText) || this.client.commands.get(this.client.aliases.get(commandText));
-            if (!command || command.disabled || (command.users && !command.users.includes(msg.author.id)) || (command.guilds && !command.guilds.includes(msg.guild.id))) return;
+            if (!command || command.disabled) return;
+
+            if ((command.guilds && (!msg.guild || !command.guilds.includes(msg.guild.id))) || (command.users && !command.users.includes(msg.author.id))) return;
             
             if (command.guildOnly && msg.channel.type == 'DM') {
                 let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
@@ -132,21 +135,21 @@ class Commander {
     }
 
     static async reload(client) {
-        const corePath = path.join(__dirname, 'src', 'core');
-        const utilPath = path.join(__dirname, 'src', 'utils');
-        const coreFolders = await fs.promises.readdir(corePath);
-        const utilFiles = await fs.promises.readdir(utilPath);
+        const srcPath = path.join(__dirname, 'src');
+        const srcFolders = await fs.promises.readdir(srcPath);
 
-        for (const folder of coreFolders) {
-            const files = fs.readdirSync(`${corePath}/${folder}`);
+        for (const folder of srcFolders) {
+            if (!(folder == 'core' || folder == 'utils')) continue;
 
-            for (const file of files) {
-                delete require.cache[require.resolve(`${corePath}/${folder}/${file}`)];
+            const subFolders = fs.readdirSync(`${srcPath}/${folder}`);
+
+            for (const subFolder of subFolders) {
+                const srcFiles = fs.readdirSync(`${srcPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
+                
+                for (const file of srcFiles) {
+                    delete require.cache[require.resolve(`${srcPath}/${folder}/${subFolder}/${file}`)];
+                }
             }
-        }
-
-        for (const file of utilFiles) {
-            delete require.cache[require.resolve(`${utilPath}/${file}`)];
         }
 
         for (const event in client._events) {
@@ -226,6 +229,8 @@ class Commander {
                 this.guilds.set(guildId, guild)
             }
         }
+
+        if (command.users) command.users.push(this.client.owner);
 
         this.commands.set(command.name, command);
 

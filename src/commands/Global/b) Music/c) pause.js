@@ -1,4 +1,4 @@
-const { MusicEmbed } = require('@utils/embeds');
+const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
     name: 'pause',
