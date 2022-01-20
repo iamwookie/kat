@@ -124,7 +124,7 @@ class Commander {
             client.commander.registerCommands();
             client.commander.registerModules();
             console.log('>>> Commander Initialized');
-    
+
             return client.commander;
         } catch (err) {
             return Commander.handleError(client, err)
@@ -150,11 +150,11 @@ class Commander {
         }
 
         for (const event in client._events) {
-            if (event == 'error') continue;
+            if (event == 'error' || event == 'shardDisconnect') continue;
             client.removeAllListeners(event);
         }
 
-        client.commander.readline.removeAllListeners('line');   
+        client.commander.readline.close();
 
         const Commander = require('./commander');
         
@@ -162,8 +162,10 @@ class Commander {
     }
 
     registerCommands() {
-        const cPath = path.join(__dirname, 'src', 'commands');
-        const commandFolders = fs.readdirSync(cPath);
+        const globalPath = path.join(__dirname, 'src', 'commands', 'Global');
+        const guildPath = path.join(__dirname, 'src', 'commands', 'Guild');
+        const globalFolders = fs.readdirSync(globalPath);
+        const guildFolders = fs.readdirSync(guildPath);
         
         this.commands = new Discord.Collection();
         this.aliases = new Discord.Collection();
@@ -176,36 +178,32 @@ class Commander {
             this.groups.set(g, new Discord.Collection())
         })
     
-        for (const folder of commandFolders) {
-            const commandFiles = fs.readdirSync(`${cPath}/${folder}`).filter(file => file.endsWith('.js'));
+        for (const folder of globalFolders) {
+            const globalFiles = fs.readdirSync(`${globalPath}/${folder}`).filter(file => file.endsWith('.js'));
     
-            for (const file of commandFiles) {
-                delete require.cache[require.resolve(`${cPath}/${folder}/${file}`)]
-
-                const command = require(`${cPath}/${folder}/${file}`);
-
-                if (command.guilds) {
-                    for (const guildId of command.guilds) {
-                        if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${command.name}`);
-
-                        let guild = this.guilds.get(guildId) || {};
-                        guild.commands = guild.commands || new Discord.Collection();
-                        guild.commands.set(command.name, command);
-
-                        this.guilds.set(guildId, guild)
-                    }
-                }
+            for (const file of globalFiles) {
+                delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)]
     
-                this.commands.set(command.name, command);
+                const command = require(`${globalPath}/${folder}/${file}`);
+
+                this.setCommand(command);
+            }
+        }
+
+        for (const folder of guildFolders) {
+            const guildSubFolders = fs.readdirSync(`${guildPath}/${folder}`);
+
+            for (const subFolder of guildSubFolders) {
+                const guildFiles = fs.readdirSync(`${guildPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
+
+                for (const file of guildFiles) {
+                    delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)]
     
-                if (this.groups.has(command.group)) {
-                    this.groups.get(command.group).set(command.name, command)
-                } else {
-                    console.warn(`Commander (WARNING) >> Command Group Does Not Exist: ${command.group} (${command.name})`)
-                }
+                    const command = require(`${guildPath}/${folder}/${subFolder}/${file}`);
+
+                    if (!command.guilds || !command.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`);;
     
-                if (command.aliases) {
-                    command.aliases.forEach((alias) => this.aliases.set(alias, command.name))
+                    this.setCommand(command);
                 }
             }
         }
@@ -216,44 +214,94 @@ class Commander {
         this.client.groups = this.groups;
     }
 
+    setCommand(command) {
+        if (command.guilds) {
+            for (const guildId of command.guilds) {
+                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${command.name}`);
+
+                let guild = this.guilds.get(guildId) || {};
+                guild.commands = guild.commands || new Discord.Collection();
+                guild.commands.set(command.name, command);
+
+                this.guilds.set(guildId, guild)
+            }
+        }
+
+        this.commands.set(command.name, command);
+
+        if (this.groups.has(command.group)) {
+            this.groups.get(command.group).set(command.name, command)
+        } else {
+            console.warn(`Commander (WARNING) >> Command Group Does Not Exist: ${command.group} (${command.name})`)
+        }
+
+        if (command.aliases) {
+            command.aliases.forEach((alias) => this.aliases.set(alias, command.name))
+        }
+    }
+
     registerModules() {
-        const mPath = path.join(__dirname, "src", 'modules');
-        const moduleFolders = fs.readdirSync(mPath);
+        const globalPath = path.join(__dirname, 'src', 'modules', 'Global');
+        const guildPath = path.join(__dirname, 'src', 'modules', 'Guild');
+        const globalFolders = fs.readdirSync(globalPath);
+        const guildFolders = fs.readdirSync(guildPath);
 
         this.modules = new Discord.Collection();
 
-        for (const folder of moduleFolders) {
-            const moduleFiles = fs.readdirSync(`${mPath}/${folder}`).filter(file => file.endsWith('.js'));
+        for (const folder of globalFolders) {
+            const globalFiles = fs.readdirSync(`${globalPath}/${folder}`).filter(file => file.endsWith('.js'));
     
-            for (const file of moduleFiles) {
-                delete require.cache[require.resolve(`${mPath}/${folder}/${file}`)]
+            for (const file of globalFiles) {
+                delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)]
+    
+                const module = require(`${globalPath}/${folder}/${file}`);
 
-                const module = require(`${mPath}/${folder}/${file}`);
+                this.setModule(module);
+            }
+        }
 
-                if (module.guilds) {
-                    for (const guildId of module.guilds) {
-                        if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${module.name}`);
+        for (const folder of guildFolders) {
+            const guildSubFolders = fs.readdirSync(`${guildPath}/${folder}`);
 
-                        let guild = this.guilds.get(guildId) || {};
-                        guild.modules = guild.modules || new Discord.Collection();
-                        guild.modules.set(module.name, module);
+            for (const subFolder of guildSubFolders) {
+                const guildFiles = fs.readdirSync(`${guildPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
 
-                        this.guilds.set(guildId, guild);
-                    }
-                }
+                for (const file of guildFiles) {
+                    delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)]
+    
+                    const module = require(`${guildPath}/${folder}/${subFolder}/${file}`);
 
-                this.modules.set(module.name, module);
-
-                try {
-                    module.run(this.client);
-                    console.log("Commander >> Loaded Module: " + module.name);
-                } catch (err) {
-                    this.constructor.handleError(this.client, err);
+                    if (!module.guilds || !module.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Module: ${module.name}`);;
+    
+                    this.setModule(module);
                 }
             }
         }
 
         this.client.modules = this.modules;
+    }
+
+    setModule(module) {
+        if (module.guilds) {
+            for (const guildId of module.guilds) {
+                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${module.name}`);
+
+                let guild = this.guilds.get(guildId) || {};
+                guild.modules = guild.modules || new Discord.Collection();
+                guild.modules.set(module.name, module);
+
+                this.guilds.set(guildId, guild);
+            }
+        }
+
+        this.modules.set(module.name, module);
+
+        try {
+            module.run(this.client);
+            console.log(`Commander >> Loaded ${module.guilds ? 'Guild' : 'Global'} Module: ` + module.name);
+        } catch (err) {
+            this.constructor.handleError(this.client, err);
+        }
     }
 
     // Error Handling
