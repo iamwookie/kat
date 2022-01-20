@@ -7,11 +7,11 @@ const channels = [
     '823602114374402048'
 ]
 
-
 module.exports = {
     name: 'live',
     group: 'Twitch',
-    description: 'Send live steam message.',
+    description: 'Send live stream announcement.',
+    hidden: true,
     // AUTHORIZATION
     guilds: ['348849020103426059', '729660181226455160'],
     users: ['182543450753728524'],
