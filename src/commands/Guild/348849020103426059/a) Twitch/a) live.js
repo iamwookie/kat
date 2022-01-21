@@ -18,6 +18,8 @@ module.exports = {
     async run(client, msg) {
         let wait = loadEmbed('Searching...', msg.author);
 
+        await msg.delete();
+
         msg.channel.send({embeds: [wait]}).then(async (waitMessage) => {
             TwitchManager.initialize(client);
 
