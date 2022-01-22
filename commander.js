@@ -380,7 +380,7 @@ class CommanderModule {
 
         if (this.guilds) {
             for (const guildId of this.guilds) {
-                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${this.name}`.yellow);
+                if (!this.commander.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${this.name}`.yellow);
 
                 let guild = this.commander.guilds.get(guildId) || {};
                 guild.modules = guild.modules || new Discord.Collection();
