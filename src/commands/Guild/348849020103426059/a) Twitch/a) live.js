@@ -20,7 +20,7 @@ module.exports = {
 
         await msg.delete();
 
-        msg.channel.send({embeds: [wait]}).then(async (waitMessage) => {
+        msg.channel.send({embeds: [wait]}).then(async waitMessage => {
             TwitchManager.initialize(client);
 
             let stream = await client.twitch.getStreamByUserName('bigmongostyler');
@@ -52,12 +52,12 @@ module.exports = {
                 } catch (err) {
                     console.log(`Guild Commands (ERROR) (${this.guilds[0]}) >> live: Failed To Fetch Channel`.red); console.log(err);
                     let fail = failEmbed('Failed to send message(s)!');
-                    return waitMessage.edit({ embeds: [fail] }).then((msg) => setTimeout(() => msg.delete(), 5000));
+                    return waitMessage.edit({ embeds: [fail] }).then(msg => setTimeout(() => msg.delete(), 5000));
                 }
             }
 
             let success = successEmbed('Message(s) sent!', msg.author);
-            waitMessage.edit({ embeds: [success] }).then((msg) => setTimeout(() => msg.delete(), 5000));
+            waitMessage.edit({ embeds: [success] }).then(msg => setTimeout(() => msg.delete(), 5000));
         });
     }
 };
