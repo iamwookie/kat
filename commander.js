@@ -1,5 +1,5 @@
-// This is the command handler, CODENAME: Commander v2.0.0
-// Last Update: Conversion to class
+// This is the command handler, CODENAME: Commander v3.0.0
+// Last Update: Modules and Commands converted to seperate classes
 const Discord = require('discord.js');
 const { failEmbed } = require('@utils/other/embeds');
 const fs = require('fs');
@@ -61,58 +61,21 @@ class Commander {
         this.client.on('messageCreate', async msg => {
             if (!msg.content.startsWith(this.prefix) || msg.author.bot) return;
 
-            if (msg.guild) {
-                if (!msg.guild.me.permissions.has(perms)) {
-                    let noPerms = failEmbed('I don\'t have enough permissions in this server. Try contacting an admin!')
-                    return msg.author.send({ embeds: [noPerms] }).catch(err => {
-                        console.log('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
-                        console.log(`REASON: ${err.meesage}`.red);
-                    });
-                }
-    
-                if (!msg.channel.permissionsFor(this.client.user).has(perms)) {
-                    let noPerms = failEmbed('I don\'t have enough permissions to type in that channel!');
-                    return msg.author.send({ embeds: [noPerms] }).catch(err => {
-                        console.log('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
-                        console.log(`REASON: ${err.meesage}`.red);
-                    });
-                };
-            }
-            
+            if (!this.authorize(msg)) return;
+
             const content = msg.content.slice(this.prefix.length).trim().split(/ +/);
             const commandText = content.shift().toLowerCase();
-            const args = content.join(' ')
-            const now = Date.now();
+            const args = content.join(' ');
         
             const command = this.client.commands.get(commandText) || this.client.commands.get(this.client.aliases.get(commandText));
-            if (!command || command.disabled) return;
+            if (!command || command.disabled) return false;
 
-            if ((command.guilds && (!msg.guild || !command.guilds.includes(msg.guild.id))) || (command.users && !command.users.includes(msg.author.id))) return;
-            
-            if (command.guildOnly && msg.channel.type == 'DM') {
-                let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
-                return msg.reply({ embeds: [notGuild] }).catch(() => msg.channel.send({ embeds: [notGuild] }));
-            }
+            if (!command.validate(msg)) return;
     
-            if (command.cooldown) {
-                let cooldown = command.cooldown * 1000;
-                if (!this.client.cooldowns.has(msg.guildId)) this.client.cooldowns.set(msg.guildId, new Discord.Collection());
-    
-                let cooldowns = this.client.cooldowns.get(msg.guildId);
-                if (!cooldowns.has(msg.author.id)) cooldowns.set(msg.author.id, new Discord.Collection());
-                
-                let usages = cooldowns.get(msg.author.id);
-                if (usages.has(command.name)) {
-                    let expire = usages.get(command.name) + cooldown
-                    if (now < expire) {
-                        let wait = failEmbed(`Please wait \`${((expire - now) / 1000).toFixed()}\` seconds before using that command again!`, msg.author)
-                        return msg.reply({ embeds: [wait] }).catch(() => msg.channel.send({ embeds: [wait] }));
-                    }
-                }
-    
-                usages.set(command.name, now)
-    
-                setTimeout(() => usages.delete(command.name), cooldown);
+            let cooldown = command.getCooldown(msg);
+            if (cooldown) {
+                let wait = failEmbed(`Please wait \`${cooldown}\` seconds before using that command again!`, msg.author)
+                return msg.reply({ embeds: [wait] }).catch(() => msg.channel.send({ embeds: [wait] }));
             }
     
             try {
@@ -188,9 +151,10 @@ class Commander {
             for (const file of globalFiles) {
                 delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)]
     
-                const command = require(`${globalPath}/${folder}/${file}`);
+                const object = require(`${globalPath}/${folder}/${file}`);
+                const command = new CommanderCommand(object, this);
 
-                this.setCommand(command);
+                this.commands.set(command.name, command);
             }
         }
 
@@ -203,11 +167,11 @@ class Commander {
                 for (const file of guildFiles) {
                     delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)]
     
-                    const command = require(`${guildPath}/${folder}/${subFolder}/${file}`);
-
+                    const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
+                    const command = new CommanderCommand(object, this);
                     if (!command.guilds || !command.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
-    
-                    this.setCommand(command);
+
+                    this.commands.set(command.name, command);
                 }
             }
         }
@@ -218,33 +182,6 @@ class Commander {
         this.client.groups = this.groups;
     }
 
-    setCommand(command) {
-        if (command.guilds) {
-            for (const guildId of command.guilds) {
-                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${command.name}`.yellow);
-
-                let guild = this.guilds.get(guildId) || {};
-                guild.commands = guild.commands || new Discord.Collection();
-                guild.commands.set(command.name, command);
-
-                this.guilds.set(guildId, guild)
-            }
-        }
-
-        if (command.users) command.users.push(this.client.owner);
-
-        this.commands.set(command.name, command);
-
-        if (this.groups.has(command.group)) {
-            this.groups.get(command.group).set(command.name, command)
-        } else {
-            console.warn(`Commander (WARNING) >> Command Group Does Not Exist: ${command.group} (${command.name})`)
-        }
-
-        if (command.aliases) {
-            command.aliases.forEach((alias) => this.aliases.set(alias, command.name))
-        }
-    }
 
     registerModules() {
         const globalPath = path.join(__dirname, 'src', 'modules', 'Global');
@@ -260,9 +197,12 @@ class Commander {
             for (const file of globalFiles) {
                 delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)]
     
-                const module = require(`${globalPath}/${folder}/${file}`);
+                const object = require(`${globalPath}/${folder}/${file}`);
+                const module = new CommanderModule(object, this);
 
-                this.setModule(module);
+                module.initialize(this.client);
+
+                this.modules.set(module.name, module);
             }
         }
 
@@ -275,11 +215,13 @@ class Commander {
                 for (const file of guildFiles) {
                     delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)]
     
-                    const module = require(`${guildPath}/${folder}/${subFolder}/${file}`);
-
+                    const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
+                    const module = new CommanderModule(object, this);
                     if (!module.guilds || !module.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Module: ${module.name}`.yellow);
     
-                    this.setModule(module);
+                    module.initialize(this.client);
+
+                    this.modules.set(module.name, module);
                 }
             }
         }
@@ -287,34 +229,28 @@ class Commander {
         this.client.modules = this.modules;
     }
 
-    setModule(module) {
-        if (module.events) {
-            for (const event in this.client._events) {
-                if (event == 'error' || event == 'shardDisconnect' || event == 'msgCreate') continue;
-                if (module.events.includes(event)) this.client.removeAllListeners(event);
-            }
+    authorize(msg) {
+        if (!msg.guild) return true;
+
+        if (!msg.guild.me.permissions.has(perms)) {
+            let noPerms = failEmbed('I don\'t have enough permissions in this server. Try contacting an admin!')
+            msg.author.send({ embeds: [noPerms] }).catch(err => {
+                console.log('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
+                console.log(`REASON: ${err.meesage}`.red);
+            });
+            return false;
         }
 
-        if (module.guilds) {
-            for (const guildId of module.guilds) {
-                if (!this.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${module.name}`.yellow);
+        if (!msg.channel.permissionsFor(this.client.user).has(perms)) {
+            let noPerms = failEmbed('I don\'t have enough permissions to type in that channel!');
+            msg.author.send({ embeds: [noPerms] }).catch(err => {
+                console.log('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
+                console.log(`REASON: ${err.meesage}`.red);
+            });
+            return false;
+        };
 
-                let guild = this.guilds.get(guildId) || {};
-                guild.modules = guild.modules || new Discord.Collection();
-                guild.modules.set(module.name, module);
-
-                this.guilds.set(guildId, guild);
-            }
-        }
-
-        this.modules.set(module.name, module);
-
-        try {
-            module.run(this.client);
-            console.log(`Commander >> Loaded ${module.guilds ? 'Guild' : 'Global'} Module: ${module.name}`.brightGreen);
-        } catch (err) {
-            this.constructor.handleError(this.client, err);
-        }
+        return true;
     }
 
     // Error Handling
@@ -355,4 +291,115 @@ class Commander {
     }
 }
 
+class CommanderCommand {
+    constructor(command, commander) {
+        this.commander = commander;
+        this.command = command;
+
+        for (const key in command) {
+            this[key] = command[key];
+        }
+
+        if (this.guilds) {
+            for (const guildId of this.guilds) {
+                if (!this.commander.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${this.name}`.yellow);
+
+                let guild = this.commander.guilds.get(guildId) || {};
+                guild.commands = guild.commands || new Discord.Collection();
+                guild.commands.set(this.name, this);
+
+                this.commander.guilds.set(guildId, guild);
+            }
+        }
+
+        if (this.users) this.users.push(this.commander.client.owner);
+
+        if (this.commander.groups.has(this.group)) {
+            this.commander.groups.get(this.group).set(this.name, this);
+        } else {
+            console.warn(`Commander (WARNING) >> Command Group Does Not Exist: ${this.group} (${this.name})`)
+        }
+
+        if (this.aliases) {
+            this.aliases.forEach((alias) => this.commander.aliases.set(alias, this.name))
+        }
+    }
+
+    validate(msg) {
+        if ((this.guilds && (!msg.guild || !this.guilds.includes(msg.guild.id))) || (this.users && !this.users.includes(msg.author.id))) return false;
+
+        if (this.guildOnly && msg.channel.type == 'DM') {
+            let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
+            msg.reply({ embeds: [notGuild] }).catch(() => msg.channel.send({ embeds: [notGuild] }));
+            return false;
+        }
+
+        return true;
+    }
+
+    getCooldown(msg) {
+        const now = Date.now();
+
+        if (!this.cooldown) return false;
+
+        let cooldown = this.cooldown * 1000;
+        if (!this.commander.cooldowns.has(msg.guildId || 'dm')) this.commander.cooldowns.set(msg.guildId || 'dm', new Discord.Collection());
+
+        let cooldowns = this.commander.cooldowns.get(msg.guildId || 'dm');
+        if (!cooldowns.has(msg.author.id)) cooldowns.set(msg.author.id, new Discord.Collection());
+        
+        let usages = cooldowns.get(msg.author.id);
+        if (usages.has(this.name)) {
+            let expire = usages.get(this.name) + cooldown;
+            if (now < expire) return ((expire - now) / 1000).toFixed();
+        }
+
+        usages.set(this.name, now)
+
+        setTimeout(() => usages.delete(this.name), cooldown);
+
+        return false;
+    }
+}
+
+class CommanderModule {
+    constructor(module, commander) {
+        this.commander = commander;
+        this.module = module;
+
+        for (const key in module) {
+            this[key] = module[key];
+        }
+
+        if (this.events) {
+            for (const event in this.commander.client._events) {
+                if (event == 'error' || event == 'shardDisconnect' || event == 'msgCreate') continue;
+                if (this.events.includes(event)) this.client.removeAllListeners(event);
+            }
+        }
+
+        if (this.guilds) {
+            for (const guildId of this.guilds) {
+                if (!this.commander.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${this.name}`.yellow);
+
+                let guild = this.commander.guilds.get(guildId) || {};
+                guild.modules = guild.modules || new Discord.Collection();
+                guild.modules.set(this.name, this);
+
+                this.commander.guilds.set(guildId, guild);
+            }
+        }
+    }
+
+    initialize(client) {
+        try {
+            this.run(client);
+            console.log(`Commander >> Loaded ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.brightGreen);
+        } catch (err) {
+            Commander.handleError(client, err);
+        }
+    }
+}
+
 module.exports = Commander;
+

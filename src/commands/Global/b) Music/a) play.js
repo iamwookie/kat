@@ -44,7 +44,7 @@ module.exports = {
         if (!subscription) {
             subscription = await VoiceSubscription.create(client, channel);
         } else {
-            await subscription.ready(20000)
+            await subscription.ready(20000);
         }
 
         try {
