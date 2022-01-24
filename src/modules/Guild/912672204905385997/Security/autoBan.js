@@ -6,7 +6,7 @@ const banned = [
 ]
 
 module.exports = {
-    name: 'Shadow Ban',
+    name: 'Auto Ban',
     guilds: ['912672204905385997'],
     run(client) {
         client.on('guildMemberAdd', async member => {
