@@ -59,11 +59,15 @@ class Commander {
 
         // Discord Commands
         this.client.on('messageCreate', async msg => {
-            if (!msg.content.startsWith(this.prefix) || msg.author.bot) return;
+            let prefix = this.prefix;
+
+            if (msg.guild) prefix = await this.client.database.get(msg.guildId, 'prefix') || this.prefix
+
+            if (!msg.content.startsWith(prefix) || msg.author.bot) return;
 
             if (!this.authorize(msg)) return;
 
-            const content = msg.content.slice(this.prefix.length).trim().split(/ +/);
+            const content = msg.content.slice(prefix.length).trim().split(/ +/);
             const commandText = content.shift().toLowerCase();
             const args = content.join(' ');
         
@@ -86,14 +90,14 @@ class Commander {
         });
     }
 
-    static initialize(client) {
+    static async initialize(client) {
         try {
-            client.commander = new Commander(client);
-            client.commander.registerCommands();
-            client.commander.registerModules();
+            let commander = new Commander(client);
+            commander.registerCommands();
+            commander.registerModules();
             console.log('>>> Commander Initialized'.brightGreen.bold.underline);
 
-            return client.commander;
+            return commander;
         } catch (err) {
             return Commander.handleError(client, err)
         }
@@ -402,4 +406,3 @@ class CommanderModule {
 }
 
 module.exports = Commander;
-
