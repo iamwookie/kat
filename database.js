@@ -45,6 +45,13 @@ class CommanderDatabase {
         }
     }
 
+    async get(guild, key) {
+        if (!this.guilds) await this.load();
+
+        let data = this.guilds.get(guild) || {};
+        return data[key];
+    }
+    
     async set(guild, key, value) {
         if (!this.guilds) await this.load();
 
@@ -65,11 +72,24 @@ class CommanderDatabase {
         }
     }
 
-    async get(guild, key) {
+    async delete(guild, key) {
         if (!this.guilds) await this.load();
 
-        let data = this.guilds.get(guild) || {};
-        return data[key];
+        try {
+            let data = this.guilds.get(guild) || {};
+            delete data[key];
+            await this.redis.hSet('guilds', guild, JSON.stringify(data));
+            await this.load();
+            console.log('CommanderDatabase >> Value Deleted'.brightGreen);
+
+            return true;
+        } catch (err) {
+            console.log('CommanderDatabase (ERROR) >> Error Deleting Value'.red);
+            console.log(err);
+            Commander.handleError(this.client, err);
+
+            return false
+        }
     }
 }
 
