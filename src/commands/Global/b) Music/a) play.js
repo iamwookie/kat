@@ -70,30 +70,64 @@ module.exports = {
                 query = args;
             }
 
-            let search = await play.search(query, { limit : 1, source: { youtube: 'video' } });
-            vid = search[0];
+            if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
+                let search = await play.playlist_info(query, { incomplete: true });
+                data = search;
+            } else {
+                let search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
+                data = search[0];
+            }
 
-            if (!vid) {
+            if (!data) {
                 let notFound = new MusicEmbed(client, msg).setTitle('Couldn\'t find your search result. Try again!');
                 reply.edit({ embeds: [notFound] });
                 return subscription.destroy();
             }
 
+            if (data.type == 'playlist') {
+                for (const video of data.videos) {
+                    const track = new Track(
+                        video,
+                        msg.author,
+                        function onStart() {
+                            let onstart = new MusicEmbed(client, msg, 'playing', this);
+                            msg.channel.send({ embeds: [onstart] });
+                        },
+                        function onFinish() {},
+                        function onError() {
+                            let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
+                            msg.reply({ embeds: [onerror] }).catch(() => msg.channel.send({ embeds: [onerror] }));
+                        }
+                    );
+
+                    subscription.add(track);
+                }
+
+                console.log('Music Commands >> play: Added Playlist:'.magenta);
+                console.log({
+                    Title: data.title,
+                    URL: data.url
+                });
+
+                let enqueued = new MusicEmbed(client, msg, 'enqueued', data);
+                return reply.edit({ embeds: [enqueued] });
+            }
+
 			const track = new Track(
-                vid,
+                data,
                 msg.author,
                 function onStart() {
-                    let embed = new MusicEmbed(client, msg, 'playing', this);
-                    msg.channel.send({ embeds: [embed] });
+                    let onstart = new MusicEmbed(client, msg, 'playing', this);
+                    msg.channel.send({ embeds: [onstart] });
                 },
                 function onFinish() {},
                 function onError() {
-                    let embed = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
-                    msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+                    let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
+                    msg.channel.send({ embeds: [onerror] });
                 }
-            )
+            );
 			
-            console.log('MUSIC >> Added Track:'.magenta);
+            console.log('Music Commands >> play: Added Track:'.magenta);
             console.log({
                 Title: track.title,
                 Duration: track.duration,
@@ -101,10 +135,10 @@ module.exports = {
             });
 
 			subscription.add(track);
-            embed = new MusicEmbed(client, msg, 'enqueued', track);
-			return reply.edit({ embeds: [embed] });
+            let enqueued = new MusicEmbed(client, msg, 'enqueued', track);
+			return reply.edit({ embeds: [enqueued] });
 		} catch (err) {
-            console.log('MUSIC (COMMAND) >> PLAY ERROR'.red);
+            console.log('Music Commands (ERROR) >> play: Error Running Command'.red);
 			console.error(err);
             console.log('<------------------------------------------->'.red);
             
