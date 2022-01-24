@@ -7,12 +7,11 @@ module.exports = {
     name: 'play',
     group: 'Music',
     description: 'Search for a track and play it or add it to the queue.',
-    format: '<search> / [prefix]play spotify <url>',
+    format: '<search / url>',
     cooldown: 5,
     guildOnly: true,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId);
-        let argsArray = args.split(' ');
         
         let channel = msg.member.voice.channel;
         if (!channel) {
@@ -48,31 +47,35 @@ module.exports = {
         }
 
         try {
-            if (argsArray[0].toLowerCase() == 'spotify') {
-                let embed = new MusicEmbed(client, msg, 'searching-spotify');
-                reply = await msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+            let query = args;
+
+            if (query.startsWith('https://open.spotify.com/track')) {
+                let searching = new MusicEmbed(client, msg, 'searching-spotify');
+                reply = await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
+
                 try {
                     if (play.is_expired()) await play.refreshToken();
-                    let search = await play.spotify(argsArray[1]);
-                    query = search.name + ' - ' + search.artists[0].name;
-                } catch(err) {
-                    console.log('MUSIC (COMMAND) >> PLAY SPOTIFY SEARCH ERROR'.red);
-                    console.log(err);
-                    console.log('<------------------------------------------->'.red);
-
+                    let search = await play.spotify(query);
+                    query = search.artists[0].name + ' - ' + search.name;
+                } catch {
                     let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid Spotify URL!');
                     reply.edit({ embeds: [notFound] });
                     return subscription.destroy();
                 }
             } else {
-                let embed = new MusicEmbed(client, msg, 'searching');
-                reply = await msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
-                query = args;
+                let searching = new MusicEmbed(client, msg, 'searching');
+                reply = await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
             }
 
             if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
-                let search = await play.playlist_info(query, { incomplete: true });
-                data = search;
+                try {
+                    let search = await play.playlist_info(query, { incomplete: true });
+                    data = search;
+                } catch {
+                    let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid playlist URL!');
+                    reply.edit({ embeds: [notFound] });
+                    return subscription.destroy();
+                }
             } else {
                 let search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
                 data = search[0];
