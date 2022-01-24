@@ -4,7 +4,7 @@ const { successEmbed, failEmbed } = require('@utils/other/embeds');
 module.exports = {
     name: 'prefix',
     group: 'Misc',
-    description: 'Change the bot prefix.',
+    description: 'Change the bot prefix. [Admin Only]',
     format: '<new prefix>',
     cooldown: 5,
     guildOnly: true,
@@ -20,8 +20,13 @@ module.exports = {
         }
 
         let prefix = args.split(' ')[0];
+        let set = false;
         
-        const set = await client.database.set(msg.guildId, 'prefix', prefix);
+        if (prefix == client.prefix) {
+            set = await client.database.delete(msg.guildId, 'prefix');
+        } else {
+            set = await client.database.set(msg.guildId, 'prefix', prefix);
+        }
 
         if (set) {
             let success = successEmbed(`The prefix has been updated to: \`${prefix}\``, msg.author);
