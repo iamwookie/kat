@@ -26,7 +26,13 @@ module.exports = {
             if (subscription.queue.length) {
                 let c = 1
                 for (const track of subscription.queue) {
-                    res += `**${c})** \`${track.title} [${track.duration}]\`\n`
+                    if (c == 16) {
+                        res += `**+ ${subscription.queue.length - c + 1} more.**`
+                        break;
+                    } else {
+                        res += `**${c})** \`${track.title} [${track.duration}]\`\n`
+                    }
+
                     c++
                 }
             }

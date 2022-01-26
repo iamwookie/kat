@@ -7,12 +7,11 @@ module.exports = {
     name: 'play',
     group: 'Music',
     description: 'Search for a track and play it or add it to the queue.',
-    format: '<search> / [prefix]play spotify <url>',
+    format: '<search / url>',
     cooldown: 5,
     guildOnly: true,
     async run(client, msg, args) {
         let subscription = client.subscriptions.get(msg.guildId);
-        let argsArray = args.split(' ');
         
         let channel = msg.member.voice.channel;
         if (!channel) {
@@ -48,52 +47,90 @@ module.exports = {
         }
 
         try {
-            if (argsArray[0].toLowerCase() == 'spotify') {
-                let embed = new MusicEmbed(client, msg, 'searching-spotify');
-                reply = await msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+            let query = args;
+
+            if (query.startsWith('https://open.spotify.com/track')) {
+                let searching = new MusicEmbed(client, msg, 'searching-spotify');
+                reply = await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
+
                 try {
                     if (play.is_expired()) await play.refreshToken();
-                    let search = await play.spotify(argsArray[1]);
-                    query = search.name + ' - ' + search.artists[0].name;
-                } catch(err) {
-                    console.log('MUSIC (COMMAND) >> PLAY SPOTIFY SEARCH ERROR'.red);
-                    console.log(err);
-                    console.log('<------------------------------------------->'.red);
-
+                    let search = await play.spotify(query);
+                    query = search.artists[0].name + ' - ' + search.name;
+                } catch {
                     let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid Spotify URL!');
                     reply.edit({ embeds: [notFound] });
                     return subscription.destroy();
                 }
             } else {
-                let embed = new MusicEmbed(client, msg, 'searching');
-                reply = await msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
-                query = args;
+                let searching = new MusicEmbed(client, msg, 'searching');
+                reply = await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
             }
 
-            let search = await play.search(query, { limit : 1, source: { youtube: 'video' } });
-            vid = search[0];
+            if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
+                try {
+                    let search = await play.playlist_info(query, { incomplete: true });
+                    data = search;
+                } catch {
+                    let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid playlist URL!');
+                    reply.edit({ embeds: [notFound] });
+                    return subscription.destroy();
+                }
+            } else {
+                let search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
+                data = search[0];
+            }
 
-            if (!vid) {
+            if (!data) {
                 let notFound = new MusicEmbed(client, msg).setTitle('Couldn\'t find your search result. Try again!');
                 reply.edit({ embeds: [notFound] });
                 return subscription.destroy();
             }
 
+            if (data.type == 'playlist') {
+                for (const video of data.videos) {
+                    const track = new Track(
+                        video,
+                        msg.author,
+                        function onStart() {
+                            let onstart = new MusicEmbed(client, msg, 'playing', this);
+                            msg.channel.send({ embeds: [onstart] });
+                        },
+                        function onFinish() {},
+                        function onError() {
+                            let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
+                            msg.reply({ embeds: [onerror] }).catch(() => msg.channel.send({ embeds: [onerror] }));
+                        }
+                    );
+
+                    subscription.add(track);
+                }
+
+                console.log('Music Commands >> play: Added Playlist:'.magenta);
+                console.log({
+                    Title: data.title,
+                    URL: data.url
+                });
+
+                let enqueued = new MusicEmbed(client, msg, 'enqueued', data);
+                return reply.edit({ embeds: [enqueued] });
+            }
+
 			const track = new Track(
-                vid,
+                data,
                 msg.author,
                 function onStart() {
-                    let embed = new MusicEmbed(client, msg, 'playing', this);
-                    msg.channel.send({ embeds: [embed] });
+                    let onstart = new MusicEmbed(client, msg, 'playing', this);
+                    msg.channel.send({ embeds: [onstart] });
                 },
                 function onFinish() {},
                 function onError() {
-                    let embed = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
-                    msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+                    let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
+                    msg.channel.send({ embeds: [onerror] });
                 }
-            )
+            );
 			
-            console.log('MUSIC >> Added Track:'.magenta);
+            console.log('Music Commands >> play: Added Track:'.magenta);
             console.log({
                 Title: track.title,
                 Duration: track.duration,
@@ -101,10 +138,10 @@ module.exports = {
             });
 
 			subscription.add(track);
-            embed = new MusicEmbed(client, msg, 'enqueued', track);
-			return reply.edit({ embeds: [embed] });
+            let enqueued = new MusicEmbed(client, msg, 'enqueued', track);
+			return reply.edit({ embeds: [enqueued] });
 		} catch (err) {
-            console.log('MUSIC (COMMAND) >> PLAY ERROR'.red);
+            console.log('Music Commands (ERROR) >> play: Error Running Command'.red);
 			console.error(err);
             console.log('<------------------------------------------->'.red);
             

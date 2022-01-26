@@ -29,9 +29,16 @@ class MusicEmbed extends Discord.MessageEmbed {
                 this.setTitle(`${loading} \u200b Searching Spotify...`);
                 break;
             case 'enqueued':
-                this.setAuthor({ name: `Requested By: ${this.track.author.tag}`, iconURL: this.track.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`Queue Updated`);
-                this.setDescription(`Added: [${this.track.title} [${this.track.duration}]](${this.track.url})`);
+                this.setAuthor({ name: `Requested By: ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
+
+                if (this.track.type && this.track.type == 'playlist') {
+                    this.setTitle(`Queue Updated [Playlist]`);
+                    this.setDescription(`Added: [${this.track.title}](${this.track.url})`);
+                } else {
+                    this.setTitle(`Queue Updated`);
+                    this.setDescription(`Added: [${this.track.title} [${this.track.duration}]](${this.track.url})`);
+                }
+                
                 break;
             case 'playing':
                 this.setAuthor({ name: `Requested By: ${this.track.author.tag}`, iconURL: this.track.author.avatarURL({ dynamic: true }) });
