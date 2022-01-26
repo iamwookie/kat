@@ -10,6 +10,7 @@
   "author": "wookie",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/builders": "^0.12.0",
     "@discordjs/voice": "^0.7.5",
     "@twurple/api": "^5.0.13",
     "@twurple/auth": "^5.0.13",

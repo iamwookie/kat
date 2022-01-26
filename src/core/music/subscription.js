@@ -58,7 +58,7 @@ class VoiceSubscription {
 		this.voice.subscribe(this.player);
 	}
 
-	static async create(client, channel, cached) {
+	static async create(client, channel) {
 		console.log(`\nMUSIC >> Created A New Subscription: ${channel.guild.id}`.magenta);
 
 		let sub = new VoiceSubscription(
@@ -74,7 +74,7 @@ class VoiceSubscription {
 		// if (cached && (cached.playing || cached.queue.length)) sub.merge(cached)
 
 		sub.voice.on('error', (err) => {
-			console.log('MUSIC (VOICE) >> VOICE ERROR'.red);
+			console.error('MUSIC (VOICE) >> VOICE ERROR'.red);
 			console.error(err);
 		});
 
@@ -122,11 +122,13 @@ class VoiceSubscription {
 		try {
 			const resource = await track.createResource();
 			this.player.play(resource);
+
 			return this.playing = track;
 		} catch (err) {
-			console.log('MUSIC (ERROR) >> ERROR PLAYING TRACK'.red);
-			console.log(err)
+			console.error('MUSIC (ERROR) >> ERROR PLAYING TRACK'.red);
+			console.error(err)
 			track.onError(err);
+			
 			return this.refresh();
 		} finally {
 			this.queueLocked = false;

@@ -16,8 +16,8 @@ class CommanderDatabase {
 
             return database;
         } catch (err) {
-            console.log('CommanderDatabase (ERROR) >> Error Initializing'.red);
-            console.log(err);
+            console.error('CommanderDatabase (ERROR) >> Error Initializing'.red);
+            console.error(err);
             Commander.handleError(this.client, err);
 
             return false;
@@ -34,12 +34,13 @@ class CommanderDatabase {
                 }
             }
             console.log('CommanderDatabase >> Data Loaded'.brightGreen);
-            
+
             return true;
         } catch (err) {
-            console.log('CommanderDatabase (ERROR) >> Error Loading'.red);
-            console.log(err);
+            console.error('CommanderDatabase (ERROR) >> Error Loading'.red);
+            console.error(err);
             Commander.handleError(this.client, err);
+            this.loadLocked = false;
 
             return false;
         }
@@ -64,8 +65,8 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
-            console.log('CommanderDatabase (ERROR) >> Error Setting Value'.red);
-            console.log(err);
+            console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
+            console.error(err);
             Commander.handleError(this.client, err);
 
             return false
@@ -90,8 +91,8 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
-            console.log('CommanderDatabase (ERROR) >> Error Deleting Value'.red);
-            console.log(err);
+            console.error('CommanderDatabase (ERROR) >> Error Deleting Value'.red);
+            console.error(err);
             Commander.handleError(this.client, err);
 
             return false

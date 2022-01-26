@@ -6,7 +6,7 @@ class MusicEmbed extends Discord.MessageEmbed {
 
         this.client = client;
         this.guild = message.guild;
-        this.author = message.author;
+        this.author = message instanceof Discord.CommandInteraction? message.user : message.author;
         this.type = type;
         this.track = track;
 
