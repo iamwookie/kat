@@ -1,3 +1,5 @@
+const Discord = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const VoiceSubscription = require('@music/subscription');
 const Track = require('@music/track');
 const play = require('play-dl');
@@ -10,20 +12,37 @@ module.exports = {
     format: '<search / url>',
     cooldown: 5,
     guildOnly: true,
+
+    // SLASH
+    data() {
+        let data = new SlashCommandBuilder()
+        .setName(this.name)
+        .setDescription(this.description)
+        .addStringOption(option => {
+            option.setName('query');
+            option.setDescription('The name or URL of the song.');
+            return option;
+        });
+        return data;
+    },
+
     async run(client, msg, args) {
+        let author = msg instanceof Discord.CommandInteraction? msg.user : msg.author;
         let subscription = client.subscriptions.get(msg.guildId);
         
         let channel = msg.member.voice.channel;
         if (!channel) {
-            let embed = new MusicEmbed(client, msg).setTitle('You are not in a channel!');
-            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+            let nochannel = new MusicEmbed(client, msg).setTitle('You are not in a channel!');
+            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [nochannel] }) : msg.reply({ embeds: [nochannel] }).catch(() => msg.channel.send({ embeds: [nochannel] }));
         }
 
+        args = msg instanceof Discord.CommandInteraction? msg.options.getString('query') : args;
+        
         if (subscription && subscription.isPlayerPaused()) {
             let track = subscription.playing;
 
-            let embed = new MusicEmbed(client, msg, 'unpaused', track);
-            msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+            let unpaused = new MusicEmbed(client, msg, 'unpaused', track);
+            msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [unpaused] }) : msg.reply({ embeds: [unpaused] }).catch(() => msg.channel.send({ embeds: [unpaused] }));
 
             subscription.unpause();
 
@@ -31,13 +50,13 @@ module.exports = {
         }
 
         if (!args) {
-            let embed = new MusicEmbed(client, msg).setTitle('What should I play?');
-            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+            let noargs = new MusicEmbed(client, msg).setTitle('What should I play?');
+            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [noargs] }) : msg.reply({ embeds: [noargs] }).catch(() => msg.channel.send({ embeds: [noargs] }));
         }
 
         if (!channel.joinable || !channel.speakable) {
-            let embed = new MusicEmbed(client, msg).setTitle('I can\'t play in that voice channel!');
-            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+            let noperms = new MusicEmbed(client, msg).setTitle('I can\'t play in that voice channel!');
+            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [noperms] }) : msg.reply({ embeds: [noperms] }).catch(() => msg.channel.send({ embeds: [noperms] }));
         }
 
         if (!subscription) {
@@ -51,7 +70,7 @@ module.exports = {
 
             if (query.startsWith('https://open.spotify.com/track')) {
                 let searching = new MusicEmbed(client, msg, 'searching-spotify');
-                reply = await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
+                reply = msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [searching] }) : await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
 
                 try {
                     if (play.is_expired()) await play.refreshToken();
@@ -59,12 +78,12 @@ module.exports = {
                     query = search.artists[0].name + ' - ' + search.name;
                 } catch {
                     let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid Spotify URL!');
-                    reply.edit({ embeds: [notFound] });
+                    reply.edit({ embeds: [notFound] }).catch(() => msg.channel.send({ embeds: [notFound] }));
                     return subscription.destroy();
                 }
             } else {
                 let searching = new MusicEmbed(client, msg, 'searching');
-                reply = await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
+                reply = msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [searching] }) : await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
             }
 
             if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
@@ -91,7 +110,7 @@ module.exports = {
                 for (const video of data.videos) {
                     const track = new Track(
                         video,
-                        msg.author,
+                        author,
                         function onStart() {
                             let onstart = new MusicEmbed(client, msg, 'playing', this);
                             msg.channel.send({ embeds: [onstart] });
@@ -99,7 +118,7 @@ module.exports = {
                         function onFinish() {},
                         function onError() {
                             let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
-                            msg.reply({ embeds: [onerror] }).catch(() => msg.channel.send({ embeds: [onerror] }));
+                            msg.channel.send({ embeds: [onerror] });
                         }
                     );
 
@@ -118,7 +137,7 @@ module.exports = {
 
 			const track = new Track(
                 data,
-                msg.author,
+                author,
                 function onStart() {
                     let onstart = new MusicEmbed(client, msg, 'playing', this);
                     msg.channel.send({ embeds: [onstart] });
@@ -138,15 +157,15 @@ module.exports = {
             });
 
 			subscription.add(track);
+            
             let enqueued = new MusicEmbed(client, msg, 'enqueued', track);
 			return reply.edit({ embeds: [enqueued] });
 		} catch (err) {
-            console.log('Music Commands (ERROR) >> play: Error Running Command'.red);
+            console.error('Music Commands (ERROR) >> play: Error Running Command'.red);
 			console.error(err);
-            console.log('<------------------------------------------->'.red);
             
-            let embed = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
-            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+            let fail = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
+            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [fail] }) : msg.reply({ embeds: [fail] }).catch(() => msg.channel.send({ embeds: [fail] }));
         }
     }
 };

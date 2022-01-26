@@ -1,10 +1,11 @@
-// This is the command handler, CODENAME: Commander v3.0.0
-// Last Update: Modules and Commands converted to seperate classes
+// This is the command handler, CODENAME: Commander v4.0.0
+// Last Update: Added slash commander
 const Discord = require('discord.js');
 const { failEmbed } = require('@utils/other/embeds');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+
 // -----------------------------------
 const perms = [ // 37047360
     // GENERAL
@@ -32,6 +33,8 @@ class Commander {
         this.client = client;
         this.prefix = client.prefix;
         this.readline = readline.createInterface(process.stdin);
+        
+        this.global = new Discord.Collection();
         this.guilds = new Discord.Collection();
 
         // Music
@@ -45,7 +48,7 @@ class Commander {
             const commandText = content.shift().toLowerCase();
             const args = content.join(' ');
 
-            const command = client.groups.get('CLI').get(commandText) || client.groups.get('CLI').get(this.client.aliases.get(commandText));
+            const command = this.groups.get('CLI').get(commandText) || this.groups.get('CLI').get(this.aliases.get(commandText));
             if (!command || command.disabled) return;
 
             try {
@@ -71,12 +74,12 @@ class Commander {
             const commandText = content.shift().toLowerCase();
             const args = content.join(' ');
         
-            const command = this.client.commands.get(commandText) || this.client.commands.get(this.client.aliases.get(commandText));
-            if (!command || command.disabled) return false;
+            const command = this.commands.get(commandText) || this.commands.get(this.aliases.get(commandText));
+            if (!command || command.disabled || command.group && command.group == 'CLI') return;
 
             if (!command.validate(msg)) return;
     
-            let cooldown = command.getCooldown(msg);
+            let cooldown = command.getCooldown(msg.guild, msg.author);
             if (cooldown) {
                 let wait = failEmbed(`Please wait \`${cooldown}\` seconds before using that command again!`, msg.author)
                 return msg.reply({ embeds: [wait] }).catch(() => msg.channel.send({ embeds: [wait] }));
@@ -90,7 +93,7 @@ class Commander {
         });
     }
 
-    static async initialize(client) {
+    static initialize(client) {
         try {
             let commander = new Commander(client);
             commander.registerCommands();
@@ -99,7 +102,7 @@ class Commander {
 
             return commander;
         } catch (err) {
-            return Commander.handleError(client, err)
+            Commander.handleError(client, err);
         }
     }
 
@@ -173,17 +176,12 @@ class Commander {
     
                     const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
                     const command = new CommanderCommand(object, this);
-                    if (!command.guilds || !command.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
+                    if (!command.guilds || !command.guilds.includes(folder)) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
 
                     this.commands.set(command.name, command);
                 }
             }
         }
-
-        this.client.commands = this.commands;
-        this.client.aliases = this.aliases;
-        this.client.cooldowns = this.cooldowns;
-        this.client.groups = this.groups;
     }
 
 
@@ -221,7 +219,7 @@ class Commander {
     
                     const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
                     const module = new CommanderModule(object, this);
-                    if (!module.guilds || !module.guilds.includes(folder)) console.log(`Commander (WARNING) >> Guild Not Set For Guild Module: ${module.name}`.yellow);
+                    if (!module.guilds || !module.guilds.includes(folder)) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Module: ${module.name}`.yellow);
     
                     module.initialize(this.client);
 
@@ -229,8 +227,6 @@ class Commander {
                 }
             }
         }
-
-        this.client.modules = this.modules;
     }
 
     authorize(msg) {
@@ -239,18 +235,20 @@ class Commander {
         if (!msg.guild.me.permissions.has(perms)) {
             let noPerms = failEmbed('I don\'t have enough permissions in this server. Try contacting an admin!')
             msg.author.send({ embeds: [noPerms] }).catch(err => {
-                console.log('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
-                console.log(`REASON: ${err.meesage}`.red);
+                console.error('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
+                console.error(err);
             });
+
             return false;
         }
 
         if (!msg.channel.permissionsFor(this.client.user).has(perms)) {
             let noPerms = failEmbed('I don\'t have enough permissions to type in that channel!');
             msg.author.send({ embeds: [noPerms] }).catch(err => {
-                console.log('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
-                console.log(`REASON: ${err.meesage}`.red);
+                console.error('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
+                console.error(err);
             });
+            
             return false;
         };
 
@@ -288,35 +286,27 @@ class Commander {
                 if (msg) await msg.channel.send({embeds: [embed]});
             }
 
-            console.log('Commander (ERROR) >> Command Error! Logged to file!'.red);
-            console.log(errorObject.errorStack);
+            console.error('Commander (ERROR) >> Command Error! Logged to file!'.red);
+            console.error(errorObject.errorStack);
             process.exit();
         })
     }
 }
 
 class CommanderCommand {
-    constructor(command, commander) {
+    constructor(object, commander) {
         this.commander = commander;
-        this.command = command;
+        this.object = object;
 
-        for (const key in command) {
-            this[key] = command[key];
-        }
-
-        if (this.guilds) {
-            for (const guildId of this.guilds) {
-                if (!this.commander.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${this.name}`.yellow);
-
-                let guild = this.commander.guilds.get(guildId) || {};
-                guild.commands = guild.commands || new Discord.Collection();
-                guild.commands.set(this.name, this);
-
-                this.commander.guilds.set(guildId, guild);
-            }
+        for (const key in object) {
+            this[key] = object[key];
         }
 
         if (this.users) this.users.push(this.commander.client.owner);
+
+        if (this.aliases) {
+            this.aliases.forEach((alias) => this.commander.aliases.set(alias, this.name))
+        }
 
         if (this.commander.groups.has(this.group)) {
             this.commander.groups.get(this.group).set(this.name, this);
@@ -324,8 +314,18 @@ class CommanderCommand {
             console.warn(`Commander (WARNING) >> Command Group Does Not Exist: ${this.group} (${this.name})`)
         }
 
-        if (this.aliases) {
-            this.aliases.forEach((alias) => this.commander.aliases.set(alias, this.name))
+        if (this.guilds) {
+            for (const guildId of this.guilds) {
+                if (!this.commander.client.guilds.cache.has(guildId)) console.warn(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${this.name}`.yellow);
+
+                let guild = this.commander.guilds.get(guildId) || {};
+                guild.commands = guild.commands || new Discord.Collection();
+                guild.commands.set(this.name, this);
+
+                this.commander.guilds.set(guildId, guild);
+            }
+        } else {
+            this.commander.global.set(this.name, this);
         }
     }
 
@@ -341,18 +341,18 @@ class CommanderCommand {
         return true;
     }
 
-    getCooldown(msg) {
+    getCooldown(guild, user) {
         const now = Date.now();
 
         if (!this.cooldown) return false;
 
         let cooldown = this.cooldown * 1000;
-        if (!this.commander.cooldowns.has(msg.guildId || 'dm')) this.commander.cooldowns.set(msg.guildId || 'dm', new Discord.Collection());
+        if (!this.commander.cooldowns.has(guild.id || 'dm')) this.commander.cooldowns.set(guild.id || 'dm', new Discord.Collection());
 
-        let cooldowns = this.commander.cooldowns.get(msg.guildId || 'dm');
-        if (!cooldowns.has(msg.author.id)) cooldowns.set(msg.author.id, new Discord.Collection());
+        let cooldowns = this.commander.cooldowns.get(guild.id || 'dm');
+        if (!cooldowns.has(user.id)) cooldowns.set(user.id, new Discord.Collection());
         
-        let usages = cooldowns.get(msg.author.id);
+        let usages = cooldowns.get(user.id);
         if (usages.has(this.name)) {
             let expire = usages.get(this.name) + cooldown;
             if (now < expire) return ((expire - now) / 1000).toFixed();
@@ -384,7 +384,7 @@ class CommanderModule {
 
         if (this.guilds) {
             for (const guildId of this.guilds) {
-                if (!this.commander.client.guilds.cache.has(guildId)) console.log(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${this.name}`.yellow);
+                if (!this.commander.client.guilds.cache.has(guildId)) console.warn(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${this.name}`.yellow);
 
                 let guild = this.commander.guilds.get(guildId) || {};
                 guild.modules = guild.modules || new Discord.Collection();
@@ -396,12 +396,8 @@ class CommanderModule {
     }
 
     initialize(client) {
-        try {
-            this.run(client);
-            console.log(`Commander >> Loaded ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.brightGreen);
-        } catch (err) {
-            Commander.handleError(client, err);
-        }
+        this.run(client);
+        console.log(`Commander >> Loaded ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.brightGreen);
     }
 }
 

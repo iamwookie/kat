@@ -1,21 +1,32 @@
 const Discord = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
     name: 'help',
     group: 'Misc',
     description: 'Stop it. Get some help.',
+
+    // SLASH
+    data() {
+        let data = new SlashCommandBuilder()
+        .setName(this.name)
+        .setDescription(this.description);
+        return data;
+    },
+
     async run(client, msg) {
+        let author = msg instanceof Discord.CommandInteraction ? msg.user : msg.author;
         let replyEmbed = new Discord.MessageEmbed()
         .setColor('RANDOM')
         .setTitle('**Help Menu**')
-        .setAuthor({ name: msg.author.tag, iconURL: msg.author.avatarURL({dynamic: true}) });
+        .setAuthor({ name: author.tag, iconURL: author.avatarURL({dynamic: true}) });
 
         let prefix = client.prefix;
 
-        if (msg.guild) prefix = await client.database.get(msg.guildId, 'prefix') || client.prefix;
+        if (msg instanceof Discord.CommandInteraction ? msg.inGuild() : msg.guild) prefix = await client.database.get(msg.guildId, 'prefix') || client.prefix;
 
         // We build the reply here.
-        client.groups.forEach((group, key) => {
+        client.commander.groups.forEach((group, key) => {
             if (key == 'CLI') return;
 
             let reply = '';
@@ -37,6 +48,6 @@ module.exports = {
             if (reply) replyEmbed.addField(key + ' Commands', reply);
         });
         
-        msg.reply({ embeds: [replyEmbed] }).catch(() => msg.channel.send({ embeds: [replyEmbed] }));
+        msg instanceof Discord.CommandInteraction ? msg.editReply({ embeds: [replyEmbed] }) : msg.reply({ embeds: [replyEmbed] }).catch(() => msg.channel.send({ embeds: [replyEmbed] }));
     }
 };

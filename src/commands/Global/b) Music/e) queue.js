@@ -1,3 +1,5 @@
+const Discord = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const progressbar = require('string-progressbar');
 const { MusicEmbed } = require('@utils/other/embeds');
 
@@ -7,11 +9,20 @@ module.exports = {
     description: 'View the queue.',
     cooldown: 5,
     guildOnly: true,
-    async run(client, msg, args) {
-        let subscription = client.subscriptions.get(msg.guildId)
+
+    // SLASH
+    data() {
+        let data = new SlashCommandBuilder()
+        .setName(this.name)
+        .setDescription(this.description);
+        return data;
+    },
+
+    async run(client, msg) {
+        let subscription = client.subscriptions.get(msg.guildId);
         let empty = new MusicEmbed(client, msg).setTitle('The queue is empty!');
 
-        if (!subscription) return msg.reply({ embeds: [empty] }).catch(() => msg.channel.send({ embeds: [empty] }));
+        if (!subscription) return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [empty] }) : msg.reply({ embeds: [empty] }).catch(() => msg.channel.send({ embeds: [empty] }));
 
         if (subscription.queue.length || subscription.playing) {
             let res = ''
@@ -37,12 +48,11 @@ module.exports = {
                 }
             }
 
-            let embed = new MusicEmbed(client, msg, 'queue')
-            embed.setDescription(res)
-            
-            return msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
+            let queue = new MusicEmbed(client, msg, 'queue');
+            queue.setDescription(res);
+            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [queue] }) : msg.reply({ embeds: [queue] }).catch(() => msg.channel.send({ embeds: [queue] }));
         } else {
-            return msg.reply({ embeds: [empty] }).catch(() => msg.channel.send({ embeds: [empty] }));
+            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [empty] }) : msg.reply({ embeds: [empty] }).catch(() => msg.channel.send({ embeds: [empty] }));
         }
     }
 };

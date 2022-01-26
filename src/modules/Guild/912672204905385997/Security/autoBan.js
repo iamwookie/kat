@@ -14,8 +14,8 @@ module.exports = {
 
             if (banned.includes(member.id)) {
                 const notallowed = failEmbed(`You have been auto banned from ${member.guild.name}. We do not want you here!`, member.user);
-                await member.send({ embeds: [notallowed] }).catch(err => { console.log(`Guild Modules (ERROR) (${this.guilds[0]}) >> Shadow Ban: Failed To Send Banned DM`.red); console.log(err); });
-                member.ban({ reason: 'Shadow Ban (CAT)'}).catch(err => { console.log(`Guild Modules (ERROR) (${this.guilds[0]}) >> Shadow Ban: Failed To Ban User: ${member.id}`.red); console.log(err); });
+                await member.send({ embeds: [notallowed] }).catch(err => { console.error(`Guild Modules (ERROR) (${this.guilds[0]}) >> Shadow Ban: Failed To Send Banned DM`.red); console.error(err); });
+                member.ban({ reason: 'Shadow Ban (CAT)'}).catch(err => { console.error(`Guild Modules (ERROR) (${this.guilds[0]}) >> Shadow Ban: Failed To Ban User: ${member.id}`.red); console.error(err); });
             }
         });
     }
