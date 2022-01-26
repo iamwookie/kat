@@ -82,7 +82,7 @@ class SlashCommander {
                 commands.push(command.data().toJSON());
             }
 
-            await this.client.application.commands.set(commands);
+            if (commands.length) await this.client.application.commands.set(commands);
             console.error('SlashCommander >> Successfully Registered Global Commands.'.brightGreen);
         } catch (err) {
             console.error('SlashCommander (ERROR) >> Error Registering Global Slash Commands'.red);
@@ -108,7 +108,7 @@ class SlashCommander {
                 }
 
                 const guild = this.client.guilds.cache.get(k);
-                if (guild) await guild.commands.set(commands).catch(err => {
+                if (commands.length && guild) await guild.commands.set(commands).catch(err => {
                     console.error(`SlashCommander (ERROR) >> Error Registering Guild Slash Commands For: ${guild.id}`.red);
                     console.error(err);
                 });
