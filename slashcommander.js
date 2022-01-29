@@ -83,7 +83,7 @@ class SlashCommander {
             }
 
             if (commands.length) await this.client.application.commands.set(commands);
-            console.error('SlashCommander >> Successfully Registered Global Commands.'.brightGreen);
+            console.log('SlashCommander >> Successfully Registered Global Commands.'.brightGreen);
         } catch (err) {
             console.error('SlashCommander (ERROR) >> Error Registering Global Slash Commands'.red);
             console.error(err.stack);
@@ -113,7 +113,7 @@ class SlashCommander {
                     console.error(err);
                 });
             }
-            console.error('SlashCommander >> Successfully Registered Guild Commands.'.brightGreen);
+            console.log('SlashCommander >> Successfully Registered Guild Commands.'.brightGreen);
         } catch (err) {
             console.error('SlashCommander (ERROR) >> Error Registering Guild Slash Commands'.red);
             console.error(err);
