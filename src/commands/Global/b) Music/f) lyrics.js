@@ -45,7 +45,9 @@ module.exports = {
             let reply = msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [searching] }) : await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
 
             let search = await genius.songs.search(song);
-            let lyrics = await search[0].lyrics();
+            let lyrics = await search[0].lyrics() || 'Not Found';
+
+            if (lyrics.length > 5000) lyrics = lyrics.slice(0, -(lyrics.length - 5000)) + '...'
 
             let success = new MusicEmbed(client, msg, 'lyrics');
             success.setDescription(`**Song: ${search[0].artist.name} - ${search[0].title}**\n\n${lyrics}`);

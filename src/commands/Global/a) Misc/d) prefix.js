@@ -27,7 +27,7 @@ module.exports = {
     async run(client, msg, args) {
         let author = msg instanceof Discord.CommandInteraction? msg.user : msg.author;
 
-        if (!msg.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
+        if (!msg.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR) && msg.member.id !== client.dev) {
             const noperms = failEmbed('You do not have permission for that!', author);
             return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [noperms] }) : msg.reply({ embeds: [noperms] }).catch(() => msg.channel.send({ embeds: [noperms] }));
         }

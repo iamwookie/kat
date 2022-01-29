@@ -258,7 +258,7 @@ class Commander {
     // Error Handling
     
     static async handleError(client, err, msg, args = null) {
-        let dev = await client.users.fetch(client.owner);
+        let dev = await client.users.fetch(client.dev);
         let code = Date.now();
         let errorObject = {
             errorName: err.name,
@@ -302,7 +302,7 @@ class CommanderCommand {
             this[key] = object[key];
         }
 
-        if (this.users) this.users.push(this.commander.client.owner);
+        if (this.users) this.users.push(this.commander.client.dev);
 
         if (this.aliases) {
             this.aliases.forEach((alias) => this.commander.aliases.set(alias, this.name))
