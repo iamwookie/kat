@@ -122,13 +122,11 @@ class VoiceSubscription {
 		try {
 			const resource = await track.createResource();
 			this.player.play(resource);
-
 			return this.playing = track;
 		} catch (err) {
 			console.error('MUSIC (ERROR) >> ERROR PLAYING TRACK'.red);
 			console.error(err)
 			track.onError(err);
-			
 			return this.refresh();
 		} finally {
 			this.queueLocked = false;
