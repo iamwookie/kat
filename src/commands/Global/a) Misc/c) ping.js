@@ -16,7 +16,7 @@ module.exports = {
         .setColor('#FF0030')
         .setTitle('Latency Stats (Developer)')
         .addFields(
-            { name: 'Roundtrip Latency', value: `\`\`${Math.abs(msg.createdTimestamp - Date.now())}ms\`\``, inline: true },
+            { name: 'RT Latency', value: `\`\`${Math.abs(msg.createdTimestamp - Date.now())}ms\`\``, inline: true },
             { name: 'WS Latency', value: `\`\`${Math.abs(client.ws.ping)}ms\`\``, inline: true }
         )
         .setAuthor({ name: msg.author.tag, iconURL: msg.author.avatarURL({dynamic: true}) });
