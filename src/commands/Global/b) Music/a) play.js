@@ -68,25 +68,28 @@ module.exports = {
         try {
             let query = args;
 
-            if (query.startsWith('https://open.spotify.com/track')) {
+            if (query.startsWith('https://open.spotify.com/')) {
                 let searching = new MusicEmbed(client, msg, 'searching-spotify');
                 reply = msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [searching] }) : await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
 
                 try {
                     if (play.is_expired()) await play.refreshToken();
+
                     let search = await play.spotify(query);
-                    query = search.artists[0].name + ' - ' + search.name;
-                } catch {
+                    if (search instanceof play.SpotifyPlaylist || search instanceof play.SpotifyAlbum) {
+                        data = search;
+                    } else {
+                        data = await play.search(search.artists[0].name + ' - ' + search.name);
+                    }
+                } catch(err) {
                     let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid Spotify URL!');
                     reply.edit({ embeds: [notFound] }).catch(() => msg.channel.send({ embeds: [notFound] }));
                     return subscription.destroy();
                 }
-            } else {
+            } else if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
                 let searching = new MusicEmbed(client, msg, 'searching');
                 reply = msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [searching] }) : await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
-            }
-
-            if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
+                
                 try {
                     let search = await play.playlist_info(query, { incomplete: true });
                     data = search;
@@ -96,6 +99,9 @@ module.exports = {
                     return subscription.destroy();
                 }
             } else {
+                let searching = new MusicEmbed(client, msg, 'searching');
+                reply = msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [searching] }) : await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
+                
                 let search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
                 data = search[0];
             }
@@ -106,32 +112,63 @@ module.exports = {
                 return subscription.destroy();
             }
 
-            if (data.type == 'playlist') {
-                for (const video of data.videos) {
-                    const track = new Track(
-                        video,
-                        author,
-                        function onStart() {
-                            let onstart = new MusicEmbed(client, msg, 'playing', this);
-                            msg.channel.send({ embeds: [onstart] });
-                        },
-                        function onFinish() {},
-                        function onError() {
-                            let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
-                            msg.channel.send({ embeds: [onerror] });
-                        }
-                    );
+            if (data.type == 'playlist' || data.type == 'album') {
+                let enqueued = new MusicEmbed(client, msg, 'enqueued', data);
 
-                    subscription.add(track);
+                if (data instanceof play.YouTubePlayList) {
+                    for (const video of data.videos) {
+                        
+                        const track = new Track(
+                            video,
+                            author,
+                            function onStart() {
+                                let onstart = new MusicEmbed(client, msg, 'playing', this);
+                                msg.channel.send({ embeds: [onstart] });
+                            },
+                            function onFinish() {},
+                            function onError() {
+                                let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
+                                msg.channel.send({ embeds: [onerror] });
+                            }
+                        );
+    
+                        subscription.add(track);
+                    }
                 }
 
+                if (data instanceof play.SpotifyPlaylist || data instanceof play.SpotifyAlbum) {
+                    let spotifyTracks = await data.all_tracks();
+
+                    for (const spotifyTrack of spotifyTracks) {
+                        let ytSearch = await play.search(spotifyTrack.artists[0].name + ' - ' + spotifyTrack.name, { limit: 1, source: { youtube: 'video' } })
+
+                        if (ytSearch.length) {
+                            const track = new Track(
+                                ytSearch[0],
+                                author,
+                                function onStart() {
+                                    let onstart = new MusicEmbed(client, msg, 'playing', this);
+                                    msg.channel.send({ embeds: [onstart] });
+                                },
+                                function onFinish() {},
+                                function onError() {
+                                    let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track: ' + this.title);
+                                    msg.channel.send({ embeds: [onerror] });
+                                }
+                            );
+        
+                            subscription.add(track);
+                        }
+                    }
+
+                    await reply.channel.send({ embeds: [enqueued] });
+                }
+                
                 console.log('Music Commands >> play: Added Playlist:'.magenta);
                 console.log({
-                    Title: data.title,
+                    Title: data instanceof play.SpotifyPlaylist || data instanceof play.SpotifyAlbum? data.name : data.title,
                     URL: data.url
                 });
-
-                let enqueued = new MusicEmbed(client, msg, 'enqueued', data);
                 return reply.edit({ embeds: [enqueued] });
             }
 
