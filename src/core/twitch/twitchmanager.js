@@ -19,9 +19,7 @@ class TwitchManager {
 
     async getStreamByUserName(user) {
         if (!user) throw new Error('User not defined.');
-
         let stream = await this.apiClient.streams.getStreamByUserName(user);
-
         return stream;
     }
 }

@@ -257,7 +257,7 @@ class Commander {
 
     // Error Handling
     
-    static async handleError(client, err, msg, args = null) {
+    static async handleError(client, err, msg, args) {
         let dev = await client.users.fetch(client.dev);
         let code = Date.now();
         let errorObject = {
