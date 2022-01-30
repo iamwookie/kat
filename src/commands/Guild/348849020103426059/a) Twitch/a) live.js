@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const TwitchManager = require('@core/twitch/twitchmanager');
 const { successEmbed, failEmbed, loadEmbed } = require('@utils/other/embeds');
 // -----------------------------------
@@ -15,6 +16,7 @@ module.exports = {
     // AUTHORIZATION
     guilds: ['348849020103426059', '729660181226455160'],
     users: ['182543450753728524'],
+    
     async run(client, msg) {
         let wait = loadEmbed('Searching...', msg.author);
 
@@ -50,7 +52,9 @@ module.exports = {
                     let channel = await client.channels.fetch(channelid);
                     if (channel) channel.send({ content: "@everyone", embeds: [embed] });
                 } catch (err) {
-                    console.log(`Guild Commands (ERROR) (${this.guilds[0]}) >> live: Failed To Fetch Channel`.red); console.log(err);
+                    console.error(`Guild Commands (ERROR) (${this.guilds[0]}) >> live: Failed To Fetch Channel`.red); 
+                    console.error(err);
+                    
                     let fail = failEmbed('Failed to send message(s)!');
                     return waitMessage.edit({ embeds: [fail] }).then(msg => setTimeout(() => msg.delete(), 5000));
                 }

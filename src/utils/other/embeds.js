@@ -6,7 +6,7 @@ class MusicEmbed extends Discord.MessageEmbed {
 
         this.client = client;
         this.guild = message.guild;
-        this.author = message.author;
+        this.author = message instanceof Discord.CommandInteraction? message.user : message.author;
         this.type = type;
         this.track = track;
 
@@ -68,6 +68,10 @@ class MusicEmbed extends Discord.MessageEmbed {
                 this.setAuthor({ name: `Requested By: ${this.track.author.tag}`, iconURL: this.track.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`Track Paused`);
                 this.setDescription(`[${this.track.title} [${this.track.duration}]](${this.track.url})`);
+                break;
+            case 'lyrics':
+                this.setAuthor({ name: `Requested By: ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
+                this.setTitle(`Lryics`);
                 break;
             default:
                 this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });

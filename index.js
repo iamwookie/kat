@@ -5,10 +5,12 @@ require('colors');
 const { Client, Intents } = require('discord.js');
 // ------------------------------------
 const Commander = require('./commander');
+const SlashCommander = require('./slashcommander');
+const CommanderDatabase = require('./database');
+// ------------------------------------
 const { bot } = require('./config.json');
 const redis = require('./redis');
 const now = Date.now();
-const CommanderDatabase = require('./database');
 // ------------------------------------
 const client = new Client({   
     intents: [
@@ -34,7 +36,7 @@ const client = new Client({
     }
 });
 client.prefix = bot.prefix,
-client.owner = '244662779745665026'
+client.dev = '244662779745665026'
 
 console.log('>>> Loading...\n'.magenta.bold.underline);
 
@@ -42,7 +44,8 @@ client.once('ready', async (client) => {
     // ------------------------------------
     client.redis = await redis();
     client.database = await CommanderDatabase.initialize(client);
-    client.commander = await Commander.initialize(client);
+    client.commander = Commander.initialize(client);
+    client.slash = SlashCommander.initialize(client, client.commander);
     // ------------------------------------
     console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`.magenta.bold.underline);
     console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);
