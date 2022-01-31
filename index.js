@@ -27,10 +27,11 @@ const client = new Client({
         'CHANNEL' // Partials are used to read DM messages.
     ],
     presence: {
+        status: 'dnd',
         activities: [
             {
-                name: 'cat music.',
-                type: 'LISTENING'
+                name: 'your heart <3',
+                type: 'COMPETING'
             }
         ]
     }
