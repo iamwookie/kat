@@ -8,7 +8,7 @@ module.exports = {
     name: 'lyrics',
     group: 'Music',
     description: 'View the currently playing tracks lyrics or search for one.',
-    format: '<search>',
+    format: '<?search>',
     cooldown: 5,
     guildOnly: true,
 

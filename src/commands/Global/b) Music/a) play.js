@@ -9,7 +9,7 @@ module.exports = {
     name: 'play',
     group: 'Music',
     description: 'Search for a track and play it or add it to the queue.',
-    format: '<search / url>',
+    format: '<?search/url>',
     cooldown: 5,
     guildOnly: true,
 
