@@ -14,7 +14,7 @@ module.exports = {
     name: 'chance',
     aliases: ['chances'],
     group: 'Misc',
-    description: 'What are your chances at getting someone like me.',
+    description: 'What are your chances at getting someone.',
     format: '<?user>',
     guildOnly: true,
 
