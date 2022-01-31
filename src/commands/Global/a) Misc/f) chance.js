@@ -14,7 +14,7 @@ module.exports = {
     name: 'chance',
     aliases: ['chances'],
     group: 'Misc',
-    description: 'What are your chances at getting someone like me.',
+    description: 'Chances at getting someone.',
     format: '<?user>',
     guildOnly: true,
 
@@ -39,7 +39,7 @@ module.exports = {
         let calculation = Math.round(Math.random() * 100);
         let reply = new Discord.MessageEmbed()
         .setTitle(`:smirk: \u200b ${author.username}\'s Chances`)
-        .setDescription(`${calculation == 0? calculation : `-${calculation}`}%`)
+        .setDescription(`${calculation}%`)
         .setColor('RANDOM')
         .setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
 
