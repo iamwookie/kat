@@ -19,7 +19,8 @@ module.exports = {
         let replyEmbed = new Discord.MessageEmbed()
         .setColor('RANDOM')
         .setTitle('**Help Menu**')
-        .setAuthor({ name: author.tag, iconURL: author.avatarURL({dynamic: true}) });
+        .setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) })
+        .setFooter({ text: 'Parameters with a \'?\' at the start are optional.' });
 
         let prefix = client.prefix;
 

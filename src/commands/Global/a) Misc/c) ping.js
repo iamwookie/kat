@@ -19,7 +19,7 @@ module.exports = {
             { name: 'RT Latency', value: `\`\`${Math.abs(msg.createdTimestamp - Date.now())}ms\`\``, inline: true },
             { name: 'WS Latency', value: `\`\`${Math.abs(client.ws.ping)}ms\`\``, inline: true }
         )
-        .setAuthor({ name: msg.author.tag, iconURL: msg.author.avatarURL({dynamic: true}) });
+        .setAuthor({ name: msg.author.tag, iconURL: msg.author.avatarURL({ dynamic: true }) });
     
         msg.reply({ embeds: [embed] }).catch(() => msg.channel.send({ embeds: [embed] }));
     }
