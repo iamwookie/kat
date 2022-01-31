@@ -46,7 +46,7 @@ module.exports = {
         if (msg instanceof Discord.CommandInteraction? msg.options.getMentionable('user') : args) {
             let mention = msg instanceof Discord.CommandInteraction? msg.options.getMentionable('user') : msg.mentions.members.first();
             if(mention instanceof Discord.GuildMember) {
-                reply.setTitle(`:smirk: \u200b ${mention.user.username}\'s Chances :smirk:`);
+                reply.setTitle(`:smirk: \u200b ${mention.user.username}\'s Chances`);
                 if (mention.user.id == client.user.id) {
                     let res = ':no_entry: ERROR: The measurement values are invalid.'
                     return msg instanceof Discord.CommandInteraction? msg.editReply(res) : msg.reply(res).catch(() => msg.channel.send(res));
