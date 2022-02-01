@@ -75,7 +75,8 @@ module.exports = {
                     if (search instanceof play.SpotifyPlaylist || search instanceof play.SpotifyAlbum) {
                         data = search;
                     } else {
-                        data = await play.search(search.artists[0].name + ' - ' + search.name);
+                        let searchArray = await play.search(search.artists[0].name + ' - ' + search.name);
+                        data = searchArray[0];
                     }
                 } catch(err) {
                     let notFound = new MusicEmbed(client, msg).setTitle('You have not provided a valid Spotify URL!');

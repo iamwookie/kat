@@ -91,10 +91,8 @@ class MusicSubscription {
 			try {
 				await DiscordVoice.entersState(this.voice, DiscordVoice.VoiceConnectionStatus.Ready, timeout);
 				console.log('Music (VOICE) >> Connection Ready'.brightGreen);
-			} catch(err) {
+			} catch {
 				if (this.voice.state.status !== DiscordVoice.VoiceConnectionStatus.Destroyed) this.voice.destroy();
-				console.error('Music (ERROR) >> Error Readying Voice');
-				console.error(err);
 			} finally {
 				this.readyLock = false;
 			}

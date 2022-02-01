@@ -55,13 +55,6 @@ module.exports = {
                 let noMention = failEmbed('You have not mentioned a valid user!', author);
                 return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [noMention] }) : msg.reply({ embeds: [noMention] }).catch(() => msg.channel.send({ embeds: [noMention] }));
             }
-        } else {
-            if (author.id == '130065975956471808') {
-                return msg instanceof Discord.CommandInteraction? msg.editReply(gif) : msg.reply(gif).catch(() => msg.channel.send(gif));
-            }
-            if (author.id == '438438026566172682') {
-                reply.setDescription(`8${body.repeat(Math.floor(Math.random() * 5))}D`);
-            }
         }
 
         msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [reply] }) : msg.reply({ embeds: [reply] }).catch(() => msg.channel.send({ embeds: [reply] }));
