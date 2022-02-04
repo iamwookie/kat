@@ -30,8 +30,8 @@ const client = new Client({
         status: 'dnd',
         activities: [
             {
-                name: 'your heart <3',
-                type: 'COMPETING'
+                name: '!help',
+                type: 'LISTENING'
             }
         ]
     }
