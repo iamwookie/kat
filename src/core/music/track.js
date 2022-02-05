@@ -31,7 +31,6 @@ class Track {
                     return msg.channel.send({ embeds: [onerror] });
                 }
             );
-            console.log(track)
             return track;
         } catch (err) {
             console.error('Music >> Error Creating Track'.red);
