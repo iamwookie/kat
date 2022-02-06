@@ -13,7 +13,7 @@ module.exports = {
 
             if (!cache.includes(member.id)) cache.push(member.id);
 
-            client.joins.set(member.guild.id, cache)
+            client.joins.set(member.guild.id, cache);
         });
     }
 }

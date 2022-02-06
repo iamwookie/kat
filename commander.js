@@ -25,7 +25,8 @@ const groups = [
     'CLI',
     'Misc',
     'Music',
-    'Twitch'
+    'Twitch',
+    'Moderation'
 ];
 
 class Commander {

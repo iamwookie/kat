@@ -34,7 +34,7 @@ module.exports = {
 
         if (!args && !msg instanceof Discord.CommandInteraction) {
             const noargs = failEmbed('You did not provide a prefix!', author);
-            return msg.reply({ embeds: [noargs] }).catch(() => msg.channel.send({ embeds: [noargs] }));
+            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [noargs] }) : msg.reply({ embeds: [noargs] }).catch(() => msg.channel.send({ embeds: [noargs] }));
         }
 
         let prefix = msg instanceof Discord.CommandInteraction? msg.options.getString('prefix').split(' ')[0] : args.split(' ')[0];
