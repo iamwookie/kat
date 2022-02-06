@@ -1,5 +1,6 @@
 const DiscordVoice = require('@discordjs/voice');
 const play = require('play-dl');
+const { MusicEmbed } = require('@utils/other/embeds');
 
 class Track {
     constructor(video, author, onStart, onFinish, onError) {
@@ -12,6 +13,30 @@ class Track {
         this.onStart = onStart ? onStart : () => {};
         this.onFinish = onFinish ? onFinish : () => {};
         this.onError = onError ? onError : () => {};
+    }
+
+    static create(client, msg, data, author) {
+        try {
+            const track = new Track(
+                data,
+                author,
+                function onStart() {
+                    let onstart = new MusicEmbed(client, msg, 'playing', this);
+                    return msg.channel.send({ embeds: [onstart] });
+                },
+                function onFinish() {},
+                function onError() {
+                    let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track');
+                    onerror.setDescription(`[${this.title}](${this.url})`);
+                    return msg.channel.send({ embeds: [onerror] });
+                }
+            );
+            return track;
+        } catch (err) {
+            console.error('Music >> Error Creating Track'.red);
+            console.error(err);
+            return false;
+        }
     }
 
     async createResource() {

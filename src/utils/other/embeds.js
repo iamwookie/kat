@@ -12,7 +12,7 @@ class MusicEmbed extends Discord.MessageEmbed {
         this.data = data;
 
         this.setColor('#C167ED');
-        this.setFooter({ text: `${this.guild.name} | 🎵 CAT Global Music System`, iconURL: this.guild.iconURL({ dynamic: true }) });
+        this.setFooter({ text: `${this.guild.name} | 🎵 ${this.client.user.username} Global Music System`, iconURL: this.guild.iconURL({ dynamic: true }) });
         this.setType(this.type);
     }
 
@@ -28,6 +28,10 @@ class MusicEmbed extends Discord.MessageEmbed {
             case 'searching-spotify':
                 this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`${loading} \u200b Searching Spotify...`);
+                break;
+            case 'adding-playlist':
+                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
+                this.setTitle(`${loading} \u200b Adding Playlist...`);
                 break;
             case 'enqueued':
                 this.setAuthor({ name: `Requested By: ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
