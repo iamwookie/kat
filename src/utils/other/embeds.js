@@ -29,6 +29,10 @@ class MusicEmbed extends Discord.MessageEmbed {
                 this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`${loading} \u200b Searching Spotify...`);
                 break;
+            case 'adding-playlist':
+                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
+                this.setTitle(`${loading} \u200b Adding Playlist...`);
+                break;
             case 'enqueued':
                 this.setAuthor({ name: `Requested By: ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
 

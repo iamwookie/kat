@@ -3,6 +3,7 @@ const { failEmbed } = require('@utils/other/embeds');
 const banned = [
     // '204308161732149248', // R
     '263601154242379777', // E
+    '150437080286232578'
 ]
 
 module.exports = {

@@ -120,6 +120,9 @@ module.exports = {
                 }
 
                 if (data instanceof play.SpotifyPlaylist || data instanceof play.SpotifyAlbum) {
+                    let adding = new MusicEmbed(client, msg, 'adding-playlist', data);
+                    await reply.edit({ embeds: [adding] });
+
                     let spotifyTracks = await data.all_tracks();
 
                     for (const spotifyTrack of spotifyTracks) {
