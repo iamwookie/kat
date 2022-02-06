@@ -5,6 +5,7 @@ module.exports = {
     group: 'Moderation',
     description: 'Remove a user from Auto Ban.',
     hidden: true,
+    guildOnly: true,
 
     // AUTHORIZATION
     guilds: ['912672204905385997'],
