@@ -8,6 +8,7 @@ module.exports = {
     description: 'Check ping statistics.',
     hidden: true,
     cooldown: 5,
+    
     // AUTHORIZATION
     users: ['244662779745665026'],
 
