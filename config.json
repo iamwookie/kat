@@ -4,7 +4,7 @@
     },
 
     "nebula": {
-        "host": "https://localhost:2000",
+        "host": "http://localhost:2000",
         "linkExpiry": 300000
     }
 }
