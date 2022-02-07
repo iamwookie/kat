@@ -13,6 +13,7 @@ module.exports = {
     group: 'Twitch',
     description: 'Send live stream announcement.',
     hidden: true,
+    
     // AUTHORIZATION
     guilds: ['348849020103426059', '729660181226455160'],
     users: ['182543450753728524'],
@@ -47,7 +48,7 @@ module.exports = {
             )
             .setImage(imageURL);
 
-            for (const channelid of channels){
+            for (const channelid of channels) {
                 try {
                     let channel = await client.channels.fetch(channelid);
                     if (channel) channel.send({ content: "@everyone", embeds: [embed] });
