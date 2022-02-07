@@ -74,7 +74,7 @@ class NebulaLinkSession {
         .setAuthor({ name: this.user.tag, iconURL: this.user.avatarURL({ dynamic: true }) })
         .setColor('#C167ED')
         .setTitle('Nebula Link')
-        .setDescription(`[Click here to link your account!](${config.nebula.host}/${this.id})`)
+        .setDescription(`[Click here to link your account!](https://link.nebularoleplay.com/${this.id})`)
         .setFooter({ text: 'NOTE: The verification link will expire in 5 minutes.' })
         .setThumbnail('https://nebularoleplay.com/media/logo-nobg.png');
 
