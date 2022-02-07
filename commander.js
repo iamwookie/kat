@@ -26,7 +26,8 @@ const groups = [
     'Misc',
     'Music',
     'Twitch',
-    'Moderation'
+    'Moderation',
+    'Verification'
 ];
 
 class Commander {
@@ -40,6 +41,9 @@ class Commander {
 
         // Music
         this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
+
+        // Guilds
+        this.client.linkSessions = this.client.linkSessions || new Discord.Collection();
 
         // CLI Commands
         this.readline.on('line', async line => {

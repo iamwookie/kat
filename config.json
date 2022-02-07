@@ -1,5 +1,10 @@
 {
     "bot": {
         "prefix": "!"
+    },
+
+    "nebula": {
+        "host": "https://localhost:2000",
+        "linkExpiry": 300000
     }
 }
