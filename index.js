@@ -52,8 +52,8 @@ client.once('ready', async (client) => {
     console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);
 });
 
-client.on('error', function TestError(err) {
-    Commander.handleError(client, err);
+client.on('error', (err) => {
+    Commander.handleError(client, err, false);
 })
 
 client.login(process.env.BOT_TOKEN);

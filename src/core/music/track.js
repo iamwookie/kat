@@ -1,4 +1,5 @@
 const DiscordVoice = require('@discordjs/voice');
+const Commander = require('@root/commander');
 const play = require('play-dl');
 const { MusicEmbed } = require('@utils/other/embeds');
 
@@ -33,6 +34,7 @@ class Track {
             );
             return track;
         } catch (err) {
+            Commander.handleError(client, err, false);
             console.error('Music >> Error Creating Track'.red);
             console.error(err);
             return false;

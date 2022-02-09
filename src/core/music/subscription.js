@@ -1,4 +1,5 @@
 const DiscordVoice = require('@discordjs/voice');
+const Commander = require('@root/commander');
 
 class MusicSubscription {
 	constructor(client, voiceConnection, channel) {
@@ -79,6 +80,7 @@ class MusicSubscription {
 			client.subscriptions.set(channel.guild.id, sub);
 			return sub;
 		} catch (err) {
+			Commander.handleError(client, err, false);
 			console.error('Music (ERROR) >> Error Creating Subscription');
 			console.error(err);
 			return false;
@@ -92,6 +94,7 @@ class MusicSubscription {
 				await DiscordVoice.entersState(this.voice, DiscordVoice.VoiceConnectionStatus.Ready, timeout);
 				console.log('Music (VOICE) >> Connection Ready'.brightGreen);
 			} catch {
+				Commander.handleError(this.client, err, false);
 				if (this.voice.state.status !== DiscordVoice.VoiceConnectionStatus.Destroyed) this.voice.destroy();
 			} finally {
 				this.readyLock = false;
@@ -128,6 +131,7 @@ class MusicSubscription {
 				this.queueLocked = false;
 				this.playing = track;
 			} catch (err) {
+				Commander.handleError(this.client, err, false);
 				console.error('Music (ERROR) >> Error Playing Track'.red);
 				console.error(err)
 				track.onError(err);

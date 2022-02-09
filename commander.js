@@ -61,7 +61,8 @@ class Commander {
                 // Breakline
                 console.log('');
             } catch (err) {
-                this.constructor.handleError(this.client, err, args);
+                Commander.handleError(this.client, err, false, args);
+                console.error('Commander (ERROR) >> Error Running CLI Command'.red + err);
             }
         })
 
@@ -93,7 +94,8 @@ class Commander {
             try {
                 command.run(this.client, msg, args);
             } catch (err) {
-                this.constructor.handleError(this.client, err, msg, args);
+                Commander.handleError(this.client, err, false, msg, args);
+                console.error('Commander (ERROR) >> Error Running Chat Command'.red + err);
             }
         });
     }
@@ -107,7 +109,8 @@ class Commander {
 
             return commander;
         } catch (err) {
-            Commander.handleError(client, err);
+            Commander.handleError(client, err, true);
+            console.error('Commander (ERROR) >> Error Initializing'.red + err);
         }
     }
 
@@ -262,8 +265,8 @@ class Commander {
 
     // Error Handling
     
-    static async handleError(client, err, msg, args) {
-        let dev = await client.users.fetch(client.dev);
+    static async handleError(client, err, quit, msg, args) {
+        let dev = client ? await client.users.fetch(client.dev).catch(() => { return }) : null;
         let code = Date.now();
         let errorObject = {
             errorName: err.name,
@@ -287,13 +290,13 @@ class Commander {
                 .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg')
                 .setFooter({ text:'NOTE: The bot will now shutdown until restarted by a developer! Thanks for your help!' })
         
-                if (dev) await dev.send({embeds: [embed]});
-                if (msg) await msg.channel.send({embeds: [embed]});
+                if (dev) await dev.send({embeds: [embed]}).catch(() => { return });
+                if (msg) await msg.channel.send({embeds: [embed]}).catch(() => { return });
             }
 
-            console.error('Commander (ERROR) >> Command Error! Logged to file!'.red);
+            console.error('Commander (ERROR) >> Error! Logged to file!'.red);
             console.error(errorObject.errorStack);
-            process.exit();
+            if (quit) process.exit();
         })
     }
 }

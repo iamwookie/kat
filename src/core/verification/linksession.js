@@ -1,7 +1,7 @@
 const config = require('@root/config');
 const Discord = require('discord.js');
-const axios = require('axios').default;
 const Commander = require('@root/commander');
+const axios = require('axios').default;
 const { successEmbed, failEmbed } = require('@utils/other/embeds');
 
 class NebulaLinkSession {
@@ -48,6 +48,7 @@ class NebulaLinkSession {
             console.log(`NebulaLinkSession (CREATED) >> ID: ${res.data} | USER: ${author.id}`.brightGreen);
             return session;
         } catch (err) {
+            Commander.handleError(client, err, false);
             console.log('NebulaLinkSession (ERROR) >> Error Creating Session'.red);
             console.error(err);
 
@@ -63,9 +64,9 @@ class NebulaLinkSession {
             if (this.pubsub.isOpen) this.pubsub.quit();
             console.log(`NebulaLinkSession (DESTROYED) >> ID: ${this.id}`.yellow);
         } catch (err) {
+            Commander.handleError(this.client, err, false, this.msg);
             console.log('NebulaLinkSession (ERROR) >> Error Destroying'.red);
             console.error(err);
-            Commander.handleError(this.client, err, this.msg);
         }
     }
 
@@ -100,9 +101,9 @@ class NebulaLinkSession {
     
             await this.pubsub.connect();
         } catch(err) {
+            Commander.handleError(this.client, err, false, this.msg);
             console.log('NebulaLinkSession (ERROR) >> Error Listening'.red);
             console.error(err);
-            Commander.handleError(this.client, err, this.msg);
         }
     }
 
@@ -123,7 +124,7 @@ class NebulaLinkSession {
                         .setAuthor({ name: this.user.tag, iconURL: this.user.avatarURL({ dynamic: true }) })
                         .setColor('#C167ED')
                         .setTitle('Nebula Link')
-                        .setDescription(`:white_check_mark: Successfully linked!`)
+                        .setDescription(`:white_check_mark: \u200b Successfully linked!`)
                         .setThumbnail('https://nebularoleplay.com/media/logo-nobg.png');
     
                         this.prompt.edit({ embeds: [success] });
@@ -132,9 +133,9 @@ class NebulaLinkSession {
                 }
             })
         } catch (err) {
+            Commander.handleError(this.client, err, false, this.msg);
             console.log('NebulaLinkSession (ERROR) >> Error Listening'.red, err);
             console.error(err);
-            Commander.handleError(this.client, err, this.msg);
         }
     }
 }
