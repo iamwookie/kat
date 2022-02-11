@@ -64,7 +64,7 @@ class NebulaLinkSession {
             if (this.pubsub.isOpen) this.pubsub.quit();
             console.log(`NebulaLinkSession (DESTROYED) >> ID: ${this.id}`.yellow);
         } catch (err) {
-            Commander.handleError(this.client, err, false, this.msg);
+            Commander.handleError(this.client, err, false, this.msg.guild, this.msg);
             console.log('NebulaLinkSession (ERROR) >> Error Destroying'.red);
             console.error(err);
         }
@@ -101,7 +101,7 @@ class NebulaLinkSession {
     
             await this.pubsub.connect();
         } catch(err) {
-            Commander.handleError(this.client, err, false, this.msg);
+            Commander.handleError(this.client, err, false, this.msg.guild, this.msg);
             console.log('NebulaLinkSession (ERROR) >> Error Listening'.red);
             console.error(err);
         }
@@ -133,7 +133,7 @@ class NebulaLinkSession {
                 }
             })
         } catch (err) {
-            Commander.handleError(this.client, err, false, this.msg);
+            Commander.handleError(this.client, err, false, this.msg.guild, this.msg);
             console.log('NebulaLinkSession (ERROR) >> Error Listening'.red, err);
             console.error(err);
         }

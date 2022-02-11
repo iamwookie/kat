@@ -40,12 +40,7 @@ class MusicSubscription {
 			if (newState.status == DiscordVoice.AudioPlayerStatus.Idle && oldState.status !== DiscordVoice.AudioPlayerStatus.Idle) {
 				this.playing = null;
 				oldState.resource.metadata.onFinish();
-
-				if (this.queue.length == 0) {
-					this.voice.destroy();
-				} else {
-					this.refresh();
-				}
+				this.process();
 			} else if (newState.status == DiscordVoice.AudioPlayerStatus.Playing && oldState.status !== DiscordVoice.AudioPlayerStatus.AutoPaused) {
 				console.log({
 					Title: this.playing.title,
@@ -80,7 +75,7 @@ class MusicSubscription {
 			client.subscriptions.set(channel.guild.id, sub);
 			return sub;
 		} catch (err) {
-			Commander.handleError(client, err, false);
+			Commander.handleError(client, err, false, channel.guild);
 			console.error('Music (ERROR) >> Error Creating Subscription');
 			console.error(err);
 			return false;
@@ -103,7 +98,7 @@ class MusicSubscription {
 
 	destroy() {
 		if (!this.isVoiceDestroyed()) this.voice.destroy();
-        this.client.subscriptions.delete(this.guild.id);
+		this.client.subscriptions.delete(this.guild.id);
 		console.log('Music >> Subscription Destroyed\n'.yellow);
 	}
 
@@ -111,38 +106,38 @@ class MusicSubscription {
 		if (sub.isVoiceDestroyed()) {
 			this.queue.push(sub.playing);
 			this.queue = this.queue.concat(sub.queue);
-			await this.refresh();
+			await this.process();
 			return console.log('Music >> Subsciptions Merged'.brightGreen);
 		}
 	}*/
 
-	async refresh() {
+	async process() {
 		if (this.queueLocked || this.player.state.status !== DiscordVoice.AudioPlayerStatus.Idle) return;
 
 		this.queueLocked = true;
 		if (!this.isVoiceReady()) await this.ready(20000);
 		const track = this.queue.shift();
+		if (!track) return this.destroy();
 
-		if (track) {
-			try {
-				const resource = await track.createResource();
-				this.player.play(resource);
-				this.queueLocked = false;
-				this.playing = track;
-			} catch (err) {
-				Commander.handleError(this.client, err, false);
-				console.error('Music (ERROR) >> Error Playing Track'.red);
-				console.error(err)
-				track.onError(err);
-				this.queueLocked = false;
-				this.refresh();
-			}
+		try {
+			const resource = await track.createResource();
+			this.player.play(resource);
+			this.queueLocked = false;
+			this.playing = track;
+		} catch (err) {
+			Commander.handleError(this.client, err, false, this.guild);
+			console.error('Music (ERROR) >> Error Playing Track'.red);
+			console.error(err);
+
+			track.onError(err);
+			this.queueLocked = false;
+			this.process();
 		}
 	}
 
 	add(track) {
 		this.queue.push(track);
-		this.refresh();
+		this.process();
 	}
 
 	clear() {

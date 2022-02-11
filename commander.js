@@ -61,7 +61,7 @@ class Commander {
                 // Breakline
                 console.log('');
             } catch (err) {
-                Commander.handleError(this.client, err, false, args);
+                Commander.handleError(this.client, err, false);
                 console.error('Commander (ERROR) >> Error Running CLI Command'.red + err);
             }
         })
@@ -265,35 +265,39 @@ class Commander {
 
     // Error Handling
     
-    static async handleError(client, err, quit, msg, args) {
+    static async handleError(client, err, quit, guild, msg) {
         let dev = client ? await client.users.fetch(client.dev).catch(() => { return }) : null;
         let code = Date.now();
         let errorObject = {
             errorName: err.name,
             errorMessage: err.message,
             errorStack: err.stack,
-            guild: msg && msg.guild ? msg.guild.id : "N/A",
+            guild: guild ? guild : "N/A",
             message: msg ? msg : 'N/A',
-            arguments: args ? args : 'N/A',
         };
         
         fs.appendFile('./error.log', `${code}: ${JSON.stringify(errorObject)}\n`, async (err) => {
             if (err) throw err;
 
-            if (msg || dev) {
+            if (dev) {
                 let embed = new Discord.MessageEmbed()
                 .setColor('#F04947')
                 .setTitle('Uh Oh!')
-                .setDescription(`A critical error in the internal code has occured. The developer has already been notified. Please wait patiently until we fix the issue!`)
+                .setDescription(`A critical error in the internal code has occured.`)
                 .addFields(
                     { name: 'Error Code', value: `\`${code}\``, inline: true },
-                    { name: 'Guild', value: `\`${msg && msg.guild ? msg.guild.id : 'N/A'}\``, inline: true }
                 )
-                .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg')
-                .setFooter({ text:'Thanks for your help!' })
+                .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg');
+
+                if (guild) {
+                    embed.addFields(
+                        { name: 'Guild', value: `\`${guild ? guild.name : 'N/A'}\`` },
+                        { name: 'Guild ID', value: `\`${guild ? guild.id : 'N/A'}\``, inline: true },
+                        { name: 'Guild Owner ID', value: `\`${guild ? guild.ownerId : 'N/A'}\``, inline: true },
+                    );
+                }
         
-                if (dev) await dev.send({embeds: [embed]}).catch(() => { return });
-                if (msg) await msg.channel.send({embeds: [embed]}).catch(() => { return });
+                await dev.send({embeds: [embed]}).catch(() => { return });
             }
 
             console.error('Commander (ERROR) >> Error! Logged to file!'.red);

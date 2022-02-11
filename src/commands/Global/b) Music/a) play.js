@@ -117,7 +117,7 @@ module.exports = {
 
                 if (data instanceof play.YouTubePlayList) {
                     for (const video of data.videos) {
-                        let track = Track.create(client, msg, video, author);
+                        let track = Track.create(subscription, msg, video, author);
                         subscription.add(track);
                     }
                 }
@@ -132,7 +132,7 @@ module.exports = {
                         let ytSearch = await play.search(spotifyTrack.artists[0].name + ' - ' + spotifyTrack.name, { limit: 1, source: { youtube: 'video' } })
 
                         if (ytSearch.length) {
-                            let track = Track.create(client, msg, ytSearch[0], author);
+                            let track = Track.create(subscription, msg, ytSearch[0], author);
                             subscription.add(track);
                         }
                     }
@@ -148,7 +148,7 @@ module.exports = {
                 return reply.edit({ embeds: [enqueued] });
             }
 
-			let track = Track.create(client, msg, data, author);
+			let track = Track.create(subscription, msg, data, author);
 			subscription.add(track);
 
             console.log('Music Commands >> play: Added Track:'.magenta);
@@ -161,7 +161,7 @@ module.exports = {
             let enqueued = new MusicEmbed(client, msg, 'enqueued', track);
 			return reply.edit({ embeds: [enqueued] });
 		} catch (err) {
-            Commander.handleError(client, err, false);
+            Commander.handleError(client, err, false, msg.guild);
             console.error('Music Commands (ERROR) >> play: Error Running Command'.red);
 			console.error(err);
             

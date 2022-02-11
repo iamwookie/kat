@@ -20,7 +20,7 @@ module.exports = {
     },
 
     async run(client, msg) {
-        let subscription = client.subscriptions.get(msg.guildId)
+        let subscription = client.subscriptions.get(msg.guildId);
         if (!subscription || !subscription.isPlayerPlaying()) {
             let notplaying = new MusicEmbed(client, msg).setTitle('I\'m not playing anything!');
             return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [notplaying] }) : msg.reply({ embeds: [notplaying] }).catch(() => msg.channel.send({ embeds: [notplaying] }));

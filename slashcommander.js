@@ -33,7 +33,7 @@ class SlashCommander {
             try {
                 command.run(this.client, interaction);
             } catch (err) {
-                Commander.handleError(this.client, err, false, msg);
+                Commander.handleError(this.client, err, false, msg.guild, msg);
                 console.error('SlashCommander (ERROR) >> Error Running Slash Command'.red);
             }
         })
