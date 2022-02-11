@@ -272,8 +272,9 @@ class Commander {
             errorName: err.name,
             errorMessage: err.message,
             errorStack: err.stack,
-            message: msg ? msg : "N/A",
-            arguments: args ? msg : "N/A",
+            guild: msg && msg.guild ? msg.guild.id : "N/A",
+            message: msg ? msg : 'N/A',
+            arguments: args ? args : 'N/A',
         };
         
         fs.appendFile('./error.log', `${code}: ${JSON.stringify(errorObject)}\n`, async (err) => {
@@ -285,10 +286,11 @@ class Commander {
                 .setTitle('Uh Oh!')
                 .setDescription(`A critical error in the internal code has occured. The developer has already been notified. Please wait patiently until we fix the issue!`)
                 .addFields(
-                    { name: 'Error Code', value: `\`${code}\`` }
+                    { name: 'Error Code', value: `\`${code}\``, inline: true },
+                    { name: 'Guild', value: `\`${msg && msg.guild ? msg.guild.id : 'N/A'}\``, inline: true }
                 )
                 .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg')
-                .setFooter({ text:'NOTE: The bot will now shutdown until restarted by a developer! Thanks for your help!' })
+                .setFooter({ text:'Thanks for your help!' })
         
                 if (dev) await dev.send({embeds: [embed]}).catch(() => { return });
                 if (msg) await msg.channel.send({embeds: [embed]}).catch(() => { return });
