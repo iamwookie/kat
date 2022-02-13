@@ -7,7 +7,7 @@ const path = require('path');
 const readline = require('readline');
 
 // -----------------------------------
-const perms = [ // 37047360
+const perms = [ // 137476000832
     // GENERAL
     Discord.Permissions.FLAGS.VIEW_CHANNEL,
     // TEXT
@@ -15,6 +15,7 @@ const perms = [ // 37047360
     Discord.Permissions.FLAGS.EMBED_LINKS,
     Discord.Permissions.FLAGS.READ_MESSAGE_HISTORY,
     Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
+    Discord.Permissions.FLAGS.USE_EXTERNAL_STICKERS,
     Discord.Permissions.FLAGS.ADD_REACTIONS,
     // VOICE
     Discord.Permissions.FLAGS.CONNECT,
