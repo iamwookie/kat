@@ -28,9 +28,11 @@
   "_moduleAliases": {
     "@root": ".",
     "@scripts": "scripts",
+    "@commander": "commander",
     "@src": "src",
     "@core": "src/core",
     "@utils": "src/utils",
+    "@providers": "src/providers",
     "@music": "src/core/music"
   }
 }

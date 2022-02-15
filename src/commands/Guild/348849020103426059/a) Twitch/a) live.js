@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Commander = require('@root/commander');
+const Commander = require('@commander/commander');
 const TwitchManager = require('@core/twitch/twitchmanager');
 const { successEmbed, failEmbed, loadEmbed } = require('@utils/other/embeds');
 // -----------------------------------

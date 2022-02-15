@@ -1,5 +1,5 @@
 const DiscordVoice = require('@discordjs/voice');
-const Commander = require('@root/commander');
+const Commander = require('@commander/commander');
 const play = require('play-dl');
 const { MusicEmbed } = require('@utils/other/embeds');
 

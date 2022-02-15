@@ -4,12 +4,12 @@ require('colors');
 // ------------------------------------
 const { Client, Intents } = require('discord.js');
 // ------------------------------------
-const Commander = require('./commander');
-const SlashCommander = require('./slashcommander');
-const CommanderDatabase = require('./database');
+const Commander = require('./commander/commander');
+const SlashCommander = require('./commander/slash');
+const CommanderDatabase = require('./commander/database');
 // ------------------------------------
 const { bot } = require('./config.json');
-const redis = require('./redis');
+const redis = require('@providers/redis');
 const now = Date.now();
 // ------------------------------------
 const client = new Client({   

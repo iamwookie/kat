@@ -1,6 +1,6 @@
 const config = require('@root/config');
 const Discord = require('discord.js');
-const Commander = require('@root/commander');
+const Commander = require('@commander/commander');
 const axios = require('axios').default;
 const { successEmbed, failEmbed } = require('@utils/other/embeds');
 

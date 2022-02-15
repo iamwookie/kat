@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Commander = require('@root/commander');
+const Commander = require('@commander/commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MusicEmbed } = require('@utils/other/embeds');
 const GeniusLyrics = require("genius-lyrics");
