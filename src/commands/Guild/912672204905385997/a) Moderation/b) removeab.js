@@ -13,14 +13,14 @@ module.exports = {
     
     async run(client, msg, args) {
         if (!args) {
-            const noargs = failEmbed('You did not provided a user!', msg.author);
+            let noargs = failEmbed('You did not provided a user!', msg.author);
             return msg.reply({ embeds: [noargs] }).catch(() => msg.channel.send({ embeds: [noargs] }));
         }
 
         let user = await client.users.fetch(args).catch(() => { return });
 
         if (!user) {
-            const nouser = failEmbed('The user provided is invalid!', msg.author);
+            let nouser = failEmbed('The user provided is invalid!', msg.author);
             return msg.reply({ embeds: [nouser] }).catch(() => msg.channel.send({ embeds: [nouser] }));
         }
 
@@ -28,7 +28,7 @@ module.exports = {
         if (!banned) banned = []
 
         if (!banned.includes(user.id)) {
-            const notfound = failEmbed('The user provided is not in the Auto Ban list!', msg.author);
+            let notfound = failEmbed('The user provided is not in the Auto Ban list!', msg.author);
             return msg.reply({ embeds: [notfound] }).catch(() => msg.channel.send({ embeds: [notfound] }));
         } else {
             banned.splice(banned.indexOf(user.id), 1);
@@ -40,10 +40,10 @@ module.exports = {
             }
 
             if (set) {
-                const success = successEmbed('The user has been removed from the Auto Ban list!', msg.author);
+                let success = successEmbed('The user has been removed from the Auto Ban list!', msg.author);
                 return msg.reply({ embeds: [success] }).catch(() => msg.channel.send({ embeds: [success] }));
             } else {
-                const fail = failEmbed('Failed to remove the user from the Auto Ban list!', msg.author);
+                let fail = failEmbed('Failed to remove the user from the Auto Ban list!', msg.author);
                 return msg.reply({ embeds: [fail] }).catch(() => msg.channel.send({ embeds: [fail] }));
             }
         }

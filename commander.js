@@ -7,7 +7,7 @@ const path = require('path');
 const readline = require('readline');
 
 // -----------------------------------
-const perms = [ // 37047360
+const perms = [ // 137476000832
     // GENERAL
     Discord.Permissions.FLAGS.VIEW_CHANNEL,
     // TEXT
@@ -15,6 +15,7 @@ const perms = [ // 37047360
     Discord.Permissions.FLAGS.EMBED_LINKS,
     Discord.Permissions.FLAGS.READ_MESSAGE_HISTORY,
     Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
+    Discord.Permissions.FLAGS.USE_EXTERNAL_STICKERS,
     Discord.Permissions.FLAGS.ADD_REACTIONS,
     // VOICE
     Discord.Permissions.FLAGS.CONNECT,
@@ -26,7 +27,8 @@ const groups = [
     'Misc',
     'Music',
     'Twitch',
-    'Moderation'
+    'Moderation',
+    'Verification'
 ];
 
 class Commander {
@@ -40,6 +42,9 @@ class Commander {
 
         // Music
         this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
+
+        // Guilds
+        this.client.linkSessions = this.client.linkSessions || new Discord.Collection();
 
         // CLI Commands
         this.readline.on('line', async line => {
@@ -57,7 +62,8 @@ class Commander {
                 // Breakline
                 console.log('');
             } catch (err) {
-                this.constructor.handleError(this.client, err, args);
+                Commander.handleError(this.client, err, false);
+                console.error('Commander (ERROR) >> Error Running CLI Command'.red + err);
             }
         })
 
@@ -89,7 +95,8 @@ class Commander {
             try {
                 command.run(this.client, msg, args);
             } catch (err) {
-                this.constructor.handleError(this.client, err, msg, args);
+                Commander.handleError(this.client, err, false, msg, args);
+                console.error('Commander (ERROR) >> Error Running Chat Command'.red + err);
             }
         });
     }
@@ -103,7 +110,8 @@ class Commander {
 
             return commander;
         } catch (err) {
-            Commander.handleError(client, err);
+            Commander.handleError(client, err, true);
+            console.error('Commander (ERROR) >> Error Initializing'.red + err);
         }
     }
 
@@ -258,38 +266,44 @@ class Commander {
 
     // Error Handling
     
-    static async handleError(client, err, msg, args) {
-        let dev = await client.users.fetch(client.dev);
+    static async handleError(client, err, quit, guild, msg) {
+        let dev = client ? await client.users.fetch(client.dev).catch(() => { return }) : null;
         let code = Date.now();
         let errorObject = {
             errorName: err.name,
             errorMessage: err.message,
             errorStack: err.stack,
-            message: msg ? msg : "N/A",
-            arguments: args ? msg : "N/A",
+            guild: guild ? guild : "N/A",
+            message: msg ? msg : 'N/A',
         };
         
         fs.appendFile('./error.log', `${code}: ${JSON.stringify(errorObject)}\n`, async (err) => {
             if (err) throw err;
 
-            if (msg || dev) {
+            if (dev) {
                 let embed = new Discord.MessageEmbed()
                 .setColor('#F04947')
                 .setTitle('Uh Oh!')
-                .setDescription(`A critical error in the internal code has occured. The developer has already been notified. Please wait patiently until we fix the issue!`)
+                .setDescription(`A critical error in the internal code has occured.`)
                 .addFields(
-                    { name: 'Error Code', value: `\`${code}\`` }
+                    { name: 'Error Code', value: `\`${code}\``, inline: true },
                 )
-                .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg')
-                .setFooter({ text:'NOTE: The bot will now shutdown until restarted by a developer! Thanks for your help!' })
+                .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg');
+
+                if (guild) {
+                    embed.addFields(
+                        { name: 'Guild', value: `\`${guild ? guild.name : 'N/A'}\`` },
+                        { name: 'Guild ID', value: `\`${guild ? guild.id : 'N/A'}\``, inline: true },
+                        { name: 'Guild Owner ID', value: `\`${guild ? guild.ownerId : 'N/A'}\``, inline: true },
+                    );
+                }
         
-                if (dev) await dev.send({embeds: [embed]});
-                if (msg) await msg.channel.send({embeds: [embed]});
+                await dev.send({embeds: [embed]}).catch(() => { return });
             }
 
-            console.error('Commander (ERROR) >> Command Error! Logged to file!'.red);
+            console.error('Commander (ERROR) >> Error! Logged to file!'.red);
             console.error(errorObject.errorStack);
-            process.exit();
+            if (quit) process.exit();
         })
     }
 }

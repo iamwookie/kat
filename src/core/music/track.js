@@ -1,4 +1,5 @@
 const DiscordVoice = require('@discordjs/voice');
+const Commander = require('@root/commander');
 const play = require('play-dl');
 const { MusicEmbed } = require('@utils/other/embeds');
 
@@ -15,24 +16,25 @@ class Track {
         this.onError = onError ? onError : () => {};
     }
 
-    static create(client, msg, data, author) {
+    static create(subscription, msg, data, author) {
         try {
             const track = new Track(
                 data,
                 author,
                 function onStart() {
-                    let onstart = new MusicEmbed(client, msg, 'playing', this);
+                    let onstart = new MusicEmbed(subscription.client, msg, 'playing', this);
                     return msg.channel.send({ embeds: [onstart] });
                 },
                 function onFinish() {},
                 function onError() {
-                    let onerror = new MusicEmbed(client, msg).setTitle('Error Playing Track');
+                    let onerror = new MusicEmbed(subscription.client, msg).setTitle('Error Playing Track | Try Again');
                     onerror.setDescription(`[${this.title}](${this.url})`);
                     return msg.channel.send({ embeds: [onerror] });
                 }
             );
             return track;
         } catch (err) {
+            Commander.handleError(subscription.client, err, false, msg);
             console.error('Music >> Error Creating Track'.red);
             console.error(err);
             return false;

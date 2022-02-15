@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
+const Commander = require('@root/commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MusicEmbed, failEmbed } = require('@utils/other/embeds');
+const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
     name: 'pause',
@@ -31,6 +32,7 @@ module.exports = {
             let success = new MusicEmbed(client, msg, 'paused', track);
             return msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [success] }) : await msg.reply({ embeds: [success] }).catch(() => msg.channel.send({ embeds: [success] }));
         } catch(err) {
+            Commander.handleError(client, err, false);
             console.error('Music Commands (ERROR) >> pause: Error Pausing Track'.red)
 			console.error(err);
 

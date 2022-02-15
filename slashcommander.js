@@ -33,7 +33,8 @@ class SlashCommander {
             try {
                 command.run(this.client, interaction);
             } catch (err) {
-                Commander.handleError(this.client, err);
+                Commander.handleError(this.client, err, false, msg.guild, msg);
+                console.error('SlashCommander (ERROR) >> Error Running Slash Command'.red);
             }
         })
     }
@@ -46,9 +47,9 @@ class SlashCommander {
 
             return slashCommander;
         } catch (err) {
+            Commander.handleError(client, err, true);
             console.error('SlashCommander (ERROR) >> Error Initializing'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
         }
     }
 
@@ -85,9 +86,9 @@ class SlashCommander {
             if (commands.length) await this.client.application.commands.set(commands);
             console.log('SlashCommander >> Successfully Registered Global Commands.'.brightGreen);
         } catch (err) {
+            Commander.handleError(this.client, err, false);
             console.error('SlashCommander (ERROR) >> Error Registering Global Slash Commands'.red);
             console.error(err.stack);
-            Commander.handleError(this.client, err);
         }
 
         try {
@@ -115,9 +116,9 @@ class SlashCommander {
             }
             console.log('SlashCommander >> Successfully Registered Guild Commands.'.brightGreen);
         } catch (err) {
+            Commander.handleError(this.client, err, false);
             console.error('SlashCommander (ERROR) >> Error Registering Guild Slash Commands'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
         }
     }
 }

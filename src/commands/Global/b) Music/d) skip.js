@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const Commander = require('@root/commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MusicEmbed } = require('@utils/other/embeds');
 
@@ -36,6 +37,7 @@ module.exports = {
             let success = new MusicEmbed(client, msg, 'skipped', track);
             return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [success] }) : msg.reply({ embeds: [success] }).catch(() => msg.channel.send({ embeds: [success] }));
         } catch(err) {
+            Commander.handleError(client, err, false);
             console.error('Music Commands (ERROR) >> skip: Error Skipping Track'.red)
 			console.error(err);
 

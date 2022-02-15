@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const Commander = require('@root/commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MusicEmbed } = require('@utils/other/embeds');
 const GeniusLyrics = require("genius-lyrics");
@@ -47,12 +48,13 @@ module.exports = {
             let search = await genius.songs.search(song);
             let lyrics = await search[0].lyrics() || 'Not Found';
 
-            if (lyrics.length > 5000) lyrics = lyrics.slice(0, -(lyrics.length - 5000)) + '...'
+            if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + '...\n\n**NOTE: Lyrics are too long to display.**';
 
             let success = new MusicEmbed(client, msg, 'lyrics');
             success.setDescription(`**Song: ${search[0].artist.name} - ${search[0].title}**\n\n${lyrics}`);
             return reply.edit({ embeds: [success] });
         } catch(err) {
+            Commander.handleError(client, err, false);
             console.error('Music Commands (ERROR) >> lyrics: Error Getting Track Lyrics'.red)
 			console.error(err);
 

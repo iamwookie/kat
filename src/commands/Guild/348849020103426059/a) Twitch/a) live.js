@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const Commander = require('@root/commander');
 const TwitchManager = require('@core/twitch/twitchmanager');
 const { successEmbed, failEmbed, loadEmbed } = require('@utils/other/embeds');
 // -----------------------------------
@@ -53,6 +53,7 @@ module.exports = {
                     let channel = await client.channels.fetch(channelid);
                     if (channel) channel.send({ content: "@everyone", embeds: [embed] });
                 } catch (err) {
+                    Commander.handleError(client, err, false);
                     console.error(`Guild Commands (ERROR) (${this.guilds[0]}) >> live: Failed To Fetch Channel`.red); 
                     console.error(err);
                     

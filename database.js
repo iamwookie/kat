@@ -16,9 +16,9 @@ class CommanderDatabase {
 
             return database;
         } catch (err) {
+            Commander.handleError(this.client, err, true);
             console.error('CommanderDatabase (ERROR) >> Error Initializing'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
 
             return false;
         }
@@ -37,9 +37,9 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
+            Commander.handleError(this.client, err, true);
             console.error('CommanderDatabase (ERROR) >> Error Loading'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
             this.loadLocked = false;
 
             return false;
@@ -65,9 +65,9 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
+            Commander.handleError(this.client, err, false);
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
 
             return false
         }
@@ -91,9 +91,9 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
+            Commander.handleError(this.client, err, false);
             console.error('CommanderDatabase (ERROR) >> Error Deleting Value'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
 
             return false
         }
