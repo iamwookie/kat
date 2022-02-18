@@ -365,9 +365,9 @@ class CommanderCommand {
         if (!this.cooldown) return false;
 
         let cooldown = this.cooldown * 1000;
-        if (!this.commander.cooldowns.has(guild.id || 'dm')) this.commander.cooldowns.set(guild.id || 'dm', new Discord.Collection());
+        if (!this.commander.cooldowns.has(guild?.id || 'dm')) this.commander.cooldowns.set(guild?.id || 'dm', new Discord.Collection());
 
-        let cooldowns = this.commander.cooldowns.get(guild.id || 'dm');
+        let cooldowns = this.commander.cooldowns.get(guild?.id || 'dm');
         if (!cooldowns.has(user.id)) cooldowns.set(user.id, new Discord.Collection());
         
         let usages = cooldowns.get(user.id);
