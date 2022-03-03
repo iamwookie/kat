@@ -21,7 +21,7 @@
     "genius-lyrics": "^4.3.5",
     "libsodium-wrappers": "^0.7.9",
     "module-alias": "^2.2.2",
-    "play-dl": "^1.7.0",
+    "play-dl": "^1.8.9",
     "redis": "^4.0.2",
     "string-progressbar": "^1.0.4"
   },

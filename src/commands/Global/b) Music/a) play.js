@@ -47,7 +47,7 @@ module.exports = {
 
             subscription.unpause();
 
-            if(!args) return;
+            if (!args) return;
         }
 
         if (!args) {
