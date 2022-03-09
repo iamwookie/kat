@@ -4,7 +4,6 @@ module.exports = {
     name: 'removeab',
     group: 'Moderation',
     description: 'Remove a user from Auto Ban.',
-    hidden: true,
     guildOnly: true,
 
     // AUTHORIZATION

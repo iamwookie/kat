@@ -26,6 +26,7 @@ const groups = [
     'CLI',
     'Misc',
     'Music',
+    'Developer',
     'Twitch',
     'Moderation',
     'Verification'
