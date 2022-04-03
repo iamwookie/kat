@@ -12,7 +12,6 @@ module.exports = {
     name: 'live',
     group: 'Twitch',
     description: 'Send live stream announcement.',
-    hidden: true,
     
     // AUTHORIZATION
     guilds: ['348849020103426059', '729660181226455160'],
