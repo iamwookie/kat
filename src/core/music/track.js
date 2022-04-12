@@ -44,7 +44,7 @@ class Track {
     async createResource() {
         return new Promise(async (resolve, reject) => {
             try {
-                const stream = await play.stream(this.url);
+                const stream = await play.stream(this.url, { quality: 3 });
                 resolve(DiscordVoice.createAudioResource(stream.stream, { metadata: this, inputType: stream.type }));
             } catch(err) {
                 reject(err);
