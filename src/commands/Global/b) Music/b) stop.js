@@ -5,9 +5,9 @@ const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
     name: 'stop',
-    aliases: ['dc'],
+    aliases: { 'dc': true, },
     group: 'Music',
-    description: 'Clear the queue and leave.',
+    description: 'Clear the queue and/or leave.',
     cooldown: 5,
     guildOnly: true,
     
@@ -21,14 +21,15 @@ module.exports = {
 
     async run(client, msg) {
         let subscription = client.subscriptions.get(msg.guildId);
-        if (!subscription || !subscription.isPlayerPlaying()) {
+
+        if (!subscription) {
             let notplaying = new MusicEmbed(client, msg).setTitle('I\'m not playing anything!');
             return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [notplaying] }) : msg.reply({ embeds: [notplaying] }).catch(() => msg.channel.send({ embeds: [notplaying] }));
         }
 
         try {
 			subscription.destroy();
-            let success = new MusicEmbed(client, msg).setTitle('👋 \u200b Stopped playing! Cya!');
+            let success = new MusicEmbed(client, msg).setTitle(subscription.isPlayerPaused() ? '👋 \u200b Discconected! Cya!' : '👋 \u200b Stopped playing! Cya!');
             return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [success] }) : msg.reply({ embeds: [success] }).catch(() => msg.channel.send({ embeds: [success] }));
 		} catch (err) {
             Commander.handleError(client, err, false);

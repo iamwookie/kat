@@ -74,9 +74,11 @@ class SlashCommander {
                 if (!command.data || command.disabled || command.hidden) continue;
 
                 if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        let data = command.data().setName(alias);
-                        commands.push(data);
+                    for (const alias in command.aliases) {
+                        if (command.aliases[alias]) {
+                            let data = command.data().setName(alias);
+                            commands.push(data);
+                        }
                     }
                 }
 
@@ -99,9 +101,11 @@ class SlashCommander {
                     if (!command.data || command.disabled || command.hidden) continue;
 
                     if (command.aliases) {
-                        for (const alias of command.aliases) {
-                            let data = command.data().setName(alias);
-                            commands.push(data);
+                        for (const alias in command.aliases) {
+                            if (command.aliases[alias]) {
+                                let data = command.data().setName(alias);
+                                commands.push(data);
+                            }
                         }
                     }
 
@@ -148,7 +152,9 @@ class SlashCommand {
         this.commander = commander;
 
         if (this.aliases) {
-            this.aliases.forEach((alias) => this.commander.aliases.set(alias, this.name))
+            for (const alias in this.aliases) {
+                this.commander.aliases.set(alias, this.name);
+            }
         }
 
         if (this.guilds) {

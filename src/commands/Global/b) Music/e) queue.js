@@ -5,6 +5,7 @@ const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
     name: 'queue',
+    aliases: { 'q': false, },
     group: 'Music',
     description: 'View the queue.',
     cooldown: 5,

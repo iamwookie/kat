@@ -37,9 +37,9 @@ module.exports = {
                 if (x.aliases) {
                     // If command has aliases, it builds reply like this for every command that has alias.
                     var aliasmsg = "";
-                    x.aliases.forEach(alias => {
-                        aliasmsg += `, ${prefix}${alias}`
-                    })
+                    for (const alias in x.aliases) {
+                        aliasmsg += `, ${prefix}${alias}`;
+                    }
                     reply += `\`\`${prefix}${x.name}${aliasmsg}${x.format ? ` ${x.format.replace('[prefix]', prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${x.description}\n`
                 } else {
                     // // If command has no aliases, it builds reply like this for every command that has no aliases.

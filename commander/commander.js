@@ -336,7 +336,9 @@ class CommanderCommand {
         if (this.users) this.users.push(this.commander.client.dev);
 
         if (this.aliases) {
-            this.aliases.forEach((alias) => this.commander.aliases.set(alias, this.name))
+            for (const alias in this.aliases) {
+                this.commander.aliases.set(alias, this.name);
+            }
         }
 
         if (this.commander.groups.has(this.group)) {

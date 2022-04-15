@@ -8,6 +8,7 @@ const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
     name: 'play',
+    aliases: { 'p': false, },
     group: 'Music',
     description: 'Search for a track and play it or add it to the queue.',
     format: '<?search/url>',
