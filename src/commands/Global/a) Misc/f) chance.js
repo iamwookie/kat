@@ -12,7 +12,7 @@ const usageCount = io.counter({
 
 module.exports = {
     name: 'chance',
-    aliases: { 'chances': true },
+    aliases: { 'chances': false },
     group: 'Misc',
     description: 'Chances at getting someone.',
     format: '<?user>',
