@@ -6,5 +6,9 @@
     "nebula": {
         "host": "http://localhost:2000",
         "linkExpiry": 300000
+    },
+
+    "twitch": {
+        "timeout": 30000
     }
 }
