@@ -46,12 +46,12 @@ module.exports = {
             let reply = msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [searching] }) : await msg.reply({ embeds: [searching] }).catch(() => msg.channel.send({ embeds: [searching] }));
 
             let search = await genius.songs.search(song);
-            let lyrics = await search[0].lyrics() || 'Not Found';
+            let lyrics = await search[0] ? search[0].lyrics() : 'Couldn\'t find those lyrics!';
 
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + '...\n\n**NOTE: Lyrics are too long to display.**';
 
             let success = new MusicEmbed(client, msg, 'lyrics');
-            success.setDescription(`**Song: ${search[0].artist.name} - ${search[0].title}**\n\n${lyrics}\n\n**Lyrics provided by [Genius](https://genius.com)**`);
+            search[0] ? success.setDescription(`**Song: ${search[0].artist.name} - ${search[0].title}**\n\n${lyrics}\n\n**Lyrics provided by [Genius](https://genius.com)**`) : success.setTitle(lyrics);
             return reply.edit({ embeds: [success] });
         } catch(err) {
             Commander.handleError(client, err, false);
