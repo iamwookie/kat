@@ -45,7 +45,8 @@ class MusicSubscription {
 				console.log({
 					Title: this.playing.title,
 					Duration: this.playing.duration,
-					URL: this.playing.url
+					URL: this.playing.url,
+					Guild: `${this.guild.name} (${this.guild.id})`
 				});
 				newState.resource.metadata.onStart();
 			}
@@ -99,7 +100,7 @@ class MusicSubscription {
 	destroy() {
 		if (!this.isVoiceDestroyed()) this.voice.destroy();
 		this.client.subscriptions.delete(this.guild.id);
-		console.log('Music >> Subscription Destroyed\n'.yellow);
+		console.log(`Music >> Subscription Destroyed: ${this.guild.name} (${this.guild.id})\n`.yellow);
 	}
 
 	/*async merge(sub) {
