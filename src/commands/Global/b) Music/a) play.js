@@ -156,7 +156,8 @@ module.exports = {
             console.log({
                 Title: track.title,
                 Duration: track.duration,
-                URL: track.url
+                URL: track.url,
+                Guild: `${subscription.guild.name} (${subscription.guild.id})`
             });
 
             let enqueued = new MusicEmbed(client, msg, 'enqueued', track);
