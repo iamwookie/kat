@@ -24,7 +24,7 @@ module.exports = {
         let user = await client.redis.hGet('nebula-link', int.user.id);
 
         if (user) {
-            let exists = failEmbed('You have already linked your account with Nebula Services!', int.int.user);
+            let exists = failEmbed('You have already linked your account with Nebula Services!', int.user);
             return int.editReply({ embeds: [exists] });
         }
 
