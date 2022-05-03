@@ -29,7 +29,7 @@ const client = new Client({
         status: 'dnd',
         activities: [
             {
-                name: '!help',
+                name: '/help',
                 type: 'LISTENING'
             }
         ]
