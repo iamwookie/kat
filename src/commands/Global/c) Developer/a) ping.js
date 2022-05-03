@@ -1,12 +1,10 @@
 const Discord = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
 
 // Simple ping command, only for devs.
 module.exports = {
     name: 'ping',
-    group: 'Misc',
+    group: 'Developer',
     description: 'Check ping statistics.',
-    hidden: true,
     cooldown: 5,
     
     // AUTHORIZATION

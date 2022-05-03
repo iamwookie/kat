@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Commander = require('@root/commander');
+const Commander = require('@commander/commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const MusicSubscription = require('@music/subscription');
 const Track = require('@music/track');
@@ -8,6 +8,7 @@ const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
     name: 'play',
+    aliases: { 'p': false, },
     group: 'Music',
     description: 'Search for a track and play it or add it to the queue.',
     format: '<?search/url>',
@@ -47,7 +48,7 @@ module.exports = {
 
             subscription.unpause();
 
-            if(!args) return;
+            if (!args) return;
         }
 
         if (!args) {
@@ -155,7 +156,8 @@ module.exports = {
             console.log({
                 Title: track.title,
                 Duration: track.duration,
-                URL: track.url
+                URL: track.url,
+                Guild: `${subscription.guild.name} (${subscription.guild.id})`
             });
 
             let enqueued = new MusicEmbed(client, msg, 'enqueued', track);

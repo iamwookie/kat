@@ -22,7 +22,7 @@ class SlashCommander {
                 return interaction.editReply({ embeds: [notFound] });
             }
 
-            if (!command.validate(interaction)) return;
+            if (!this.authenticate(interaction, command)) return;
             
             let cooldown = command.parent.getCooldown(interaction.guild, interaction.user);
             if (cooldown) {
@@ -74,9 +74,11 @@ class SlashCommander {
                 if (!command.data || command.disabled || command.hidden) continue;
 
                 if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        let data = command.data().setName(alias);
-                        commands.push(data);
+                    for (const alias in command.aliases) {
+                        if (command.aliases[alias]) {
+                            let data = command.data().setName(alias);
+                            commands.push(data);
+                        }
                     }
                 }
 
@@ -99,9 +101,11 @@ class SlashCommander {
                     if (!command.data || command.disabled || command.hidden) continue;
 
                     if (command.aliases) {
-                        for (const alias of command.aliases) {
-                            let data = command.data().setName(alias);
-                            commands.push(data);
+                        for (const alias in command.aliases) {
+                            if (command.aliases[alias]) {
+                                let data = command.data().setName(alias);
+                                commands.push(data);
+                            }
                         }
                     }
 
@@ -121,6 +125,22 @@ class SlashCommander {
             console.error(err);
         }
     }
+
+    authenticate(interaction, command) {
+        if (command.users && !command.users.includes(interaction.user.id)) {
+            let notAllowed = failEmbed('You are not allowed to use this command!', interaction.user);
+            interaction.editReply({ embeds: [notAllowed] });
+            return false;
+        }
+
+        if (command.guildOnly && !interaction.inGuild()) {
+            let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
+            interaction.editReply({ embeds: [notGuild] });
+            return false;
+        }
+
+        return true;
+    }
 }
 
 class SlashCommand {
@@ -132,7 +152,9 @@ class SlashCommand {
         this.commander = commander;
 
         if (this.aliases) {
-            this.aliases.forEach((alias) => this.commander.aliases.set(alias, this.name))
+            for (const alias in this.aliases) {
+                this.commander.aliases.set(alias, this.name);
+            }
         }
 
         if (this.guilds) {
@@ -146,22 +168,6 @@ class SlashCommand {
         } else {
             this.commander.global.set(this.name, this);
         }
-    }
-
-    validate(interaction) {
-        if (this.users && !this.users.includes(interaction.user.id)) {
-            let notAllowed = failEmbed('You are not allowed to use this command!', interaction.user);
-            interaction.editReply({ embeds: [notAllowed] });
-            return false;
-        }
-
-        if (this.guildOnly && !interaction.inGuild()) {
-            let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
-            interaction.editReply({ embeds: [notGuild] });
-            return false;
-        }
-
-        return true;
     }
 }
 

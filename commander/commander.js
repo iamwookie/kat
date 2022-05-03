@@ -1,10 +1,10 @@
-// This is the command handler, CODENAME: Commander v4.0.0
-// Last Update: Added slash commander
+// This is the command handler, CODENAME: Commander v4.1.0
+
 const Discord = require('discord.js');
-const { failEmbed } = require('@utils/other/embeds');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { failEmbed } = require('@utils/other/embeds');
 
 // -----------------------------------
 const perms = [ // 137476000832
@@ -26,6 +26,7 @@ const groups = [
     'CLI',
     'Misc',
     'Music',
+    'Developer',
     'Twitch',
     'Moderation',
     'Verification'
@@ -75,7 +76,7 @@ class Commander {
 
             if (!msg.content.startsWith(prefix) || msg.author.bot) return;
 
-            if (!this.authorize(msg)) return;
+            if (!this.validate(msg)) return;
 
             const content = msg.content.slice(prefix.length).trim().split(/ +/);
             const commandText = content.shift().toLowerCase();
@@ -84,7 +85,7 @@ class Commander {
             const command = this.commands.get(commandText) || this.commands.get(this.aliases.get(commandText));
             if (!command || command.disabled || command.group && command.group == 'CLI') return;
 
-            if (!command.validate(msg)) return;
+            if (!this.authenticate(msg, command)) return;
     
             let cooldown = command.getCooldown(msg.guild, msg.author);
             if (cooldown) {
@@ -111,42 +112,43 @@ class Commander {
             return commander;
         } catch (err) {
             Commander.handleError(client, err, true);
-            console.error('Commander (ERROR) >> Error Initializing'.red + err);
+            console.error('Commander (ERROR) >> Error Initializing'.red);
+            console.error(err);
         }
     }
 
-    static async reload(client) {
-        const srcPath = path.join(__dirname, 'src');
-        const srcFolders = await fs.promises.readdir(srcPath);
+    // static async reload(client) {
+    //     const srcPath = path.join(__dirname, 'src');
+    //     const srcFolders = await fs.promises.readdir(srcPath);
 
-        for (const folder of srcFolders) {
-            if (!(folder == 'core' || folder == 'utils')) continue;
+    //     for (const folder of srcFolders) {
+    //         if (!(folder == 'core' || folder == 'utils')) continue;
 
-            const subFolders = fs.readdirSync(`${srcPath}/${folder}`);
+    //         const subFolders = fs.readdirSync(`${srcPath}/${folder}`);
 
-            for (const subFolder of subFolders) {
-                const srcFiles = fs.readdirSync(`${srcPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
+    //         for (const subFolder of subFolders) {
+    //             const srcFiles = fs.readdirSync(`${srcPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
                 
-                for (const file of srcFiles) {
-                    delete require.cache[require.resolve(`${srcPath}/${folder}/${subFolder}/${file}`)];
-                }
-            }
-        }
+    //             for (const file of srcFiles) {
+    //                 delete require.cache[require.resolve(`${srcPath}/${folder}/${subFolder}/${file}`)];
+    //             }
+    //         }
+    //     }
 
-        for (const event in client._events) {
-            if (event == 'error' || event == 'shardDisconnect') continue;
-            client.removeAllListeners(event);
-        }
+    //     for (const event in client._events) {
+    //         if (event == 'error' || event == 'shardDisconnect') continue;
+    //         client.removeAllListeners(event);
+    //     }
 
-        client.commander.readline.close();
+    //     client.commander.readline.close();
 
-        const Commander = require('./commander');
-        return Commander.initialize(client);
-    }
+    //     const Commander = require('./commander');
+    //     return Commander.initialize(client);
+    // }
 
     registerCommands() {
-        const globalPath = path.join(__dirname, 'src', 'commands', 'Global');
-        const guildPath = path.join(__dirname, 'src', 'commands', 'Guild');
+        const globalPath = path.join(__dirname, '../src', 'commands', 'Global');
+        const guildPath = path.join(__dirname, '../src', 'commands', 'Guild');
         const globalFolders = fs.readdirSync(globalPath);
         const guildFolders = fs.readdirSync(guildPath);
         
@@ -195,8 +197,8 @@ class Commander {
 
 
     registerModules() {
-        const globalPath = path.join(__dirname, 'src', 'modules', 'Global');
-        const guildPath = path.join(__dirname, 'src', 'modules', 'Guild');
+        const globalPath = path.join(__dirname, '../src', 'modules', 'Global');
+        const guildPath = path.join(__dirname, '../src', 'modules', 'Guild');
         const globalFolders = fs.readdirSync(globalPath);
         const guildFolders = fs.readdirSync(guildPath);
 
@@ -238,7 +240,7 @@ class Commander {
         }
     }
 
-    authorize(msg) {
+    validate(msg) {
         if (!msg.guild) return true;
 
         if (!msg.guild.me.permissions.has(perms)) {
@@ -260,6 +262,20 @@ class Commander {
             
             return false;
         };
+
+        return true;
+    }
+
+    authenticate(msg, command) {
+        if (command.guilds && (!msg.guild || !command.guilds.includes(msg.guild.id))) return false;
+
+        if (command.users && !command.users.includes(msg.author.id)) return false;
+
+        if (command.guildOnly && !msg.guild) {
+            let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
+            msg.reply({ embeds: [notGuild] }).catch(() => msg.channel.send({ embeds: [notGuild] }));
+            return false;
+        }
 
         return true;
     }
@@ -320,7 +336,9 @@ class CommanderCommand {
         if (this.users) this.users.push(this.commander.client.dev);
 
         if (this.aliases) {
-            this.aliases.forEach((alias) => this.commander.aliases.set(alias, this.name))
+            for (const alias in this.aliases) {
+                this.commander.aliases.set(alias, this.name);
+            }
         }
 
         if (this.commander.groups.has(this.group)) {
@@ -344,27 +362,15 @@ class CommanderCommand {
         }
     }
 
-    validate(msg) {
-        if ((this.guilds && (!msg.guild || !this.guilds.includes(msg.guild.id))) || (this.users && !this.users.includes(msg.author.id))) return false;
-
-        if (this.guildOnly && msg.channel.type == 'DM') {
-            let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
-            msg.reply({ embeds: [notGuild] }).catch(() => msg.channel.send({ embeds: [notGuild] }));
-            return false;
-        }
-
-        return true;
-    }
-
     getCooldown(guild, user) {
         const now = Date.now();
 
         if (!this.cooldown) return false;
 
         let cooldown = this.cooldown * 1000;
-        if (!this.commander.cooldowns.has(guild.id || 'dm')) this.commander.cooldowns.set(guild.id || 'dm', new Discord.Collection());
+        if (!this.commander.cooldowns.has(guild?.id || 'dm')) this.commander.cooldowns.set(guild?.id || 'dm', new Discord.Collection());
 
-        let cooldowns = this.commander.cooldowns.get(guild.id || 'dm');
+        let cooldowns = this.commander.cooldowns.get(guild?.id || 'dm');
         if (!cooldowns.has(user.id)) cooldowns.set(user.id, new Discord.Collection());
         
         let usages = cooldowns.get(user.id);

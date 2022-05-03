@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
+    "@discordjs/opus": "^0.5.3",
     "@discordjs/voice": "^0.7.5",
     "@twurple/api": "^5.0.13",
     "@twurple/auth": "^5.0.13",
@@ -21,16 +22,18 @@
     "genius-lyrics": "^4.3.5",
     "libsodium-wrappers": "^0.7.9",
     "module-alias": "^2.2.2",
-    "play-dl": "^1.7.0",
+    "play-dl": "^1.8.9",
     "redis": "^4.0.2",
     "string-progressbar": "^1.0.4"
   },
   "_moduleAliases": {
     "@root": ".",
     "@scripts": "scripts",
+    "@commander": "commander",
     "@src": "src",
     "@core": "src/core",
     "@utils": "src/utils",
+    "@providers": "src/providers",
     "@music": "src/core/music"
   }
 }

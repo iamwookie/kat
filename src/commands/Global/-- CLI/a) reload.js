@@ -1,5 +1,4 @@
 const reloadCommands = require('@scripts/reload-commands');
-const reloadCommander = require('@scripts/reload-commander');
 const registerSlash = require('@scripts/register-slash');
 
 module.exports = {
@@ -12,8 +11,6 @@ module.exports = {
             reloadCommands();
         } else if (args == 'slash') {
             await registerSlash();
-        } else if (args == 'full') {
-            await reloadCommander();
         } else {
             console.log('❌ Invalid Args'.yellow);
         }

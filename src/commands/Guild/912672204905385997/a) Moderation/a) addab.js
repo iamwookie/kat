@@ -4,7 +4,6 @@ module.exports = {
     name: 'addab',
     group: 'Moderation',
     description: 'Add a user to Auto Ban.',
-    hidden: true,
     guildOnly: true,
 
     // AUTHORIZATION

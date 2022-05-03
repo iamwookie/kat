@@ -1,6 +1,7 @@
 const config = require('@root/config');
 const Discord = require('discord.js');
-const Commander = require('@root/commander');
+const Commander = require('@commander/commander');
+const PubSubClient = require('@providers/pubsub');
 const axios = require('axios').default;
 const { successEmbed, failEmbed } = require('@utils/other/embeds');
 
@@ -41,10 +42,33 @@ class NebulaLinkSession {
             });
 
             let session = new NebulaLinkSession(client, msg, res.data, config.nebula.linkExpiry);
-            NebulaLinkSession.cache.set(author.id, session);
+            session.pubsub = new PubSubClient(client);
+
             await session.createPrompt();
-            await session.createPubSub();
-            await session.listen();
+            
+            session.pubsub.subscribe('nebula-link', (message) => {
+                let data = JSON.parse(message);
+                if (!data.id == session.id) return;
+                
+                session.status = 'complete';
+                session.destroy();
+    
+                if (data.status == 'success') {
+                    if (session.prompt) {
+                        let success = new Discord.MessageEmbed()
+                        .setAuthor({ name: session.user.tag, iconURL: session.user.avatarURL({ dynamic: true }) })
+                        .setColor('#C167ED')
+                        .setTitle('Nebula Link')
+                        .setDescription(`:white_check_mark: \u200b Successfully linked!`)
+                        .setThumbnail('https://nebularoleplay.com/media/logo-nobg.png');
+    
+                        session.prompt.edit({ embeds: [success] });
+                    }
+                    console.log(`NebulaLinkSession (COMPLETED) >> ID: ${session.id} | USER: ${session.user.id}`.brightGreen);
+                }
+            })
+
+            NebulaLinkSession.cache.set(author.id, session);
             console.log(`NebulaLinkSession (CREATED) >> ID: ${res.data} | USER: ${author.id}`.brightGreen);
             return session;
         } catch (err) {
@@ -61,7 +85,7 @@ class NebulaLinkSession {
     destroy() {
         try {
             if (NebulaLinkSession.cache.has(this.user.id)) NebulaLinkSession.cache.delete(this.user.id);
-            if (this.pubsub.isOpen) this.pubsub.quit();
+            this.pubsub.close();
             console.log(`NebulaLinkSession (DESTROYED) >> ID: ${this.id}`.yellow);
         } catch (err) {
             Commander.handleError(this.client, err, false, this.msg.guild, this.msg);
@@ -87,56 +111,6 @@ class NebulaLinkSession {
             let fail = failEmbed('I could not send you a DM. Are you sure your DMs are open?', this.user);
             this.msg instanceof Discord.CommandInteraction ? this.msg.editReply({ embeds: [fail] }) : this.msg.reply({ embeds: [fail] }).catch(() => this.msg.channel.send({ embeds: [fail] }));
         });
-    }
-
-    async createPubSub() {
-        if (this.pubsub && this.pubsub.isOpen) return;
-
-        try {
-            this.pubsub = this.client.redis.duplicate();
-    
-            this.pubsub.on('connect', () => console.log('[Redis] '.red + 'PubSub Connected'));
-            this.pubsub.on('end', () => console.log('[Redis] '.red + 'PubSub Disconnected'));
-            this.pubsub.on('error', (err) => console.log('PubSub Client Error', err));
-    
-            await this.pubsub.connect();
-        } catch(err) {
-            Commander.handleError(this.client, err, false, this.msg.guild, this.msg);
-            console.log('NebulaLinkSession (ERROR) >> Error Listening'.red);
-            console.error(err);
-        }
-    }
-
-    async listen() {
-        if (!this.pubsub) await this.createPubSub();
-
-        try {
-            this.pubsub.subscribe('nebula-link', (message) => {
-                let data = JSON.parse(message);
-                if (!data.id == this.id) return;
-                
-                this.status = 'complete';
-                this.destroy();
-    
-                if (data.status == 'success') {
-                    if (this.prompt) {
-                        let success = new Discord.MessageEmbed()
-                        .setAuthor({ name: this.user.tag, iconURL: this.user.avatarURL({ dynamic: true }) })
-                        .setColor('#C167ED')
-                        .setTitle('Nebula Link')
-                        .setDescription(`:white_check_mark: \u200b Successfully linked!`)
-                        .setThumbnail('https://nebularoleplay.com/media/logo-nobg.png');
-    
-                        this.prompt.edit({ embeds: [success] });
-                    }
-                    console.log(`NebulaLinkSession (COMPLETED) >> ID: ${this.id} | USER: ${this.user.id}`.brightGreen);
-                }
-            })
-        } catch (err) {
-            Commander.handleError(this.client, err, false, this.msg.guild, this.msg);
-            console.log('NebulaLinkSession (ERROR) >> Error Listening'.red, err);
-            console.error(err);
-        }
     }
 }
 
