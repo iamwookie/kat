@@ -4,6 +4,7 @@ const registerSlash = require('@scripts/register-slash');
 module.exports = {
     name: 'reload',
     group: 'CLI',
+    
     async run(client, args) {
         if (!client.commander) return console.log('❌ Commander Not Found.\n'.yellow);
         

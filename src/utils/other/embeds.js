@@ -2,12 +2,12 @@ const Discord = require('discord.js');
 const play = require('play-dl');
 
 class MusicEmbed extends Discord.MessageEmbed {
-    constructor(client, message, type, data) {
+    constructor(client, int, type, data) {
         super();
 
         this.client = client;
         this.guild = message.guild;
-        this.author = message instanceof Discord.CommandInteraction? message.user : message.author;
+        this.author = int.user
         this.type = type;
         this.data = data;
 

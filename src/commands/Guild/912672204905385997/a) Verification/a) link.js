@@ -20,20 +20,19 @@ module.exports = {
         return data;
     },
     
-    async run(client, msg) {
-        let author = msg instanceof Discord.CommandInteraction ? msg.user : msg.author;
+    async run(client, int) {
         let user = await client.redis.hGet('nebula-link', author.id);
 
         if (user) {
-            let exists = failEmbed('You have already linked your account with Nebula Services!', msg.author);
-            return msg instanceof Discord.CommandInteraction ? msg.editReply({ embeds: [exists] }) : msg.reply({ embeds: [exists] }).catch(() => msg.channel.send({ embeds: [exists] }));
+            let exists = failEmbed('You have already linked your account with Nebula Services!', int.author);
+            return int.editReply({ embeds: [exists] });
         }
 
         if (NebulaLinkSession.cache.has(author.id)) {
-            let started = failEmbed('You have already started a link session!', msg.author);
-            return msg instanceof Discord.CommandInteraction ? msg.editReply({ embeds: [started] }) : msg.reply({ embeds: [started] }).catch(() => msg.channel.send({ embeds: [started] }));
+            let started = failEmbed('You have already started a link session!', int.author);
+            return int.editReply({ embeds: [started] });
         }
 
-        return NebulaLinkSession.initialize(client, msg);
+        return NebulaLinkSession.initialize(client, int);
     }
 };

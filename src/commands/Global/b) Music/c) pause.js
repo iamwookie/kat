@@ -12,32 +12,33 @@ module.exports = {
 
     // SLASH
     data() {
-        let data = new SlashCommandBuilder()
-        .setName(this.name)
-        .setDescription(this.description);
-        return data;
+        return (
+            new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription(this.description)
+        )
     },
 
-    async run(client, msg) {
-        let subscription = client.subscriptions.get(msg.guildId)
+    async run(client, int) {
+        let subscription = client.subscriptions.get(int.guildId)
         if (!subscription || !subscription.isPlayerPlaying()) {
-            let notplaying = new MusicEmbed(client, msg).setTitle('I\'m not playing anything!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [notplaying] }) : msg.reply({ embeds: [notplaying] }).catch(() => msg.channel.send({ embeds: [notplaying] }));
+            let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
+            return int.editReply({ embeds: [notplaying] });
         }
 
         try {
             let track = subscription.playing;
             subscription.pause()
             
-            let success = new MusicEmbed(client, msg, 'paused', track);
-            return msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [success] }) : await msg.reply({ embeds: [success] }).catch(() => msg.channel.send({ embeds: [success] }));
+            let success = new MusicEmbed(client, int, 'paused', track);
+            return int.editReply({ embeds: [success] });
         } catch(err) {
             Commander.handleError(client, err, false);
             console.error('Music Commands (ERROR) >> pause: Error Pausing Track'.red)
 			console.error(err);
 
-            let fail = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [fail] }) : msg.reply({ embeds: [fail] }).catch(() => msg.channel.send({ embeds: [fail] }));
+            let fail = new MusicEmbed(client, int).setTitle('An error occured! Contact a developer ASAP!');
+            return int.editReply({ embeds: [fail] });
         }
     }
 };

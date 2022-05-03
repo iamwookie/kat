@@ -1,4 +1,4 @@
-// This is the command handler, CODENAME: Commander v4.1.0
+// This is the command handler, CODENAME: Commander v5.0.0
 
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -69,37 +69,32 @@ class Commander {
         })
 
         // Discord Commands
-        this.client.on('messageCreate', async msg => {
-            let prefix = this.prefix;
+        this.client.on('interactionCreate', async interaction => {
+            if (!interaction.isCommand()) return;
 
-            if (msg.guild) prefix = await this.client.database.get(msg.guildId, 'prefix') || this.prefix
+            await interaction.deferReply();
 
-            if (!msg.content.startsWith(prefix) || msg.author.bot) return;
+            const command = this.commands.get(interaction.commandName) || this.commands.get(this.aliases.get(interaction.commandName));
+            if (!command || command.disabled) {
+                let notFound = failEmbed('This command has been disabled or removed!', interaction.user);
+                return interaction.editReply({ embeds: [notFound] });
+            }
 
-            if (!this.validate(msg)) return;
-
-            const content = msg.content.slice(prefix.length).trim().split(/ +/);
-            const commandText = content.shift().toLowerCase();
-            const args = content.join(' ');
-        
-            const command = this.commands.get(commandText) || this.commands.get(this.aliases.get(commandText));
-            if (!command || command.disabled || command.group && command.group == 'CLI') return;
-
-            if (!this.authenticate(msg, command)) return;
-    
-            let cooldown = command.getCooldown(msg.guild, msg.author);
+            if (!this.authenticate(interaction, command)) return;
+            
+            let cooldown = command.getCooldown(interaction.guild, interaction.user);
             if (cooldown) {
-                let wait = failEmbed(`Please wait \`${cooldown}\` seconds before using that command again!`, msg.author)
-                return msg.reply({ embeds: [wait] }).catch(() => msg.channel.send({ embeds: [wait] }));
+                let wait = failEmbed(`Please wait \`${cooldown}\` seconds before using that command again!`, interaction.user)
+                return interaction.editReply({ embeds: [wait] })
             }
-    
+
             try {
-                command.run(this.client, msg, args);
+                await command.run(this.client, interaction);
             } catch (err) {
-                Commander.handleError(this.client, err, false, msg, args);
-                console.error('Commander (ERROR) >> Error Running Chat Command'.red + err);
+                Commander.handleError(this.client, err, false, interaction.guild);
+                console.error('Commander (ERROR) >> Error Running Slash Command'.red);
             }
-        });
+        })
     }
 
     static initialize(client) {
@@ -195,6 +190,61 @@ class Commander {
         }
     }
 
+    async updateCommands() {
+        try {
+            let commands = [];
+
+            for (const [_, command] of this.global) {
+                if (!command.data || command.disabled || command.hidden) continue;
+
+                if (command.aliases) {
+                    for (const alias of command.aliases) {
+                        let data = command.data().setName(alias);
+                        commands.push(data);
+                    }
+                }
+
+                commands.push(command.data().toJSON());
+            }
+
+            if (commands.length) await this.client.application.commands.set(commands);
+            console.log('Commander >> Successfully Registered Global Commands.'.brightGreen);
+        } catch (err) {
+            Commander.handleError(this.client, err, false);
+            console.error('Commander (ERROR) >> Error Registering Global Slash Commands'.red);
+            console.error(err);
+        }
+
+        try {
+            for (const [k, g] of this.guilds) {
+                let commands = [];
+
+                for (const [_, command] of g.commands) {
+                    if (!command.data || command.disabled || command.hidden) continue;
+
+                    if (command.aliases) {
+                        for (const alias of command.aliases) {
+                            let data = command.data().setName(alias);
+                            commands.push(data);
+                        }
+                    }
+
+                    commands.push(command.data().toJSON());
+                }
+
+                const guild = this.client.guilds.cache.get(k);
+                if (commands.length && guild) await guild.commands.set(commands).catch(err => {
+                    console.error(`Commander (ERROR) >> Error Registering Guild Slash Commands For: ${guild.id}`.red);
+                    console.error(err);
+                });
+            }
+            console.log('Commander >> Successfully Registered Guild Commands.'.brightGreen);
+        } catch (err) {
+            Commander.handleError(this.client, err, false);
+            console.error('Commander (ERROR) >> Error Registering Guild Slash Commands'.red);
+            console.error(err);
+        }
+    }
 
     registerModules() {
         const globalPath = path.join(__dirname, '../src', 'modules', 'Global');
@@ -266,14 +316,16 @@ class Commander {
         return true;
     }
 
-    authenticate(msg, command) {
-        if (command.guilds && (!msg.guild || !command.guilds.includes(msg.guild.id))) return false;
+    authenticate(interaction, command) {
+        if (command.users && !command.users.includes(interaction.user.id)) {
+            let notAllowed = failEmbed('You are not allowed to use this command!', interaction.user);
+            interaction.editReply({ embeds: [notAllowed] });
+            return false;
+        }
 
-        if (command.users && !command.users.includes(msg.author.id)) return false;
-
-        if (command.guildOnly && !msg.guild) {
+        if (command.guildOnly && !interaction.inGuild()) {
             let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
-            msg.reply({ embeds: [notGuild] }).catch(() => msg.channel.send({ embeds: [notGuild] }));
+            interaction.editReply({ embeds: [notGuild] });
             return false;
         }
 
@@ -282,7 +334,7 @@ class Commander {
 
     // Error Handling
     
-    static async handleError(client, err, quit, guild, msg) {
+    static async handleError(client, err, quit, guild) {
         let dev = client ? await client.users.fetch(client.dev).catch(() => { return }) : null;
         let code = Date.now();
         let errorObject = {
@@ -290,7 +342,6 @@ class Commander {
             errorMessage: err.message,
             errorStack: err.stack,
             guild: guild ? guild : "N/A",
-            message: msg ? msg : 'N/A',
         };
         
         fs.appendFile('./error.log', `${code}: ${JSON.stringify(errorObject)}\n`, async (err) => {
@@ -336,7 +387,7 @@ class CommanderCommand {
         if (this.users) this.users.push(this.commander.client.dev);
 
         if (this.aliases) {
-            for (const alias in this.aliases) {
+            for (const alias of this.aliases) {
                 this.commander.aliases.set(alias, this.name);
             }
         }

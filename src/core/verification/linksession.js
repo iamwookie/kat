@@ -8,10 +8,10 @@ const { successEmbed, failEmbed } = require('@utils/other/embeds');
 class NebulaLinkSession {
     static cache = new Discord.Collection();
 
-    constructor(client, msg, id, expiry) {
+    constructor(client, int, id, expiry) {
         this.client = client;
-        this.user = msg instanceof Discord.CommandInteraction ? msg.user : msg.author;
-        this.msg = msg;
+        this.user = int.user;
+        this.int = int;
         this.id = id;
         this.status = 'pending';
 
@@ -28,12 +28,10 @@ class NebulaLinkSession {
         }, expiry);
     }
 
-    static async initialize(client, msg) {
+    static async initialize(client, int) {
         try {
-            let author = msg instanceof Discord.CommandInteraction ? msg.user : msg.author;
-
             let res = await axios.post(`${config.nebula.host}/create`, {
-                discord: { id: author.id }
+                discord: { id: int.user.id }
             }, 
             { 
                 headers: {
@@ -41,7 +39,7 @@ class NebulaLinkSession {
                 }
             });
 
-            let session = new NebulaLinkSession(client, msg, res.data, config.nebula.linkExpiry);
+            let session = new NebulaLinkSession(client, int, res.data, config.nebula.linkExpiry);
             session.pubsub = new PubSubClient(client);
 
             await session.createPrompt();
@@ -68,16 +66,16 @@ class NebulaLinkSession {
                 }
             })
 
-            NebulaLinkSession.cache.set(author.id, session);
-            console.log(`NebulaLinkSession (CREATED) >> ID: ${res.data} | USER: ${author.id}`.brightGreen);
+            NebulaLinkSession.cache.set(int.user.id, session);
+            console.log(`NebulaLinkSession (CREATED) >> ID: ${res.data} | USER: ${int.user.id}`.brightGreen);
             return session;
         } catch (err) {
             Commander.handleError(client, err, false);
             console.log('NebulaLinkSession (ERROR) >> Error Creating Session'.red);
             console.error(err);
 
-            let fail = failEmbed('Something went wrong. Try again later!', msg.author);
-            msg instanceof Discord.CommandInteraction ? msg.editReply({ embeds: [fail] }) : msg.reply({ embeds: [fail] }).catch(() => msg.channel.send({ embeds: [fail] }));
+            let fail = failEmbed('Something went wrong. Try again later!', int.user);
+            int.editReply({ embeds: [fail] });
             return false;
         }
     }
@@ -88,7 +86,7 @@ class NebulaLinkSession {
             this.pubsub.close();
             console.log(`NebulaLinkSession (DESTROYED) >> ID: ${this.id}`.yellow);
         } catch (err) {
-            Commander.handleError(this.client, err, false, this.msg.guild, this.msg);
+            Commander.handleError(this.client, err, false, this.int.guild, this.int);
             console.log('NebulaLinkSession (ERROR) >> Error Destroying'.red);
             console.error(err);
         }
@@ -103,13 +101,13 @@ class NebulaLinkSession {
         .setFooter({ text: 'NOTE: The verification link will expire in 5 minutes.' })
         .setThumbnail('https://nebularoleplay.com/media/logo-nobg.png');
 
-        await this.user.send({ embeds: [prompt] }).then(msg => {
-            this.prompt = msg;
+        await this.user.send({ embeds: [prompt] }).then(int => {
+            this.prompt = int;
             let success = successEmbed('A verification prompt has been sent to your DMs!', this.user);
-            this.msg instanceof Discord.CommandInteraction ? this.msg.editReply({ embeds: [success] }) : this.msg.reply({ embeds: [success] }).catch(() => this.msg.channel.send({ embeds: [success] }));
+            this.int.editReply({ embeds: [success] });
         }).catch(() => {
             let fail = failEmbed('I could not send you a DM. Are you sure your DMs are open?', this.user);
-            this.msg instanceof Discord.CommandInteraction ? this.msg.editReply({ embeds: [fail] }) : this.msg.reply({ embeds: [fail] }).catch(() => this.msg.channel.send({ embeds: [fail] }));
+            this.int.editReply({ embeds: [fail] });
         });
     }
 }

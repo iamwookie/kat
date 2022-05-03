@@ -1,6 +1,7 @@
 module.exports = {
     name: 'stats',
     group: 'CLI',
+    
     run(client) {
         console.log('----- APP STATS -----'.brightGreen);
         console.log(`Uptime: ${formatTime(client.uptime)}`.brightGreen);
