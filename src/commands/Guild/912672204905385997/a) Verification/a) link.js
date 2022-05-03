@@ -21,15 +21,15 @@ module.exports = {
     },
     
     async run(client, int) {
-        let user = await client.redis.hGet('nebula-link', author.id);
+        let user = await client.redis.hGet('nebula-link', int.user.id);
 
         if (user) {
-            let exists = failEmbed('You have already linked your account with Nebula Services!', int.author);
+            let exists = failEmbed('You have already linked your account with Nebula Services!', int.int.user);
             return int.editReply({ embeds: [exists] });
         }
 
-        if (NebulaLinkSession.cache.has(author.id)) {
-            let started = failEmbed('You have already started a link session!', int.author);
+        if (NebulaLinkSession.cache.has(int.user.id)) {
+            let started = failEmbed('You have already started a link session!', int.user);
             return int.editReply({ embeds: [started] });
         }
 
