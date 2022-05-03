@@ -324,7 +324,7 @@ class Commander {
         }
 
         if (command.guildOnly && !interaction.inGuild()) {
-            let notGuild = failEmbed('This command can not be used in DMs!', msg.author);
+            let notGuild = failEmbed('This command can not be used in DMs!', interaction.user);
             interaction.editReply({ embeds: [notGuild] });
             return false;
         }
