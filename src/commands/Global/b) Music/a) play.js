@@ -164,7 +164,7 @@ module.exports = {
             console.error('Music Commands (ERROR) >> play: Error Running Command'.red);
 			console.error(err);
             
-            let fail = new MusicEmbed(client, int).setTitle('An error occured! Contact a developer ASAP!');
+            let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
             return int.editReply({ embeds: [fail] });
         }
     }
