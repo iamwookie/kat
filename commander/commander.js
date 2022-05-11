@@ -22,15 +22,6 @@ const perms = [ // 137476000832
     Discord.Permissions.FLAGS.SPEAK,
     Discord.Permissions.FLAGS.USE_VAD
 ];
-const groups = [
-    'CLI',
-    'Misc',
-    'Music',
-    'Developer',
-    'Twitch',
-    'Moderation',
-    'Verification'
-];
 
 class Commander {
     constructor(client) {
@@ -46,6 +37,9 @@ class Commander {
 
         // Guilds
         this.client.linkSessions = this.client.linkSessions || new Discord.Collection();
+
+        // Colors
+        this.client.colors = this.client.colors || new Discord.Collection();
 
         // CLI Commands
         this.readline.on('line', async line => {
@@ -151,12 +145,6 @@ class Commander {
         this.aliases = new Discord.Collection();
         this.cooldowns = new Discord.Collection();
         this.groups = new Discord.Collection();
-
-        groups.forEach((g) => {
-            if(this.groups.has(g)) return;
-    
-            this.groups.set(g, new Discord.Collection())
-        })
     
         for (const folder of globalFolders) {
             const globalFiles = fs.readdirSync(`${globalPath}/${folder}`).filter(file => file.endsWith('.js'));
@@ -392,11 +380,9 @@ class CommanderCommand {
             }
         }
 
-        if (this.commander.groups.has(this.group)) {
-            this.commander.groups.get(this.group).set(this.name, this);
-        } else {
-            console.warn(`Commander (WARNING) >> Command Group Does Not Exist: ${this.group} (${this.name})`)
-        }
+        if (!this.commander.groups.has(this.group)) this.commander.groups.set(this.group, new Discord.Collection());
+    
+        this.commander.groups.get(this.group).set(this.name, this);
 
         if (this.guilds) {
             for (const guildId of this.guilds) {
