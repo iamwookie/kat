@@ -14,10 +14,11 @@ module.exports = {
 
     // SLASH
     data() {
-        let data = new SlashCommandBuilder()
-        .setName(this.name)
-        .setDescription(this.description);
-        return data;
+        return (
+            new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription(this.description)
+        )
     },
     
     async run(client, int) {
