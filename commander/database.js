@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const Commander = require('./commander');
+const redis = require('@providers/redis');
 
 class CommanderDatabase {
     constructor(client) {
@@ -10,6 +11,7 @@ class CommanderDatabase {
     static async initialize(client) {
         try {
             let database = new CommanderDatabase(client);
+            database.redis = await redis();
             await database.load();
             console.log('>>> Database Initialized'.brightGreen.bold.underline);
 
@@ -25,7 +27,7 @@ class CommanderDatabase {
 
     async load() {
         try {
-            let guilds = await this.client.redis.hGetAll('guilds');
+            let guilds = await this.redis.hGetAll('guilds');
 
             if (Object.keys(guilds).length) {
                 for (const guild in guilds) {
@@ -58,7 +60,7 @@ class CommanderDatabase {
         try {
             let data = this.guilds.get(guild) || {};
             data[key] = value;
-            await this.client.redis.hSet('guilds', guild, JSON.stringify(data));
+            await this.redis.hSet('guilds', guild, JSON.stringify(data));
             await this.load();
             console.log('CommanderDatabase >> Value Set'.brightGreen);
 
@@ -80,9 +82,9 @@ class CommanderDatabase {
             delete data[key];
 
             if (Object.keys(data).length) {
-                await this.client.redis.hSet('guilds', guild, JSON.stringify(data));
+                await this.redis.hSet('guilds', guild, JSON.stringify(data));
             } else {
-                await this.client.redis.hDel('guilds', guild);
+                await this.redis.hDel('guilds', guild);
             }
             
             await this.load();

@@ -22,7 +22,7 @@ module.exports = {
     },
     
     async run(client, int) {
-        let user = await client.redis.hGet('nebula-link', int.user.id);
+        let user = await client.database.redis.hGet('nebula-link', int.user.id);
 
         if (user) {
             let exists = failEmbed('You have already linked your account with Nebula Services!', int.user);

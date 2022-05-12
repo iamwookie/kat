@@ -7,7 +7,6 @@ const Commander = require('./commander/commander');
 const CommanderDatabase = require('./commander/database');
 // ------------------------------------
 const { bot } = require('./config.json');
-const redis = require('@providers/redis');
 const now = Date.now();
 // ------------------------------------
 const client = new Client({
@@ -41,7 +40,6 @@ console.log('>>> Loading...\n'.magenta.bold.underline);
 
 client.once('ready', async (client) => {
     // ------------------------------------
-    client.redis = await redis();
     client.database = await CommanderDatabase.initialize(client);
     client.commander = Commander.initialize(client);
     // ------------------------------------

@@ -9,7 +9,7 @@ class PubSubClient {
         this.channels = new Discord.Collection();
         
         try {
-            this.pubsub = this.client.redis.duplicate();
+            this.pubsub = this.client.database.redis.duplicate();
     
             this.pubsub.on('connect', () => console.log('[PubSubClient] '.red + 'PubSub Connected'));
             this.pubsub.on('end', () => console.log('[PubSubClient] '.red + 'PubSub Disconnected'));
