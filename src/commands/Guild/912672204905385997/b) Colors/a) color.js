@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const ColorManager = require('@core/color/manager');
 const { failEmbed } = require('@utils/other/embeds');

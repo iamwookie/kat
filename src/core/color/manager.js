@@ -86,9 +86,12 @@ class ColorManager {
                     if (interaction.member.roles.cache.has(color)) await interaction.member.roles.remove(color);
                 }
 
-                if (this.colorHeader && !interaction.member.roles.cache.has(this.colorHeader)) {
-                    let headerRole = await interaction.guild.roles.fetch(this.colorHeader);
-                    if (headerRole) await interaction.member.roles.add(headerRole);
+                if (this.colorHeaders.length) {
+                    for (const colorHeader of this.colorHeaders) {
+                        if (interaction.member.roles.has(colorHeader)) continue;
+                        let headerRole = await interaction.guild.roles.fetch(colorHeader);
+                        if (headerRole) await interaction.member.roles.add(headerRole);
+                    }
                 }
 
                 let role = await interaction.guild.roles.fetch(color);
