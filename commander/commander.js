@@ -138,8 +138,8 @@ class Commander {
     registerCommands() {
         const globalPath = path.join(__dirname, '../src', 'commands', 'Global');
         const guildPath = path.join(__dirname, '../src', 'commands', 'Guild');
-        const globalFolders = fs.readdirSync(globalPath);
-        const guildFolders = fs.readdirSync(guildPath);
+        const globalFolders = fs.existsSync(globalPath) ? fs.readdirSync(globalPath) : [];
+        const guildFolders = fs.existsSync(guildPath) ? fs.readdirSync(guildPath) : [];
         
         this.commands = new Discord.Collection();
         this.aliases = new Discord.Collection();
@@ -241,8 +241,8 @@ class Commander {
     registerModules() {
         const globalPath = path.join(__dirname, '../src', 'modules', 'Global');
         const guildPath = path.join(__dirname, '../src', 'modules', 'Guild');
-        const globalFolders = fs.readdirSync(globalPath);
-        const guildFolders = fs.readdirSync(guildPath);
+        const globalFolders = fs.existsSync(globalPath) ? fs.readdirSync(globalPath) : [];
+        const guildFolders = fs.existsSync(guildPath) ? fs.readdirSync(guildPath) : [];
 
         this.modules = new Discord.Collection();
 
