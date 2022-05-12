@@ -29,6 +29,11 @@ module.exports = {
         let embed = manager.createEmbed(int);
         let menu = await manager.createMenu(int);
 
+        if (!menu) {
+            let noOptions = failEmbed('No color options available!', int.user);
+            return int.editReply({ embeds: [noOptions] });
+        }
+
         return int.editReply({ embeds: [embed], components: [menu] });
     }
 };
