@@ -46,6 +46,8 @@ class ColorManager {
             if (role && !int.member.roles.cache.has(color)) options.push({ label: role.name, value: role.id})
         }
 
+        if (!options.length) return failEmbed('There are no colors available!', int.user);
+        
         let menu = new Discord.MessageSelectMenu()
         .setCustomId('menu')
         .setPlaceholder('Color options...')

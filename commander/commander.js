@@ -467,7 +467,7 @@ class CommanderModule {
             console.log(`Commander >> Loaded ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.brightGreen);
         } catch (err) {
             Commander.handleError(client, err, false);
-            console.error(`Commander >> Failed to Load ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.brightRed);
+            console.error(`Commander >> Failed to Load ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.red);
             console.error(err);
         }
     }
