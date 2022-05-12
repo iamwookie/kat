@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const Commander = require('@commander/commander');
 const { failEmbed } = require('@utils/other/embeds');
 
 class ColorManager {
@@ -10,13 +11,25 @@ class ColorManager {
     static async initialize(client, guild) {
         try {
             let manager = new ColorManager(client, guild);
-            manager.colors = await client.database.get(guild.id, 'colors') || [];
-            manager.colorHeader = await client.database.get(guild.id, 'colorHeader');
+            await manager.loadColors();
             client.colors.set(guild.id, manager);
 
             return manager;
         } catch (err) {
-            console.error('ColorManager (ERROR) >> Error Creating'.red, err);
+            Commander.handleError(client, err, false);
+            console.error('ColorManager (ERROR) >> Error Creating'.red);
+            console.error(err);
+        }
+    }
+
+    async loadColors() {
+        try {
+            this.colors = await this.client.database.get(this.guild.id, 'colors') || [];
+            this.colorHeader = await this.client.database.get(this.guild.id, 'colorHeaders') || [];
+        } catch (err) {
+            Commander.handleError(this.client, err, false);
+            console.error('ColorManager (ERROR) >> Error Loading Colors'.red);
+            console.error(err);
         }
     }
 
