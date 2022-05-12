@@ -88,7 +88,7 @@ class ColorManager {
 
                 if (this.colorHeaders.length) {
                     for (const colorHeader of this.colorHeaders) {
-                        if (interaction.member.roles.has(colorHeader)) continue;
+                        if (interaction.member.roles.cache.has(colorHeader)) continue;
                         let headerRole = await interaction.guild.roles.fetch(colorHeader);
                         if (headerRole) await interaction.member.roles.add(headerRole);
                     }
