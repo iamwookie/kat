@@ -25,7 +25,7 @@ class ColorManager {
     async loadColors() {
         try {
             this.colors = await this.client.database.get(this.guild.id, 'colors') || [];
-            this.colorHeader = await this.client.database.get(this.guild.id, 'colorHeaders') || [];
+            this.colorHeaders = await this.client.database.get(this.guild.id, 'colorHeaders') || [];
         } catch (err) {
             Commander.handleError(this.client, err, false);
             console.error('ColorManager (ERROR) >> Error Loading Colors'.red);
