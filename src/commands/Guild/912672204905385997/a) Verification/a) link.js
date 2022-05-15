@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const NebulaLinkSession = require('@core/verification/linksession');
 const { failEmbed } = require('@utils/other/embeds');

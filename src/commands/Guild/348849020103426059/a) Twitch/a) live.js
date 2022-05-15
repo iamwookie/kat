@@ -3,6 +3,7 @@ const Commander = require('@commander/commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const TwitchManager = require('@core/twitch/twitchmanager');
 const { successEmbed, failEmbed, loadEmbed } = require('@utils/other/embeds');
+const { ChannelType } = require('discord-api-types/v9');
 // -----------------------------------
 
 module.exports = {
@@ -33,10 +34,11 @@ module.exports = {
                     .setDescription('Your twitch channel name without the URL. (e.g `ninja`)')
                     .setRequired(true);
                 })
-                .addStringOption(option => {
-                    return option.setName('channels')
-                    .setDescription('The channel ID(s) of the channels to announce in, seperated by a comma.')
-                    .setRequired(true);
+                .addChannelOption(option => {
+                    return option.setName('channel')
+                    .setDescription('The channel to announce in.')
+                    .setRequired(true)
+                    .addChannelType(ChannelType.GuildText);
                 })
             })
         )
@@ -56,22 +58,20 @@ module.exports = {
                 return int.editReply({ embeds: [notFound] });
             }
 
-            let channels = int.options.getString('channels').trim().split(',');
+            let announce = int.options.getChannel('channel');
 
-            for (const channel of channels) {
-                if (!int.guild.channels.cache.has(channel)) {
-                    let notFound = failEmbed('Invalid channel ID(s) provided!', int.user);
-                    return int.editReply({ embeds: [notFound] });
-                }
+            if (!announce) {
+                let notFound = failEmbed('Invalid channel ID(s) provided!', int.user);
+                return int.editReply({ embeds: [notFound] });
             }
 
-            await client.database.set(int.guildId, 'twitch', { 'user': username, 'channels': channels });
+            await client.database.set(int.guildId, 'twitch', { 'user': username, 'channels': [announce.id] });
 
             let success = successEmbed('Setup complete!', int.user);
             success.setTitle('Twitch Setup');
             success.addFields(
                 { name: 'User', value: `[${username}](https://twitch.tv/${username})` },
-                { name: 'Channels', value: `\`${channels.join(', ')}\`` }
+                { name: 'Channel', value: `\`#${announce.name}\`` }
             );
 
             return int.editReply({ embeds: [success] });
