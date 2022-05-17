@@ -60,7 +60,7 @@ module.exports = {
         if (command == 'add') {
             let admin = await client.database.get(int.guild.id, 'colorAdmin');
 
-            if (admin && int.user.id !== client.dev && !int.member.roles.cache.has(admin)) {
+            if (admin && !int.member.roles.cache.has(admin)) {
                 let noPerms = failEmbed('You do not have permission to use this command!', int.user);
                 return int.editReply({ embeds: [noPerms] });
             }
