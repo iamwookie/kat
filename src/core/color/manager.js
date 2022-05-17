@@ -119,6 +119,24 @@ class ColorManager {
         })
     }
 
+    async addColor(int, name, hex) {
+        let header = this.colorHeaders.length ? await int.guild.roles.fetch(this.colorHeaders[0]) : int.guild.roles.botRoleFor(this.client.user);
+        
+        if (!header) header = int.guild.roles.botRoleFor(this.client.user);
+        
+        try {
+            let role = await int.guild.roles.create({ name: name, color: hex, position: header.position - 1 });
+            this.colors.push(role.id);
+            await this.client.database.set(int.guild.id, 'colors', this.colors);
+
+            return role;
+        } catch (err) {
+            Commander.handleError(this.client, err, false);
+            console.error('ColorManager (ERROR) >> Error Adding Color'.red);
+            console.error(err);
+        }
+    }
+
     getColor(member) {
         if (!member) return null;
 

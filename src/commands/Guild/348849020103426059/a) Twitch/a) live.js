@@ -21,7 +21,6 @@ module.exports = {
             new SlashCommandBuilder()
             .setName(this.name)
             .setDescription(this.description)
-            .setDefaultPermission(false)
             .addSubcommand(sub => {
                 return sub.setName('send')
                 .setDescription('Send the livestream message.');
@@ -37,8 +36,8 @@ module.exports = {
                 .addChannelOption(option => {
                     return option.setName('channel')
                     .setDescription('The channel to announce in.')
-                    .setRequired(true)
-                    .addChannelType(ChannelType.GuildText);
+                    .addChannelType(ChannelType.GuildText)
+                    .setRequired(true);
                 })
             })
         )
