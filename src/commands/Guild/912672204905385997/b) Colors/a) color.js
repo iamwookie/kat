@@ -70,7 +70,7 @@ module.exports = {
             let re = /^#[0-9A-F]{6}$/i;
 
             if (!re.test(hex)) {
-                let invalid = failEmbed('Invalid hex code provided. Make sure to include the `#!`', int.user);
+                let invalid = failEmbed('Invalid hex code provided. Make sure to include the `#`!', int.user);
                 return int.editReply({ embeds: [invalid] });
             }
 
