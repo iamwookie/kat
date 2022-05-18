@@ -47,7 +47,7 @@ module.exports = {
             let reply = await int.editReply({ embeds: [searching] });
 
             let search = await genius.songs.search(song);
-            let lyrics = await search[0] ? search[0].lyrics() : 'Couldn\'t find those lyrics!';
+            let lyrics = search[0] ? await search[0].lyrics() : 'Couldn\'t find those lyrics!';
 
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + '...\n\n**NOTE: Lyrics are too long to display.**';
 
