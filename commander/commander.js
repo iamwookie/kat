@@ -46,24 +46,16 @@ class Commander {
             }
         });
 
-        this.client.player.on('botDisconnect', async queue => {
-            try {
-                let sub = this.client.subscriptions.get(queue.guild.id);
-                if (sub) sub.destroy();
-            } catch (err) {
-                console.error('Music (ERROR) >> Error Destroying Subscription'.red);
-                console.error(err);
-            }
+        this.client.player.on('error', async (queue, err) => {
+            Commander.handleError(this.client, err, false);
+            console.error('Music (ERROR) >> Player Error Occured'.red);
+            console.error(err);
         });
 
-        this.client.player.on('queueEnd', async queue => {
-            try {
-                let sub = this.client.subscriptions.get(queue.guild.id);
-                if (sub) sub.destroy();
-            } catch (err) {
-                console.error('Music (ERROR) >> Error Destroying Subscription'.red);
-                console.error(err);
-            }
+        this.client.player.on('connectionError', async (queue, err) => {
+            Commander.handleError(this.client, err, false);
+            console.error('Music (ERROR) >> Connection Error Occured'.red);
+            console.error(err);
         });
 
         this.client.player.on('trackStart', async (queue, track) => {
@@ -73,6 +65,16 @@ class Commander {
                 return sub.interaction.channel.send({ embeds: [onstart] });
             } catch (err) {
                 console.error('Music (ERROR) >> Error Sending Track Start Message'.red);
+                console.error(err);
+            }
+        });
+
+        this.client.player.on('queueEnd', queue => {
+            try {
+                let sub = this.client.subscriptions.get(queue.guild.id);
+                if (sub) sub.destroy();
+            } catch (err) {
+                console.error('Music (ERROR) >> Error Destroying Subscription'.red);
                 console.error(err);
             }
         });

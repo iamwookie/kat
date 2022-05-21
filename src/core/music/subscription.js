@@ -32,6 +32,10 @@ class MusicSubscription {
 	async connect() {
 		try {
 			await this.queue.connect(this.channel);
+
+			this.queue.connection.connectionTimeout = 5000;
+			this.queue.connection.voiceConnection.on('stateChange', (_, newState) => { if (newState.status == DiscordVoice.VoiceConnectionStatus.Destroyed) this.destroy(); });
+
 			console.log('Music (VOICE) >> Connection Ready'.brightGreen);
 		} catch (err) {
 			this.destroy();
