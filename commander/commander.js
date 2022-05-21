@@ -1,10 +1,12 @@
 // This is the command handler, CODENAME: Commander v5.0.0
 
 const Discord = require('discord.js');
+const { youtube } = require('@root/config.json');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-const { failEmbed } = require('@utils/other/embeds');
+const { Player } = require('discord-player');
+const { MusicEmbed, failEmbed } = require('@utils/other/embeds');
 
 // -----------------------------------
 const perms = [ // 137476000832
@@ -33,6 +35,38 @@ class Commander {
         this.guilds = new Discord.Collection();
 
         // Music
+
+        this.client.player = new Player(this.client, {
+            ytdlOptions: {
+                requestOptions: {
+                    headers: {
+                        cookie: youtube.cookie
+                    }
+                }
+            }
+        });
+
+        this.client.player.on('queueEnd', async queue => {
+            try {
+                let sub = this.client.subscriptions.get(queue.guild.id);
+                if (sub) sub.destroy();
+            } catch (err) {
+                console.error('Music (ERROR) >> Error Destroying Subscription'.red);
+                console.error(err);
+            }
+        });
+
+        this.client.player.on('trackStart', async (queue, track) => {
+            try {
+                let sub = this.client.subscriptions.get(queue.guild.id);
+                let onstart = new MusicEmbed(this.client, sub.interaction, 'playing', track);
+                return sub.interaction.channel.send({ embeds: [onstart] });
+            } catch (err) {
+                console.error('Music (ERROR) >> Error Sending Track Start Message'.red);
+                console.error(err);
+            }
+        });
+
         this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
 
         // Guilds

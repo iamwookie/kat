@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const play = require('play-dl');
 
 class MusicEmbed extends Discord.MessageEmbed {
     constructor(client, int, type, data) {
@@ -7,7 +6,7 @@ class MusicEmbed extends Discord.MessageEmbed {
 
         this.client = client;
         this.guild = int.guild;
-        this.author = int.user
+        this.author = int.user;
         this.type = type;
         this.data = data;
 
@@ -25,20 +24,12 @@ class MusicEmbed extends Discord.MessageEmbed {
                 this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
                 this.setTitle(`${loading} \u200b Searching...`);
                 break;
-            case 'searching-spotify':
-                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`${loading} \u200b Searching Spotify...`);
-                break;
-            case 'adding-playlist':
-                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`${loading} \u200b Adding Playlist...`);
-                break;
             case 'enqueued':
                 this.setAuthor({ name: `Requested By: ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
 
-                if (this.data.type && (this.data.type == 'playlist' || this.data.type == 'album')) {
-                    this.setTitle(`Queue Updated [${this.data.type == 'album' ? 'Album' : 'Playlist'}]`);
-                    this.setDescription(`Added: [${this.data instanceof play.SpotifyPlaylist || this.data instanceof play.SpotifyAlbum? this.data.name : this.data.title}](${this.data.url})`);
+                if (this.data.playlist) {
+                    this.setTitle(`Queue Updated [Playlist]`);
+                    this.setDescription(`Added: [${this.data.playlist.title}](${this.data.playlist.url})`);
                 } else {
                     this.setTitle(`Queue Updated`);
                     this.setDescription(`Added: [${this.data.title} [${this.data.duration}]](${this.data.url})`);
@@ -46,13 +37,13 @@ class MusicEmbed extends Discord.MessageEmbed {
                 
                 break;
             case 'playing':
-                this.setAuthor({ name: `Requested By: ${this.data.author.tag}`, iconURL: this.data.author.avatarURL({ dynamic: true }) });
+                this.setAuthor({ name: `Requested By: ${this.data.requestedBy.tag}`, iconURL: this.data.requestedBy.avatarURL({ dynamic: true }) });
                 this.setTitle(`Now Playing`);
                 this.setDescription(`[${this.data.title} [${this.data.duration}]](${this.data.url})`);
                 break;
             case 'paused':
                 this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`Now Paused`);
+                this.setTitle(`Track Paused`);
                 this.setDescription(`[${this.data.title} [${this.data.duration}]](${this.data.url})`);
                 break;
             case 'queue':
@@ -60,18 +51,13 @@ class MusicEmbed extends Discord.MessageEmbed {
                 this.setTitle(`Server Queue`);
                 break;
             case 'skipped':
-                this.setAuthor({ name: `Requested By: ${this.data.author.tag}`, iconURL: this.data.author.avatarURL({ dynamic: true }) });
+                this.setAuthor({ name: `Requested By: ${this.data.requestedBy.tag}`, iconURL: this.data.requestedBy.avatarURL({ dynamic: true }) });
                 this.setTitle(`Track Skipped`);
                 this.setDescription(`[${this.data.title} [${this.data.duration}]](${this.data.url})`);
                 break;
-            case 'unpaused':
-                this.setAuthor({ name: `Requested By: ${this.data.author.tag}`, iconURL: this.data.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`Track Unpaused`);
-                this.setDescription(`[${this.data.title} [${this.data.duration}]](${this.data.url})`);
-                break;
-            case 'paused':
-                this.setAuthor({ name: `Requested By: ${this.data.author.tag}`, iconURL: this.data.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`Track Paused`);
+            case 'resumed':
+                this.setAuthor({ name: `Requested By: ${this.data.requestedBy.tag}`, iconURL: this.data.requestedBy.avatarURL({ dynamic: true }) });
+                this.setTitle(`Track Resumed`);
                 this.setDescription(`[${this.data.title} [${this.data.duration}]](${this.data.url})`);
                 break;
             case 'lyrics':
@@ -81,10 +67,6 @@ class MusicEmbed extends Discord.MessageEmbed {
             default:
                 this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
         }
-    }
-
-    setTrack(track) {
-        return this.data = track;
     }
 }
 

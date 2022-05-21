@@ -33,11 +33,11 @@ module.exports = {
 
         if (!args) {
             let subscription = client.subscriptions.get(int.guildId);
-            if (!subscription || !subscription.isPlayerPlaying() || !subscription.playing) {
+            if (!subscription || !subscription.isPlaying()) {
                 let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
                 return int.editReply({ embeds: [notplaying] });
             }
-            song = subscription.playing.title;
+            song = subscription.active().title;
         } else {
             song = args;
         }
@@ -46,7 +46,7 @@ module.exports = {
             let searching = new MusicEmbed(client, int, 'searching');
             let reply = await int.editReply({ embeds: [searching] });
 
-            let search = await genius.songs.search(song);
+            let search = await genius.songs.search(song, );
             let lyrics = search[0] ? await search[0].lyrics() : 'Couldn\'t find those lyrics!';
 
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + '...\n\n**NOTE: Lyrics are too long to display.**';

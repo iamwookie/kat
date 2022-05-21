@@ -20,17 +20,16 @@ module.exports = {
     },
 
     async run(client, int) {
-        let subscription = client.subscriptions.get(int.guildId)
-        if (!subscription || !subscription.isPlayerPlaying()) {
+        let subscription = client.subscriptions.get(int.guildId);
+
+        if (!subscription || !subscription.isPlaying()) {
             let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
             return int.editReply({ embeds: [notplaying] });
         }
 
         try {
-            let track = subscription.playing;
             subscription.pause()
-            
-            let success = new MusicEmbed(client, int, 'paused', track);
+            let success = new MusicEmbed(client, int, 'paused', subscription.active());
             return int.editReply({ embeds: [success] });
         } catch(err) {
             Commander.handleError(client, err, false);

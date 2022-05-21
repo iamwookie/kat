@@ -7,6 +7,3 @@ node_modules/
 
 # Dotenv environment variables file
 .env
-
-# Extras
-.data

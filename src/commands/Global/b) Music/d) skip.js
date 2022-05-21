@@ -21,21 +21,20 @@ module.exports = {
     
     async run(client, int) {
         let subscription = client.subscriptions.get(int.guildId);
-        if (!subscription || !subscription.isPlayerPlaying()) {
+
+        if (!subscription || !subscription.isPlaying()) {
             let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
             return int.editReply({ embeds: [notplaying] });
         }
 
-        if (subscription.queue.length == 0) {
+        if (subscription.queue.tracks.length == 0) {
             let noskip = new MusicEmbed(client, int).setTitle('Nothing to skip to! This is the last song!');
             return int.editReply({ embeds: [noskip] });
         }
 
         try {
-            let track = subscription.playing;
-            subscription.player.stop();
-
-            let success = new MusicEmbed(client, int, 'skipped', track);
+            subscription.queue.skip();
+            let success = new MusicEmbed(client, int, 'skipped', subscription.active());
             return int.editReply({ embeds: [success] });
         } catch(err) {
             Commander.handleError(client, err, false);
