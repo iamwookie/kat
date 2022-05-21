@@ -46,6 +46,16 @@ class Commander {
             }
         });
 
+        this.client.player.on('botDisconnect', async queue => {
+            try {
+                let sub = this.client.subscriptions.get(queue.guild.id);
+                if (sub) sub.destroy();
+            } catch (err) {
+                console.error('Music (ERROR) >> Error Destroying Subscription'.red);
+                console.error(err);
+            }
+        });
+
         this.client.player.on('queueEnd', async queue => {
             try {
                 let sub = this.client.subscriptions.get(queue.guild.id);
