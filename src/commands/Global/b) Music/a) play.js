@@ -36,13 +36,9 @@ module.exports = {
 
         let subscription = client.subscriptions.get(int.guildId);
 
-        if (!subscription) subscription = await MusicSubscription.create(client, channel, int);
-
-        if (!subscription.queue.connection) await subscription.connect();
-
         args = int.options.getString('query');
 
-        if (subscription.isPaused()) {
+        if (subscription && subscription.isPaused()) {
             subscription.unpause();
             let resumed = new MusicEmbed(client, int, 'resumed', subscription.active());
             if (!args) return int.editReply({ embeds: [resumed] });
@@ -58,6 +54,10 @@ module.exports = {
             let noperms = new MusicEmbed(client, int).setTitle('I can\'t play in that voice channel!');
             return int.editReply({ embeds: [noperms] });
         }
+
+        if (!subscription) subscription = await MusicSubscription.create(client, channel, int);
+
+        if (!subscription.queue.connection) await subscription.connect();
 
         try {
             let searching = new MusicEmbed(client, int, 'searching');
