@@ -4,45 +4,45 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
-    name: 'skip',
-    group: 'Music',
-    description: 'Skip the track.',
-    cooldown: 5,
-    guildOnly: true,
+  name: 'skip',
+  group: 'Music',
+  description: 'Skip the track.',
+  cooldown: 5,
+  guildOnly: true,
 
-    // SLASH
-    data() {
-        return (
-            new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description)
-        )
-    },
-    
-    async run(client, int) {
-        let subscription = client.subscriptions.get(int.guildId);
+  // SLASH
+  data() {
+    return (
+      new SlashCommandBuilder()
+        .setName(this.name)
+        .setDescription(this.description)
+    );
+  },
 
-        if (!subscription || !subscription.isPlaying()) {
-            let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
-            return int.editReply({ embeds: [notplaying] });
-        }
+  async run(client, int) {
+    let subscription = client.subscriptions.get(int.guildId);
 
-        if (subscription.queue.tracks.length == 0) {
-            let noskip = new MusicEmbed(client, int).setTitle('Nothing to skip to! This is the last song!');
-            return int.editReply({ embeds: [noskip] });
-        }
-
-        try {
-            subscription.queue.skip();
-            let success = new MusicEmbed(client, int, 'skipped', subscription.active());
-            return int.editReply({ embeds: [success] });
-        } catch(err) {
-            Commander.handleError(client, err, false);
-            console.error('Music Commands (ERROR) >> skip: Error Skipping Track'.red)
-			console.error(err);
-
-            let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
-            return int.editReply({ embeds: [fail] });
-        }
+    if (!subscription || !subscription.isPlaying()) {
+      let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
+      return int.editReply({ embeds: [notplaying] });
     }
+
+    if (subscription.queue.tracks.length == 0) {
+      let noskip = new MusicEmbed(client, int).setTitle('Nothing to skip to! This is the last song!');
+      return int.editReply({ embeds: [noskip] });
+    }
+
+    try {
+      subscription.queue.skip();
+      let success = new MusicEmbed(client, int, 'skipped', subscription.active());
+      return int.editReply({ embeds: [success] });
+    } catch (err) {
+      Commander.handleError(client, err, false);
+      console.error('Music Commands (ERROR) >> skip: Error Skipping Track'.red);
+      console.error(err);
+
+      let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
+      return int.editReply({ embeds: [fail] });
+    }
+  }
 };
