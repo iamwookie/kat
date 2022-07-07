@@ -3,6 +3,7 @@ const NebulaLinkSession = require('@core/verification/linksession');
 const { failEmbed } = require('@utils/other/embeds');
 
 module.exports = {
+  disabled: true,
   name: 'link',
   group: 'Verification',
   description: 'Link your account with the Nebula Services.',
