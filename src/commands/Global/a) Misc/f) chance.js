@@ -11,52 +11,52 @@ const usageCount = io.counter({
 */
 
 module.exports = {
-    name: 'chance',
-    aliases: { 'chances': false },
-    group: 'Misc',
-    description: 'Chances at getting someone.',
-    format: '<?user>',
-    guildOnly: true,
+  name: 'chance',
+  group: 'Misc',
+  description: 'Chances at getting someone.',
+  format: '<?user>',
+  guildOnly: true,
 
-    // SLASH
-    data() {
-        let data = new SlashCommandBuilder()
+  // SLASH
+  data() {
+    return (
+      new SlashCommandBuilder()
         .setName(this.name)
         .setDescription(this.description)
         .addMentionableOption(option => {
-            option.setName('user');
-            option.setDescription('The user to analyze.');
-            return option;
-        });
-        return data;
-    },
-    
+          option.setName('user');
+          option.setDescription('The user to analyze.');
+          return option;
+        })
+    );
+  },
 
-    async run(client, msg, args) {
-        // usageCount.inc();
-        // ------------
-        let author = msg instanceof Discord.CommandInteraction? msg.user : msg.author;
-        let calculation = Math.round(Math.random() * 100);
-        let reply = new Discord.MessageEmbed()
-        .setTitle(`:smirk: \u200b ${author.username}\'s Chances`)
-        .setDescription(`${calculation}%`)
-        .setColor('RANDOM')
-        .setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
 
-        if (msg instanceof Discord.CommandInteraction? msg.options.getMentionable('user') : args) {
-            let mention = msg instanceof Discord.CommandInteraction? msg.options.getMentionable('user') : msg.mentions.members.first();
-            if(mention instanceof Discord.GuildMember) {
-                reply.setTitle(`:smirk: \u200b ${mention.user.username}\'s Chances`);
-                if (mention.user.id == client.user.id) {
-                    let res = ':no_entry: ERROR: The measurement values are invalid.'
-                    return msg instanceof Discord.CommandInteraction? msg.editReply(res) : msg.reply(res).catch(() => msg.channel.send(res));
-                }
-            } else {
-                let noMention = failEmbed('You have not mentioned a valid user!', author);
-                return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [noMention] }) : msg.reply({ embeds: [noMention] }).catch(() => msg.channel.send({ embeds: [noMention] }));
-            }
+  async run(client, int) {
+    // usageCount.inc();
+    // ------------
+    let calculation = Math.round(Math.random() * 100);
+    let reply = new Discord.MessageEmbed()
+      .setTitle(`:smirk: \u200b ${int.user.username}\'s Chances`)
+      .setDescription(`${calculation}%`)
+      .setColor('RANDOM')
+      .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) });
+
+    let mention = int.options.getMentionable('user');
+
+    if (mention) {
+      if (mention instanceof Discord.GuildMember) {
+        reply.setTitle(`:smirk: \u200b ${mention.user.username}\'s Chances`);
+        if (mention.user.id == client.user.id) {
+          let res = ':no_entry: ERROR: The measurement values are invalid.';
+          return int.editReply(res);
         }
-
-        msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [reply] }) : msg.reply({ embeds: [reply] }).catch(() => msg.channel.send({ embeds: [reply] }));
+      } else {
+        let noMention = failEmbed('You have not mentioned a valid user!', int.user);
+        return int.editReply({ embeds: [noMention] });
+      }
     }
+
+    int.editReply({ embeds: [reply] });
+  }
 };

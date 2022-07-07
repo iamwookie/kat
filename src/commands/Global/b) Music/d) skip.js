@@ -4,45 +4,45 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MusicEmbed } = require('@utils/other/embeds');
 
 module.exports = {
-    name: 'skip',
-    group: 'Music',
-    description: 'Skip the track.',
-    cooldown: 5,
-    guildOnly: true,
+  name: 'skip',
+  group: 'Music',
+  description: 'Skip the track.',
+  cooldown: 5,
+  guildOnly: true,
 
-    // SLASH
-    data() {
-        let data = new SlashCommandBuilder()
+  // SLASH
+  data() {
+    return (
+      new SlashCommandBuilder()
         .setName(this.name)
-        .setDescription(this.description);
-        return data;
-    },
+        .setDescription(this.description)
+    );
+  },
 
-    async run(client, msg) {
-        let subscription = client.subscriptions.get(msg.guildId);
-        if (!subscription || !subscription.isPlayerPlaying()) {
-            let notplaying = new MusicEmbed(client, msg).setTitle('I\'m not playing anything!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [notplaying] }) : msg.reply({ embeds: [notplaying] }).catch(() => msg.channel.send({ embeds: [notplaying] }));
-        }
+  async run(client, int) {
+    let subscription = client.subscriptions.get(int.guildId);
 
-        if (subscription.queue.length == 0) {
-            let noskip = new MusicEmbed(client, msg).setTitle('Nothing to skip to! This is the last song!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [noskip] }) : msg.reply({ embeds: [noskip] }).catch(() => msg.channel.send({ embeds: [noskip] }));
-        }
-
-        try {
-            let track = subscription.playing;
-            subscription.player.stop();
-
-            let success = new MusicEmbed(client, msg, 'skipped', track);
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [success] }) : msg.reply({ embeds: [success] }).catch(() => msg.channel.send({ embeds: [success] }));
-        } catch(err) {
-            Commander.handleError(client, err, false);
-            console.error('Music Commands (ERROR) >> skip: Error Skipping Track'.red)
-			console.error(err);
-
-            let fail = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [fail] }) : msg.reply({ embeds: [fail] }).catch(() => msg.channel.send({ embeds: [fail] }));
-        }
+    if (!subscription || !subscription.isPlaying()) {
+      let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
+      return int.editReply({ embeds: [notplaying] });
     }
+
+    if (subscription.queue.tracks.length == 0) {
+      let noskip = new MusicEmbed(client, int).setTitle('Nothing to skip to! This is the last song!');
+      return int.editReply({ embeds: [noskip] });
+    }
+
+    try {
+      subscription.queue.skip();
+      let success = new MusicEmbed(client, int, 'skipped', subscription.active());
+      return int.editReply({ embeds: [success] });
+    } catch (err) {
+      Commander.handleError(client, err, false);
+      console.error('Music Commands (ERROR) >> skip: Error Skipping Track'.red);
+      console.error(err);
+
+      let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
+      return int.editReply({ embeds: [fail] });
+    }
+  }
 };
