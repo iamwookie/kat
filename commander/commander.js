@@ -219,7 +219,7 @@ class Commander {
 
             const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
             const command = new CommanderCommand(object, this);
-            if (!command.guilds || !command.guilds.includes(folder)) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
+            if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
 
             this.commands.set(command.name, command);
           }
