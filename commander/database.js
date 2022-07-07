@@ -38,12 +38,11 @@ class CommanderDatabase {
 
       return true;
     } catch (err) {
-      Commander.handleError(this.client, err, true);
-      console.error('CommanderDatabase (ERROR) >> Error Loading'.red);
+      console.error('CommanderDatabase (ERROR) >> Error Loading (SHUTDOWN)'.red);
       console.error(err);
       this.loadLocked = false;
 
-      return false;
+      Commander.handleError(this.client, err, true);
     }
   }
 
