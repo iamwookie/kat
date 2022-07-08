@@ -1,4 +1,4 @@
-const Commander = require('@commander/commander');
+const Commander = require('@commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MusicEmbed } = require('@utils/other/embeds');
 

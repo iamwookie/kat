@@ -3,13 +3,14 @@ const NebulaLinkSession = require('@core/verification/linksession');
 const { failEmbed } = require('@utils/other/embeds');
 
 module.exports = {
+  disabled: true,
   name: 'link',
   group: 'Verification',
   description: 'Link your account with the Nebula Services.',
   guildOnly: true,
 
   // AUTHORIZATION
-  guilds: ['912672204905385997'],
+  guilds: [],
 
   // SLASH
   data() {

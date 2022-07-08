@@ -1,4 +1,5 @@
-const reloadCommands = require('@scripts/reload-commands');
+const reloadGlobal = require('@scripts/reload-global');
+const reloadGuild = require('@scripts/reload-guild');
 const registerSlash = require('@scripts/register-slash');
 
 module.exports = {
@@ -8,7 +9,8 @@ module.exports = {
   run(client, args) {
     if (!client.commander) return console.log('❌ Commander Not Found.\n'.yellow);
 
-    if (args == 'commands') return reloadCommands();
+    if (args == 'global') return reloadGlobal();
+    if (args == 'guild') return reloadGuild();
     if (args == 'slash') return registerSlash();
 
     if (args == 'colors') {

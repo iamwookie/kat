@@ -1,5 +1,5 @@
 const DiscordVoice = require('@discordjs/voice');
-const Commander = require('@commander/commander');
+const Commander = require('@commander');
 
 class MusicSubscription {
   constructor(client, channel, interaction) {
