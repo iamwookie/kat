@@ -3,7 +3,7 @@ require('colors');
 // ------------------------------------
 const { Client, Intents } = require('discord.js');
 // ------------------------------------
-const Commander = require('./commander/commander');
+const Commander = require('./commander');
 const CommanderDatabase = require('./commander/database');
 // ------------------------------------
 const { bot } = require('./config.json');
@@ -42,7 +42,7 @@ console.log('>>> Loading...\n'.magenta.bold.underline);
 client.once('ready', async (client) => {
   // ------------------------------------
   client.database = await CommanderDatabase.initialize(client);
-  client.commander = Commander.initialize(client);
+  client.commander = await Commander.initialize(client);
   // ------------------------------------
   console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`.magenta.bold.underline);
   console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);

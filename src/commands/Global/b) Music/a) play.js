@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Commander = require('@commander/commander');
+const Commander = require('@commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const MusicSubscription = require('@core/music/subscription');
 const { MusicEmbed } = require('@utils/other/embeds');

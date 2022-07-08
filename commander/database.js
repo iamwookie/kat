@@ -1,11 +1,12 @@
 const Discord = require("discord.js");
-const Commander = require('./commander');
+const Commander = require('@commander');
 const redis = require('@providers/redis');
 
 class CommanderDatabase {
   constructor(client) {
     this.client = client;
     this.guilds = new Discord.Collection();
+    this.access = new Discord.Collection();
   }
 
   static async initialize(client) {
@@ -17,11 +18,9 @@ class CommanderDatabase {
 
       return database;
     } catch (err) {
-      Commander.handleError(this.client, err, true);
       console.error('CommanderDatabase (ERROR) >> Error Initializing'.red);
       console.error(err);
-
-      return false;
+      Commander.handleError(this.client, err, true);
     }
   }
 
@@ -34,6 +33,15 @@ class CommanderDatabase {
           this.guilds.set(guild, JSON.parse(guilds[guild]));
         }
       }
+
+      let access = await this.redis.hGetAll('access');
+
+      if (Object.keys(access).length) {
+        for (const command in access) {
+          this.access.set(command, JSON.parse(access[command]));
+        }
+      }
+
       console.log('CommanderDatabase >> Data Loaded'.brightGreen);
 
       return true;
@@ -41,7 +49,6 @@ class CommanderDatabase {
       console.error('CommanderDatabase (ERROR) >> Error Loading (SHUTDOWN)'.red);
       console.error(err);
       this.loadLocked = false;
-
       Commander.handleError(this.client, err, true);
     }
   }
@@ -65,9 +72,9 @@ class CommanderDatabase {
 
       return true;
     } catch (err) {
-      Commander.handleError(this.client, err, false);
       console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
       console.error(err);
+      Commander.handleError(this.client, err, false);
 
       return false;
     }
@@ -91,11 +98,29 @@ class CommanderDatabase {
 
       return true;
     } catch (err) {
-      Commander.handleError(this.client, err, false);
       console.error('CommanderDatabase (ERROR) >> Error Deleting Value'.red);
       console.error(err);
+      Commander.handleError(this.client, err, false);
 
       return false;
+    }
+  }
+
+  async getAccess(command) {
+    if (!this.access) await this.load();
+
+    let data = this.access.get(command) || {};
+    return data;
+  }
+
+  async setAccess(command, data) {
+    try {
+      await this.redis.hSet('access', command, JSON.stringify(data));
+      await this.load();
+    } catch (err) {
+      console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
+      console.error(err);
+      Commander.handleError(this.client, err, false);
     }
   }
 }

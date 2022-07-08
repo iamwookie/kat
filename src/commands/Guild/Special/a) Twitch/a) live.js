@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Commander = require('@commander/commander');
+const Commander = require('@commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const TwitchManager = require('@core/twitch/twitchmanager');
 const { successEmbed, failEmbed, loadEmbed } = require('@utils/other/embeds');
@@ -12,8 +12,8 @@ module.exports = {
   description: 'Send live stream announcement.',
 
   // AUTHORIZATION
-  guilds: ['348849020103426059', '729660181226455160'],
-  users: ['182543450753728524'],
+  guilds: [],
+  users: [],
 
   // SLASH
   data() {

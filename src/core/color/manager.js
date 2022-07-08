@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Commander = require('@commander/commander');
+const Commander = require('@commander');
 const { failEmbed } = require('@utils/other/embeds');
 
 class ColorManager {

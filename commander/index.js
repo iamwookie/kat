@@ -1,10 +1,10 @@
-// This is the command handler, CODENAME: Commander v5.0.0
+// This is the command handler, CODENAME: Commander v6.0.0
 
 const Discord = require('discord.js');
-const { youtube } = require('@root/config.json');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { youtube } = require('@root/config.json');
 const { Player } = require('discord-player');
 const { MusicEmbed, failEmbed } = require('@utils/other/embeds');
 
@@ -33,6 +33,13 @@ class Commander {
 
     this.global = new Discord.Collection();
     this.guilds = new Discord.Collection();
+
+    // Commands
+
+    this.commands = new Discord.Collection();
+    this.aliases = new Discord.Collection();
+    this.cooldowns = new Discord.Collection();
+    this.groups = new Discord.Collection();
 
     // Music
 
@@ -103,8 +110,9 @@ class Commander {
         // Breakline
         console.log('');
       } catch (err) {
+        console.error('Commander (ERROR) >> Error Running CLI Command'.red);
+        console.error(err);
         Commander.handleError(this.client, err, false);
-        console.error('Commander (ERROR) >> Error Running CLI Command'.red + err);
       }
     });
 
@@ -131,24 +139,26 @@ class Commander {
       try {
         await command.run(this.client, interaction);
       } catch (err) {
-        Commander.handleError(this.client, err, false, interaction.guild);
         console.error('Commander (ERROR) >> Error Running Slash Command'.red);
+        console.error(err);
+        Commander.handleError(this.client, err, false, interaction.guild);
       }
     });
   }
 
-  static initialize(client) {
+  static async initialize(client) {
     try {
       let commander = new Commander(client);
-      commander.registerCommands();
+      await commander.registerGlobalCommands();
+      await commander.registerGuildCommands();
       commander.registerModules();
       console.log('>>> Commander Initialized'.brightGreen.bold.underline);
 
       return commander;
     } catch (err) {
-      Commander.handleError(client, err, true);
       console.error('Commander (ERROR) >> Error Initializing'.red);
       console.error(err);
+      Commander.handleError(client, err, true);
     }
   }
 
@@ -181,16 +191,9 @@ class Commander {
   //     return Commander.initialize(client);
   // }
 
-  registerCommands() {
+  async registerGlobalCommands() {
     const globalPath = path.join(__dirname, '../src', 'commands', 'Global');
-    const guildPath = path.join(__dirname, '../src', 'commands', 'Guild');
     const globalFolders = fs.existsSync(globalPath) ? fs.readdirSync(globalPath) : [];
-    const guildFolders = fs.existsSync(guildPath) ? fs.readdirSync(guildPath) : [];
-
-    this.commands = new Discord.Collection();
-    this.aliases = new Discord.Collection();
-    this.cooldowns = new Discord.Collection();
-    this.groups = new Discord.Collection();
 
     if (globalFolders.length) {
       for (const folder of globalFolders) {
@@ -202,10 +205,20 @@ class Commander {
           const object = require(`${globalPath}/${folder}/${file}`);
           const command = new CommanderCommand(object, this);
 
+          if (command.users) {
+            const data = await this.client.database.getAccess(command.name);
+            if (data.users) command.users.push(...data.users);
+          }
+
           this.commands.set(command.name, command);
         }
       }
     }
+  }
+
+  async registerGuildCommands() {
+    const guildPath = path.join(__dirname, '../src', 'commands', 'Guild');
+    const guildFolders = fs.existsSync(guildPath) ? fs.readdirSync(guildPath) : [];
 
     if (guildFolders.length) {
       for (const folder of guildFolders) {
@@ -220,6 +233,12 @@ class Commander {
             const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
             const command = new CommanderCommand(object, this);
             if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
+
+            if (command.guilds || command.users) {
+              const data = await this.client.database.getAccess(command.name);
+              if (data.guilds && command.guilds) command.guilds.push(...data.guilds);
+              if (data.users && command.users) command.users.push(...data.users);
+            }
 
             this.commands.set(command.name, command);
           }
@@ -248,9 +267,9 @@ class Commander {
       if (commands.length) await this.client.application.commands.set(commands);
       console.log('Commander >> Successfully Registered Global Commands.'.brightGreen);
     } catch (err) {
-      Commander.handleError(this.client, err, false);
       console.error('Commander (ERROR) >> Error Registering Global Slash Commands'.red);
       console.error(err);
+      Commander.handleError(this.client, err, false);
     }
 
     try {
@@ -278,9 +297,9 @@ class Commander {
       }
       console.log('Commander >> Successfully Registered Guild Commands.'.brightGreen);
     } catch (err) {
-      Commander.handleError(this.client, err, false);
       console.error('Commander (ERROR) >> Error Registering Guild Slash Commands'.red);
       console.error(err);
+      Commander.handleError(this.client, err, false);
     }
   }
 
@@ -512,9 +531,9 @@ class CommanderModule {
       await this.run(client);
       console.log(`Commander >> Loaded ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.brightGreen);
     } catch (err) {
-      Commander.handleError(client, err, false);
       console.error(`Commander >> Failed to Load ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.red);
       console.error(err);
+      Commander.handleError(client, err, false);
     }
   }
 }

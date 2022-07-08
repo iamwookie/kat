@@ -10,7 +10,7 @@ module.exports = {
   guildOnly: true,
 
   // AUTHORIZATION
-  guilds: ['912672204905385997'],
+  guilds: [],
 
   // SLASH
   data() {
