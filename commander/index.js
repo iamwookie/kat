@@ -1,4 +1,4 @@
-// This is the command handler, CODENAME: Commander v6.0.0
+// This is the command handler, CODENAME: Commander v6.0.1
 
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -204,11 +204,7 @@ class Commander {
 
           const object = require(`${globalPath}/${folder}/${file}`);
           const command = new CommanderCommand(object, this);
-
-          if (command.users) {
-            const data = await this.client.database.getAccess(command.name);
-            if (data.users) command.users.push(...data.users);
-          }
+          await command.initialize();
 
           this.commands.set(command.name, command);
         }
@@ -233,12 +229,7 @@ class Commander {
             const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
             const command = new CommanderCommand(object, this);
             if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
-
-            if (command.guilds || command.users) {
-              const data = await this.client.database.getAccess(command.name);
-              if (data.guilds && command.guilds) command.guilds.push(...data.guilds);
-              if (data.users && command.users) command.users.push(...data.users);
-            }
+            await command.initialize();
 
             this.commands.set(command.name, command);
           }
@@ -444,18 +435,21 @@ class CommanderCommand {
     for (const key in object) {
       this[key] = object[key];
     }
+  }
 
-    if (this.users) this.users.push(this.commander.client.dev);
-
+  async initialize() {
     if (this.aliases) {
       for (const alias of this.aliases) {
         this.commander.aliases.set(alias, this.name);
       }
     }
 
-    if (!this.commander.groups.has(this.group)) this.commander.groups.set(this.group, new Discord.Collection());
-
-    this.commander.groups.get(this.group).set(this.name, this);
+    if (this.guilds || this.users) {
+      const data = await this.commander.client.database.getAccess(this.name);
+      if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
+      if (data.users && this.users) this.users.push(...data.users);
+      if (this.users) this.users.push(this.commander.client.dev);
+    }
 
     if (this.guilds) {
       for (const guildId of this.guilds) {
@@ -470,6 +464,10 @@ class CommanderCommand {
     } else {
       this.commander.global.set(this.name, this);
     }
+
+    if (!this.commander.groups.has(this.group)) this.commander.groups.set(this.group, new Discord.Collection());
+
+    this.commander.groups.get(this.group).set(this.name, this);
   }
 
   getCooldown(guild, user) {
