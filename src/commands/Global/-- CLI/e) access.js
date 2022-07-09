@@ -1,5 +1,3 @@
-const Commander = require('@commander');
-
 module.exports = {
   name: 'access',
   group: 'CLI',
@@ -41,4 +39,4 @@ module.exports = {
 
     console.log('❌ Invalid Arguments.'.yellow);
   }
-};;
+};
