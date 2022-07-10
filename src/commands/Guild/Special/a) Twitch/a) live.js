@@ -44,7 +44,7 @@ module.exports = {
   },
 
   async run(client, int) {
-    TwitchManager.initialize(client);
+    if (!client.twitch) client.twitch = TwitchManager.initialize(client);
 
     let command = int.options.getSubcommand();
 
