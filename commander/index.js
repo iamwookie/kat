@@ -4,9 +4,7 @@ const Discord = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-const { youtube } = require('@root/config.json');
-const { Player } = require('discord-player');
-const { MusicEmbed, failEmbed } = require('@utils/other/embeds');
+const { failEmbed } = require('@utils/other/embeds');
 
 // -----------------------------------
 const perms = [ // 137476000832
@@ -43,7 +41,7 @@ class Commander {
 
     // Music
 
-    this.initializeMusic(this.client);
+    this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
 
     // Guilds
     this.client.linkSessions = this.client.linkSessions || new Discord.Collection();
@@ -117,53 +115,6 @@ class Commander {
       console.error(err);
       Commander.handleError(client, err, true);
     }
-  }
-
-  initializeMusic(client) {
-    client.player = new Player(client, {
-      ytdlOptions: {
-        requestOptions: {
-          headers: {
-            cookie: youtube.cookie
-          }
-        }
-      }
-    });
-
-    client.player.on('error', async (queue, err) => {
-      console.error('Music (ERROR) >> Player Error Occured'.red);
-      console.error(err);
-      Commander.handleError(client, err, false);
-    });
-
-    client.player.on('connectionError', async (queue, err) => {
-      console.error('Music (ERROR) >> Connection Error Occured'.red);
-      console.error(err);
-      Commander.handleError(client, err, false);
-    });
-
-    client.player.on('trackStart', async (queue, track) => {
-      try {
-        let sub = client.subscriptions.get(queue.guild.id);
-        let onstart = new MusicEmbed(client, sub.interaction, 'playing', track);
-        return sub.interaction.channel.send({ embeds: [onstart] });
-      } catch (err) {
-        console.error('Music (ERROR) >> Error Sending Track Start Message'.red);
-        console.error(err);
-      }
-    });
-
-    client.player.on('queueEnd', queue => {
-      try {
-        let sub = client.subscriptions.get(queue.guild.id);
-        if (sub) sub.destroy();
-      } catch (err) {
-        console.error('Music (ERROR) >> Error Destroying Subscription'.red);
-        console.error(err);
-      }
-    });
-
-    client.subscriptions = client.subscriptions || new Discord.Collection();
   }
 
   async registerGlobalCommands() {
@@ -364,6 +315,7 @@ class Commander {
   static async handleError(client, err, quit, guild) {
     let dev = client ? await client.users.fetch(client.dev).catch(() => { return; }) : null;
     let code = Date.now();
+
     let errorObject = {
       errorName: err.name,
       errorMessage: err.message,

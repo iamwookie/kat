@@ -33,11 +33,11 @@ module.exports = {
 
     if (!args) {
       let subscription = client.subscriptions.get(int.guildId);
-      if (!subscription || !subscription.isPlaying()) {
+      if (!subscription || !subscription.isPlayerPlaying()) {
         let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
         return int.editReply({ embeds: [notplaying] });
       }
-      song = subscription.active().title;
+      song = subscription.active.title;
     } else {
       song = args;
     }
@@ -55,9 +55,9 @@ module.exports = {
       search[0] ? success.setDescription(`**Song: ${search[0].artist.name} - ${search[0].title}**\n\n${lyrics}\n\n**Lyrics provided by [Genius](https://genius.com)**`) : success.setTitle(lyrics);
       return reply.edit({ embeds: [success] });
     } catch (err) {
-      Commander.handleError(client, err, false);
       console.error('Music Commands (ERROR) >> lyrics: Error Getting Track Lyrics'.red);
       console.error(err);
+      Commander.handleError(client, err, false);
 
       let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
       return int.editReply({ embeds: [fail] });
