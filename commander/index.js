@@ -1,4 +1,4 @@
-// This is the command handler, CODENAME: Commander v6.0.1
+// This is the command handler, CODENAME: Commander v6.1.0
 
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -43,50 +43,7 @@ class Commander {
 
     // Music
 
-    this.client.player = new Player(this.client, {
-      ytdlOptions: {
-        requestOptions: {
-          headers: {
-            cookie: youtube.cookie
-          }
-        }
-      }
-    });
-
-    this.client.player.on('error', async (queue, err) => {
-      Commander.handleError(this.client, err, false);
-      console.error('Music (ERROR) >> Player Error Occured'.red);
-      console.error(err);
-    });
-
-    // this.client.player.on('connectionError', async (queue, err) => {
-    //     Commander.handleError(this.client, err, false);
-    //     console.error('Music (ERROR) >> Connection Error Occured'.red);
-    //     console.error(err);
-    // });
-
-    this.client.player.on('trackStart', async (queue, track) => {
-      try {
-        let sub = this.client.subscriptions.get(queue.guild.id);
-        let onstart = new MusicEmbed(this.client, sub.interaction, 'playing', track);
-        return sub.interaction.channel.send({ embeds: [onstart] });
-      } catch (err) {
-        console.error('Music (ERROR) >> Error Sending Track Start Message'.red);
-        console.error(err);
-      }
-    });
-
-    this.client.player.on('queueEnd', queue => {
-      try {
-        let sub = this.client.subscriptions.get(queue.guild.id);
-        if (sub) sub.destroy();
-      } catch (err) {
-        console.error('Music (ERROR) >> Error Destroying Subscription'.red);
-        console.error(err);
-      }
-    });
-
-    this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
+    this.initializeMusic(this.client);
 
     // Guilds
     this.client.linkSessions = this.client.linkSessions || new Discord.Collection();
@@ -162,34 +119,52 @@ class Commander {
     }
   }
 
-  // static async reload(client) {
-  //     const srcPath = path.join(__dirname, 'src');
-  //     const srcFolders = await fs.promises.readdir(srcPath);
+  initializeMusic(client) {
+    client.player = new Player(client, {
+      ytdlOptions: {
+        requestOptions: {
+          headers: {
+            cookie: youtube.cookie
+          }
+        }
+      }
+    });
 
-  //     for (const folder of srcFolders) {
-  //         if (!(folder == 'core' || folder == 'utils')) continue;
+    client.player.on('error', async (queue, err) => {
+      console.error('Music (ERROR) >> Player Error Occured'.red);
+      console.error(err);
+      Commander.handleError(client, err, false);
+    });
 
-  //         const subFolders = fs.readdirSync(`${srcPath}/${folder}`);
+    client.player.on('connectionError', async (queue, err) => {
+      console.error('Music (ERROR) >> Connection Error Occured'.red);
+      console.error(err);
+      Commander.handleError(client, err, false);
+    });
 
-  //         for (const subFolder of subFolders) {
-  //             const srcFiles = fs.readdirSync(`${srcPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
+    client.player.on('trackStart', async (queue, track) => {
+      try {
+        let sub = client.subscriptions.get(queue.guild.id);
+        let onstart = new MusicEmbed(client, sub.interaction, 'playing', track);
+        return sub.interaction.channel.send({ embeds: [onstart] });
+      } catch (err) {
+        console.error('Music (ERROR) >> Error Sending Track Start Message'.red);
+        console.error(err);
+      }
+    });
 
-  //             for (const file of srcFiles) {
-  //                 delete require.cache[require.resolve(`${srcPath}/${folder}/${subFolder}/${file}`)];
-  //             }
-  //         }
-  //     }
+    client.player.on('queueEnd', queue => {
+      try {
+        let sub = client.subscriptions.get(queue.guild.id);
+        if (sub) sub.destroy();
+      } catch (err) {
+        console.error('Music (ERROR) >> Error Destroying Subscription'.red);
+        console.error(err);
+      }
+    });
 
-  //     for (const event in client._events) {
-  //         if (event == 'error' || event == 'shardDisconnect') continue;
-  //         client.removeAllListeners(event);
-  //     }
-
-  //     client.commander.readline.close();
-
-  //     const Commander = require('./commander');
-  //     return Commander.initialize(client);
-  // }
+    client.subscriptions = client.subscriptions || new Discord.Collection();
+  }
 
   async registerGlobalCommands() {
     const globalPath = path.join(__dirname, '../src', 'commands', 'Global');
