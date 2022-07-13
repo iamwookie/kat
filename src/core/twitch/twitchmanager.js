@@ -24,7 +24,9 @@ class TwitchManager {
     }
   }
 
-  async registerListeners(listener) {
+  async registerListeners(subscriber) {
+    if (!this.subscriber) this.subscriber = subscriber;
+
     this.listeners = new Discord.Collection();
 
     let data = await this.client.database.getTwitch();
@@ -37,7 +39,7 @@ class TwitchManager {
 
         if (!user) throw new Error(`User ${info.user} not found.`);
 
-        let subscription = await listener.subscribeToStreamOnlineEvents(user, async (event) => {
+        let subscription = await this.subscriber.subscribeToStreamOnlineEvents(user, async (event) => {
           try {
             let stream = await event.getStream();
             let image = await stream.getThumbnailUrl(1280, 720);
@@ -56,14 +58,14 @@ class TwitchManager {
         });
 
         this.listeners.set(user.id, subscription);
-
-        console.log('TwitchManager >> Created Event Listeners'.brightGreen.bold);
       } catch (err) {
         console.error('TwitchManager (ERROR) >> Failed To Create Listener'.red);
         console.error(err);
         Commander.handleError(this.client, err, false);
       }
     }
+
+    console.log('TwitchManager >> Created Event Listeners'.brightGreen.bold);
   }
 
   async getStreamByUserName(name) {

@@ -65,6 +65,7 @@ module.exports = {
       if (!announce) return int.editReply({ embeds: [failEmbed('Invalid channel ID(s) provided!', int.user)] });
 
       await client.database.set(int.guildId, 'twitch', { 'user': username, 'channels': [announce.id], autoSend });
+      if (client.twitch) await client.twitch.registerListeners();
 
       let success = successEmbed('Setup complete!', int.user);
       success.setTitle('Twitch Setup');
