@@ -5,6 +5,7 @@ const { Client, Intents } = require('discord.js');
 // ------------------------------------
 const Commander = require('./commander');
 const CommanderDatabase = require('./commander/database');
+const App = require('./src/app');
 // ------------------------------------
 const { bot } = require('./config.json');
 const now = Date.now();
@@ -43,6 +44,7 @@ client.once('ready', async (client) => {
   // ------------------------------------
   client.database = await CommanderDatabase.initialize(client);
   client.commander = await Commander.initialize(client);
+  client.app = await App(client);
   // ------------------------------------
   console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`.magenta.bold.underline);
   console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);

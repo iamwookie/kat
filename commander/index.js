@@ -7,12 +7,13 @@ const readline = require('readline');
 const { failEmbed } = require('@utils/other/embeds');
 
 // -----------------------------------
-const perms = [ // 137476000832
+const perms = [ // 137476033600
   // GENERAL
   Discord.Permissions.FLAGS.VIEW_CHANNEL,
   // TEXT
   Discord.Permissions.FLAGS.SEND_MESSAGES,
   Discord.Permissions.FLAGS.EMBED_LINKS,
+  Discord.Permissions.FLAGS.ATTACH_FILES,
   Discord.Permissions.FLAGS.READ_MESSAGE_HISTORY,
   Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
   Discord.Permissions.FLAGS.USE_EXTERNAL_STICKERS,

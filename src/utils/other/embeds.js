@@ -83,6 +83,24 @@ class MusicEmbed extends Discord.MessageEmbed {
   }
 }
 
+class TwitchEmbed extends Discord.MessageEmbed {
+  constructor(user, stream, image) {
+    super();
+
+    this.setColor('#9146ff');
+    this.setAuthor({ name: `${stream.userDisplayName} is NOW LIVE!!`, iconURL: user.profilePictureUrl, URL: `https://www.twitch.tv/${user.name}` });
+    this.setTitle(`${stream.title}`);
+    this.setTitle(stream.title);
+    this.setURL(`https://www.twitch.tv/${user.name}`);
+    this.addFields(
+      { name: 'Playing', value: stream.gameName, inline: true },
+      { name: 'Viewers', value: stream.viewers.toString(), inline: true },
+      { name: '-----------------------------------------------------------', value: `[Click here to watch now!](https://www.twitch.tv/${user.name})` }
+    );
+    this.setImage(image);
+  }
+}
+
 function parseDuration(time) {
   let hours = Math.floor(time / 3600);
   let minutes = Math.floor(time / 60);
@@ -122,5 +140,6 @@ module.exports = {
     return embed;
   },
 
-  MusicEmbed
+  MusicEmbed,
+  TwitchEmbed
 };
