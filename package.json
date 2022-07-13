@@ -16,7 +16,6 @@
     "@twurple/api": "^5.1.6",
     "@twurple/auth": "^5.1.6",
     "@twurple/eventsub": "^5.1.6",
-    "@twurple/eventsub-ngrok": "^5.1.6",
     "axios": "^0.25.0",
     "colors": "^1.4.0",
     "discord-api-types": "^0.32.1",
