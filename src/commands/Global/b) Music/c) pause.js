@@ -22,19 +22,19 @@ module.exports = {
   async run(client, int) {
     let subscription = client.subscriptions.get(int.guildId);
 
-    if (!subscription || !subscription.isPlaying()) {
+    if (!subscription || !subscription.isPlayerPlaying()) {
       let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
       return int.editReply({ embeds: [notplaying] });
     }
 
     try {
       subscription.pause();
-      let success = new MusicEmbed(client, int, 'paused', subscription.active());
+      let success = new MusicEmbed(client, int, 'paused', subscription.active);
       return int.editReply({ embeds: [success] });
     } catch (err) {
-      Commander.handleError(client, err, false);
       console.error('Music Commands (ERROR) >> pause: Error Pausing Track'.red);
       console.error(err);
+      Commander.handleError(client, err, false);
 
       let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
       return int.editReply({ embeds: [fail] });

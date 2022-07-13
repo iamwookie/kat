@@ -1,3 +1,4 @@
+const Commander = require('@commander');
 const { ClientCredentialsAuthProvider } = require('@twurple/auth');
 const { ApiClient } = require('@twurple/api');
 
@@ -9,12 +10,16 @@ class TwitchManager {
   }
 
   static initialize(client) {
-    if (!client.twitch) {
-      client.twitch = new TwitchManager(client);
-      console.log('>>> TwitchManager Created'.brightGreen.bold.underline);
-    }
+    try {
+      let twitch = new TwitchManager(client);
+      console.log('>>> TwitchManager Initialized'.brightGreen.bold.underline);
 
-    return client.twitch;
+      return twitch;
+    } catch (err) {
+      console.error('TwitchManager (ERROR) >> Error Initializing'.red);
+      console.error(err);
+      Commander.handleError(this.client, err, false);
+    }
   }
 
   async getStreamByUserName(name) {

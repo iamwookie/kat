@@ -30,12 +30,12 @@ module.exports = {
 
     try {
       subscription.destroy();
-      let success = new MusicEmbed(client, int).setTitle(subscription.isPaused() ? '👋 \u200b Discconected! Cya!' : '👋 \u200b Stopped playing! Cya!');
+      let success = new MusicEmbed(client, int).setTitle(subscription.isPlayerPaused() ? '👋 \u200b Discconected! Cya!' : '👋 \u200b Stopped playing! Cya!');
       return int.editReply({ embeds: [success] });
     } catch (err) {
-      Commander.handleError(client, err, false);
       console.error('Music Commands (ERROR) >> stop: Error Stopping Track'.red);
       console.error(err);
+      Commander.handleError(client, err, false);
 
       let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
       return int.editReply({ embeds: [fail] });

@@ -1,12 +1,10 @@
-// This is the command handler, CODENAME: Commander v6.0.0
+// This is the command handler, CODENAME: Commander v6.1.0
 
 const Discord = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-const { youtube } = require('@root/config.json');
-const { Player } = require('discord-player');
-const { MusicEmbed, failEmbed } = require('@utils/other/embeds');
+const { failEmbed } = require('@utils/other/embeds');
 
 // -----------------------------------
 const perms = [ // 137476000832
@@ -42,49 +40,6 @@ class Commander {
     this.groups = new Discord.Collection();
 
     // Music
-
-    this.client.player = new Player(this.client, {
-      ytdlOptions: {
-        requestOptions: {
-          headers: {
-            cookie: youtube.cookie
-          }
-        }
-      }
-    });
-
-    this.client.player.on('error', async (queue, err) => {
-      Commander.handleError(this.client, err, false);
-      console.error('Music (ERROR) >> Player Error Occured'.red);
-      console.error(err);
-    });
-
-    // this.client.player.on('connectionError', async (queue, err) => {
-    //     Commander.handleError(this.client, err, false);
-    //     console.error('Music (ERROR) >> Connection Error Occured'.red);
-    //     console.error(err);
-    // });
-
-    this.client.player.on('trackStart', async (queue, track) => {
-      try {
-        let sub = this.client.subscriptions.get(queue.guild.id);
-        let onstart = new MusicEmbed(this.client, sub.interaction, 'playing', track);
-        return sub.interaction.channel.send({ embeds: [onstart] });
-      } catch (err) {
-        console.error('Music (ERROR) >> Error Sending Track Start Message'.red);
-        console.error(err);
-      }
-    });
-
-    this.client.player.on('queueEnd', queue => {
-      try {
-        let sub = this.client.subscriptions.get(queue.guild.id);
-        if (sub) sub.destroy();
-      } catch (err) {
-        console.error('Music (ERROR) >> Error Destroying Subscription'.red);
-        console.error(err);
-      }
-    });
 
     this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
 
@@ -162,35 +117,6 @@ class Commander {
     }
   }
 
-  // static async reload(client) {
-  //     const srcPath = path.join(__dirname, 'src');
-  //     const srcFolders = await fs.promises.readdir(srcPath);
-
-  //     for (const folder of srcFolders) {
-  //         if (!(folder == 'core' || folder == 'utils')) continue;
-
-  //         const subFolders = fs.readdirSync(`${srcPath}/${folder}`);
-
-  //         for (const subFolder of subFolders) {
-  //             const srcFiles = fs.readdirSync(`${srcPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
-
-  //             for (const file of srcFiles) {
-  //                 delete require.cache[require.resolve(`${srcPath}/${folder}/${subFolder}/${file}`)];
-  //             }
-  //         }
-  //     }
-
-  //     for (const event in client._events) {
-  //         if (event == 'error' || event == 'shardDisconnect') continue;
-  //         client.removeAllListeners(event);
-  //     }
-
-  //     client.commander.readline.close();
-
-  //     const Commander = require('./commander');
-  //     return Commander.initialize(client);
-  // }
-
   async registerGlobalCommands() {
     const globalPath = path.join(__dirname, '../src', 'commands', 'Global');
     const globalFolders = fs.existsSync(globalPath) ? fs.readdirSync(globalPath) : [];
@@ -204,11 +130,7 @@ class Commander {
 
           const object = require(`${globalPath}/${folder}/${file}`);
           const command = new CommanderCommand(object, this);
-
-          if (command.users) {
-            const data = await this.client.database.getAccess(command.name);
-            if (data.users) command.users.push(...data.users);
-          }
+          await command.initialize();
 
           this.commands.set(command.name, command);
         }
@@ -233,12 +155,7 @@ class Commander {
             const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
             const command = new CommanderCommand(object, this);
             if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
-
-            if (command.guilds || command.users) {
-              const data = await this.client.database.getAccess(command.name);
-              if (data.guilds && command.guilds) command.guilds.push(...data.guilds);
-              if (data.users && command.users) command.users.push(...data.users);
-            }
+            await command.initialize();
 
             this.commands.set(command.name, command);
           }
@@ -398,6 +315,7 @@ class Commander {
   static async handleError(client, err, quit, guild) {
     let dev = client ? await client.users.fetch(client.dev).catch(() => { return; }) : null;
     let code = Date.now();
+
     let errorObject = {
       errorName: err.name,
       errorMessage: err.message,
@@ -444,18 +362,21 @@ class CommanderCommand {
     for (const key in object) {
       this[key] = object[key];
     }
+  }
 
-    if (this.users) this.users.push(this.commander.client.dev);
-
+  async initialize() {
     if (this.aliases) {
       for (const alias of this.aliases) {
         this.commander.aliases.set(alias, this.name);
       }
     }
 
-    if (!this.commander.groups.has(this.group)) this.commander.groups.set(this.group, new Discord.Collection());
-
-    this.commander.groups.get(this.group).set(this.name, this);
+    if (this.guilds || this.users) {
+      const data = await this.commander.client.database.getAccess(this.name);
+      if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
+      if (data.users && this.users) this.users.push(...data.users);
+      if (this.users) this.users.push(this.commander.client.dev);
+    }
 
     if (this.guilds) {
       for (const guildId of this.guilds) {
@@ -470,6 +391,10 @@ class CommanderCommand {
     } else {
       this.commander.global.set(this.name, this);
     }
+
+    if (!this.commander.groups.has(this.group)) this.commander.groups.set(this.group, new Discord.Collection());
+
+    this.commander.groups.get(this.group).set(this.name, this);
   }
 
   getCooldown(guild, user) {

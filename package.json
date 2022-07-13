@@ -1,6 +1,6 @@
 {
   "name": "cat-bot",
-  "version": "3.1.1",
+  "version": "4.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,17 +13,18 @@
     "@discordjs/builders": "^0.12.0",
     "@discordjs/opus": "^0.8.0",
     "@discordjs/voice": "^0.7.5",
-    "@twurple/api": "^5.0.13",
-    "@twurple/auth": "^5.0.13",
+    "@twurple/api": "^5.1.6",
+    "@twurple/auth": "^5.1.6",
     "axios": "^0.25.0",
     "colors": "^1.4.0",
     "discord-api-types": "^0.32.1",
-    "discord-player": "^5.2.2",
     "discord.js": "^13.8.0",
     "genius-lyrics": "^4.3.5",
     "libsodium-wrappers": "^0.7.9",
     "module-alias": "^2.2.2",
-    "redis": "^4.0.2"
+    "play-dl": "^1.9.5",
+    "redis": "^4.0.2",
+    "string-progressbar": "^1.0.4"
   },
   "_moduleAliases": {
     "@root": ".",

@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const { SpotifyTrack, SpotifyPlaylist, SpotifyAlbum } = require('play-dl');
 
 class MusicEmbed extends Discord.MessageEmbed {
   constructor(client, int, type, data) {
@@ -9,6 +10,8 @@ class MusicEmbed extends Discord.MessageEmbed {
     this.author = int.user;
     this.type = type;
     this.data = data;
+
+    if (this.data && this.data.spotify) this.data.url = this.data.spotify.url;
 
     this.setColor('#C167ED');
     this.setFooter({ text: `${this.guild.name} | 🎵 ${this.client.user.username} Global Music System`, iconURL: this.guild.iconURL({ dynamic: true }) });
@@ -27,12 +30,22 @@ class MusicEmbed extends Discord.MessageEmbed {
       case 'enqueued':
         this.setAuthor({ name: `Requested By: ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
 
-        if (this.data.playlist) {
+        if (this.data.type == 'playlist' || this.data.type == 'album') {
+          if (this.data instanceof SpotifyPlaylist || this.data instanceof SpotifyAlbum) {
+            this.data.title = this.data.name;
+            this.data.videoCount = this.data.tracksCount;
+          }
+
           this.setTitle(`Queue Updated [Playlist]`);
-          this.setDescription(`Added: [${this.data.playlist.title}](${this.data.playlist.url})`);
+          this.setDescription(`Added \`${this.data.videoCount}\` Tracks From: [${this.data.title}](${this.data.url})`);
         } else {
+          if (this.data instanceof SpotifyTrack) {
+            this.data.title = `${this.data.artists[0].name} - ${this.data.name}`;
+            this.data.durationRaw = parseDuration(this.data.durationInSec);
+          }
+
           this.setTitle(`Queue Updated`);
-          this.setDescription(`Added: [${this.data.title} [${this.data.duration}]](${this.data.url})`);
+          this.setDescription(`Added: [${this.data.title} [${this.data.durationRaw}]](${this.data.url})`);
         }
 
         break;
@@ -56,7 +69,7 @@ class MusicEmbed extends Discord.MessageEmbed {
         this.setDescription(`[${this.data.title} [${this.data.duration}]](${this.data.url})`);
         break;
       case 'resumed':
-        this.setAuthor({ name: `Requested By: ${this.data.requestedBy.tag}`, iconURL: this.data.requestedBy.avatarURL({ dynamic: true }) });
+        this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
         this.setTitle(`Track Resumed`);
         this.setDescription(`[${this.data.title} [${this.data.duration}]](${this.data.url})`);
         break;
@@ -69,6 +82,13 @@ class MusicEmbed extends Discord.MessageEmbed {
     }
   }
 }
+
+function parseDuration(time) {
+  let hours = Math.floor(time / 3600);
+  let minutes = Math.floor(time / 60);
+  let seconds = time - minutes * 60;
+  return `${hours > 0 ? hours + ':' : ''}${minutes > 0 ? minutes + ':' : ''}${seconds}`;
+};
 
 module.exports = {
   successEmbed(reply, author) {
