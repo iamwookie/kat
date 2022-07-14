@@ -1,12 +1,15 @@
 const express = require('express');
-const app = express();
-// ------------------------------------
 const TwitchManager = require('@core/twitch/twitchmanager');
 const { EventSubMiddleware } = require('@twurple/eventsub');
+// ------------------------------------
 const { server } = require('@root/config.json');
 
 module.exports = async (client) => {
   client.twitch = await TwitchManager.initialize(client);
+
+  const app = express();
+
+  if (app.get('env') == 'production') app.set('trust proxy', 1);
 
   const middleware = new EventSubMiddleware({
     apiClient: client.twitch.apiClient,
