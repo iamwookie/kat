@@ -23,6 +23,7 @@ module.exports = async (client) => {
 
   app.listen(server.port, async () => {
     console.log(`>>> App Initialized On Port: ${server.port}`.brightGreen.bold.underline);
+    await middleware.markAsReady();
     await client.twitch.registerListeners(middleware);
     console.log('\n');
   });
