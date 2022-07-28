@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const { SpotifyTrack, SpotifyPlaylist, SpotifyAlbum } = require('play-dl');
 
-class MusicEmbed extends Discord.MessageEmbed {
+class MusicEmbed extends Discord.EmbedBuilder {
   constructor(client, int, type, data) {
     super();
 
@@ -83,7 +83,7 @@ class MusicEmbed extends Discord.MessageEmbed {
   }
 }
 
-class TwitchEmbed extends Discord.MessageEmbed {
+class TwitchEmbed extends Discord.EmbedBuilder {
   constructor(user, stream, image) {
     super();
 
@@ -92,11 +92,11 @@ class TwitchEmbed extends Discord.MessageEmbed {
     this.setTitle(`${stream.title}`);
     this.setTitle(stream.title);
     this.setURL(`https://www.twitch.tv/${user.name}`);
-    this.addFields(
+    this.addFields([
       { name: 'Playing', value: stream.gameName, inline: true },
       { name: 'Viewers', value: stream.viewers.toString(), inline: true },
       { name: '-----------------------------------------------------------', value: `[Click here to watch now!](https://www.twitch.tv/${user.name})` }
-    );
+    ]);
     this.setImage(image);
   }
 }
@@ -110,20 +110,20 @@ function parseDuration(time) {
 
 module.exports = {
   successEmbed(reply, author) {
-    let embed = new Discord.MessageEmbed();
+    let embed = new Discord.EmbedBuilder();
 
     if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
-    embed.setColor('GREEN');
+    embed.setColor('Green');
     embed.setDescription(`✅ \u200b ${reply}`);
 
     return embed;
   },
 
   failEmbed(reply, author) {
-    let embed = new Discord.MessageEmbed();
+    let embed = new Discord.EmbedBuilder();
 
     if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
-    embed.setColor('RED');
+    embed.setColor('Red');
     embed.setDescription(`🚫 \u200b ${reply}`);
 
     return embed;
@@ -131,10 +131,10 @@ module.exports = {
 
   loadEmbed(reply, author) {
     let loading = '<a:loading:928668691997012028>';
-    let embed = new Discord.MessageEmbed();
+    let embed = new Discord.EmbedBuilder();
 
     if (author) embed.setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
-    embed.setColor('YELLOW');
+    embed.setColor('Yellow');
     embed.setDescription(`${loading} \u200b ${reply}`);
 
     return embed;

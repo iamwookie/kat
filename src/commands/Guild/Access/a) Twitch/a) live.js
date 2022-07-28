@@ -1,9 +1,8 @@
-const Discord = require('discord.js');
+const { ChannelType } = require('discord.js');
 const Commander = require('@commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const TwitchManager = require('@core/twitch/twitchmanager');
 const { successEmbed, failEmbed, loadEmbed, TwitchEmbed } = require('@utils/other/embeds');
-const { ChannelType } = require('discord-api-types/v9');
 // -----------------------------------
 
 module.exports = {
@@ -12,7 +11,7 @@ module.exports = {
   description: 'Send live stream announcement.',
 
   // AUTHORIZATION
-  guilds: [],
+  guilds: ['858675408140369920'],
   users: [],
 
   // SLASH
@@ -36,7 +35,7 @@ module.exports = {
             .addChannelOption(option => {
               return option.setName('channel')
                 .setDescription('The channel to announce in.')
-                .addChannelType(ChannelType.GuildText)
+                .addChannelTypes(ChannelType.GuildText)
                 .setRequired(true);
             })
             .addBooleanOption(option => {
@@ -69,11 +68,11 @@ module.exports = {
 
       let success = successEmbed('Setup complete!', int.user);
       success.setTitle('Twitch Setup');
-      success.addFields(
+      success.addFields([
         { name: 'User', value: `[${username}](https://twitch.tv/${username})` },
         { name: 'Channel', value: `\`#${announce.name}\`` },
         { name: 'Auto Send', value: `\`${autoSend ? 'Enabled' : 'Disabled'}\`` }
-      );
+      ]);
 
       return int.editReply({ embeds: [success] });
     }

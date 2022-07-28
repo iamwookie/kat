@@ -38,10 +38,10 @@ module.exports = {
     // ------------
     let size = 20;
     let body = '=';
-    let reply = new Discord.MessageEmbed()
+    let reply = new Discord.EmbedBuilder()
       .setTitle(`${int.user.username}\'s PP Size`)
       .setDescription(`8${body.repeat(Math.floor(Math.random() * (size - 1)))}D`)
-      .setColor('RANDOM')
+      .setColor('Random')
       .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) });
 
     let gif = 'https://tenor.com/view/the-biggest-one-cillian-murphy-bustle-huge-massive-gif-21987675';

@@ -16,8 +16,8 @@ module.exports = {
   },
 
   async run(client, int) {
-    let replyEmbed = new Discord.MessageEmbed()
-      .setColor('RANDOM')
+    let replyEmbed = new Discord.EmbedBuilder()
+      .setColor('Random')
       .setTitle('**Help Menu**')
       .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) })
       .setFooter({ text: 'Parameters with a \'?\' at the start are optional.' });
@@ -40,7 +40,7 @@ module.exports = {
           reply += `\`\`${client.prefix}${x.name}${x.format ? ` ${x.format.replace('[prefix]', client.prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${x.description}\n`;
         }
       });
-      if (reply) replyEmbed.addField(key + ' Commands', reply);
+      if (reply) replyEmbed.addFields([{ name: `${key} Commands`, value: reply }]);
     });
 
     int.editReply({ embeds: [replyEmbed] });

@@ -34,7 +34,7 @@ class ColorManager {
   }
 
   createEmbed(int) {
-    let embed = new Discord.MessageEmbed()
+    let embed = new Discord.EmbedBuilder()
       .setTitle('Colors')
       .setDescription('Select a color to apply.')
       .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) });
@@ -43,9 +43,9 @@ class ColorManager {
 
     if (color) {
       embed.setColor(color.hexColor);
-      embed.addField('Current Color', `\`${color.name}\``);
+      embed.addFields([{ name: 'Current Color', value: `\`${color.name}\`` }]);
     } else {
-      embed.setColor('RANDOM');
+      embed.setColor('Random');
     }
 
     return embed;
@@ -61,12 +61,12 @@ class ColorManager {
 
     if (!options.length) return;
 
-    let menu = new Discord.MessageSelectMenu()
+    let menu = new Discord.SelectMenuBuilder()
       .setCustomId('menu')
       .setPlaceholder('Color options...')
       .addOptions(options);
 
-    let row = new Discord.MessageActionRow()
+    let row = new Discord.ActionRowBuilder()
       .addComponents(menu);
 
     await this.createListener(int);
@@ -97,10 +97,10 @@ class ColorManager {
         let role = await interaction.guild.roles.fetch(color);
         if (role) await interaction.member.roles.add(color);
 
-        let success = new Discord.MessageEmbed()
+        let success = new Discord.EmbedBuilder()
           .setTitle('Colors')
           .setDescription('Your selected color was applied.')
-          .addField('Color Applied', `\`${role.name}\``)
+          .addFields([{ name: 'Color Applied', value: `\`${role.name}\`` }])
           .setColor(role.hexColor)
           .setAuthor({ name: interaction.user.tag, iconURL: interaction.user.avatarURL({ dynamic: true }) });
 
