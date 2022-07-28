@@ -11,7 +11,7 @@ module.exports = {
   description: 'Send live stream announcement.',
 
   // AUTHORIZATION
-  guilds: ['858675408140369920'],
+  guilds: [],
   users: [],
 
   // SLASH
