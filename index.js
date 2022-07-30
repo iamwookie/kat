@@ -1,7 +1,7 @@
 require('module-alias/register');
 require('colors');
 // ------------------------------------
-const { Client, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.js');
 // ------------------------------------
 const Commander = require('./commander');
 const CommanderDatabase = require('./commander/database');
@@ -31,7 +31,7 @@ const client = new Client({
     activities: [
       {
         name: '/help',
-        type: 'LISTENING'
+        type: ActivityType.Listening
       }
     ]
   }
