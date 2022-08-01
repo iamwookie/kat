@@ -1,31 +1,28 @@
 const express = require('express');
-const { EventSubMiddleware } = require('@twurple/eventsub');
+const helmet = require('helmet');
+const bodyParser = require("body-parser");
 // ------------------------------------
 const { server } = require('@root/config.json');
 
-module.exports = async (client) => {
-  const app = express();
+const app = express();
 
-  if (app.get('env') == 'production') app.set('trust proxy', 1);
+module.exports = (client) => {
+    return new Promise((resolve, reject) => {
+        if (app.get('env') == 'production') app.set('trust proxy', 1);
 
-  const middleware = new EventSubMiddleware({
-    apiClient: client.twitch.apiClient,
-    hostName: server.hostName,
-    pathPrefix: '/twitch',
-    secret: process.env.TWITCH_EVENT_SECRET,
-    strictHostCheck: true
-  });
+        app.use(helmet());
+        app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(express.json());
+        app.use(require('./routes')(client));
 
-  await middleware.apply(app);
-
-  app.listen(server.port, async () => {
-    console.log(`>>> App Initialized On Port: ${server.port}`.brightGreen.bold.underline);
-    await middleware.markAsReady();
-    await client.twitch.registerListeners(middleware);
-    console.log('\n');
-  });
-
-  return app;
+        app.listen(server.port, async (err) => {
+            if (err) return reject(err);
+            console.log(`>>> App Initialized On Port: ${server.port}`.brightGreen.bold.underline);
+            return resolve(app);
+        });
+    });
 };
+
+
 
 
