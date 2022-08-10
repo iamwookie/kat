@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const bodyParser = require("body-parser");
 // ------------------------------------
 const { server } = require('@root/config.json');
+const { handler } = require('@providers/authenticator');
 
 const app = express();
 
@@ -14,10 +15,11 @@ module.exports = (client) => {
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(express.json());
         app.use(require('./routes')(client));
+        app.use(handler());
 
         app.listen(server.port, async (err) => {
             if (err) return reject(err);
-            console.log(`>>> App Initialized On Port: ${server.port}`.brightGreen.bold.underline);
+            console.log(`>>> Server Initialized On Port: ${server.port}`.brightGreen.bold.underline);
             return resolve(app);
         });
     });

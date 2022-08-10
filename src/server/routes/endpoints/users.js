@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = (client) => {
-
     // /users/:id
     router.get('/:id', async (req, res) => {
         try {

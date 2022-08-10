@@ -6,7 +6,7 @@ const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.j
 const Commander = require('./commander');
 const CommanderDatabase = require('./commander/database');
 const TwitchManager = require('@core/twitch/twitchmanager');
-const App = require('./src/app');
+const Server = require('./src/server');
 // ------------------------------------
 const { bot } = require('./config.json');
 const now = Date.now();
@@ -47,7 +47,7 @@ client.once('ready', async (client) => {
     client.database = await CommanderDatabase.initialize(client);
     client.commander = await Commander.initialize(client);
     client.twitch = await TwitchManager.initialize(client);
-    client.app = await App(client).catch(console.error);
+    client.server = await Server(client).catch(console.error);
     // ------------------------------------
     console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`.magenta.bold.underline);
     console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);
