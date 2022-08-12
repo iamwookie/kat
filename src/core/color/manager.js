@@ -1,149 +1,149 @@
 const Discord = require('discord.js');
 const Commander = require('@commander');
-const { failEmbed } = require('@utils/other/embeds');
+const ActionEmbed = require('@utils/embeds/action');
 
 class ColorManager {
-  constructor(client, guild) {
-    this.client = client;
-    this.guild = guild;
-  }
-
-  static async initialize(client, guild) {
-    try {
-      let manager = new ColorManager(client, guild);
-      await manager.loadColors();
-      client.colors.set(guild.id, manager);
-
-      return manager;
-    } catch (err) {
-      Commander.handleError(client, err, false);
-      console.error('ColorManager (ERROR) >> Error Creating'.red);
-      console.error(err);
-    }
-  }
-
-  async loadColors() {
-    try {
-      this.colors = await this.client.database.get(this.guild.id, 'colors') || [];
-      this.colorHeaders = await this.client.database.get(this.guild.id, 'colorHeaders') || [];
-    } catch (err) {
-      Commander.handleError(this.client, err, false);
-      console.error('ColorManager (ERROR) >> Error Loading Colors'.red);
-      console.error(err);
-    }
-  }
-
-  createEmbed(int) {
-    let embed = new Discord.EmbedBuilder()
-      .setTitle('Colors')
-      .setDescription('Select a color to apply.')
-      .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) });
-
-    let color = this.getColor(int.member);
-
-    if (color) {
-      embed.setColor(color.hexColor);
-      embed.addFields([{ name: 'Current Color', value: `\`${color.name}\`` }]);
-    } else {
-      embed.setColor('Random');
+    constructor(client, guild) {
+        this.client = client;
+        this.guild = guild;
     }
 
-    return embed;
-  }
+    static async initialize(client, guild) {
+        try {
+            let manager = new ColorManager(client, guild);
+            await manager.loadColors();
+            client.colors.set(guild.id, manager);
 
-  async createMenu(int) {
-    let options = [];
-
-    for (const color of this.colors) {
-      let role = await int.guild.roles.fetch(color);
-      if (role && !int.member.roles.cache.has(color)) options.push({ label: role.name, value: role.id });
+            return manager;
+        } catch (err) {
+            Commander.handleError(client, err, false);
+            console.error('ColorManager (ERROR) >> Error Creating'.red);
+            console.error(err);
+        }
     }
 
-    if (!options.length) return;
+    async loadColors() {
+        try {
+            this.colors = await this.client.database.get(this.guild.id, 'colors') || [];
+            this.colorHeaders = await this.client.database.get(this.guild.id, 'colorHeaders') || [];
+        } catch (err) {
+            Commander.handleError(this.client, err, false);
+            console.error('ColorManager (ERROR) >> Error Loading Colors'.red);
+            console.error(err);
+        }
+    }
 
-    let menu = new Discord.SelectMenuBuilder()
-      .setCustomId('menu')
-      .setPlaceholder('Color options...')
-      .addOptions(options);
+    createEmbed(int) {
+        let embed = new Discord.EmbedBuilder()
+            .setTitle('Colors')
+            .setDescription('Select a color to apply.')
+            .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) });
 
-    let row = new Discord.ActionRowBuilder()
-      .addComponents(menu);
+        let color = this.getColor(int.member);
 
-    await this.createListener(int);
+        if (color) {
+            embed.setColor(color.hexColor);
+            embed.addFields([{ name: 'Current Color', value: `\`${color.name}\`` }]);
+        } else {
+            embed.setColor('Random');
+        }
 
-    return row;
-  }
+        return embed;
+    }
 
-  async createListener(int) {
-    let filter = interaction => interaction.customId == 'menu' && interaction.user.id == int.user.id;
-    let collector = int.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
-
-    collector.on('collect', async interaction => {
-      if (this.colors.includes(interaction.values[0])) {
-        let color = interaction.values[0];
+    async createMenu(int) {
+        let options = [];
 
         for (const color of this.colors) {
-          if (interaction.member.roles.cache.has(color)) await interaction.member.roles.remove(color);
+            let role = await int.guild.roles.fetch(color);
+            if (role && !int.member.roles.cache.has(color)) options.push({ label: role.name, value: role.id });
         }
 
-        if (this.colorHeaders.length) {
-          for (const colorHeader of this.colorHeaders) {
-            if (interaction.member.roles.cache.has(colorHeader)) continue;
-            let headerRole = await interaction.guild.roles.fetch(colorHeader);
-            if (headerRole) await interaction.member.roles.add(headerRole);
-          }
+        if (!options.length) return;
+
+        let menu = new Discord.SelectMenuBuilder()
+            .setCustomId('menu')
+            .setPlaceholder('Color options...')
+            .addOptions(options);
+
+        let row = new Discord.ActionRowBuilder()
+            .addComponents(menu);
+
+        await this.createListener(int);
+
+        return row;
+    }
+
+    async createListener(int) {
+        let filter = interaction => interaction.customId == 'menu' && interaction.user.id == int.user.id;
+        let collector = int.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
+
+        collector.on('collect', async interaction => {
+            if (this.colors.includes(interaction.values[0])) {
+                let color = interaction.values[0];
+
+                for (const color of this.colors) {
+                    if (interaction.member.roles.cache.has(color)) await interaction.member.roles.remove(color);
+                }
+
+                if (this.colorHeaders.length) {
+                    for (const colorHeader of this.colorHeaders) {
+                        if (interaction.member.roles.cache.has(colorHeader)) continue;
+                        let headerRole = await interaction.guild.roles.fetch(colorHeader);
+                        if (headerRole) await interaction.member.roles.add(headerRole);
+                    }
+                }
+
+                let role = await interaction.guild.roles.fetch(color);
+                if (role) await interaction.member.roles.add(color);
+
+                let success = new Discord.EmbedBuilder()
+                    .setTitle('Colors')
+                    .setDescription('Your selected color was applied.')
+                    .addFields([{ name: 'Color Applied', value: `\`${role.name}\`` }])
+                    .setColor(role.hexColor)
+                    .setAuthor({ name: interaction.user.tag, iconURL: interaction.user.avatarURL({ dynamic: true }) });
+
+                return int.editReply({ embeds: [success], components: [] });
+            } else {
+                let fail = new ActionEmbed('fail', 'The color does not exist anymore!', interaction.user);
+                return int.editReply({ embeds: [fail], components: [] });
+            }
+        });
+
+        collector.on('end', interaction => {
+            if (!collector.endReason) {
+                let expired = new ActionEmbed('fail', 'The color menu has expired!', interaction.user);
+                return int.editReply({ embeds: [expired], components: [] });
+            }
+        });
+    }
+
+    async addColor(int, name, hex) {
+        let header = this.colorHeaders.length ? await int.guild.roles.fetch(this.colorHeaders[0]) : int.guild.roles.botRoleFor(this.client.user);
+
+        if (!header) header = int.guild.roles.botRoleFor(this.client.user);
+
+        try {
+            let role = await int.guild.roles.create({ name: name, color: hex, position: header.position - 1 });
+            this.colors.push(role.id);
+            await this.client.database.set(int.guild.id, 'colors', this.colors);
+
+            return role;
+        } catch (err) {
+            Commander.handleError(this.client, err, false);
+            console.error('ColorManager (ERROR) >> Error Adding Color'.red);
+            console.error(err);
         }
-
-        let role = await interaction.guild.roles.fetch(color);
-        if (role) await interaction.member.roles.add(color);
-
-        let success = new Discord.EmbedBuilder()
-          .setTitle('Colors')
-          .setDescription('Your selected color was applied.')
-          .addFields([{ name: 'Color Applied', value: `\`${role.name}\`` }])
-          .setColor(role.hexColor)
-          .setAuthor({ name: interaction.user.tag, iconURL: interaction.user.avatarURL({ dynamic: true }) });
-
-        return int.editReply({ embeds: [success], components: [] });
-      } else {
-        let fail = failEmbed('The color does not exist anymore!', interaction.user);
-        return int.editReply({ embeds: [fail], components: [] });
-      }
-    });
-
-    collector.on('end', interaction => {
-      if (!collector.endReason) {
-        let expired = failEmbed('The color menu has expired!', interaction.user);
-        return int.editReply({ embeds: [expired], components: [] });
-      }
-    });
-  }
-
-  async addColor(int, name, hex) {
-    let header = this.colorHeaders.length ? await int.guild.roles.fetch(this.colorHeaders[0]) : int.guild.roles.botRoleFor(this.client.user);
-
-    if (!header) header = int.guild.roles.botRoleFor(this.client.user);
-
-    try {
-      let role = await int.guild.roles.create({ name: name, color: hex, position: header.position - 1 });
-      this.colors.push(role.id);
-      await this.client.database.set(int.guild.id, 'colors', this.colors);
-
-      return role;
-    } catch (err) {
-      Commander.handleError(this.client, err, false);
-      console.error('ColorManager (ERROR) >> Error Adding Color'.red);
-      console.error(err);
     }
-  }
 
-  getColor(member) {
-    if (!member) return null;
+    getColor(member) {
+        if (!member) return null;
 
-    for (const color of this.colors) {
-      if (member.roles.cache.has(color)) return member.roles.cache.get(color);
+        for (const color of this.colors) {
+            if (member.roles.cache.has(color)) return member.roles.cache.get(color);
+        }
     }
-  }
 }
 
 module.exports = ColorManager;

@@ -1,39 +1,39 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const NebulaLinkSession = require('@core/verification/linksession');
-const { failEmbed } = require('@utils/other/embeds');
+const ActionEmbed = require('@utils/embeds/action');
 
 module.exports = {
-  disabled: true,
-  name: 'link',
-  group: 'Verification',
-  description: 'Link your account with the Nebula Services.',
-  guildOnly: true,
+    disabled: true,
+    name: 'link',
+    group: 'Verification',
+    description: 'Link your account with the Nebula Services.',
+    guildOnly: true,
 
-  // AUTHORIZATION
-  guilds: [],
+    // AUTHORIZATION
+    guilds: [],
 
-  // SLASH
-  data() {
-    return (
-      new SlashCommandBuilder()
-        .setName(this.name)
-        .setDescription(this.description)
-    );
-  },
+    // SLASH
+    data() {
+        return (
+            new SlashCommandBuilder()
+                .setName(this.name)
+                .setDescription(this.description)
+        );
+    },
 
-  async run(client, int) {
-    let user = await client.database.redis.hGet('nebula-link', int.user.id);
+    async run(client, int) {
+        let user = await client.database.redis.hGet('nebula-link', int.user.id);
 
-    if (user) {
-      let exists = failEmbed('You have already linked your account with Nebula Services!', int.user);
-      return int.editReply({ embeds: [exists] });
+        if (user) {
+            let exists = new ActionEmbed('fail', 'You have already linked your account with Nebula Services!', int.user);
+            return int.editReply({ embeds: [exists] });
+        }
+
+        if (NebulaLinkSession.cache.has(int.user.id)) {
+            let started = new ActionEmbed('fail', 'You have already started a link session!', int.user);
+            return int.editReply({ embeds: [started] });
+        }
+
+        return NebulaLinkSession.initialize(client, int);
     }
-
-    if (NebulaLinkSession.cache.has(int.user.id)) {
-      let started = failEmbed('You have already started a link session!', int.user);
-      return int.editReply({ embeds: [started] });
-    }
-
-    return NebulaLinkSession.initialize(client, int);
-  }
 };
