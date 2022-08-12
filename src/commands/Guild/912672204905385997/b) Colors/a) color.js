@@ -81,15 +81,15 @@ module.exports = {
         return int.editReply({ embeds: [invalid] });
       }
 
-      let embed = new Discord.MessageEmbed()
+      let embed = new Discord.EmbedBuilder()
         .setTitle('Colors')
         .setDescription('Successfully created color!')
         .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) })
         .setColor(color.hexColor)
-        .addFields(
+        .addFields([
           { name: 'Name', value: `\`${color.name}\``, inline: true },
           { name: 'Hex Code', value: `\`${color.hexColor}\``, inline: true }
-        );
+        ]);
 
       return int.editReply({ embeds: [embed] });
     }

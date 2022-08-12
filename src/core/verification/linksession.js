@@ -53,7 +53,7 @@ class NebulaLinkSession {
 
         if (data.status == 'success') {
           if (session.prompt) {
-            let success = new Discord.MessageEmbed()
+            let success = new Discord.EmbedBuilder()
               .setAuthor({ name: session.user.tag, iconURL: session.user.avatarURL({ dynamic: true }) })
               .setColor('#C167ED')
               .setTitle('Nebula Link')
@@ -93,7 +93,7 @@ class NebulaLinkSession {
   }
 
   async createPrompt() {
-    let prompt = new Discord.MessageEmbed()
+    let prompt = new Discord.EmbedBuilder()
       .setAuthor({ name: this.user.tag, iconURL: this.user.avatarURL({ dynamic: true }) })
       .setColor('#C167ED')
       .setTitle('Nebula Link')

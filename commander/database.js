@@ -123,6 +123,18 @@ class CommanderDatabase {
       Commander.handleError(this.client, err, false);
     }
   }
+
+  async getTwitch() {
+    if (!this.guilds) await this.load();
+
+    let res = [];
+
+    for (const [_, data] of this.guilds) {
+      if (data.twitch) res.push(data.twitch);
+    }
+
+    return res;
+  }
 }
 
 module.exports = CommanderDatabase;

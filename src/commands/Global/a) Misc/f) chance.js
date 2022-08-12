@@ -36,10 +36,10 @@ module.exports = {
     // usageCount.inc();
     // ------------
     let calculation = Math.round(Math.random() * 100);
-    let reply = new Discord.MessageEmbed()
+    let reply = new Discord.EmbedBuilder()
       .setTitle(`:smirk: \u200b ${int.user.username}\'s Chances`)
       .setDescription(`${calculation}%`)
-      .setColor('RANDOM')
+      .setColor('Random')
       .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) });
 
     let mention = int.options.getMentionable('user');

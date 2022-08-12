@@ -7,20 +7,21 @@ const readline = require('readline');
 const { failEmbed } = require('@utils/other/embeds');
 
 // -----------------------------------
-const perms = [ // 137476000832
+const perms = [ // 137476033600
   // GENERAL
-  Discord.Permissions.FLAGS.VIEW_CHANNEL,
+  Discord.PermissionFlagsBits.ViewChannel,
   // TEXT
-  Discord.Permissions.FLAGS.SEND_MESSAGES,
-  Discord.Permissions.FLAGS.EMBED_LINKS,
-  Discord.Permissions.FLAGS.READ_MESSAGE_HISTORY,
-  Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS,
-  Discord.Permissions.FLAGS.USE_EXTERNAL_STICKERS,
-  Discord.Permissions.FLAGS.ADD_REACTIONS,
+  Discord.PermissionFlagsBits.SendMessages,
+  Discord.PermissionFlagsBits.EmbedLinks,
+  Discord.PermissionFlagsBits.AttachFiles,
+  Discord.PermissionFlagsBits.ReadMessageHistory,
+  Discord.PermissionFlagsBits.UseExternalEmojis,
+  Discord.PermissionFlagsBits.UseExternalStickers,
+  Discord.PermissionFlagsBits.AddReactions,
   // VOICE
-  Discord.Permissions.FLAGS.CONNECT,
-  Discord.Permissions.FLAGS.SPEAK,
-  Discord.Permissions.FLAGS.USE_VAD
+  Discord.PermissionFlagsBits.Connect,
+  Discord.PermissionFlagsBits.Speak,
+  Discord.PermissionFlagsBits.UseVAD
 ];
 
 class Commander {
@@ -73,7 +74,7 @@ class Commander {
 
     // Discord Commands
     this.client.on('interactionCreate', async interaction => {
-      if (!interaction.isCommand()) return;
+      if (interaction.type !== Discord.InteractionType.ApplicationCommand) return;
 
       await interaction.deferReply();
 
@@ -327,21 +328,19 @@ class Commander {
       if (err) throw err;
 
       if (dev) {
-        let embed = new Discord.MessageEmbed()
+        let embed = new Discord.EmbedBuilder()
           .setColor('#F04947')
           .setTitle('Uh Oh!')
           .setDescription(`A critical error in the internal code has occured.`)
-          .addFields(
-            { name: 'Error Code', value: `\`${code}\``, inline: true },
-          )
+          .addFields([{ name: 'Error Code', value: `\`${code}\``, inline: true }])
           .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg');
 
         if (guild) {
-          embed.addFields(
+          embed.addFields([
             { name: 'Guild', value: `\`${guild ? guild.name : 'N/A'}\`` },
             { name: 'Guild ID', value: `\`${guild ? guild.id : 'N/A'}\``, inline: true },
-            { name: 'Guild Owner ID', value: `\`${guild ? guild.ownerId : 'N/A'}\``, inline: true },
-          );
+            { name: 'Guild Owner ID', value: `\`${guild ? guild.ownerId : 'N/A'}\``, inline: true }
+          ]);
         }
 
         await dev.send({ embeds: [embed] }).catch(() => { return; });
