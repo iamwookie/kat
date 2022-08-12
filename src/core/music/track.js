@@ -8,7 +8,7 @@ class Track {
         this.data = data;
         this.title = data.title;
         this.url = data.url;
-        this.thumbnail = data.thumbnails[0].url;
+        this.thumbnail = data.thumbnails[0];
         this.spotify = data.spotify;
         this.duration = data.durationRaw;
         this.durationRaw = data.durationInSec;

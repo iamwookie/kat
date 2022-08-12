@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { SpotifyTrack, SpotifyPlaylist, SpotifyAlbum } = require('play-dl');
+const parseDuration = require('@utils/functions/parseDuration');
 
 class MusicEmbed extends EmbedBuilder {
     constructor(client, int, type, info) {
@@ -11,7 +12,12 @@ class MusicEmbed extends EmbedBuilder {
         this.type = type;
         this.info = info;
 
-        if (this.info && this.info.spotify) this.info.url = this.info.spotify.url;
+        if (this.info) {
+            if (this.info.spotify) this.info.url = this.info.spotify.url;
+            this.thumbnail = this.info.thumbnail?.url || this.info.thumbnails[0]?.url;
+        }
+
+        if (this.thumbnail) this.setThumbnail(this.thumbnail);
 
         this.setColor('#C167ED');
         this.setFooter({ text: `${this.guild.name} | 🎵 ${this.client.user.username} Global Music System`, iconURL: this.guild.iconURL({ dynamic: true }) });

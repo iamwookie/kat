@@ -3,6 +3,7 @@ const Commander = require('@commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const TwitchManager = require('@core/twitch/twitchmanager');
 const ActionEmbed = require('@utils/embeds/action');
+const TwitchEmbed = require('@utils/embeds/twitch');
 // -----------------------------------
 
 module.exports = {
