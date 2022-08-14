@@ -63,7 +63,7 @@ module.exports = {
                 }
             } else {
                 let noMention = new ActionEmbed('fail', 'You have not mentioned a valid user!', int.user);
-                return int instanceof int.editReply({ embeds: [noMention] });
+                return int.editReply({ embeds: [noMention] });
             }
         } else {
             if (int.user.id == '130065975956471808') {
