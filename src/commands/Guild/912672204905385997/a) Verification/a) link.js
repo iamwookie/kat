@@ -22,6 +22,8 @@ module.exports = {
     },
 
     async run(client, int) {
+        if (!client.database) return int.editReply({ embeds: [new ActionEmbed('fail', 'Database not online!', int.user)] });
+
         let user = await client.database.redis.hGet('nebula-link', int.user.id);
 
         if (user) {

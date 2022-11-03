@@ -40,6 +40,8 @@ module.exports = {
     },
 
     async run(client, int) {
+        if (!client.database) return int.editReply({ embeds: [new ActionEmbed('fail', 'Database not online!', int.user)] });
+
         let manager = client.colors.get(int.guildId);
         if (!manager) manager = await ColorManager.initialize(client, int.guild);
 

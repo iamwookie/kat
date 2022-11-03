@@ -49,6 +49,8 @@ module.exports = {
     },
 
     async run(client, int) {
+        if (!client.database) return int.editReply({ embeds: [new ActionEmbed('fail', 'Database not online!', int.user)] });
+
         if (!client.twitch) client.twitch = TwitchManager.initialize(client);
 
         let command = int.options.getSubcommand();

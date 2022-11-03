@@ -5,6 +5,7 @@ module.exports = {
     guilds: ['912672204905385997'],
     run(client) {
         client.on('guildMemberAdd', async member => {
+            if (!client.database) return;
             if (!this.guilds.includes(member.guild.id)) return;
 
             let banned = await client.database.get(member.guild.id, 'autobanned');
