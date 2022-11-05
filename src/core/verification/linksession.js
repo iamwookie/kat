@@ -70,7 +70,7 @@ class NebulaLinkSession {
             console.log(`NebulaLinkSession (CREATED) >> ID: ${res.data} | USER: ${int.user.id}`.brightGreen);
             return session;
         } catch (err) {
-            Commander.handleError(client, err, false);
+            Commander.handleError(client, err);
             console.log('NebulaLinkSession (ERROR) >> Error Creating Session'.red);
             console.error(err);
 

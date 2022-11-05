@@ -20,11 +20,12 @@ class TwitchManager {
         } catch (err) {
             console.error('TwitchManager (ERROR) >> Error Initializing'.red);
             console.error(err);
-            Commander.handleError(this.client, err, false);
+            Commander.handleError(this.client, err);
         }
     }
 
     async registerListeners(subscriber) {
+        if (this.client.database) return;
         if (!this.subscriber) this.subscriber = subscriber;
 
         this.listeners = new Discord.Collection();
@@ -53,7 +54,7 @@ class TwitchManager {
                     } catch (err) {
                         console.error(`TwitchManager (ERROR) >> Error Sending Notification`.red);
                         console.error(err);
-                        Commander.handleError(this.client, err, false);
+                        Commander.handleError(this.client, err);
                     }
                 });
 
@@ -61,7 +62,7 @@ class TwitchManager {
             } catch (err) {
                 console.error('TwitchManager (ERROR) >> Failed To Create Listener'.red);
                 console.error(err);
-                Commander.handleError(this.client, err, false);
+                Commander.handleError(this.client, err);
             }
         }
 

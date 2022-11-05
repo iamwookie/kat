@@ -1,4 +1,4 @@
-// This is the command handler, CODENAME: Commander v6.1.0
+// This is the command handler, CODENAME: Commander v6.1.1
 
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -68,7 +68,7 @@ class Commander {
             } catch (err) {
                 console.error('Commander (ERROR) >> Error Running CLI Command'.red);
                 console.error(err);
-                Commander.handleError(this.client, err, false);
+                Commander.handleError(this.client, err);
             }
         });
 
@@ -187,24 +187,26 @@ class Commander {
         } catch (err) {
             console.error('Commander (ERROR) >> Error Registering Global Slash Commands'.red);
             console.error(err);
-            Commander.handleError(this.client, err, false);
+            Commander.handleError(this.client, err);
         }
 
         try {
             for (const [k, g] of this.guilds) {
                 let commands = [];
 
-                for (const [_, command] of g.commands) {
-                    if (!command.data || command.disabled || command.hidden) continue;
+                if (g.commands) {
+                    for (const [_, command] of g.commands) {
+                        if (!command.data || command.disabled || command.hidden) continue;
 
-                    if (command.aliases) {
-                        for (const alias of command.aliases) {
-                            let data = command.data().setName(alias);
-                            commands.push(data);
+                        if (command.aliases) {
+                            for (const alias of command.aliases) {
+                                let data = command.data().setName(alias);
+                                commands.push(data);
+                            }
                         }
-                    }
 
-                    commands.push(command.data().toJSON());
+                        commands.push(command.data().toJSON());
+                    }
                 }
 
                 const guild = this.client.guilds.cache.get(k);
@@ -217,7 +219,7 @@ class Commander {
         } catch (err) {
             console.error('Commander (ERROR) >> Error Registering Guild Slash Commands'.red);
             console.error(err);
-            Commander.handleError(this.client, err, false);
+            Commander.handleError(this.client, err);
         }
     }
 
@@ -371,9 +373,12 @@ class CommanderCommand {
         }
 
         if (this.guilds || this.users) {
-            const data = await this.commander.client.database.getAccess(this.name);
-            if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
-            if (data.users && this.users) this.users.push(...data.users);
+            if (this.commander.client.database) {
+                const data = await this.commander.client.database.getAccess(this.name);
+                if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
+                if (data.users && this.users) this.users.push(...data.users);
+            }
+            
             if (this.users) this.users.push(this.commander.client.dev);
         }
 
@@ -457,7 +462,7 @@ class CommanderModule {
         } catch (err) {
             console.error(`Commander >> Failed to Load ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.red);
             console.error(err);
-            Commander.handleError(client, err, false);
+            Commander.handleError(client, err);
         }
     }
 }

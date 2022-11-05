@@ -5,7 +5,7 @@
 
   "server": {
     "hostName": "cat.wookie.info",
-    "port": 3000,
+    "port": 3030,
     "limiter": {
       "duration": 5,
       "max": 50

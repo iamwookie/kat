@@ -54,7 +54,7 @@ client.once('ready', async (client) => {
 });
 
 client.on('error', (err) => {
-    Commander.handleError(client, err, false);
+    Commander.handleError(client, err);
 });
 
 client.login(process.env.BOT_TOKEN);

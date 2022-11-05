@@ -57,7 +57,7 @@ module.exports = {
         } catch (err) {
             console.error('Music Commands (ERROR) >> lyrics: Error Getting Track Lyrics'.red);
             console.error(err);
-            Commander.handleError(client, err, false);
+            Commander.handleError(client, err);
 
             let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
             return int.editReply({ embeds: [fail] });

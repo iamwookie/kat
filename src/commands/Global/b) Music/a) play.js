@@ -74,7 +74,7 @@ module.exports = {
                 } catch (err) {
                     let notFound = new MusicEmbed(client, int).setTitle('You have not provided a valid Spotify URL!');
                     reply.edit({ embeds: [notFound] }).catch(() => int.channel.send({ embeds: [notFound] }));
-                    Commander.handleError(client, err, false);
+                    Commander.handleError(client, err);
                     return subscription.destroy();
                 }
             } else if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
@@ -86,7 +86,7 @@ module.exports = {
                 } catch {
                     let notFound = new MusicEmbed(client, int).setTitle('You have not provided a valid playlist URL!');
                     reply.edit({ embeds: [notFound] });
-                    Commander.handleError(client, err, false);
+                    Commander.handleError(client, err);
                     return subscription.destroy();
                 }
             } else {

@@ -16,7 +16,7 @@ class ColorManager {
 
             return manager;
         } catch (err) {
-            Commander.handleError(client, err, false);
+            Commander.handleError(client, err);
             console.error('ColorManager (ERROR) >> Error Creating'.red);
             console.error(err);
         }
@@ -24,10 +24,10 @@ class ColorManager {
 
     async loadColors() {
         try {
-            this.colors = await this.client.database.get(this.guild.id, 'colors') || [];
-            this.colorHeaders = await this.client.database.get(this.guild.id, 'colorHeaders') || [];
+            this.colors = this.client.database ? await this.client.database.get(this.guild.id, 'colors') || [] : [];
+            this.colorHeaders = this.client.database ? await this.client.database.get(this.guild.id, 'colorHeaders') || [] : [];
         } catch (err) {
-            Commander.handleError(this.client, err, false);
+            Commander.handleError(this.client, err);
             console.error('ColorManager (ERROR) >> Error Loading Colors'.red);
             console.error(err);
         }
@@ -127,11 +127,12 @@ class ColorManager {
         try {
             let role = await int.guild.roles.create({ name: name, color: hex, position: header.position - 1 });
             this.colors.push(role.id);
+
             await this.client.database.set(int.guild.id, 'colors', this.colors);
 
             return role;
         } catch (err) {
-            Commander.handleError(this.client, err, false);
+            Commander.handleError(this.client, err);
             console.error('ColorManager (ERROR) >> Error Adding Color'.red);
             console.error(err);
         }
