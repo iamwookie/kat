@@ -6,6 +6,7 @@ class CommanderDatabase {
     constructor(client) {
         this.client = client;
         this.prefix = 'cat:';
+        
         this.guilds = new Discord.Collection();
         this.access = new Discord.Collection();
     }
