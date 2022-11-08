@@ -8,7 +8,8 @@ module.exports = {
     guildOnly: true,
 
     // AUTHORIZATION
-    guilds: ["311942245899173888"],
+    guilds: [],
+    users: [],
 
     // SLASH
     data() {
@@ -20,8 +21,6 @@ module.exports = {
     },
 
     async run(client, int) {
-        if (!int.user.id == client.dev) return;
-
         let bans = await int.guild.bans.fetch();
 
         await int.editReply({ embeds: [new ActionEmbed('success', 'Unbanning all users!', int.user)] });
