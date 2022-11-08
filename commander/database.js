@@ -26,7 +26,9 @@ class CommanderDatabase {
 
     async load() {
         try {
-            let guilds = await this.redis.hGetAll('guilds');
+            let guilds = await this.redis.hGetAll('cat:guilds');
+
+            this.guilds.clear();
 
             if (Object.keys(guilds).length) {
                 for (const guild in guilds) {
@@ -34,7 +36,9 @@ class CommanderDatabase {
                 }
             }
 
-            let access = await this.redis.hGetAll('access');
+            let access = await this.redis.hGetAll('cat:access');
+
+            this.access.clear();
 
             if (Object.keys(access).length) {
                 for (const command in access) {
@@ -106,16 +110,23 @@ class CommanderDatabase {
         }
     }
 
+    // ACCESS
+
     async getAccess(command) {
         if (!this.access) await this.load();
 
-        let data = this.access.get(command) || {};
+        const data = this.access.get(command) || {};
         return data;
     }
 
     async setAccess(command, data) {
         try {
-            await this.redis.hSet('cat:access', command, JSON.stringify(data));
+            if (!data.guilds?.length && !data.users?.length) {
+                await this.redis.hDel('cat:access', command);
+            } else {
+                await this.redis.hSet('cat:access', command, JSON.stringify(data));
+            }
+
             await this.load();
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
@@ -123,6 +134,8 @@ class CommanderDatabase {
             Commander.handleError(this.client, err);
         }
     }
+
+    // EXTRAS
 
     async getTwitch() {
         if (!this.guilds) await this.load();

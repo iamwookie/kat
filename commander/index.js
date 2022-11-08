@@ -1,4 +1,4 @@
-// This is the command handler, CODENAME: Commander v6.1.1
+// This is the command handler, CODENAME: Commander v6.2.0
 
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -33,15 +33,15 @@ class Commander {
         this.global = new Discord.Collection();
         this.guilds = new Discord.Collection();
 
-        // Commands
+        this.rest = new Discord.REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 
+        // Commands
         this.commands = new Discord.Collection();
         this.aliases = new Discord.Collection();
         this.cooldowns = new Discord.Collection();
         this.groups = new Discord.Collection();
 
         // Music
-
         this.client.subscriptions = this.client.subscriptions || new Discord.Collection();
 
         // Guilds
@@ -182,8 +182,9 @@ class Commander {
                 commands.push(command.data().toJSON());
             }
 
-            if (commands.length) await this.client.application.commands.set(commands);
-            console.log('Commander >> Successfully Registered Global Commands.'.brightGreen);
+            const res = await this.rest.put(Discord.Routes.applicationCommands(process.env.BOT_APP_ID), { body: commands });
+
+            console.log(`Commander >> Successfully Registered ${res.length} Global Command(s).`.brightGreen);
         } catch (err) {
             console.error('Commander (ERROR) >> Error Registering Global Slash Commands'.red);
             console.error(err);
@@ -194,28 +195,33 @@ class Commander {
             for (const [k, g] of this.guilds) {
                 let commands = [];
 
-                if (g.commands) {
-                    for (const [_, command] of g.commands) {
-                        if (!command.data || command.disabled || command.hidden) continue;
+                if (!g.commands) continue;
 
-                        if (command.aliases) {
-                            for (const alias of command.aliases) {
-                                let data = command.data().setName(alias);
-                                commands.push(data);
-                            }
+                for (const [_, command] of g.commands) {
+                    if (!command.data || command.disabled || command.hidden) continue;
+
+                    if (command.aliases) {
+                        for (const alias of command.aliases) {
+                            let data = command.data().setName(alias);
+                            commands.push(data);
                         }
-
-                        commands.push(command.data().toJSON());
                     }
+
+                    commands.push(command.data().toJSON());
                 }
 
-                const guild = this.client.guilds.cache.get(k);
-                if (commands.length && guild) await guild.commands.set(commands).catch(err => {
-                    console.error(`Commander (ERROR) >> Error Registering Guild Slash Commands For: ${guild.id}`.red);
+                if (!this.client.guilds.cache.has(k)) continue;
+
+                try {
+                    const res = await this.rest.put(Discord.Routes.applicationGuildCommands(process.env.BOT_APP_ID, k), { body: commands });
+                    console.log(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`.brightGreen);
+                } catch (err) {
+                    console.error(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${k}`.red);
                     console.error(err);
-                });
+                    Commander.handleError(this.client, err);
+                }
             }
-            console.log('Commander >> Successfully Registered Guild Commands.'.brightGreen);
+            console.log('Commander >> Successfully Registered All Guild Commands.'.brightGreen);
         } catch (err) {
             console.error('Commander (ERROR) >> Error Registering Guild Slash Commands'.red);
             console.error(err);
@@ -378,7 +384,7 @@ class CommanderCommand {
                 if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
                 if (data.users && this.users) this.users.push(...data.users);
             }
-            
+
             if (this.users) this.users.push(this.commander.client.dev);
         }
 
