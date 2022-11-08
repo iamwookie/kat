@@ -66,7 +66,7 @@ class CommanderDatabase {
         try {
             let data = this.guilds.get(guild) || {};
             data[key] = value;
-            await this.redis.hSet('guilds', guild, JSON.stringify(data));
+            await this.redis.hSet('cat:guilds', guild, JSON.stringify(data));
             await this.load();
             console.log('CommanderDatabase >> Value Set'.brightGreen);
 
@@ -88,9 +88,9 @@ class CommanderDatabase {
             delete data[key];
 
             if (Object.keys(data).length) {
-                await this.redis.hSet('guilds', guild, JSON.stringify(data));
+                await this.redis.hSet('cat:guilds', guild, JSON.stringify(data));
             } else {
-                await this.redis.hDel('guilds', guild);
+                await this.redis.hDel('cat:guilds', guild);
             }
 
             await this.load();
@@ -115,7 +115,7 @@ class CommanderDatabase {
 
     async setAccess(command, data) {
         try {
-            await this.redis.hSet('access', command, JSON.stringify(data));
+            await this.redis.hSet('cat:access', command, JSON.stringify(data));
             await this.load();
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
