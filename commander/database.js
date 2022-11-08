@@ -5,6 +5,7 @@ const redis = require('@providers/redis');
 class CommanderDatabase {
     constructor(client) {
         this.client = client;
+        this.prefix = 'cat:';
         this.guilds = new Discord.Collection();
         this.access = new Discord.Collection();
     }
@@ -26,7 +27,7 @@ class CommanderDatabase {
 
     async load() {
         try {
-            let guilds = await this.redis.hGetAll('cat:guilds');
+            let guilds = await this.redis.hGetAll(this.prefix + 'guilds');
 
             this.guilds.clear();
 
@@ -36,7 +37,7 @@ class CommanderDatabase {
                 }
             }
 
-            let access = await this.redis.hGetAll('cat:access');
+            let access = await this.redis.hGetAll(this.prefix + 'access');
 
             this.access.clear();
 
@@ -70,7 +71,7 @@ class CommanderDatabase {
         try {
             let data = this.guilds.get(guild) || {};
             data[key] = value;
-            await this.redis.hSet('cat:guilds', guild, JSON.stringify(data));
+            await this.redis.hSet(this.prefix + 'guilds', guild, JSON.stringify(data));
             await this.load();
             console.log('CommanderDatabase >> Value Set'.brightGreen);
 
@@ -92,9 +93,9 @@ class CommanderDatabase {
             delete data[key];
 
             if (Object.keys(data).length) {
-                await this.redis.hSet('cat:guilds', guild, JSON.stringify(data));
+                await this.redis.hSet(this.prefix + 'guilds', guild, JSON.stringify(data));
             } else {
-                await this.redis.hDel('cat:guilds', guild);
+                await this.redis.hDel(this.prefix + 'guilds', guild);
             }
 
             await this.load();
@@ -122,9 +123,9 @@ class CommanderDatabase {
     async setAccess(command, data) {
         try {
             if (!data.guilds?.length && !data.users?.length) {
-                await this.redis.hDel('cat:access', command);
+                await this.redis.hDel(this.prefix + 'access', command);
             } else {
-                await this.redis.hSet('cat:access', command, JSON.stringify(data));
+                await this.redis.hSet(this.prefix + 'access', command, JSON.stringify(data));
             }
 
             await this.load();
