@@ -118,6 +118,8 @@ class ColorManager {
 
     async addColor(role) {
         try {
+            if (this.colors.includes(role.id)) return role;
+
             this.colors.push(role.id);
             await this.client.database.set(role.guild.id, 'colors', this.colors);
 

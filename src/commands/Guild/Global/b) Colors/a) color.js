@@ -57,6 +57,8 @@ module.exports = {
 
             const role = int.options.getRole('role');
 
+            if (manager.colors.includes(role.id)) return int.editReply({ embeds: [new ActionEmbed('fail', 'This role is already a color!', int.user)] });
+
             const colorRole = await manager.addColor(role);
 
             if (!colorRole) return int.editReply({ embeds: [new ActionEmbed('fail', 'Error creating color!', int.user)] });
