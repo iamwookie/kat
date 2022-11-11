@@ -44,7 +44,7 @@ class NebulaLinkSession {
 
             await session.createPrompt();
 
-            session.pubsub.subscribe(client.database.prefix + 'nebula-link', (message) => {
+            session.pubsub.subscribe(client.database.withPrefix('nebula-link'), (message) => {
                 let data = JSON.parse(message);
                 if (!data.id == session.id) return;
 

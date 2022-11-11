@@ -15,7 +15,7 @@ class CommanderDatabase {
         try {
             let database = new CommanderDatabase(client);
             database.redis = await redis();
-            await database.load();
+            await database.#load();
             console.log('>>> Database Initialized'.brightGreen.bold.underline);
 
             return database;
@@ -26,9 +26,11 @@ class CommanderDatabase {
         }
     }
 
-    async load() {
+    // Private
+
+    async #load() {
         try {
-            let guilds = await this.redis.hGetAll(this.prefix + 'guilds');
+            let guilds = await this.redis.hGetAll(this.withPrefix('guilds'));
 
             this.guilds.clear();
 
@@ -38,7 +40,7 @@ class CommanderDatabase {
                 }
             }
 
-            let access = await this.redis.hGetAll(this.prefix + 'access');
+            let access = await this.redis.hGetAll(this.withPrefix('access'));
 
             this.access.clear();
 
@@ -59,6 +61,8 @@ class CommanderDatabase {
         }
     }
 
+    // Public
+
     async get(guild, key) {
         if (!this.guilds) await this.load();
 
@@ -72,7 +76,7 @@ class CommanderDatabase {
         try {
             let data = this.guilds.get(guild) || {};
             data[key] = value;
-            await this.redis.hSet(this.prefix + 'guilds', guild, JSON.stringify(data));
+            await this.redis.hSet(this.withPrefix('guilds'), guild, JSON.stringify(data));
             await this.load();
             console.log('CommanderDatabase >> Value Set'.brightGreen);
 
@@ -94,9 +98,9 @@ class CommanderDatabase {
             delete data[key];
 
             if (Object.keys(data).length) {
-                await this.redis.hSet(this.prefix + 'guilds', guild, JSON.stringify(data));
+                await this.redis.hSet(this.withPrefix('guilds'), guild, JSON.stringify(data));
             } else {
-                await this.redis.hDel(this.prefix + 'guilds', guild);
+                await this.redis.hDel(this.withPrefix('guilds'), guild);
             }
 
             await this.load();
@@ -112,7 +116,11 @@ class CommanderDatabase {
         }
     }
 
-    // ACCESS
+    withPrefix(key) {
+        return this.prefix + key;
+    }
+
+    // Access
 
     async getAccess(command) {
         if (!this.access) await this.load();
@@ -124,9 +132,9 @@ class CommanderDatabase {
     async setAccess(command, data) {
         try {
             if (!data.guilds?.length && !data.users?.length) {
-                await this.redis.hDel(this.prefix + 'access', command);
+                await this.redis.hDel(this.withPrefix('access'), command);
             } else {
-                await this.redis.hSet(this.prefix + 'access', command, JSON.stringify(data));
+                await this.redis.hSet(this.withPrefix('access'), command, JSON.stringify(data));
             }
 
             await this.load();
@@ -137,7 +145,7 @@ class CommanderDatabase {
         }
     }
 
-    // EXTRAS
+    // Twitch
 
     async getTwitch() {
         if (!this.guilds) await this.load();
