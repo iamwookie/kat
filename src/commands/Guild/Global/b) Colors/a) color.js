@@ -51,17 +51,17 @@ module.exports = {
         }
 
         if (command == 'add') {
-            let admin = await client.database.get(int.guild.id, 'colorAdmin');
+            const admin = await client.database.get(int.guild.id, 'colorAdmin');
 
-            if (admin && int.user.id !== client.dev && !int.member.roles.cache.has(admin)) return int.editReply({ embeds: [new ActionEmbed('fail', 'You do not have permission to use this command!', int.user)] });
+            if (int.user.id != client.dev && int.user.id != int.guild.owner && (admin ? !int.member.roles.cache.has(admin) : true)) return int.editReply({ embeds: [new ActionEmbed('fail', 'You do not have permission to use this command!', int.user)] });
 
-            let role = int.options.getRole('role');
+            const role = int.options.getRole('role');
 
-            let colorRole = await manager.addColor(role);
+            const colorRole = await manager.addColor(role);
 
             if (!colorRole) return int.editReply({ embeds: [new ActionEmbed('fail', 'Error creating color!', int.user)] });
 
-            let embed = new Discord.EmbedBuilder()
+            const embed = new Discord.EmbedBuilder()
                 .setTitle('Colors')
                 .setDescription('Successfully added a color role!')
                 .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) })
