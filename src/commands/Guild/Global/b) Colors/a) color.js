@@ -24,15 +24,10 @@ module.exports = {
                 })
                 .addSubcommand(sub => {
                     return sub.setName('add')
-                        .setDescription('Add a color.')
-                        .addStringOption(option => {
-                            return option.setName('name')
-                                .setDescription('The name of the color.')
-                                .setRequired(true);
-                        })
-                        .addStringOption(option => {
-                            return option.setName('hex')
-                                .setDescription('The hex code of the color (e.g #00000).')
+                        .setDescription('Add a color role.')
+                        .addRoleOption(option => {
+                            return option.setName('role')
+                                .setDescription('The role to add.')
                                 .setRequired(true);
                         });
                 })
@@ -48,44 +43,27 @@ module.exports = {
         let command = int.options.getSubcommand();
 
         if (command == 'set') {
-            let embed = manager.createEmbed(int);
-            let menu = await manager.createMenu(int);
+            let [embed, row] = await manager.createMenu(int);
 
-            if (!menu) {
-                let noOptions = new ActionEmbed('fail', 'No color options available!', int.user);
-                return int.editReply({ embeds: [noOptions] });
-            }
+            if (!embed) return int.editReply({ embeds: [new ActionEmbed('fail', 'No color options available!', int.user)] });
 
-            return int.editReply({ embeds: [embed], components: [menu] });
+            return int.editReply({ embeds: [embed], components: [row] });
         }
 
         if (command == 'add') {
             let admin = await client.database.get(int.guild.id, 'colorAdmin');
 
-            if (admin && int.user.id !== client.dev && !int.member.roles.cache.has(admin)) {
-                let noPerms = new ActionEmbed('fail', 'You do not have permission to use this command!', int.user);
-                return int.editReply({ embeds: [noPerms] });
-            }
+            if (admin && int.user.id !== client.dev && !int.member.roles.cache.has(admin)) return int.editReply({ embeds: [new ActionEmbed('fail', 'You do not have permission to use this command!', int.user)] });
 
-            let name = int.options.getString('name');
-            let hex = int.options.getString('hex');
-            let re = /^#[0-9A-F]{6}$/i;
+            let role = int.options.getRole('role');
 
-            if (!re.test(hex)) {
-                let invalid = new ActionEmbed('fail', 'Invalid hex code provided. Make sure to include the `#`!', int.user);
-                return int.editReply({ embeds: [invalid] });
-            }
+            let colorRole = await manager.addColor(role);
 
-            let color = await manager.addColor(int, name, hex);
-
-            if (!color) {
-                let invalid = new ActionEmbed('fail', 'Error creating color!', int.user);
-                return int.editReply({ embeds: [invalid] });
-            }
+            if (!colorRole) return int.editReply({ embeds: [new ActionEmbed('fail', 'Error creating color!', int.user)] });
 
             let embed = new Discord.EmbedBuilder()
                 .setTitle('Colors')
-                .setDescription('Successfully created color!')
+                .setDescription('Successfully added a color role!')
                 .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) })
                 .setColor(color.hexColor)
                 .addFields([
