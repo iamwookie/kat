@@ -65,10 +65,10 @@ module.exports = {
                 .setTitle('Colors')
                 .setDescription('Successfully added a color role!')
                 .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) })
-                .setColor(color.hexColor)
+                .setColor(colorRole.hexColor)
                 .addFields([
-                    { name: 'Name', value: `\`${color.name}\``, inline: true },
-                    { name: 'Hex Code', value: `\`${color.hexColor}\``, inline: true }
+                    { name: 'Name', value: `\`${colorRole.name}\``, inline: true },
+                    { name: 'Hex Code', value: `\`${colorRole.hexColor}\``, inline: true }
                 ]);
 
             return int.editReply({ embeds: [embed] });
