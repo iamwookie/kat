@@ -35,8 +35,8 @@ class ColorManager {
     }
 
     async #createListener(int) {
-        let filter = interaction => interaction.customId == 'menu' && interaction.user.id == int.user.id;
-        let collector = int.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
+        const filter = interaction => interaction.customId == 'menu' && interaction.user.id == int.user.id;
+        const collector = int.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
 
         collector.on('collect', async interaction => {
             if (this.colors.includes(interaction.values[0])) {
@@ -46,10 +46,10 @@ class ColorManager {
                     if (interaction.member.roles.cache.has(color)) await interaction.member.roles.remove(color);
                 }
 
-                let role = await interaction.guild.roles.fetch(color);
+                const role = await interaction.guild.roles.fetch(color);
                 if (role) await interaction.member.roles.add(color);
 
-                let success = new Discord.EmbedBuilder()
+                const success = new Discord.EmbedBuilder()
                     .setTitle('Colors')
                     .setDescription('Your selected color was applied.')
                     .addFields([{ name: 'Color Applied', value: `\`${role.name}\`` }])
@@ -58,16 +58,12 @@ class ColorManager {
 
                 return int.editReply({ embeds: [success], components: [] });
             } else {
-                let fail = new ActionEmbed('fail', 'The color does not exist anymore!', interaction.user);
-                return int.editReply({ embeds: [fail], components: [] });
+                return int.editReply({ embeds: [new ActionEmbed('fail', 'The color does not exist anymore!', interaction.user)], components: [] });
             }
         });
 
         collector.on('end', interaction => {
-            if (!collector.endReason) {
-                let expired = new ActionEmbed('fail', 'The color menu has expired!', interaction.user);
-                return int.editReply({ embeds: [expired], components: [] });
-            }
+            if (collector.endReason == 'time') return int.editReply({ embeds: [new ActionEmbed('fail', 'The color menu has expired!', interaction.user)], components: [] });
         });
     }
 
