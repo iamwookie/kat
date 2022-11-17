@@ -3,7 +3,7 @@ const helmet = require('helmet');
 const bodyParser = require("body-parser");
 // ------------------------------------
 const { server } = require('@root/config.json');
-const { handler } = require('@providers/authenticator');
+const { log } = require('./utils/logs');
 
 const app = express();
 
@@ -15,7 +15,11 @@ module.exports = (client) => {
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(express.json());
         app.use(require('./routes')(client));
-        app.use(handler());
+
+        app.use((err, req, res, next) => {
+            log(req, 'Error Occured', 'error', err);
+            return res.status(500).send('Internal Server Error');
+        });
 
         app.listen(server.port, async (err) => {
             if (err) return reject(err);
