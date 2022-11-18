@@ -1,7 +1,7 @@
 const Commander = require('@commander');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const MusicSubscription = require('@core/music/subscription');
-const Track = require('@core/music/track');
+const MusicSubscription = require('@libs/music/subscription');
+const Track = require('@libs/music/track');
 const play = require('play-dl');
 const MusicEmbed = require('@utils/embeds/music');
 

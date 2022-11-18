@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-exports.log = (req, type, scope, error) => {
+exports.createLog = (req, type, scope, error) => {
     let time = Date.now();
 
     if (this.lastIp && this.lastIp == req.ip) return console.log('>> Received Duplicate Request'.red);

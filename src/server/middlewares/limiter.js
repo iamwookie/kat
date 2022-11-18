@@ -1,10 +1,10 @@
 const rateLimit = require('express-rate-limit');
 
-const { server } = require('@root/config.json');
+const { limiter } = require('@configs/server.json');
 
-exports.limiter = rateLimit({
-    windowMs: server.limiter.duration * 60 * 1000,
-    max: server.limiter.max,
+exports.withLimiter = rateLimit({
+    windowMs: limiter.duration * 60 * 1000,
+    max: limiter.max,
     message: 'You\'re being rate limited.',
     standardHeaders: true,
     legacyHeaders: false,

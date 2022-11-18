@@ -119,7 +119,7 @@ class Commander {
     }
 
     async registerGlobalCommands() {
-        const globalPath = path.join(__dirname, '../src', 'commands', 'Global');
+        const globalPath = path.join(__dirname, '../commands', 'Global');
         const globalFolders = fs.existsSync(globalPath) ? fs.readdirSync(globalPath) : [];
 
         if (globalFolders.length) {
@@ -140,7 +140,7 @@ class Commander {
     }
 
     async registerGuildCommands() {
-        const guildPath = path.join(__dirname, '../src', 'commands', 'Guild');
+        const guildPath = path.join(__dirname, '../commands', 'Guild');
         const guildFolders = fs.existsSync(guildPath) ? fs.readdirSync(guildPath) : [];
 
         if (guildFolders.length) {
@@ -230,8 +230,8 @@ class Commander {
     }
 
     registerModules() {
-        const globalPath = path.join(__dirname, '../src', 'modules', 'Global');
-        const guildPath = path.join(__dirname, '../src', 'modules', 'Guild');
+        const globalPath = path.join(__dirname, '../modules', 'Global');
+        const guildPath = path.join(__dirname, '../modules', 'Guild');
         const globalFolders = fs.existsSync(globalPath) ? fs.readdirSync(globalPath) : [];
         const guildFolders = fs.existsSync(guildPath) ? fs.readdirSync(guildPath) : [];
 

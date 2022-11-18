@@ -25,18 +25,18 @@
     "helmet": "^5.1.1",
     "libsodium-wrappers": "^0.7.9",
     "module-alias": "^2.2.2",
-    "play-dl": "^1.9.5",
+    "play-dl": "^1.9.6",
     "redis": "^4.0.2",
     "string-progressbar": "^1.0.4"
   },
   "_moduleAliases": {
     "@root": ".",
     "@scripts": "scripts",
-    "@commander": "commander",
     "@src": "src",
-    "@core": "src/core",
-    "@utils": "src/utils",
-    "@providers": "src/providers",
-    "@music": "src/core/music"
+    "@configs": "src/configs",
+    "@commander": "src/commander",
+    "@server": "src/server",
+    "@libs": "src/libs",
+    "@utils": "src/utils"
   }
 }

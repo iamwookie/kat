@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const { methods } = require('../../middlewares/methods');
-const { fetchUser } = require('../../controllers/user');
+const { fetchUser } = require('@server/controllers/user');
 
 module.exports = (client) => {
     // /users/:id
-    router.get('/:id', methods(['GET']), fetchUser(client));
+    router.get('/:id', fetchUser(client));
 
     return router;
 };
