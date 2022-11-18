@@ -2,14 +2,12 @@ const express = require('express');
 const router = express.Router();
 
 const { version } = require('@root/package.json');
-const { limiter } = require('@providers/authenticator');
+const { withLimiter } = require('@server/middlewares/limiter');
 
 module.exports = (client) => {
-    router.get("/", (req, res) => {
-        res.send(`${client.user.username} - v${version}`);
-    });
+    router.get("/", (req, res) => res.send(`${client.user.username} - v${version}`));
 
-    router.use("/users", limiter(), require("./endpoints/users")(client));
+    router.use("/users", withLimiter, require("./endpoints/users")(client));
 
     return router;
 };

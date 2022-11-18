@@ -1,4 +1,4 @@
-const deleteSlash = require('@scripts/delete-slash');
+const clearSlash = require('@scripts/clear-slash');
 
 module.exports = {
   name: 'clear',
@@ -6,6 +6,6 @@ module.exports = {
 
   async run(client, args) {
     if (!args) return console.log('❌ No ID Provided.'.yellow);
-    deleteSlash(args);
+    clearSlash(args);
   }
 };

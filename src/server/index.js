@@ -2,8 +2,8 @@ const express = require('express');
 const helmet = require('helmet');
 const bodyParser = require("body-parser");
 // ------------------------------------
-const { server } = require('@root/config.json');
-const { handler } = require('@providers/authenticator');
+const { port } = require('@configs/server.json');
+const { createLog } = require('@server/utils/logs');
 
 const app = express();
 
@@ -15,11 +15,15 @@ module.exports = (client) => {
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(express.json());
         app.use(require('./routes')(client));
-        app.use(handler());
 
-        app.listen(server.port, async (err) => {
+        app.use((err, req, res, next) => {
+            createLog(req, 'Error Occured', 'error', err);
+            return res.status(500).send('Internal Server Error');
+        });
+
+        app.listen(port, async (err) => {
             if (err) return reject(err);
-            console.log(`>>> Server Initialized On Port: ${server.port}`.brightGreen.bold.underline);
+            console.log(`>>> Server Initialized On Port: ${port}`.brightGreen.bold.underline);
             return resolve(app);
         });
     });

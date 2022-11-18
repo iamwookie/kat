@@ -3,12 +3,12 @@ require('colors');
 // ------------------------------------
 const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.js');
 // ------------------------------------
-const Commander = require('./commander');
-const CommanderDatabase = require('./commander/database');
-const TwitchManager = require('@core/twitch/twitchmanager');
-const Server = require('./src/server');
+const Commander = require('@commander');
+const CommanderDatabase = require('@commander/database');
+const TwitchManager = require('@libs/twitch/twitchmanager');
+const Server = require('@server');
 // ------------------------------------
-const { bot } = require('./config.json');
+const { prefix } = require('@configs/bot.json');
 const now = Date.now();
 // ------------------------------------
 const client = new Client({
@@ -37,7 +37,7 @@ const client = new Client({
     }
 });
 
-client.prefix = bot.prefix;
+client.prefix = prefix;
 client.dev = '244662779745665026';
 
 console.log('>>> Loading...\n'.magenta.bold.underline);
@@ -53,9 +53,7 @@ client.once('ready', async (client) => {
     console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);
 });
 
-client.on('error', (err) => {
-    Commander.handleError(client, err, false);
-});
+client.on('error', (err) => Commander.handleError(client, err));
 
 client.login(process.env.BOT_TOKEN);
 

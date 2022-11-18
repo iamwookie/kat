@@ -1,0 +1,7 @@
+{
+    "port": 3030,
+    "limiter": {
+        "duration": 5,
+        "max": 50
+    }
+}
