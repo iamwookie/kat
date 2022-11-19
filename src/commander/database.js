@@ -64,20 +64,20 @@ class CommanderDatabase {
     // Public
 
     async get(guild, key) {
-        if (!this.guilds) await this.load();
+        if (!this.guilds) await this.#load();
 
         let data = this.guilds.get(guild) || {};
         return data[key];
     }
 
     async set(guild, key, value) {
-        if (!this.guilds) await this.load();
+        if (!this.guilds) await this.#load();
 
         try {
             let data = this.guilds.get(guild) || {};
             data[key] = value;
             await this.redis.hSet(this.withPrefix('guilds'), guild, JSON.stringify(data));
-            await this.load();
+            await this.#load();
             console.log('CommanderDatabase >> Value Set'.brightGreen);
 
             return true;
@@ -91,7 +91,7 @@ class CommanderDatabase {
     }
 
     async delete(guild, key) {
-        if (!this.guilds) await this.load();
+        if (!this.guilds) await this.#load();
 
         try {
             let data = this.guilds.get(guild) || {};
@@ -103,7 +103,7 @@ class CommanderDatabase {
                 await this.redis.hDel(this.withPrefix('guilds'), guild);
             }
 
-            await this.load();
+            await this.#load();
             console.log('CommanderDatabase >> Value Deleted'.brightGreen);
 
             return true;
@@ -123,7 +123,7 @@ class CommanderDatabase {
     // Access
 
     async getAccess(command) {
-        if (!this.access) await this.load();
+        if (!this.access) await this.#load();
 
         const data = this.access.get(command) || {};
         return data;
@@ -137,7 +137,7 @@ class CommanderDatabase {
                 await this.redis.hSet(this.withPrefix('access'), command, JSON.stringify(data));
             }
 
-            await this.load();
+            await this.#load();
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
             console.error(err);
@@ -148,7 +148,7 @@ class CommanderDatabase {
     // Twitch
 
     async getTwitch() {
-        if (!this.guilds) await this.load();
+        if (!this.guilds) await this.#load();
 
         let res = [];
 
