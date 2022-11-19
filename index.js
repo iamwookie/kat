@@ -1,4 +1,3 @@
-require('dotenv').config();
 require('module-alias/register');
 require('colors');
 // ------------------------------------
@@ -10,6 +9,7 @@ const TwitchManager = require('@libs/twitch/manager');
 const Server = require('@server');
 // ------------------------------------
 const { prefix } = require('@configs/bot.json');
+// ------------------------------------
 const now = Date.now();
 // ------------------------------------
 const client = new Client({
