@@ -1,13 +1,15 @@
 const Discord = require('discord.js');
 
 class CommanderCommand {
-    constructor(object, commander) {
+    constructor(commander, options) {
         this.commander = commander;
-        this.object = object;
 
-        for (const key in object) {
-            this[key] = object[key];
-        }
+        Object.assign(this, options);
+
+        if (!this.name) throw new Error('CommanderCommand (ERROR) >> Command Missing Name');
+        if (!this.group) throw new Error('CommanderCommand (ERROR) >> Command Missing Group');
+
+        if (this.cooldown) this.cooldowns = new Discord.Collection();
     }
 
     async initialize() {
@@ -46,28 +48,19 @@ class CommanderCommand {
         this.commander.groups.get(this.group).set(this.name, this);
     }
 
-    getCooldown(guild, user) {
+    applyCooldown(guild, user) {
+        if (!this.cooldown || !this.cooldowns) return;
+
         const now = Date.now();
+        const cooldown = this.cooldown * 1000;
 
-        if (!this.cooldown) return false;
+        if (!this.cooldowns.has(guild?.id || 'dm')) this.cooldowns.set(guild?.id || 'dm', new Discord.Collection());
 
-        let cooldown = this.cooldown * 1000;
-        if (!this.commander.cooldowns.has(guild?.id || 'dm')) this.commander.cooldowns.set(guild?.id || 'dm', new Discord.Collection());
+        const cooldowns = this.cooldowns.get(guild?.id || 'dm');
 
-        let cooldowns = this.commander.cooldowns.get(guild?.id || 'dm');
-        if (!cooldowns.has(user.id)) cooldowns.set(user.id, new Discord.Collection());
+        if (!cooldowns.has(user.id)) cooldowns.set(user.id, now + cooldown);
 
-        let usages = cooldowns.get(user.id);
-        if (usages.has(this.name)) {
-            let expire = usages.get(this.name) + cooldown;
-            if (now < expire) return ((expire - now) / 1000).toFixed();
-        }
-
-        usages.set(this.name, now);
-
-        setTimeout(() => usages.delete(this.name), cooldown);
-
-        return false;
+        setTimeout(() => cooldowns.delete(user.id), cooldown);
     }
 }
 

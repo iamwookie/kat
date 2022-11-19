@@ -62,7 +62,7 @@ class Commander {
             const commandText = content.shift().toLowerCase();
             const args = content.join(' ');
 
-            const command = this.groups.get('CLI').get(commandText) || this.groups.get('CLI').get(this.aliases.get(commandText));
+            const command = this.cli.get(commandText) || this.cli.get(this.aliases.get(commandText));
             if (!command || command.disabled) return;
 
             try {
@@ -83,18 +83,10 @@ class Commander {
             await interaction.deferReply();
 
             const command = this.commands.get(interaction.commandName) || this.commands.get(this.aliases.get(interaction.commandName));
-            if (!command || command.disabled) {
-                let notFound = new ActionEmbed('fail', 'This command has been disabled or removed!', interaction.user);
-                return interaction.editReply({ embeds: [notFound] });
-            }
+
+            if (!command || command.disabled) return interaction.editReply({ embeds: [new ActionEmbed('fail', 'This command has been disabled or removed!', interaction.user)] });
 
             if (!this.authenticate(interaction, command)) return;
-
-            let cooldown = command.getCooldown(interaction.guild, interaction.user);
-            if (cooldown) {
-                let wait = new ActionEmbed('fail', `Please wait \`${cooldown}\` seconds before using that command again!`, interaction.user);
-                return interaction.editReply({ embeds: [wait] });
-            }
 
             try {
                 await command.run(this.client, interaction);
@@ -129,13 +121,19 @@ class Commander {
 
         if (cliFiles.length) {
             for (const file of cliFiles) {
-                delete require.cache[require.resolve(`${cliPath}/${file}`)];
+                try {
+                    delete require.cache[require.resolve(`${cliPath}/${file}`)];
 
-                const object = require(`${cliPath}/${file}`);
-                const command = new CommanderCommand(object, this);
-                await command.initialize();
+                    const object = require(`${cliPath}/${file}`);
+                    const command = new CommanderCommand(this, object);
+                    await command.initialize();
 
-                this.cli.set(command.name, command);
+                    this.cli.set(command.name, command);
+                } catch (err) {
+                    console.error('Commander (ERROR) >> Error Registering CLI Command'.red);
+                    console.error(err);
+                    Commander.handleError(this.client, err);
+                }
             }
         }
     }
@@ -149,13 +147,19 @@ class Commander {
                 const globalFiles = fs.readdirSync(`${globalPath}/${folder}`).filter(file => file.endsWith('.js'));
 
                 for (const file of globalFiles) {
-                    delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)];
+                    try {
+                        delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)];
 
-                    const object = require(`${globalPath}/${folder}/${file}`);
-                    const command = new CommanderCommand(object, this);
-                    await command.initialize();
+                        const object = require(`${globalPath}/${folder}/${file}`);
+                        const command = new CommanderCommand(this, object);
+                        await command.initialize();
 
-                    this.commands.set(command.name, command);
+                        this.commands.set(command.name, command);
+                    } catch (err) {
+                        console.error('Commander (ERROR) >> Error Registering Global Command'.red);
+                        console.error(err);
+                        Commander.handleError(this.client, err);
+                    }
                 }
             }
         }
@@ -173,14 +177,20 @@ class Commander {
                     const guildFiles = fs.readdirSync(`${guildPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
 
                     for (const file of guildFiles) {
-                        delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)];
+                        try {
+                            delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)];
 
-                        const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
-                        const command = new CommanderCommand(object, this);
-                        if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
-                        await command.initialize();
+                            const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
+                            const command = new CommanderCommand(this, object);
+                            if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
+                            await command.initialize();
 
-                        this.commands.set(command.name, command);
+                            this.commands.set(command.name, command);
+                        } catch (err) {
+                            console.error('Commander (ERROR) >> Error Registering Guild Command'.red);
+                            console.error(err);
+                            Commander.handleError(this.client, err);
+                        }
                     }
                 }
             }
@@ -299,43 +309,29 @@ class Commander {
         }
     }
 
-    validate(msg) {
-        if (!msg.guild) return true;
-
-        if (!msg.guild.me.permissions.has(perms)) {
-            let noPerms = new ActionEmbed('fail', 'I don\'t have enough permissions in this server. Try contacting an admin!');
-            msg.author.send({ embeds: [noPerms] }).catch(err => {
-                console.error('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
-                console.error(err);
-            });
-
-            return false;
-        }
-
-        if (!msg.channel.permissionsFor(this.client.user).has(perms)) {
-            let noPerms = new ActionEmbed('fail', 'I don\'t have enough permissions to type in that channel!');
-            msg.author.send({ embeds: [noPerms] }).catch(err => {
-                console.error('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
-                console.error(err);
-            });
-
-            return false;
-        };
-
-        return true;
-    }
-
     authenticate(interaction, command) {
         if (command.users && !command.users.includes(interaction.user.id)) {
-            let notAllowed = new ActionEmbed('fail', 'You are not allowed to use this command!', interaction.user);
-            interaction.editReply({ embeds: [notAllowed] });
+            interaction.editReply({ embeds: [new ActionEmbed('fail', 'You are not allowed to use this command!', interaction.user)] });
             return false;
         }
 
         if (command.guildOnly && !interaction.inGuild()) {
-            let notGuild = new ActionEmbed('fail', 'This command can not be used in DMs!', interaction.user);
-            interaction.editReply({ embeds: [notGuild] });
+            interaction.editReply({ embeds: [new ActionEmbed('fail', 'This command can not be used in DMs!', interaction.user)] });
             return false;
+        }
+
+        if (command.cooldown && command.cooldowns) {
+            const context = interaction.guild?.id || 'dm';
+
+            if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
+                const cooldown = command.cooldowns.get(context).get(interaction.user.id);
+                const secondsLeft = (cooldown - Date.now()) / 1000;
+
+                interaction.editReply({ embeds: [new ActionEmbed('fail', `Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`, interaction.user)] });
+                return false;
+            }
+
+            command.applyCooldown(interaction.guild, interaction.user);
         }
 
         return true;

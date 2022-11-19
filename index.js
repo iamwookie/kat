@@ -1,3 +1,4 @@
+require('dotenv').config();
 require('module-alias/register');
 require('colors');
 // ------------------------------------
@@ -5,7 +6,7 @@ const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.j
 // ------------------------------------
 const Commander = require('@commander');
 const CommanderDatabase = require('@commander/database');
-const TwitchManager = require('@libs/twitch/twitchmanager');
+const TwitchManager = require('@libs/twitch/manager');
 const Server = require('@server');
 // ------------------------------------
 const { prefix } = require('@configs/bot.json');

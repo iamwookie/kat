@@ -1,6 +1,7 @@
 module.exports = {
   name: 'stats',
   group: 'CLI',
+  aliases: ['botinfo', 'botstats', 'bot'],
 
   run(client) {
     console.log('----- APP STATS -----'.brightGreen);
