@@ -5,7 +5,9 @@ const play = require('play-dl');
 const MusicEmbed = require('@utils/embeds/music');
 
 class Track {
-    constructor({ data, requestedBy, onStart, onFinish, onError }) {
+    constructor(subscription, { data, requestedBy, onStart, onFinish, onError }) {
+        this.subscription = subscription;
+
         this.data = data;
         this.title = data.title;
         this.url = data.url;
@@ -13,6 +15,7 @@ class Track {
         this.spotify = data.spotify;
         this.duration = data.durationRaw;
         this.durationRaw = data.durationInSec;
+
         this.requestedBy = requestedBy;
         this.onStart = onStart ? onStart : () => { };
         this.onFinish = onFinish ? onFinish : () => { };
@@ -31,19 +34,22 @@ class Track {
                 data.spotify = spotify;
             }
 
-            const track = new Track({
-                data,
-                requestedBy: author,
-                onStart: () => {
-                    let onstart = new MusicEmbed(subscription.client, int, 'playing', track);
-                    return int.channel.send({ embeds: [onstart] });
-                },
-                onError: () => {
-                    let onerror = new MusicEmbed(subscription.client, int).setTitle('Error Playing Track | Try Again');
-                    onerror.setDescription(`[${track.title}](${track.url})`);
-                    return int.channel.send({ embeds: [onerror] });
+            const track = new Track(
+                subscription,
+                {
+                    data,
+                    requestedBy: author,
+                    onStart: () => {
+                        let onstart = new MusicEmbed(subscription.client, int, 'playing', track);
+                        return int.channel.send({ embeds: [onstart] });
+                    },
+                    onError: () => {
+                        let onerror = new MusicEmbed(subscription.client, int).setTitle('Error Playing Track | Try Again');
+                        onerror.setDescription(`[${track.title}](${track.url})`);
+                        return int.channel.send({ embeds: [onerror] });
+                    }
                 }
-            });
+            );
 
             return track;
         } catch (err) {

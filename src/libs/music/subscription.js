@@ -4,13 +4,14 @@ const Commander = require('@commander');
 class MusicSubscription {
     constructor(client, voiceConnection, channel) {
         this.client = client;
+
         this.voice = voiceConnection;
         this.player = DiscordVoice.createAudioPlayer();
         this.channel = channel;
         this.guild = channel.guild;
         this.queue = [];
 
-        this.initializeListeners(this.voice, this.player);
+        this.initializeListeners();
 
         this.voice.subscribe(this.player);
     }
@@ -44,10 +45,10 @@ class MusicSubscription {
         }
     }
 
-    initializeListeners(voice, player) {
+    initializeListeners() {
         // Configure voice connection
 
-        voice.on('stateChange', async (_, newState) => {
+        this.voice.on('stateChange', async (_, newState) => {
             if (newState.status == DiscordVoice.VoiceConnectionStatus.Disconnected) {
                 console.log('Music (VOICE) >> Connection Disconnected'.yellow);
                 if (newState.reason == DiscordVoice.VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
@@ -69,7 +70,7 @@ class MusicSubscription {
         });
 
         // Configure audio player
-        player.on('stateChange', (oldState, newState) => {
+        this.player.on('stateChange', (oldState, newState) => {
             // console.log(`Music (PLAYER) >> Previous State: ${oldState.status}`.magenta);
             // console.log(`Music (PLAYER) >> New State: ${newState.status}`.magenta);
 
