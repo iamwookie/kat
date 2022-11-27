@@ -7,18 +7,20 @@ class MusicSubscription {
 
         this.voice = voiceConnection;
         this.player = DiscordVoice.createAudioPlayer();
+
         this.channel = channel;
         this.guild = channel.guild;
+
         this.queue = [];
 
-        this.initializeListeners();
+        this.#initializeListeners();
 
         this.voice.subscribe(this.player);
     }
 
     static async create(client, channel) {
         try {
-            let sub = new MusicSubscription(
+            const sub = new MusicSubscription(
                 client,
                 DiscordVoice.joinVoiceChannel({
                     channelId: channel.id,
@@ -45,7 +47,13 @@ class MusicSubscription {
         }
     }
 
-    initializeListeners() {
+    destroy() {
+        if (!this.isVoiceDestroyed()) this.voice.destroy();
+        this.client.subscriptions.delete(this.guild.id);
+        console.log(`Music >> Subscription Destroyed: ${this.guild.name} (${this.guild.id})`.yellow);
+    }
+
+    #initializeListeners() {
         // Configure voice connection
 
         this.voice.on('stateChange', async (_, newState) => {
@@ -53,7 +61,7 @@ class MusicSubscription {
                 console.log('Music (VOICE) >> Connection Disconnected'.yellow);
                 if (newState.reason == DiscordVoice.VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
                     console.log('Music (VOICE) >> Connection Disconnected (Code 4014)'.yellow);
-                    await this.connect(5000);
+                    await this.#connect(5000);
                 } else if (voice.rejoinAttempts < 5) {
                     voice.rejoinAttempts + 1;
                     voice.rejoin();
@@ -65,7 +73,7 @@ class MusicSubscription {
                 this.destroy();
             } else if (!this.readyLock && (newState.status == DiscordVoice.VoiceConnectionStatus.Connecting || newState.status == DiscordVoice.VoiceConnectionStatus.Signalling)) {
                 // console.log('Music >> (VOICE) Connection Connecting / Signalling'.yellow);
-                await this.connect(20000);
+                await this.#connect(20000);
             }
         });
 
@@ -77,7 +85,7 @@ class MusicSubscription {
             if (newState.status == DiscordVoice.AudioPlayerStatus.Idle && oldState.status !== DiscordVoice.AudioPlayerStatus.Idle) {
                 this.active = null;
                 oldState.resource.metadata.onFinish();
-                this.process();
+                this.#process();
             } else if (newState.status == DiscordVoice.AudioPlayerStatus.Playing && oldState.status !== DiscordVoice.AudioPlayerStatus.AutoPaused) {
                 console.log('Music (PLAYER) >> Playing Track: '.green);
                 console.log({
@@ -91,7 +99,7 @@ class MusicSubscription {
         });
     }
 
-    async connect(timeout) {
+    async #connect(timeout) {
         if (!this.readyLock) {
             try {
                 await DiscordVoice.entersState(this.voice, DiscordVoice.VoiceConnectionStatus.Ready, timeout);
@@ -104,17 +112,12 @@ class MusicSubscription {
         }
     }
 
-    destroy() {
-        if (!this.isVoiceDestroyed()) this.voice.destroy();
-        this.client.subscriptions.delete(this.guild.id);
-        console.log(`Music >> Subscription Destroyed: ${this.guild.name} (${this.guild.id})`.yellow);
-    }
-
-    async process() {
+    async #process() {
         if (this.queueLocked || this.player.state.status !== DiscordVoice.AudioPlayerStatus.Idle) return;
 
         this.queueLocked = true;
-        if (!this.isVoiceReady()) await this.connect(20000);
+        if (!this.isVoiceReady()) await this.#connect(20000);
+
         const track = this.queue.shift();
         if (!track) return this.destroy();
 
@@ -130,13 +133,15 @@ class MusicSubscription {
 
             track.onError(err);
             this.queueLocked = false;
-            this.process();
+            this.#process();
         }
     }
 
+    // Actions
+
     add(track) {
         this.queue.push(track);
-        this.process();
+        this.#process();
     }
 
     clear() {
@@ -152,7 +157,7 @@ class MusicSubscription {
         return this.player.unpause();
     }
 
-    // BOOLEANS
+    // Booleans
 
     isVoiceReady() {
         return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Ready);
