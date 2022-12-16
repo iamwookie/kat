@@ -45,7 +45,7 @@ module.exports = {
                             .setStyle(ButtonStyle.Link)
                     );
 
-                int.editReply({ embeds: [new ActionEmbed('fail', 'You have not linked your accounts yet. Click below to link your accounts!', int.user)], components: [row] });
+                return int.editReply({ embeds: [new ActionEmbed('fail', 'You have not linked your accounts yet. Click below to link your accounts!', int.user)], components: [row] });
             }
 
             const reward = await client.database.redis.hGet(prefix + steamId, 'discord');
