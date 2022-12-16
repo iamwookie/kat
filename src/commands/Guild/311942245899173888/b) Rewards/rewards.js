@@ -83,7 +83,7 @@ module.exports = {
                 if (i.customId == 'discord') {
                     try {
                         await client.database.redis.hSet(prefix + steamId, 'discord', 1);
-                        int.editReply({ embeds: [new ActionEmbed('success', 'You have claimed the Discord join reward!', int.user)], components: [] });
+                        int.editReply({ embeds: [new ActionEmbed('success', 'You have claimed the join rewards! You can now claim them in-game using the !rewards command!', int.user)], components: [] });
                     } catch (err) {
                         console.error('Guild Commands (ERROR): rewards: Error Claiming Join Reward');
                         console.error(err);
@@ -94,7 +94,7 @@ module.exports = {
                 } else if (i.customId == 'boost') {
                     try {
                         await client.database.redis.hSet(prefix + steamId, 'boost', 1);
-                        int.editReply({ embeds: [new ActionEmbed('success', 'You have claimed the Discord boost reward!', int.user)], components: [] });
+                        int.editReply({ embeds: [new ActionEmbed('success', 'You have claimed the boost rewards. You can now claim them in-game using the !rewards command!', int.user)], components: [] });
                     } catch (err) {
                         console.error('Guild Commands (ERROR): rewards: Error Claiming Boost Reward');
                         console.error(err);
