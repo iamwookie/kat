@@ -74,7 +74,7 @@ module.exports = {
                 );
             }
 
-            const reply = int.editReply({ embeds: [new ActionEmbed('success', 'Click the buttons below to claim your rewards!', int.user)], components: [row] });
+            const reply = await int.editReply({ embeds: [new ActionEmbed('success', 'Click the buttons below to claim your rewards!', int.user)], components: [row] });
 
             const filter = interaction => interaction.user.id == int.user.id;
             const collector = reply.createMessageComponentCollector({ filter, time: 30_000 });
