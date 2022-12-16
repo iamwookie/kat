@@ -30,7 +30,7 @@ module.exports = {
         if (!client.database) return int.editReply({ embeds: [new ActionEmbed('fail', 'Database not online!', int.user)] });
 
         const prefix = 'd:rewards_';
-        
+
         const errorEmbed = new ActionEmbed('fail', 'An error occurred while claiming your rewards. A developer has been notified!', int.user);
 
         try {
@@ -77,7 +77,7 @@ module.exports = {
             const reply = await int.editReply({ embeds: [new ActionEmbed('success', 'Click the buttons below to claim your rewards!', int.user)], components: [row] });
 
             const filter = interaction => interaction.user.id == int.user.id;
-            const collector = reply.createMessageComponentCollector({ filter, time: 30_000 });
+            const collector = reply.createMessageComponentCollector({ filter, max: 1, time: 30_000 });
 
             collector.on('collect', async i => {
                 if (i.customId == 'discord') {
