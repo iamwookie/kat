@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
   name: 'help',
@@ -16,7 +16,7 @@ module.exports = {
   },
 
   async run(client, int) {
-    let replyEmbed = new Discord.EmbedBuilder()
+    const replyEmbed = new Discord.EmbedBuilder()
       .setColor('Random')
       .setTitle('**Help Menu**')
       .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) })

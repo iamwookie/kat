@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const ColorManager = require('@libs/color/manager');
 const ActionEmbed = require('@utils/embeds/action');
 

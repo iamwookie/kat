@@ -1,9 +1,13 @@
+const { SlashCommandBuilder } = require('discord.js');
+
+const play = require('play-dl');
+
 const Commander = require('@commander');
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const MusicSubscription = require('@libs/music/subscription');
 const Track = require('@libs/music/track');
-const play = require('play-dl');
+
 const MusicEmbed = require('@utils/embeds/music');
+const ActionEmbed = require('@utils/embeds/action');
 
 module.exports = {
     name: 'play',
@@ -28,17 +32,11 @@ module.exports = {
     },
 
     async run(client, int) {
-        let channel = int.member.voice.channel;
+        const channel = int.member.voice.channel;
 
-        if (!channel) {
-            let nochannel = new MusicEmbed(client, int).setTitle('You are not in a channel!');
-            return int.editReply({ embeds: [nochannel] });
-        }
+        if (!channel) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('You are not in a channel!')] });
 
-        if (!channel.joinable || !channel.speakable) {
-            let noperms = new MusicEmbed(client, int).setTitle('I can\'t play in that voice channel!');
-            return int.editReply({ embeds: [noperms] });
-        }
+        if (!channel.joinable || !channel.speakable) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('I can\'t play in that voice channel!')] });
 
         let subscription = client.subscriptions.get(int.guildId);
 
@@ -46,22 +44,22 @@ module.exports = {
 
         if (subscription && subscription.isPlayerPaused()) {
             subscription.unpause();
-            let resumed = new MusicEmbed(client, int, 'resumed', subscription.active);
+
+            const resumed = new MusicEmbed(client, int, 'resumed', subscription.active);
+
             if (!args) return int.editReply({ embeds: [resumed] });
+
             int.channel.send({ embeds: [resumed] });
         }
 
-        if (!args) {
-            let noargs = new MusicEmbed(client, int).setTitle('What should I play?');
-            return int.editReply({ embeds: [noargs] });
-        }
+        if (!args) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('What should I play?')] });
 
         if (!subscription) subscription = await MusicSubscription.create(client, channel);
 
         try {
-            let query = args;
+            const query = args;
 
-            let searching = new MusicEmbed(client, int, 'searching');
+            const searching = new MusicEmbed(client, int, 'searching');
 
             if (query.startsWith('https://open.spotify.com/')) {
                 searching.setTitle('<a:loading:928668691997012028> \u200b Searching Spotify...');
@@ -69,11 +67,10 @@ module.exports = {
 
                 try {
                     if (play.is_expired()) await play.refreshToken();
-                    let search = await play.spotify(query);
+                    const search = await play.spotify(query);
                     data = search;
                 } catch (err) {
-                    let notFound = new MusicEmbed(client, int).setTitle('You have not provided a valid Spotify URL!');
-                    reply.edit({ embeds: [notFound] }).catch(() => int.channel.send({ embeds: [notFound] }));
+                    reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('You have not provided a valid Spotify URL!')] }).catch(() => int.channel.send({ embeds: [notFound] }));
                     Commander.handleError(client, err);
                     return subscription.destroy();
                 }
@@ -81,17 +78,16 @@ module.exports = {
                 reply = await int.editReply({ embeds: [searching] });
 
                 try {
-                    let search = await play.playlist_info(query, { incomplete: true });
+                    const search = await play.playlist_info(query, { incomplete: true });
                     data = search;
                 } catch {
-                    let notFound = new MusicEmbed(client, int).setTitle('You have not provided a valid playlist URL!');
-                    reply.edit({ embeds: [notFound] });
+                    reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('You have not provided a valid playlist URL!')] });
                     Commander.handleError(client, err);
                     return subscription.destroy();
                 }
             } else {
                 reply = await int.editReply({ embeds: [searching] });
-                let search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
+                const search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
                 data = search[0];
             }
 
@@ -102,16 +98,15 @@ module.exports = {
                     || data instanceof play.SpotifyPlaylist
                     || data instanceof play.SpotifyAlbum
                 )) {
-                let notFound = new MusicEmbed(client, int).setTitle('Couldn\'t find your search result. Try again!');
-                reply.edit({ embeds: [notFound] });
+                reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('Couldn\'t find your search result. Try again!')] });
                 return subscription.destroy();
             }
 
-            let enqueued = new MusicEmbed(client, int, 'enqueued', data);
+            const enqueued = new MusicEmbed(client, int, 'enqueued', data);
 
             if (data instanceof play.YouTubePlayList) {
                 for (const youtubeVideo of data.videos) {
-                    let track = await Track.create(subscription, int, youtubeVideo, int.user);
+                    const track = await Track.create(subscription, int, youtubeVideo, int.user);
                     subscription.add(track);
                 }
 
@@ -119,22 +114,23 @@ module.exports = {
             }
 
             if (data instanceof play.SpotifyPlaylist || data instanceof play.SpotifyAlbum) {
-                let adding = new MusicEmbed(client, int);
+                const adding = new MusicEmbed(client, int);
                 adding.setTitle('<a:loading:928668691997012028> \u200b Adding tracks...');
                 reply.edit({ embeds: [adding] });
 
-                let spotifyTracks = await data.all_tracks();
+                const spotifyTracks = await data.all_tracks();
 
                 for (const spotifyTrack of spotifyTracks) {
-                    let track = await Track.create(subscription, int, spotifyTrack, int.user);
+                    const track = await Track.create(subscription, int, spotifyTrack, int.user);
                     subscription.add(track);
                 }
 
                 return reply.edit({ embeds: [enqueued] });
             }
 
-            let track = await Track.create(subscription, int, data, int.user);
+            const track = await Track.create(subscription, int, data, int.user);
             subscription.add(track);
+
             console.log('Music Commands >> play: Added Track'.green);
 
             return reply.edit({ embeds: [enqueued] });
@@ -143,8 +139,7 @@ module.exports = {
             console.error(err);
             Commander.handleError(client, err, false, int.guild);
 
-            let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
-            return int.editReply({ embeds: [fail] });
+            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
         }
     }
 };

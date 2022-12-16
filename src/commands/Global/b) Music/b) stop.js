@@ -1,7 +1,10 @@
-const Discord = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
+
 const Commander = require('@commander');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+
 const MusicEmbed = require('@utils/embeds/music');
+const ActionEmbed = require('@utils/embeds/action');
+
 module.exports = {
     name: 'stop',
     aliases: ['dc'],
@@ -20,24 +23,19 @@ module.exports = {
     },
 
     async run(client, int) {
-        let subscription = client.subscriptions.get(int.guildId);
+        const subscription = client.subscriptions.get(int.guildId);
 
-        if (!subscription) {
-            let notplaying = new MusicEmbed(client, int).setTitle('I\'m not playing anything!');
-            return int.editReply({ embeds: [notplaying] });
-        }
+        if (!subscription) { return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('I\'m not playing anything!')] }); }
 
         try {
             subscription.destroy();
-            let success = new MusicEmbed(client, int).setTitle(subscription.isPlayerPaused() ? '👋 \u200b Discconected! Cya!' : '👋 \u200b Stopped playing! Cya!');
-            return int.editReply({ embeds: [success] });
+            return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle(subscription.isPlayerPaused() ? '👋 \u200b Discconected! Cya!' : '👋 \u200b Stopped playing! Cya!')] });
         } catch (err) {
             console.error('Music Commands (ERROR) >> stop: Error Stopping Track'.red);
             console.error(err);
             Commander.handleError(client, err);
 
-            let fail = new MusicEmbed(client, int).setTitle('An error occured! A developer has been notified!');
-            return int.editReply({ embeds: [fail] });
+            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
         }
     }
 };

@@ -36,7 +36,7 @@ class ColorManager {
 
     async #createListener(int) {
         const filter = interaction => interaction.customId == 'menu' && interaction.user.id == int.user.id;
-        const collector = int.channel.createMessageComponentCollector({ filter, max: 1, time: 30000 });
+        const collector = int.channel.createMessageComponentCollector({ filter, max: 1, time: 30_000 });
 
         collector.on('collect', async interaction => {
             if (this.colors.includes(interaction.values[0])) {
