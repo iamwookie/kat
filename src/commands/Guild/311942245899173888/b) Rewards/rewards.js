@@ -60,7 +60,7 @@ module.exports = {
                 row.addComponents(
                     new ButtonBuilder()
                         .setCustomId('discord')
-                        .setLabel('Claim Join Reward')
+                        .setLabel('Claim Join Rewards')
                         .setStyle(ButtonStyle.Success)
                 );
             }
@@ -69,7 +69,7 @@ module.exports = {
                 row.addComponents(
                     new ButtonBuilder()
                         .setCustomId('boost')
-                        .setLabel('Claim Boost Reward')
+                        .setLabel('Claim Boost Rewards')
                         .setStyle(ButtonStyle.Primary)
                 );
             }
@@ -83,7 +83,7 @@ module.exports = {
                 if (i.customId == 'discord') {
                     try {
                         await client.database.redis.hSet(prefix + steamId, 'discord', 1);
-                        int.editReply({ embeds: [new ActionEmbed('success', 'Success! You can now claim your boost rewards in-game using the `!rewards` command!', int.user)], components: [] });
+                        int.editReply({ embeds: [new ActionEmbed('success', 'Success! You can now claim your join rewards in-game using the `!rewards` command!', int.user)], components: [] });
                     } catch (err) {
                         console.error('Guild Commands (ERROR): rewards: Error Claiming Join Reward');
                         console.error(err);
@@ -94,7 +94,7 @@ module.exports = {
                 } else if (i.customId == 'boost') {
                     try {
                         await client.database.redis.hSet(prefix + steamId, 'boost', 1);
-                        int.editReply({ embeds: [new ActionEmbed('success', 'Success! You can now claim your join rewards in-game using the `!rewards` command!', int.user)], components: [] });
+                        int.editReply({ embeds: [new ActionEmbed('success', 'Success! You can now claim your boost rewards in-game using the `!rewards` command!', int.user)], components: [] });
                     } catch (err) {
                         console.error('Guild Commands (ERROR): rewards: Error Claiming Boost Reward');
                         console.error(err);
