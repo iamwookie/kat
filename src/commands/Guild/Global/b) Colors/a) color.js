@@ -7,7 +7,6 @@ module.exports = {
     name: 'color',
     group: 'Color',
     description: 'Set colors for yourself via roles.',
-    guildOnly: true,
 
     // AUTHORIZATION
     guilds: [],
@@ -18,6 +17,7 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
                 .addSubcommand(sub => {
                     return sub.setName('set')
                         .setDescription('Set your color.');

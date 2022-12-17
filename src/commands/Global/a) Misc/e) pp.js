@@ -16,7 +16,6 @@ module.exports = {
     group: 'Misc',
     description: 'How big is it?',
     format: '<?user>',
-    guildOnly: true,
 
     // SLASH
     data() {
@@ -24,6 +23,7 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
                 .addMentionableOption(option => {
                     option.setName('user');
                     option.setDescription('The user to analyze.');

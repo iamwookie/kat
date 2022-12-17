@@ -1,13 +1,14 @@
-// This is the command handler, CODENAME: Commander v6.2.0
+// This is the command handler, CODENAME: Commander v6.2.1
 
 const Discord = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-const ActionEmbed = require('@utils/embeds/action');
 
 const CommanderCommand = require('@commander/command');
 const CommanderModule = require('@commander/module');
+
+const ActionEmbed = require('@utils/embeds/action');
 
 // -----------------------------------
 const perms = [ // 137476033600
@@ -77,7 +78,7 @@ class Commander {
         });
 
         // Discord Commands
-        this.client.on('interactionCreate', async interaction => {
+        this.client.on(Discord.Events.InteractionCreate, async interaction => {
             if (interaction.type !== Discord.InteractionType.ApplicationCommand) return;
 
             await interaction.deferReply();
@@ -312,11 +313,6 @@ class Commander {
     authenticate(interaction, command) {
         if (command.users && !command.users.includes(interaction.user.id)) {
             interaction.editReply({ embeds: [new ActionEmbed('fail', 'You are not allowed to use this command!', interaction.user)] });
-            return false;
-        }
-
-        if (command.guildOnly && !interaction.inGuild()) {
-            interaction.editReply({ embeds: [new ActionEmbed('fail', 'This command can not be used in DMs!', interaction.user)] });
             return false;
         }
 

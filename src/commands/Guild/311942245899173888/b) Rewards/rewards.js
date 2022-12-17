@@ -8,7 +8,6 @@ module.exports = {
     name: 'rewards',
     group: 'Rewards',
     description: 'Claim your Discord rewards.',
-    guildOnly: true,
 
     // AUTHORIZATION
     guilds: [],
@@ -19,6 +18,7 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
                 .addSubcommand(sub => {
                     return sub.setName('claim')
                         .setDescription('Claim your rewards.');

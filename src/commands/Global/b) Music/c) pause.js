@@ -10,7 +10,6 @@ module.exports = {
     group: 'Music',
     description: 'Pause the track.',
     cooldown: 5,
-    guildOnly: true,
 
     // SLASH
     data() {
@@ -18,6 +17,7 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
         );
     },
 

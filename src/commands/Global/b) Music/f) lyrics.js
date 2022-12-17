@@ -14,7 +14,6 @@ module.exports = {
     description: 'View the currently playing tracks lyrics or search for one.',
     format: '<?search>',
     cooldown: 5,
-    guildOnly: true,
 
     // SLASH
     data() {
@@ -22,6 +21,7 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
                 .addStringOption(option => {
                     option.setName('query');
                     option.setDescription('The name of the song.');

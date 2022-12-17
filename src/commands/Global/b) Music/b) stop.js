@@ -11,7 +11,6 @@ module.exports = {
     group: 'Music',
     description: 'Clear the queue and/or leave.',
     cooldown: 5,
-    guildOnly: true,
 
     // SLASH
     data() {
@@ -19,6 +18,7 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
         );
     },
 

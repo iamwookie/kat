@@ -15,7 +15,6 @@ module.exports = {
     description: 'Search for a track and play it or add it to the queue.',
     format: '<?search/url>',
     cooldown: 5,
-    guildOnly: true,
 
     // SLASH
     data() {
@@ -23,6 +22,7 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
                 .addStringOption(option => {
                     option.setName('query');
                     option.setDescription('The name or URL of the song.');
