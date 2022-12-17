@@ -1,9 +1,13 @@
-// This is the command handler, CODENAME: Commander v6.2.0
+// This is the command handler, CODENAME: Commander v6.2.1
 
 const Discord = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+
+const CommanderCommand = require('@commander/command');
+const CommanderModule = require('@commander/module');
+
 const ActionEmbed = require('@utils/embeds/action');
 
 // -----------------------------------
@@ -30,6 +34,7 @@ class Commander {
         this.prefix = client.prefix;
         this.readline = readline.createInterface(process.stdin);
 
+        this.cli = new Discord.Collection();
         this.global = new Discord.Collection();
         this.guilds = new Discord.Collection();
 
@@ -58,7 +63,7 @@ class Commander {
             const commandText = content.shift().toLowerCase();
             const args = content.join(' ');
 
-            const command = this.groups.get('CLI').get(commandText) || this.groups.get('CLI').get(this.aliases.get(commandText));
+            const command = this.cli.get(commandText) || this.cli.get(this.aliases.get(commandText));
             if (!command || command.disabled) return;
 
             try {
@@ -73,24 +78,16 @@ class Commander {
         });
 
         // Discord Commands
-        this.client.on('interactionCreate', async interaction => {
+        this.client.on(Discord.Events.InteractionCreate, async interaction => {
             if (interaction.type !== Discord.InteractionType.ApplicationCommand) return;
 
-            await interaction.deferReply();
-
             const command = this.commands.get(interaction.commandName) || this.commands.get(this.aliases.get(interaction.commandName));
-            if (!command || command.disabled) {
-                let notFound = new ActionEmbed('fail', 'This command has been disabled or removed!', interaction.user);
-                return interaction.editReply({ embeds: [notFound] });
-            }
 
-            if (!this.authenticate(interaction, command)) return;
+            if (!command || command.disabled) return;
 
-            let cooldown = command.getCooldown(interaction.guild, interaction.user);
-            if (cooldown) {
-                let wait = new ActionEmbed('fail', `Please wait \`${cooldown}\` seconds before using that command again!`, interaction.user);
-                return interaction.editReply({ embeds: [wait] });
-            }
+            await interaction.deferReply({ ephemeral: command.ephemeral });
+
+            if (!this.validate(interaction, command)) return;
 
             try {
                 await command.run(this.client, interaction);
@@ -105,9 +102,10 @@ class Commander {
     static async initialize(client) {
         try {
             let commander = new Commander(client);
+            await commander.registerCLICommands();
             await commander.registerGlobalCommands();
             await commander.registerGuildCommands();
-            commander.registerModules();
+            await commander.registerModules();
             console.log('>>> Commander Initialized'.brightGreen.bold.underline);
 
             return commander;
@@ -115,6 +113,29 @@ class Commander {
             console.error('Commander (ERROR) >> Error Initializing'.red);
             console.error(err);
             Commander.handleError(client, err, true);
+        }
+    }
+
+    async registerCLICommands() {
+        const cliPath = path.join(__dirname, '../commands', 'CLI');
+        const cliFiles = fs.existsSync(cliPath) ? fs.readdirSync(cliPath).filter(file => file.endsWith('.js')) : [];
+
+        if (cliFiles.length) {
+            for (const file of cliFiles) {
+                try {
+                    delete require.cache[require.resolve(`${cliPath}/${file}`)];
+
+                    const object = require(`${cliPath}/${file}`);
+                    const command = new CommanderCommand(this, object);
+                    await command.initialize();
+
+                    this.cli.set(command.name, command);
+                } catch (err) {
+                    console.error('Commander (ERROR) >> Error Registering CLI Command'.red);
+                    console.error(err);
+                    Commander.handleError(this.client, err);
+                }
+            }
         }
     }
 
@@ -127,13 +148,19 @@ class Commander {
                 const globalFiles = fs.readdirSync(`${globalPath}/${folder}`).filter(file => file.endsWith('.js'));
 
                 for (const file of globalFiles) {
-                    delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)];
+                    try {
+                        delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)];
 
-                    const object = require(`${globalPath}/${folder}/${file}`);
-                    const command = new CommanderCommand(object, this);
-                    await command.initialize();
+                        const object = require(`${globalPath}/${folder}/${file}`);
+                        const command = new CommanderCommand(this, object);
+                        await command.initialize();
 
-                    this.commands.set(command.name, command);
+                        this.commands.set(command.name, command);
+                    } catch (err) {
+                        console.error('Commander (ERROR) >> Error Registering Global Command'.red);
+                        console.error(err);
+                        Commander.handleError(this.client, err);
+                    }
                 }
             }
         }
@@ -151,14 +178,20 @@ class Commander {
                     const guildFiles = fs.readdirSync(`${guildPath}/${folder}/${subFolder}`).filter(file => file.endsWith('.js'));
 
                     for (const file of guildFiles) {
-                        delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)];
+                        try {
+                            delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)];
 
-                        const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
-                        const command = new CommanderCommand(object, this);
-                        if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
-                        await command.initialize();
+                            const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
+                            const command = new CommanderCommand(this, object);
+                            if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
+                            await command.initialize();
 
-                        this.commands.set(command.name, command);
+                            this.commands.set(command.name, command);
+                        } catch (err) {
+                            console.error('Commander (ERROR) >> Error Registering Guild Command'.red);
+                            console.error(err);
+                            Commander.handleError(this.client, err);
+                        }
                     }
                 }
             }
@@ -229,7 +262,7 @@ class Commander {
         }
     }
 
-    registerModules() {
+    async registerModules() {
         const globalPath = path.join(__dirname, '../modules', 'Global');
         const guildPath = path.join(__dirname, '../modules', 'Guild');
         const globalFolders = fs.existsSync(globalPath) ? fs.readdirSync(globalPath) : [];
@@ -247,7 +280,7 @@ class Commander {
                     const object = require(`${globalPath}/${folder}/${file}`);
                     const module = new CommanderModule(object, this);
 
-                    module.initialize(this.client);
+                    await module.initialize(this.client);
 
                     this.modules.set(module.name, module);
                 }
@@ -277,43 +310,24 @@ class Commander {
         }
     }
 
-    validate(msg) {
-        if (!msg.guild) return true;
-
-        if (!msg.guild.me.permissions.has(perms)) {
-            let noPerms = new ActionEmbed('fail', 'I don\'t have enough permissions in this server. Try contacting an admin!');
-            msg.author.send({ embeds: [noPerms] }).catch(err => {
-                console.error('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
-                console.error(err);
-            });
-
-            return false;
-        }
-
-        if (!msg.channel.permissionsFor(this.client.user).has(perms)) {
-            let noPerms = new ActionEmbed('fail', 'I don\'t have enough permissions to type in that channel!');
-            msg.author.send({ embeds: [noPerms] }).catch(err => {
-                console.error('Commander (ERROR) >> Could Not Send Permission Warning To User'.red);
-                console.error(err);
-            });
-
-            return false;
-        };
-
-        return true;
-    }
-
-    authenticate(interaction, command) {
+    validate(interaction, command) {
         if (command.users && !command.users.includes(interaction.user.id)) {
-            let notAllowed = new ActionEmbed('fail', 'You are not allowed to use this command!', interaction.user);
-            interaction.editReply({ embeds: [notAllowed] });
+            interaction.editReply({ embeds: [new ActionEmbed('fail', 'You are not allowed to use this command!', interaction.user)] });
             return false;
         }
 
-        if (command.guildOnly && !interaction.inGuild()) {
-            let notGuild = new ActionEmbed('fail', 'This command can not be used in DMs!', interaction.user);
-            interaction.editReply({ embeds: [notGuild] });
-            return false;
+        if (command.cooldown && command.cooldowns) {
+            const context = interaction.guild?.id || 'dm';
+
+            if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
+                const cooldown = command.cooldowns.get(context).get(interaction.user.id);
+                const secondsLeft = (cooldown - Date.now()) / 1000;
+
+                interaction.editReply({ embeds: [new ActionEmbed('fail', `Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`, interaction.user)] });
+                return false;
+            }
+
+            command.applyCooldown(interaction.guild, interaction.user);
         }
 
         return true;
@@ -358,118 +372,6 @@ class Commander {
             console.error(errorObject.errorStack);
             if (quit) process.exit();
         });
-    }
-}
-
-class CommanderCommand {
-    constructor(object, commander) {
-        this.commander = commander;
-        this.object = object;
-
-        for (const key in object) {
-            this[key] = object[key];
-        }
-    }
-
-    async initialize() {
-        if (this.aliases) {
-            for (const alias of this.aliases) {
-                this.commander.aliases.set(alias, this.name);
-            }
-        }
-
-        if (this.guilds || this.users) {
-            if (this.commander.client.database) {
-                const data = await this.commander.client.database.getAccess(this.name);
-                if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
-                if (data.users && this.users) this.users.push(...data.users);
-            }
-
-            if (this.users) this.users.push(this.commander.client.dev);
-        }
-
-        if (this.guilds) {
-            for (const guildId of this.guilds) {
-                if (!this.commander.client.guilds.cache.has(guildId)) console.warn(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${this.name}`.yellow);
-
-                let guild = this.commander.guilds.get(guildId) || {};
-                guild.commands = guild.commands || new Discord.Collection();
-                guild.commands.set(this.name, this);
-
-                this.commander.guilds.set(guildId, guild);
-            }
-        } else {
-            this.commander.global.set(this.name, this);
-        }
-
-        if (!this.commander.groups.has(this.group)) this.commander.groups.set(this.group, new Discord.Collection());
-
-        this.commander.groups.get(this.group).set(this.name, this);
-    }
-
-    getCooldown(guild, user) {
-        const now = Date.now();
-
-        if (!this.cooldown) return false;
-
-        let cooldown = this.cooldown * 1000;
-        if (!this.commander.cooldowns.has(guild?.id || 'dm')) this.commander.cooldowns.set(guild?.id || 'dm', new Discord.Collection());
-
-        let cooldowns = this.commander.cooldowns.get(guild?.id || 'dm');
-        if (!cooldowns.has(user.id)) cooldowns.set(user.id, new Discord.Collection());
-
-        let usages = cooldowns.get(user.id);
-        if (usages.has(this.name)) {
-            let expire = usages.get(this.name) + cooldown;
-            if (now < expire) return ((expire - now) / 1000).toFixed();
-        }
-
-        usages.set(this.name, now);
-
-        setTimeout(() => usages.delete(this.name), cooldown);
-
-        return false;
-    }
-}
-
-class CommanderModule {
-    constructor(module, commander) {
-        this.commander = commander;
-        this.module = module;
-
-        for (const key in module) {
-            this[key] = module[key];
-        }
-
-        if (this.events) {
-            for (const event in this.commander.client._events) {
-                if (event == 'error' || event == 'shardDisconnect' || event == 'msgCreate') continue;
-                if (this.events.includes(event)) this.client.removeAllListeners(event);
-            }
-        }
-
-        if (this.guilds) {
-            for (const guildId of this.guilds) {
-                if (!this.commander.client.guilds.cache.has(guildId)) console.warn(`Commander (WARNING) >> Guild (${guildId}) Not Found For Module: ${this.name}`.yellow);
-
-                let guild = this.commander.guilds.get(guildId) || {};
-                guild.modules = guild.modules || new Discord.Collection();
-                guild.modules.set(this.name, this);
-
-                this.commander.guilds.set(guildId, guild);
-            }
-        }
-    }
-
-    async initialize(client) {
-        try {
-            await this.run(client);
-            console.log(`Commander >> Loaded ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.brightGreen);
-        } catch (err) {
-            console.error(`Commander >> Failed to Load ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.red);
-            console.error(err);
-            Commander.handleError(client, err);
-        }
     }
 }
 

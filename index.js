@@ -1,14 +1,17 @@
+if (process.env.NODE_ENV != 'production') require('dotenv').config();
+
 require('module-alias/register');
 require('colors');
 // ------------------------------------
-const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, ActivityType, Events } = require('discord.js');
 // ------------------------------------
 const Commander = require('@commander');
 const CommanderDatabase = require('@commander/database');
-const TwitchManager = require('@libs/twitch/twitchmanager');
+const TwitchManager = require('@libs/twitch/manager');
 const Server = require('@server');
 // ------------------------------------
 const { prefix } = require('@configs/bot.json');
+// ------------------------------------
 const now = Date.now();
 // ------------------------------------
 const client = new Client({
@@ -42,7 +45,7 @@ client.dev = '244662779745665026';
 
 console.log('>>> Loading...\n'.magenta.bold.underline);
 
-client.once('ready', async (client) => {
+client.once(Events.ClientReady, async (client) => {
     // ------------------------------------
     client.database = await CommanderDatabase.initialize(client);
     client.commander = await Commander.initialize(client);
@@ -53,7 +56,7 @@ client.once('ready', async (client) => {
     console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);
 });
 
-client.on('error', (err) => Commander.handleError(client, err));
+client.on(Events.Error, (err) => Commander.handleError(client, err));
 
 client.login(process.env.BOT_TOKEN);
 

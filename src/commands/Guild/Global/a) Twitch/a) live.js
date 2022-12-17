@@ -1,7 +1,7 @@
 const { ChannelType } = require('discord.js');
 const Commander = require('@commander');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const TwitchManager = require('@libs/twitch/twitchmanager');
+const { SlashCommandBuilder } = require('discord.js');
+const TwitchManager = require('@libs/twitch/manager');
 const ActionEmbed = require('@utils/embeds/action');
 const TwitchEmbed = require('@utils/embeds/twitch');
 // -----------------------------------
@@ -38,11 +38,6 @@ module.exports = {
                                 .setDescription('The channel to announce in.')
                                 .addChannelTypes(ChannelType.GuildText)
                                 .setRequired(true);
-                        })
-                        .addBooleanOption(option => {
-                            return option.setName('autosend')
-                                .setDescription('Whether to automatically send a notification when the stream goes online.')
-                                .setRequired(true);
                         });
                 })
         );
@@ -58,23 +53,21 @@ module.exports = {
         if (command == 'setup') {
             let username = int.options.getString('username');
             let channel = await client.twitch.getUserByUserName(username);
-            let autoSend = int.options.getBoolean('autosend');
 
-            if (!channel) return int.editReply({ embeds: [new ActionEmbed('fail', 'Invalid channel name provided!', int.user)] });
+            if (!channel) return int.editReply({ embeds: [new ActionEmbed('fail', 'Invalid twich user provided!', int.user)] });
 
             let announce = int.options.getChannel('channel');
 
-            if (!announce) return int.editReply({ embeds: [new ActionEmbed('fail', 'Invalid channel ID(s) provided!', int.user)] });
+            if (!announce) return int.editReply({ embeds: [new ActionEmbed('fail', 'Invalid channel provided!', int.user)] });
 
-            await client.database.set(int.guildId, 'twitch', { 'user': username, 'channels': [announce.id], autoSend });
+            await client.database.set(int.guildId, 'twitch', { 'user': username, 'channels': [announce.id] });
             if (client.twitch) await client.twitch.registerListeners();
 
             let success = new ActionEmbed('success', 'Setup complete!', int.user);
             success.setTitle('Twitch Setup');
             success.addFields([
                 { name: 'User', value: `[${username}](https://twitch.tv/${username})` },
-                { name: 'Channel', value: `\`#${announce.name}\`` },
-                { name: 'Auto Send', value: `\`${autoSend ? 'Enabled' : 'Disabled'}\`` }
+                { name: 'Channel', value: `\`#${announce.name}\`` }
             ]);
 
             return int.editReply({ embeds: [success] });

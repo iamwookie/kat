@@ -1,5 +1,7 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
+
 const progressbar = require('string-progressbar');
+
 const MusicEmbed = require('@utils/embeds/music');
 
 module.exports = {
@@ -7,7 +9,6 @@ module.exports = {
     group: 'Music',
     description: 'View the queue.',
     cooldown: 5,
-    guildOnly: true,
 
     // SLASH
     data() {
@@ -15,15 +16,14 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
         );
     },
 
     async run(client, int) {
-        let subscription = client.subscriptions.get(int.guildId);
+        const subscription = client.subscriptions.get(int.guildId);
 
-        let empty = new MusicEmbed(client, int).setTitle('The queue is empty!');
-
-        if (!subscription || !subscription.active && !subscription.length) return int.editReply({ embeds: [empty] });
+        if (!subscription || !subscription.active && !subscription.length) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('The queue is empty!')] });
 
         let res = '';
 
@@ -47,8 +47,10 @@ module.exports = {
             }
         }
 
-        let queue = new MusicEmbed(client, int, 'queue');
+        const queue = new MusicEmbed(client, int, 'queue');
+
         queue.setDescription(res);
+
         return int.editReply({ embeds: [queue] });
     }
 };

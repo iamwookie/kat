@@ -1,13 +1,13 @@
-const Discord = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+
 const ColorManager = require('@libs/color/manager');
+
 const ActionEmbed = require('@utils/embeds/action');
 
 module.exports = {
     name: 'color',
     group: 'Color',
     description: 'Set colors for yourself via roles.',
-    guildOnly: true,
 
     // AUTHORIZATION
     guilds: [],
@@ -18,6 +18,7 @@ module.exports = {
             new SlashCommandBuilder()
                 .setName(this.name)
                 .setDescription(this.description)
+                .setDMPermission(false)
                 .addSubcommand(sub => {
                     return sub.setName('set')
                         .setDescription('Set your color.');
@@ -63,7 +64,7 @@ module.exports = {
 
             if (!colorRole) return int.editReply({ embeds: [new ActionEmbed('fail', 'Error creating color!', int.user)] });
 
-            const embed = new Discord.EmbedBuilder()
+            const embed = new EmbedBuilder()
                 .setTitle('Colors')
                 .setDescription('Successfully added a color role!')
                 .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) })
