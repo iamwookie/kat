@@ -81,13 +81,13 @@ class Commander {
         this.client.on(Discord.Events.InteractionCreate, async interaction => {
             if (interaction.type !== Discord.InteractionType.ApplicationCommand) return;
 
-            await interaction.deferReply();
-
             const command = this.commands.get(interaction.commandName) || this.commands.get(this.aliases.get(interaction.commandName));
 
-            if (!command || command.disabled) return interaction.editReply({ embeds: [new ActionEmbed('fail', 'This command has been disabled or removed!', interaction.user)] });
+            if (!command || command.disabled) return;
 
-            if (!this.authenticate(interaction, command)) return;
+            await interaction.deferReply({ ephemeral: command.ephemeral });
+
+            if (!this.validate(interaction, command)) return;
 
             try {
                 await command.run(this.client, interaction);
@@ -310,7 +310,7 @@ class Commander {
         }
     }
 
-    authenticate(interaction, command) {
+    validate(interaction, command) {
         if (command.users && !command.users.includes(interaction.user.id)) {
             interaction.editReply({ embeds: [new ActionEmbed('fail', 'You are not allowed to use this command!', interaction.user)] });
             return false;
