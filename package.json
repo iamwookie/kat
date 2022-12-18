@@ -1,6 +1,6 @@
 {
   "name": "cat-bot",
-  "version": "5.2.6",
+  "version": "5.2.7",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "@configs": "src/configs",
     "@commander": "src/commander",
     "@server": "src/server",
-    "@libs": "src/libs",
+    "@lib": "src/lib",
     "@utils": "src/utils"
   }
 }

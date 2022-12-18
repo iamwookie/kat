@@ -7,7 +7,7 @@ const { Client, GatewayIntentBits, Partials, ActivityType, Events } = require('d
 // ------------------------------------
 const Commander = require('@commander');
 const CommanderDatabase = require('@commander/database');
-const TwitchManager = require('@libs/twitch/manager');
+const TwitchManager = require('@lib/twitch/manager');
 const Server = require('@server');
 // ------------------------------------
 const { prefix } = require('@configs/bot.json');
