@@ -102,8 +102,7 @@ module.exports = {
                 }
             }
 
-            let success = new ActionEmbed('success', 'Message(s) sent!', int.user);
-            return int.editReply({ embeds: [success] });
+            return int.editReply({ embeds: [new ActionEmbed('success', 'Message(s) sent!', int.user)] });
         }
     }
 };

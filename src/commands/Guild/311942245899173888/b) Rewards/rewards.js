@@ -8,6 +8,7 @@ module.exports = {
     name: 'rewards',
     group: 'Rewards',
     description: 'Claim your Discord rewards.',
+    ephemeral: true,
 
     // AUTHORIZATION
     guilds: [],
