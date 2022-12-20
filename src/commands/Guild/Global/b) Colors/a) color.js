@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
-const ColorManager = require('@libs/color/manager');
+const ColorManager = require('@lib/color/manager');
 
 const ActionEmbed = require('@utils/embeds/action');
 

@@ -3,8 +3,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const play = require('play-dl');
 
 const Commander = require('@commander');
-const MusicSubscription = require('@libs/music/subscription');
-const Track = require('@libs/music/track');
+const MusicSubscription = require('@lib/music/subscription');
+const Track = require('@lib/music/track');
 
 const MusicEmbed = require('@utils/embeds/music');
 const ActionEmbed = require('@utils/embeds/action');
