@@ -1,7 +1,8 @@
-const { ChannelType } = require('discord.js');
+const { SlashCommandBuilder, ChannelType } = require('discord.js');
+
 const Commander = require('@commander');
-const { SlashCommandBuilder } = require('discord.js');
 const TwitchManager = require('@lib/twitch/manager');
+
 const ActionEmbed = require('@utils/embeds/action');
 const TwitchEmbed = require('@utils/embeds/twitch');
 // -----------------------------------
@@ -49,22 +50,22 @@ module.exports = {
 
         if (!client.twitch) client.twitch = TwitchManager.initialize(client);
 
-        let command = int.options.getSubcommand();
+        const command = int.options.getSubcommand();
 
         if (command == 'setup') {
-            let username = int.options.getString('username');
-            let channel = await client.twitch.getUserByUserName(username);
+            const username = int.options.getString('username');
+            const channel = await client.twitch.getUserByUserName(username);
 
             if (!channel) return int.editReply({ embeds: [new ActionEmbed('fail', 'Invalid twich user provided!', int.user)] });
 
-            let announce = int.options.getChannel('channel');
+            const announce = int.options.getChannel('channel');
 
             if (!announce) return int.editReply({ embeds: [new ActionEmbed('fail', 'Invalid channel provided!', int.user)] });
 
             await client.database.set(int.guildId, 'twitch', { 'user': username, 'channels': [announce.id] });
             if (client.twitch) await client.twitch.registerListeners();
 
-            let success = new ActionEmbed('success', 'Setup complete!', int.user);
+            const success = new ActionEmbed('success', 'Setup complete!', int.user);
             success.setTitle('Twitch Setup');
             success.addFields([
                 { name: 'User', value: `[${username}](https://twitch.tv/${username})` },
@@ -77,22 +78,22 @@ module.exports = {
         if (command == 'send') {
             await int.editReply({ embeds: [new ActionEmbed('load', 'Searching...', int.user)] });
 
-            let info = await client.database.get(int.guildId, 'twitch');
+            const info = await client.database.get(int.guildId, 'twitch');
 
             if (!info) return int.editReply({ embeds: [new ActionEmbed('fail', 'You have not completed the setup. Try running the command: `/live setup`', int.user)] });
 
-            let stream = await client.twitch.getStreamByUserName(info.user);
+            const stream = await client.twitch.getStreamByUserName(info.user);
 
             if (!stream) return int.editReply({ embeds: [new ActionEmbed('fail', 'User is not streaming!', int.user)] });
 
-            let user = await stream.getUser();
-            let image = await stream.getThumbnailUrl(1280, 720);
+            const user = await stream.getUser();
+            const image = await stream.getThumbnailUrl(1280, 720);
 
-            let embed = new TwitchEmbed(user, stream, image);
+            const embed = new TwitchEmbed(user, stream, image);
 
             for (const channelId of info.channels) {
                 try {
-                    let channel = await int.guild.channels.fetch(channelId);
+                    const channel = await int.guild.channels.fetch(channelId);
                     if (channel) channel.send({ content: "@everyone", embeds: [embed] });
                 } catch (err) {
                     console.error(`Guild Commands (ERROR) (${int.guild.id}) >> live: Failed To Fetch Channel`.red);
