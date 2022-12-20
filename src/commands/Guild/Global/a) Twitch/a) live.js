@@ -10,6 +10,7 @@ module.exports = {
     name: 'live',
     group: 'Twitch',
     description: 'Send live stream announcement.',
+    ephemeral: true,
 
     // AUTHORIZATION
     guilds: [],
