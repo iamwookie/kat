@@ -1,6 +1,6 @@
 {
   "name": "cat-bot",
-  "version": "5.2.8",
+  "version": "5.2.9",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,8 @@
   "dependencies": {
     "@discordjs/opus": "^0.8.0",
     "@discordjs/voice": "^0.7.5",
+    "@sentry/node": "^7.28.0",
+    "@sentry/tracing": "^7.28.0",
     "@twurple/api": "^5.1.6",
     "@twurple/auth": "^5.1.6",
     "axios": "^0.25.0",
