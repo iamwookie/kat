@@ -3,12 +3,15 @@ exports.fetchUser = client => {
         try {
             const id = req.params.id;
             if (!id) return res.status(400).send('Bad Request');
+
             const user = await client.users.fetch(id, { force: true });
             if (!user) return res.status(404).send('Not Found');
+            
             return res.json(parseUser(user));
         } catch (err) {
             console.error('User Controller (ERROR) >> Error Getting User'.red);
             console.error(err);
+
             return res.status(500).send('Internal Server Error');
         }
     }
