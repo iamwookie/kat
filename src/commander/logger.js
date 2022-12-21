@@ -41,7 +41,7 @@ class CommanderLogger {
     }
 
     debug(msg) {
-        console.log('Logger (DEBUG): '.green + msg);
+        console.log('Logger (DEBUG): '.blue + msg);
     }
 
     async warnDev(eventId) {
