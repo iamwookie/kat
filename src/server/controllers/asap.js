@@ -99,14 +99,14 @@ exports.createStaff = client => {
                 .setThumbnail(avi)
                 .setColor(ban ? '#ff0000' : '#00ff00')
                 .addFields([
-                    { name: 'Player', value: `[${banUser} (${banUserSid})](https://steamcommunity.com/profiles/${banUserSid})`, inline: true },
-                    { name: 'Admin', value: `[${adminUser} (${adminSid})](https://steamcommunity.com/profiles/${adminSid})`, inline: true }
+                    { name: 'Player', value: `[${banUser} (${banUserSid})](https://steamcommunity.com/profiles/${banUserSid})` },
+                    { name: 'Admin', value: `[${adminUser} (${adminSid})](https://steamcommunity.com/profiles/${adminSid})` }
                 ]);
 
             if (ban) {
                 embed.addFields([
-                    { name: 'Ban Length', value: `\`${banLength}\``, inline: true },
-                    { name: 'Ban Reason', value: `\`${banReason}\``, inline: true }
+                    { name: 'Ban Length', value: `\`${banLength}\`` },
+                    { name: 'Ban Reason', value: `\`${banReason}\`` }
                 ]);
             }
 
