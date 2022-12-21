@@ -1,11 +1,11 @@
 const { createLog } = require('@server/utils/logs');
 
-exports.withMethods = (options) => {
+exports.withMethods = (client, options) => {
     if (!options || !Array.isArray(options)) throw new Error('Invalid methods!');
 
     return ((req, res, next) => {
         if (!options.includes(req.method)) {
-            console.log('>> Disallowed Method Used'.red);
+            client.logger?.warn('>> Disallowed Method Used'.red);
             createLog(req, 'Disallowed Method', 'access');
 
             const allowed = options.join(', ');
