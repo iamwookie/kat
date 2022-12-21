@@ -31,9 +31,9 @@ class CommanderCommand {
 
         if (this.guilds) {
             for (const guildId of this.guilds) {
-                if (!this.commander.client.guilds.cache.has(guildId)) console.warn(`Commander (WARNING) >> Guild (${guildId}) Not Found For Command: ${this.name}`.yellow);
+                if (!this.commander.client.guilds.cache.has(guildId)) this.commander.client.logger?.warn(`Commander >> Guild (${guildId}) Not Found For Command: ${this.name}`);
 
-                let guild = this.commander.guilds.get(guildId) || {};
+                const guild = this.commander.guilds.get(guildId) || {};
                 guild.commands = guild.commands || new Discord.Collection();
                 guild.commands.set(this.name, this);
 

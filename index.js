@@ -6,8 +6,9 @@ require('colors');
 const { Client, GatewayIntentBits, Partials, ActivityType, Events } = require('discord.js');
 // ------------------------------------
 const Commander = require('@commander');
+const CommanderLogger = require('@commander/logger');
 const CommanderDatabase = require('@commander/database');
-const TwitchManager = require('@libs/twitch/manager');
+const TwitchManager = require('@lib/twitch/manager');
 const Server = require('@server');
 // ------------------------------------
 const { prefix } = require('@configs/bot.json');
@@ -47,6 +48,7 @@ console.log('>>> Loading...\n'.magenta.bold.underline);
 
 client.once(Events.ClientReady, async (client) => {
     // ------------------------------------
+    client.logger = new CommanderLogger(client);
     client.database = await CommanderDatabase.initialize(client);
     client.commander = await Commander.initialize(client);
     client.twitch = await TwitchManager.initialize(client);
@@ -56,7 +58,8 @@ client.once(Events.ClientReady, async (client) => {
     console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);
 });
 
-client.on(Events.Error, (err) => Commander.handleError(client, err));
+// log error with logger
+client.on(Events.Error, (error) => client.logger?.error(error));
 
 client.login(process.env.BOT_TOKEN);
 

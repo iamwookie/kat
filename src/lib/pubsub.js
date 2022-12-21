@@ -17,9 +17,10 @@ class PubSubClient {
 
             this.pubsub.connect();
         } catch (err) {
-            Commander.handleError(this.client, err);
-            console.log('PubSubClient (ERROR) >> Error Creating Client'.red);
+            console.error('PubSubClient (ERROR) >> Error Creating Client'.red);
             console.error(err);
+
+            this.client.logger?.error(err);
         }
     }
 
@@ -29,9 +30,10 @@ class PubSubClient {
             this.channels.set(channel, cb);
             console.log('[PubSubClient] '.red + 'Subscribed Channel: ' + channel);
         } catch (err) {
-            Commander.handleError(this.client, err);
-            console.log(`PubSubClient (ERROR) >> Error Subscribing: ${channel}`.red);
+            console.error(`PubSubClient (ERROR) >> Error Subscribing: ${channel}`.red);
             console.error(err);
+
+            this.client.logger?.error(err);
         }
     }
 
@@ -41,9 +43,10 @@ class PubSubClient {
             this.channels.delete(channel);
             console.log('[PubSubClient] '.red + 'Unsubscribed Channel: ' + channel);
         } catch (err) {
-            Commander.handleError(this.client, err);
-            console.log(`PubSubClient (ERROR) >> Error Unsubscribing: ${channel}`.red);
+            console.error(`PubSubClient (ERROR) >> Error Unsubscribing: ${channel}`.red);
             console.error(err);
+
+            this.client.logger?.error(err);
         }
     }
 

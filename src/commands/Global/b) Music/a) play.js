@@ -3,8 +3,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const play = require('play-dl');
 
 const Commander = require('@commander');
-const MusicSubscription = require('@libs/music/subscription');
-const Track = require('@libs/music/track');
+const MusicSubscription = require('@lib/music/subscription');
+const Track = require('@lib/music/track');
 
 const MusicEmbed = require('@utils/embeds/music');
 const ActionEmbed = require('@utils/embeds/action');
@@ -67,11 +67,14 @@ module.exports = {
 
                 try {
                     if (play.is_expired()) await play.refreshToken();
+                    
                     const search = await play.spotify(query);
                     data = search;
                 } catch (err) {
                     reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('You have not provided a valid Spotify URL!')] }).catch(() => int.channel.send({ embeds: [notFound] }));
-                    Commander.handleError(client, err);
+                    
+                    client.logger?.error(err);
+
                     return subscription.destroy();
                 }
             } else if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
@@ -82,11 +85,14 @@ module.exports = {
                     data = search;
                 } catch {
                     reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('You have not provided a valid playlist URL!')] });
-                    Commander.handleError(client, err);
+
+                    client.logger?.error(err);
+
                     return subscription.destroy();
                 }
             } else {
                 reply = await int.editReply({ embeds: [searching] });
+                
                 const search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
                 data = search[0];
             }
@@ -137,7 +143,8 @@ module.exports = {
         } catch (err) {
             console.error('Music Commands (ERROR) >> play: Error Running Command'.red);
             console.error(err);
-            Commander.handleError(client, err, false, int.guild);
+            
+            client.logger?.error(err);
 
             return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
         }
