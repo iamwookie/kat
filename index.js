@@ -50,7 +50,8 @@ client.once(Events.ClientReady, async (client) => {
 });
 
 client.on(Events.Error, client.logger?.error);
-client.on(Events.Debug, client.logger?.debug);
+
+if (process.env.NODE_ENV != 'production') client.on(Events.Debug, client.logger?.debug);
 
 client.login(process.env.BOT_TOKEN);
 
