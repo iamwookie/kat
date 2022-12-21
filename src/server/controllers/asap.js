@@ -20,7 +20,7 @@ exports.createUnbox = client => {
 
             const embed = new EmbedBuilder()
                 .setTitle(`ASAP Unbox`)
-                .setDescription(`**${name}** has received **${crateName}** from **${itemName}**!`)
+                .setDescription(`**${name}** has received **${itemName}** from **${crateName}**!`)
                 .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
                 .setColor(itemColor)
                 .addFields([
