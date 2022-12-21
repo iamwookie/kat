@@ -24,7 +24,7 @@ exports.createUnbox = client => {
                 .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
                 .setColor(itemColor)
                 .addFields([
-                    { name: 'Steam Profile', value: `[Click here](https://steamcommunity.com/profiles/${steamId})`, inline: true },
+                    { name: 'Player', value: `[${name}](https://steamcommunity.com/profiles/${steamId})`, inline: true },
                     { name: 'Item', value: `\`${itemName}\``, inline: true },
                     { name: 'Crate', value: `\`${crateName}\``, inline: true }
                 ]);
@@ -61,7 +61,7 @@ exports.createSuits = client => {
                 .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
                 .setColor(itemColor)
                 .addFields([
-                    { name: 'Steam Profile', value: `[Click here](https://steamcommunity.com/profiles/${steamId})`, inline: true },
+                    { name: 'Player', value: `[${name}](https://steamcommunity.com/profiles/${steamId})`, inline: true },
                     { name: 'Suit Lost', value: `\`${itemName}\``, inline: true },
                     { name: 'Killer', value: `\`${killerName}\``, inline: true }
                 ]);
