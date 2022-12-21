@@ -19,8 +19,8 @@ exports.createUnbox = client => {
             if (!channel) return res.status(500).send('Internal Server Error');
 
             const embed = new EmbedBuilder()
-                .setTitle('🎁 ASAP Unbox')
-                .setDescription(`**${name}** has received **${itemName}** from **${crateName}**!`)
+                .setTitle('ASAP Unbox')
+                .setDescription(`**${name}** has received **${itemName}** from **${crateName}** 🎁!`)
                 .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
                 .setColor(itemColor)
                 .addFields([
@@ -56,8 +56,8 @@ exports.createSuits = client => {
             if (!channel) return res.status(500).send('Internal Server Error');
 
             const embed = new EmbedBuilder()
-                .setTitle('💀 ASAP Suit Rips')
-                .setDescription(`**${name}** has lost **${itemName}** to **${killerName}**!`)
+                .setTitle('ASAP Suit Rips')
+                .setDescription(`**${name}** has lost **${itemName}** to **${killerName}** 💀!`)
                 .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
                 .setColor(itemColor)
                 .addFields([
