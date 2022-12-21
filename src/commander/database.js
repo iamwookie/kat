@@ -6,23 +6,25 @@ class CommanderDatabase {
     constructor(client) {
         this.client = client;
         this.prefix = 'cat:';
-        
+
         this.guilds = new Discord.Collection();
         this.access = new Discord.Collection();
     }
 
     static async initialize(client) {
         try {
-            let database = new CommanderDatabase(client);
-            database.redis = await redis();
+            const database = new CommanderDatabase(client);
+            database.redis = await redis(client);
             await database.#load();
+            
             console.log('>>> Database Initialized'.brightGreen.bold.underline);
 
             return database;
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Initializing'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
+
+            this.client.logger?.error(err);
         }
     }
 
@@ -50,14 +52,15 @@ class CommanderDatabase {
                 }
             }
 
-            console.log('CommanderDatabase >> Data Loaded'.brightGreen);
+            this.client.logger?.info('CommanderDatabase >> Data Loaded');
 
             return true;
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Loading (SHUTDOWN)'.red);
             console.error(err);
             this.loadLocked = false;
-            Commander.handleError(this.client, err, true);
+
+            this.client.logger?.fatal(err);
         }
     }
 
@@ -84,7 +87,8 @@ class CommanderDatabase {
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
+
+            this.client.logger?.error(err);
 
             return false;
         }
@@ -110,7 +114,8 @@ class CommanderDatabase {
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Deleting Value'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
+            
+            this.client.logger?.error(err);
 
             return false;
         }
@@ -141,7 +146,8 @@ class CommanderDatabase {
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
+            
+            this.client.logger?.error(err);
         }
     }
 

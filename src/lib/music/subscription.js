@@ -43,7 +43,8 @@ class MusicSubscription {
         } catch (err) {
             console.error('Music (ERROR) >> Error Creating Subscription');
             console.error(err);
-            Commander.handleError(client, err, false, channel.guild);
+            
+            client.logger?.error(err);
         }
     }
 
@@ -129,7 +130,8 @@ class MusicSubscription {
         } catch (err) {
             console.error('Music (ERROR) >> Error Playing Track'.red);
             console.error(err);
-            Commander.handleError(this.client, err, false, this.guild);
+            
+            this.client.logger?.error(err);
 
             track.onError(err);
             this.queueLocked = false;

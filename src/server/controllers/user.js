@@ -12,6 +12,8 @@ exports.fetchUser = client => {
             console.error('User Controller (ERROR) >> Error Getting User'.red);
             console.error(err);
 
+            // Don't log error as missing user can trigger error
+
             return res.status(500).send('Internal Server Error');
         }
     }

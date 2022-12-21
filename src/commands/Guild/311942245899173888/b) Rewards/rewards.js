@@ -88,7 +88,8 @@ module.exports = {
                     } catch (err) {
                         console.error('Guild Commands (ERROR): rewards: Error Claiming Join Reward');
                         console.error(err);
-                        Commander.handleError(client, err, false, int.guild);
+                        
+                        client.logger?.error(err);
 
                         int.editReply({ embeds: [errorEmbed], components: [] });
                     }
@@ -99,7 +100,8 @@ module.exports = {
                     } catch (err) {
                         console.error('Guild Commands (ERROR): rewards: Error Claiming Boost Reward');
                         console.error(err);
-                        Commander.handleError(client, err, false, int.guild);
+                        
+                        client.logger?.error(err);
 
                         int.editReply({ embeds: [errorEmbed], components: [] });
                     }
@@ -112,7 +114,8 @@ module.exports = {
         } catch (err) {
             console.error('Guild Commands (ERROR): rewards');
             console.error(err);
-            Commander.handleError(client, err, false, int.guild);
+            
+            client.logger?.error(err);
 
             int.editReply({ embeds: [errorEmbed], components: [] });
         }

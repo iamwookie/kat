@@ -98,7 +98,8 @@ module.exports = {
                 } catch (err) {
                     console.error(`Guild Commands (ERROR) (${int.guild.id}) >> live: Failed To Fetch Channel`.red);
                     console.error(err);
-                    Commander.handleError(client, err);
+                    
+                    client.logger?.error(err);
 
                     return int.editReply({ embeds: [new ActionEmbed('fail', 'Failed to send message(s)! Are you sure I have enough permissions? Try running the setup again if this message keeps appearing.', int.user)] });
                 }

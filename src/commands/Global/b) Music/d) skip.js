@@ -35,7 +35,8 @@ module.exports = {
         } catch (err) {
             console.error('Music Commands (ERROR) >> skip: Error Skipping Track'.red);
             console.error(err);
-            Commander.handleError(client, err);
+            
+            client.logger?.error(err);
 
             return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
         }

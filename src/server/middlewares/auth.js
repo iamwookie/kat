@@ -3,7 +3,7 @@
 const { createLog } = require('@server/utils/logs');
 
 exports.withAuth = (req, res, next) => {
-    if (!req.headers.authorization || req.headers.authorization != process.env.API_KEY) {
+    if (!req.headers.authorization || req.headers.authorization != process.env.CAT_API_KEY) {
         console.log('>> Unauthorized Request Received'.red);
         createLog(req, 'Unauthorized', 'access');
 

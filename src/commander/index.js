@@ -1,4 +1,4 @@
-// This is the command handler, CODENAME: Commander v6.2.1
+// This is the command handler, CODENAME: Commander v6.3.0
 
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -73,7 +73,8 @@ class Commander {
             } catch (err) {
                 console.error('Commander (ERROR) >> Error Running CLI Command'.red);
                 console.error(err);
-                Commander.handleError(this.client, err);
+                
+                this.client.logger?.error(err);
             }
         });
 
@@ -82,7 +83,6 @@ class Commander {
             if (interaction.type !== Discord.InteractionType.ApplicationCommand) return;
 
             const command = this.commands.get(interaction.commandName) || this.commands.get(this.aliases.get(interaction.commandName));
-
             if (!command || command.disabled) return;
 
             await interaction.deferReply({ ephemeral: command.ephemeral });
@@ -94,25 +94,28 @@ class Commander {
             } catch (err) {
                 console.error('Commander (ERROR) >> Error Running Slash Command'.red);
                 console.error(err);
-                Commander.handleError(this.client, err, false, interaction.guild);
+                
+                this.client.logger?.error(err);
             }
         });
     }
 
     static async initialize(client) {
         try {
-            let commander = new Commander(client);
+            const commander = new Commander(client);
             await commander.registerCLICommands();
             await commander.registerGlobalCommands();
             await commander.registerGuildCommands();
             await commander.registerModules();
+
             console.log('>>> Commander Initialized'.brightGreen.bold.underline);
 
             return commander;
         } catch (err) {
             console.error('Commander (ERROR) >> Error Initializing'.red);
             console.error(err);
-            Commander.handleError(client, err, true);
+
+            this.client.logger?.fatal(err);
         }
     }
 
@@ -133,7 +136,8 @@ class Commander {
                 } catch (err) {
                     console.error('Commander (ERROR) >> Error Registering CLI Command'.red);
                     console.error(err);
-                    Commander.handleError(this.client, err);
+                    
+                    this.client.logger?.error(err);
                 }
             }
         }
@@ -159,7 +163,8 @@ class Commander {
                     } catch (err) {
                         console.error('Commander (ERROR) >> Error Registering Global Command'.red);
                         console.error(err);
-                        Commander.handleError(this.client, err);
+                        
+                        this.client.logger?.error(err);
                     }
                 }
             }
@@ -183,14 +188,15 @@ class Commander {
 
                             const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
                             const command = new CommanderCommand(this, object);
-                            if (!command.guilds) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Command: ${command.name}`.yellow);
+                            if (!command.guilds) this.client.logger?.warn(`Commander >> Guild Not Set For Guild Command: ${command.name}`);
                             await command.initialize();
 
                             this.commands.set(command.name, command);
                         } catch (err) {
                             console.error('Commander (ERROR) >> Error Registering Guild Command'.red);
                             console.error(err);
-                            Commander.handleError(this.client, err);
+                            
+                            this.client.logger?.error(err);
                         }
                     }
                 }
@@ -221,7 +227,8 @@ class Commander {
         } catch (err) {
             console.error('Commander (ERROR) >> Error Registering Global Slash Commands'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
+            
+            this.client.logger?.error(err);
         }
 
         try {
@@ -251,14 +258,16 @@ class Commander {
                 } catch (err) {
                     console.error(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${k}`.red);
                     console.error(err);
-                    Commander.handleError(this.client, err);
+                    
+                    this.client.logger?.error(err);
                 }
             }
             console.log('Commander >> Successfully Registered All Guild Commands.'.brightGreen);
         } catch (err) {
             console.error('Commander (ERROR) >> Error Registering Guild Slash Commands'.red);
             console.error(err);
-            Commander.handleError(this.client, err);
+            
+            this.client.logger?.error(err);
         }
     }
 
@@ -299,7 +308,7 @@ class Commander {
 
                         const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
                         const module = new CommanderModule(object, this);
-                        if (!module.guilds || !module.guilds.includes(folder)) console.warn(`Commander (WARNING) >> Guild Not Set For Guild Module: ${module.name}`.yellow);
+                        if (!module.guilds || !module.guilds.includes(folder)) this.client.logger?.warn(`Commander >> Guild Not Set For Guild Module: ${module.name}`);
 
                         module.initialize(this.client);
 
@@ -331,47 +340,6 @@ class Commander {
         }
 
         return true;
-    }
-
-    // Error Handling
-
-    static async handleError(client, err, quit, guild) {
-        let dev = client ? await client.users.fetch(client.dev).catch(() => { return; }) : null;
-        let code = Date.now();
-
-        let errorObject = {
-            errorName: err.name,
-            errorMessage: err.message,
-            errorStack: err.stack,
-            guild: guild ? guild : "N/A",
-        };
-
-        fs.appendFile('./error.log', `${code}: ${JSON.stringify(errorObject)}\n`, async (err) => {
-            if (err) throw err;
-
-            if (dev) {
-                let embed = new Discord.EmbedBuilder()
-                    .setColor('#F04947')
-                    .setTitle('Uh Oh!')
-                    .setDescription(`A critical error in the internal code has occured.`)
-                    .addFields([{ name: 'Error Code', value: `\`${code}\``, inline: true }])
-                    .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg');
-
-                if (guild) {
-                    embed.addFields([
-                        { name: 'Guild', value: `\`${guild ? guild.name : 'N/A'}\`` },
-                        { name: 'Guild ID', value: `\`${guild ? guild.id : 'N/A'}\``, inline: true },
-                        { name: 'Guild Owner ID', value: `\`${guild ? guild.ownerId : 'N/A'}\``, inline: true }
-                    ]);
-                }
-
-                await dev.send({ embeds: [embed] }).catch(() => { return; });
-            }
-
-            console.error('Commander (ERROR) >> Error! Logged to file!'.red);
-            console.error(errorObject.errorStack);
-            if (quit) process.exit();
-        });
     }
 }
 
