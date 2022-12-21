@@ -1,3 +1,5 @@
+const { EmbedBuilder } = require('@discordjs/builders');
+
 const Sentry = require('@sentry/node');
 require('@sentry/tracing');
 
@@ -41,14 +43,14 @@ class CommanderLogger {
     }
 
     debug(msg) {
-        console.log('Logger (DEBUG): '.green + msg);
+        console.log('Logger (DEBUG): '.blue + msg);
     }
 
     async warnDev(eventId) {
         try {
             const dev = await this.client.users.fetch(this.client.dev);
 
-            const embed = new Discord.EmbedBuilder()
+            const embed = new EmbedBuilder()
                 .setColor('#F04947')
                 .setTitle('Uh Oh!')
                 .setDescription(`A error in the internal code has occured.`)
