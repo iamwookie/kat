@@ -3,7 +3,7 @@ if (process.env.NODE_ENV != 'production') require('dotenv').config();
 require('module-alias/register');
 require('colors');
 // ------------------------------------
-const { Client, GatewayIntentBits, Partials, ActivityType, Events } = require('discord.js');
+const { Client, GatewayIntentBits, ActivityType, Events } = require('discord.js');
 // ------------------------------------
 const Commander = require('@commander');
 const CommanderLogger = require('@commander/logger');
@@ -18,17 +18,7 @@ const now = Date.now();
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.GuildEmojisAndStickers,
         GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.DirectMessageReactions,
-        GatewayIntentBits.GuildPresences
-    ],
-    partials: [
-        Partials.Channel // Partials are used to read DM messages.
     ],
     presence: {
         status: 'online',

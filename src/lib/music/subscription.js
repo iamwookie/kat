@@ -1,19 +1,25 @@
-const DiscordVoice = require('@discordjs/voice');
-const Commander = require('@commander');
+const {
+    createAudioPlayer,
+    joinVoiceChannel,
+    entersState,
+    VoiceConnectionStatus,
+    VoiceConnectionDisconnectReason,
+    AudioPlayerStatus
+} = require('@discordjs/voice');
 
 class MusicSubscription {
     constructor(client, voiceConnection, channel) {
         this.client = client;
 
         this.voice = voiceConnection;
-        this.player = DiscordVoice.createAudioPlayer();
+        this.player = createAudioPlayer();
 
         this.channel = channel;
         this.guild = channel.guild;
 
         this.queue = [];
 
-        this.#initializeListeners();
+        this.initializeListeners();
 
         this.voice.subscribe(this.player);
     }
@@ -22,7 +28,7 @@ class MusicSubscription {
         try {
             const sub = new MusicSubscription(
                 client,
-                DiscordVoice.joinVoiceChannel({
+                joinVoiceChannel({
                     channelId: channel.id,
                     guildId: channel.guild.id,
                     adapterCreator: channel.guild.voiceAdapterCreator,
@@ -34,10 +40,12 @@ class MusicSubscription {
             sub.voice.on('error', (err) => {
                 console.error('Music (VOICE) >> Voice Error'.red);
                 console.error(err);
+
+                client.logger?.error(err);
             });
 
             client.subscriptions.set(channel.guild.id, sub);
-            console.log(`\nMusic >> Subscription Created: ${sub.guild.name} (${sub.guild.id})`.brightGreen);
+            client.logger?.info(`Music >> Subscription Created: ${sub.guild.name} (${sub.guild.id})`.brightGreen);
 
             return sub;
         } catch (err) {
@@ -51,73 +59,75 @@ class MusicSubscription {
     destroy() {
         if (!this.isVoiceDestroyed()) this.voice.destroy();
         this.client.subscriptions.delete(this.guild.id);
-        console.log(`Music >> Subscription Destroyed: ${this.guild.name} (${this.guild.id})`.yellow);
+        this.client.logger?.warn(`Music >> Subscription Destroyed: ${this.guild.name} (${this.guild.id})`.yellow);
     }
 
-    #initializeListeners() {
+    initializeListeners() {
         // Configure voice connection
 
         this.voice.on('stateChange', async (_, newState) => {
-            if (newState.status == DiscordVoice.VoiceConnectionStatus.Disconnected) {
-                console.log('Music (VOICE) >> Connection Disconnected'.yellow);
-                if (newState.reason == DiscordVoice.VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
-                    console.log('Music (VOICE) >> Connection Disconnected (Code 4014)'.yellow);
-                    await this.#connect(5000);
+            if (newState.status == VoiceConnectionStatus.Disconnected) {
+                this.client.logger?.warn('Music (VOICE) >> Connection Disconnected'.yellow);
+
+                if (newState.reason == VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
+                    this.client.logger?.warn('Music (VOICE) >> Connection Disconnected (Code 4014)'.yellow);
+                    await this.connect(5000);
                 } else if (voice.rejoinAttempts < 5) {
                     voice.rejoinAttempts + 1;
                     voice.rejoin();
                 } else {
                     voice.destroy();
                 }
-            } else if (newState.status == DiscordVoice.VoiceConnectionStatus.Destroyed) {
-                console.log('Music >> (VOICE) Connection Destroyed'.yellow);
+            } else if (newState.status == VoiceConnectionStatus.Destroyed) {
+                this.client.logger?.warn('Music >> (VOICE) Connection Destroyed'.yellow);
+                
                 this.destroy();
-            } else if (!this.readyLock && (newState.status == DiscordVoice.VoiceConnectionStatus.Connecting || newState.status == DiscordVoice.VoiceConnectionStatus.Signalling)) {
-                // console.log('Music >> (VOICE) Connection Connecting / Signalling'.yellow);
-                await this.#connect(20000);
+            } else if (!this.readyLock && (newState.status == VoiceConnectionStatus.Connecting || newState.status == VoiceConnectionStatus.Signalling)) {
+                // this.client.logger?.warn('Music >> (VOICE) Connection Connecting / Signalling'.yellow);
+                await this.connect(20_000);
             }
         });
 
         // Configure audio player
         this.player.on('stateChange', (oldState, newState) => {
-            // console.log(`Music (PLAYER) >> Previous State: ${oldState.status}`.magenta);
-            // console.log(`Music (PLAYER) >> New State: ${newState.status}`.magenta);
+            // this.client.logger?.info(`Music (PLAYER) >> Previous State: ${oldState.status}`.magenta);
+            // this.client.logger?.info(`Music (PLAYER) >> New State: ${newState.status}`.magenta);
 
-            if (newState.status == DiscordVoice.AudioPlayerStatus.Idle && oldState.status !== DiscordVoice.AudioPlayerStatus.Idle) {
+            if (newState.status == AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                 this.active = null;
                 oldState.resource.metadata.onFinish();
-                this.#process();
-            } else if (newState.status == DiscordVoice.AudioPlayerStatus.Playing && oldState.status !== DiscordVoice.AudioPlayerStatus.AutoPaused) {
-                console.log('Music (PLAYER) >> Playing Track: '.green);
+                this.process();
+            } else if (newState.status == AudioPlayerStatus.Playing && oldState.status !== AudioPlayerStatus.AutoPaused) {
+                this.client.logger?.info('Music (PLAYER) >> Playing Track: '.green);
                 console.log({
                     Title: this.active.title,
                     Duration: this.active.duration,
                     URL: this.active.url,
                     Guild: `${this.guild.name} (${this.guild.id})`
                 });
-                if (oldState.status !== DiscordVoice.AudioPlayerStatus.Paused) newState.resource.metadata.onStart();
+                if (oldState.status !== AudioPlayerStatus.Paused) newState.resource.metadata.onStart();
             }
         });
     }
 
-    async #connect(timeout) {
+    async connect(timeout) {
         if (!this.readyLock) {
             try {
-                await DiscordVoice.entersState(this.voice, DiscordVoice.VoiceConnectionStatus.Ready, timeout);
-                // console.log('Music (VOICE) >> Connection Ready'.brightGreen);
+                await entersState(this.voice, VoiceConnectionStatus.Ready, timeout);
+                // this.client.logger?.info('Music (VOICE) >> Connection Ready'.brightGreen);
             } catch (err) {
-                if (this.voice.state.status !== DiscordVoice.VoiceConnectionStatus.Destroyed) this.voice.destroy();
+                if (this.voice.state.status !== VoiceConnectionStatus.Destroyed) this.voice.destroy();
             } finally {
                 this.readyLock = false;
             }
         }
     }
 
-    async #process() {
-        if (this.queueLocked || this.player.state.status !== DiscordVoice.AudioPlayerStatus.Idle) return;
+    async process() {
+        if (this.queueLocked || this.player.state.status !== AudioPlayerStatus.Idle) return;
 
         this.queueLocked = true;
-        if (!this.isVoiceReady()) await this.#connect(20000);
+        if (!this.isVoiceReady()) await this.connect(20000);
 
         const track = this.queue.shift();
         if (!track) return this.destroy();
@@ -135,7 +145,7 @@ class MusicSubscription {
 
             track.onError(err);
             this.queueLocked = false;
-            this.#process();
+            this.process();
         }
     }
 
@@ -143,7 +153,7 @@ class MusicSubscription {
 
     add(track) {
         this.queue.push(track);
-        this.#process();
+        this.process();
     }
 
     clear() {
@@ -162,19 +172,19 @@ class MusicSubscription {
     // Booleans
 
     isVoiceReady() {
-        return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Ready);
+        return (this.voice.state.status == VoiceConnectionStatus.Ready);
     }
 
     isVoiceDestroyed() {
-        return (this.voice.state.status == DiscordVoice.VoiceConnectionStatus.Destroyed);
+        return (this.voice.state.status == VoiceConnectionStatus.Destroyed);
     }
 
     isPlayerPlaying() {
-        return (this.player.state.status == DiscordVoice.AudioPlayerStatus.Playing);
+        return (this.player.state.status == AudioPlayerStatus.Playing);
     }
 
     isPlayerPaused() {
-        return (this.player.state.status == DiscordVoice.AudioPlayerStatus.Paused);
+        return (this.player.state.status == AudioPlayerStatus.Paused);
     }
 }
 
