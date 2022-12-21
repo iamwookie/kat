@@ -3,7 +3,8 @@ const { EmbedBuilder } = require('discord.js');
 
 const channels = {
     unbox: '1055019802361598023',
-    suits: '1054873048160927774'
+    suits: '1054873048160927774',
+    staff: '520652380799369218'
 }
 
 exports.createUnbox = client => {
@@ -33,7 +34,7 @@ exports.createUnbox = client => {
 
             return res.status(200).send('OK');
         } catch (err) {
-            console.error('ASAP Controller (ERROR) >> Error Creating Unbox'.red);
+            console.error('ASAP Controller (ERROR) >> Error Creating Unbox Log'.red);
             console.error(err);
 
             client.logger?.error(err);
@@ -70,7 +71,50 @@ exports.createSuits = client => {
 
             return res.status(200).send('OK');
         } catch (err) {
-            console.error('ASAP Controller (ERROR) >> Error Creating Suit Rip'.red);
+            console.error('ASAP Controller (ERROR) >> Error Creating Suit Rip Log'.red);
+            console.error(err);
+
+            client.logger?.error(err);
+
+            return res.status(500).send('Internal Server Error');
+        }
+    }
+}
+
+exports.createStaff = client => {
+    return async (req, res) => {
+        try {
+            const body = req.body;
+            if (!body) return res.status(400).send('Bad Request');
+
+            const { ban, banLength, banReason, adminUser, adminSid, banUser, banUserSid, avi } = body;
+            if (!adminUser || adminSid || !banUser || !banUserSid || !avi) return res.status(400).send('Bad Request');
+
+            const channel = await client.channels.fetch(channels.staff);
+            if (!channel) return res.status(500).send('Internal Server Error');
+
+            const embed = new EmbedBuilder()
+                .setTitle('ASAP Admin')
+                .setDescription(`**${banUser}** has been ${ban ? 'banned' : 'unbanned'}!`)
+                .setThumbnail(avi)
+                .setColor(ban ? '#ff0000' : '#00ff00')
+                .addFields([
+                    { name: 'Player', value: `[${banUser} (${banUserSid})](https://steamcommunity.com/profiles/${banUserSid})`, inline: true },
+                    { name: 'Admin', value: `[${adminUser} (${adminSid})](https://steamcommunity.com/profiles/${adminSid})`, inline: true }
+                ]);
+
+            if (ban) {
+                embed.addFields([
+                    { name: 'Ban Length', value: `\`${banLength}\``, inline: true },
+                    { name: 'Ban Reason', value: `\`${banReason}\``, inline: true }
+                ]);
+            }
+
+            await channel.send({ embeds: [embed] });
+
+            return res.status(200).send('OK');
+        } catch (err) {
+            console.error('ASAP Controller (ERROR) >> Error Creating Staff Log'.red);
             console.error(err);
 
             client.logger?.error(err);
