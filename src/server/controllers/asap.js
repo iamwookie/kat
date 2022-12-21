@@ -88,7 +88,7 @@ exports.createStaff = client => {
             if (!body) return res.status(400).send('Bad Request');
 
             const { ban, banLength, banReason, adminUser, adminSid, banUser, banUserSid, avi } = body;
-            if (!adminUser || adminSid || !banUser || !banUserSid || !avi) return res.status(400).send('Bad Request');
+            if (!adminUser || !adminSid || !banUser || !banUserSid || !avi) return res.status(400).send('Bad Request');
 
             const channel = await client.channels.fetch(channels.staff);
             if (!channel) return res.status(500).send('Internal Server Error');
