@@ -96,7 +96,7 @@ exports.createStaff = client => {
             const embed = new EmbedBuilder()
                 .setTitle('ASAP Admin')
                 .setDescription(`**${banUser}** has been ${ban ? 'banned' : 'unbanned'}!`)
-                .setThumbnail(avi)
+                .setThumbnail(banUserAvatar)
                 .setColor(ban ? '#ff0000' : '#00ff00')
                 .addFields([
                     { name: 'Player', value: `[${banUser} (${banUserSid})](${banUserProfile})` },
