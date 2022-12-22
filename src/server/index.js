@@ -16,8 +16,9 @@ module.exports = (client) => {
         app.use(express.json());
         app.use(require('./routes')(client));
 
-        app.use((err, req, res, next) => {
+        app.use((err, req, res, _) => {
             createLog(req, 'Error Occured', 'error', err);
+            client.logger?.error(err);
             return res.status(500).send('Internal Server Error');
         });
 
