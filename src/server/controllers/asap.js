@@ -87,6 +87,8 @@ exports.createStaff = client => {
             const body = req.body;
             if (!body) return res.status(400).send('Bad Request');
 
+            console.log(body)
+
             const { ban, banLength, banReason, adminUser, adminSid, banUser, banUserSid, banUserProfile, banUserAvatar } = body;
             if (!adminUser || !adminSid || !banUser || !banUserSid || !banUserProfile || !banUserAvatar) return res.status(400).send('Bad Request');
 
