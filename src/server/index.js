@@ -3,7 +3,6 @@ const helmet = require('helmet');
 const bodyParser = require("body-parser");
 // ------------------------------------
 const { port } = require('@configs/server.json');
-const { createLog } = require('@server/utils/logs');
 
 const app = express();
 
@@ -17,8 +16,7 @@ module.exports = (client) => {
         app.use(require('./routes')(client));
 
         app.use((err, req, res, _) => {
-            createLog(req, 'Error Occured', 'error', err);
-            client.logger?.error(err);
+            client.logger?.request(req, 'error', err);
             return res.status(500).send('Internal Server Error');
         });
 

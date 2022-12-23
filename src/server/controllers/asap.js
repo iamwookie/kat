@@ -1,11 +1,8 @@
 
 const { EmbedBuilder } = require('discord.js');
 
-const channels = {
-    unbox: '1055019802361598023',
-    suits: '1054873048160927774',
-    staff: '520652380799369218'
-}
+const { asap } = require('@configs/server.json');
+const { channels } = asap;
 
 exports.createUnbox = client => {
     return async (req, res) => {
@@ -37,12 +34,12 @@ exports.createUnbox = client => {
             console.error('ASAP Controller (ERROR) >> Error Creating Unbox Log'.red);
             console.error(err);
 
-            client.logger?.error(err);
+            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }
-    }
-}
+    };
+};
 
 exports.createSuits = client => {
     return async (req, res) => {
@@ -74,12 +71,12 @@ exports.createSuits = client => {
             console.error('ASAP Controller (ERROR) >> Error Creating Suit Rip Log'.red);
             console.error(err);
 
-            client.logger?.error(err);
+            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }
-    }
-}
+    };
+};
 
 exports.createStaff = client => {
     return async (req, res) => {
@@ -117,9 +114,9 @@ exports.createStaff = client => {
             console.error('ASAP Controller (ERROR) >> Error Creating Staff Log'.red);
             console.error(err);
 
-            client.logger?.error(err);
+            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }
-    }
-}
+    };
+};
