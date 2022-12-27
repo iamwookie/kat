@@ -10,8 +10,22 @@ exports.createUnbox = client => {
             const body = req.body;
             if (!body) return res.status(400).send('Bad Request');
 
-            const { name, steamId, itemName, itemIcon, itemColor, crateName } = body;
-            if (!name || !steamId || !itemName || !itemIcon || !itemColor || !crateName) return res.status(400).send('Bad Request');
+            const {
+                name,
+                steamId,
+                itemName,
+                itemIcon,
+                itemColor,
+                crateName
+            } = body;
+            if (
+                !name ||
+                !steamId ||
+                !itemName ||
+                !itemIcon ||
+                !itemColor ||
+                !crateName
+            ) return res.status(400).send('Bad Request');
 
             const channel = await client.channels.fetch(channels.unbox);
             if (!channel) return res.status(500).send('Internal Server Error');
@@ -47,8 +61,22 @@ exports.createSuits = client => {
             const body = req.body;
             if (!body) return res.status(400).send('Bad Request');
 
-            const { name, steamId, itemName, itemIcon, itemColor, killerName } = body;
-            if (!name || !steamId || !itemName || !itemIcon || !itemColor || !killerName) return res.status(400).send('Bad Request');
+            const {
+                name,
+                steamId,
+                itemName,
+                itemIcon,
+                itemColor,
+                killerName
+            } = body;
+            if (
+                !name ||
+                !steamId ||
+                !itemName ||
+                !itemIcon ||
+                !itemColor ||
+                !killerName
+            ) return res.status(400).send('Bad Request');
 
             const channel = await client.channels.fetch(channels.suits);
             if (!channel) return res.status(500).send('Internal Server Error');
@@ -84,8 +112,25 @@ exports.createStaff = client => {
             const body = req.body;
             if (!body) return res.status(400).send('Bad Request');
 
-            const { ban, banLength, banReason, adminUser, adminSid, banUser, banUserSid, banUserProfile, banUserAvatar } = body;
-            if (!adminUser || !adminSid || !banUser || !banUserSid || !banUserProfile || !banUserAvatar) return res.status(400).send('Bad Request');
+            const {
+                ban,
+                banLength,
+                banReason,
+                adminUser,
+                adminSid,
+                banUser,
+                banUserSid,
+                banUserProfile,
+                banUserAvatar
+            } = body;
+            if (
+                !adminUser ||
+                !adminSid ||
+                !banUser ||
+                !banUserSid ||
+                !banUserProfile ||
+                !banUserAvatar
+            ) return res.status(400).send('Bad Request');
 
             const channel = await client.channels.fetch(channels.staff);
             if (!channel) return res.status(500).send('Internal Server Error');
