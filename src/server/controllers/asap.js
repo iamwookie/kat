@@ -132,9 +132,6 @@ exports.createStaff = client => {
                 !banUserAvatar
             ) return res.status(400).send('Bad Request');
 
-            const channel = await client.channels.fetch(channels.staff);
-            if (!channel) return res.status(500).send('Internal Server Error');
-
             const embed = new EmbedBuilder()
                 .setTitle('ASAP Admin')
                 .setDescription(`**${banUser}** has been ${ban}!`)
@@ -152,7 +149,11 @@ exports.createStaff = client => {
                 ]);
             }
 
-            await channel.send({ embeds: [embed] });
+            for (const c of channels.staff) {
+                const channel = await client.channels.fetch(c);
+                if (!channel) return res.status(500).send('Internal Server Error');
+                await channel.send({ embeds: [embed] });
+            }
 
             return res.status(200).send('OK');
         } catch (err) {
