@@ -17,7 +17,7 @@ class CommanderLogger {
         console.error(`Logger (FATAL) (${eventId}): A Fatal Error Has Occured!`.red);
         console.error(err);
 
-        this.warnDev(eventId);
+        this.notify(eventId);
 
         process.exit();
     }
@@ -28,7 +28,7 @@ class CommanderLogger {
         console.error(`Logger (ERROR) (${eventId}): An Error Has Occured!`.red);
         console.error(err);
 
-        this.warnDev(eventId);
+        this.notify(eventId);
     }
 
     warn(msg) {
@@ -58,7 +58,7 @@ class CommanderLogger {
         });
     }
 
-    async warnDev(eventId) {
+    async notify(eventId) {
         try {
             const dev = await this.client.users.fetch(this.client.dev);
 
@@ -70,7 +70,7 @@ class CommanderLogger {
 
             await dev.send({ embeds: [embed] }).catch(() => { return; });
         } catch (err) {
-            console.error('Logger (ERROR) >> Error Warning Dev!'.red);
+            console.error('Logger (ERROR): Error Warning Dev!'.red);
             console.error(err);
         }
     }
