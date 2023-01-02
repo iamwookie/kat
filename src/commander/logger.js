@@ -1,6 +1,8 @@
-const { EmbedBuilder } = require('discord.js');
+const fs = require('fs');
 
 const Sentry = require('@sentry/node');
+
+const { EmbedBuilder } = require('discord.js');
 
 class CommanderLogger {
     constructor(client) {
