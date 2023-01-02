@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
 
 const Sentry = require('@sentry/node');
 require('@sentry/tracing');
@@ -67,11 +67,10 @@ class CommanderLogger {
             const dev = await this.client.users.fetch(this.client.dev);
 
             const embed = new EmbedBuilder()
-                .setColor('#F04947')
+                .setColor('Red')
                 .setTitle('Uh Oh!')
                 .setDescription(`A error in the internal code has occured.`)
-                .addFields([{ name: 'Event ID', value: `\`${eventId}\``, inline: true }])
-                .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg');
+                .addFields([{ name: 'Event ID', value: `\`${eventId}\``, inline: true }]);
 
             await dev.send({ embeds: [embed] }).catch(() => { return; });
         } catch (err) {
