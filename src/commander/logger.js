@@ -1,16 +1,10 @@
 const { EmbedBuilder } = require('discord.js');
 
 const Sentry = require('@sentry/node');
-require('@sentry/tracing');
 
 class CommanderLogger {
     constructor(client) {
         this.client = client;
-        this.sentry = Sentry.init({
-            dsn: process.env.SENTRY_DSN,
-            environment: process.env.NODE_ENV,
-            maxBreadcrumbs: 50
-        });
 
         console.log('>>> Logger Initialized!'.brightGreen.bold.underline);
     }

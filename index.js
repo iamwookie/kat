@@ -3,6 +3,9 @@ if (process.env.NODE_ENV != 'production') require('dotenv').config();
 require('module-alias/register');
 require('colors');
 // ------------------------------------
+const Sentry = require('@sentry/node');
+require('@sentry/tracing');
+// ------------------------------------
 const { Client, GatewayIntentBits, ActivityType, Events } = require('discord.js');
 // ------------------------------------
 const Commander = require('@commander');
@@ -11,7 +14,7 @@ const CommanderDatabase = require('@commander/database');
 const TwitchManager = require('@lib/twitch/manager');
 const Server = require('@server');
 // ------------------------------------
-const { prefix } = require('@configs/bot.json');
+const { prefix, dev } = require('@configs/bot.json');
 // ------------------------------------
 const now = Date.now();
 // ------------------------------------
@@ -32,7 +35,13 @@ const client = new Client({
 });
 
 client.prefix = prefix;
-client.dev = '244662779745665026';
+client.dev = dev;
+
+Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV,
+    maxBreadcrumbs: 50
+});
 
 client.logger = new CommanderLogger(client);
 

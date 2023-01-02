@@ -6,14 +6,20 @@ const { port } = require('@configs/server.json');
 
 const app = express();
 
+const Sentry = require('@sentry/node');
+
 module.exports = (client) => {
     return new Promise((resolve, reject) => {
         if (app.get('env') == 'production') app.set('trust proxy', 1);
+
+        app.use(Sentry.Handlers.requestHandler());
 
         app.use(helmet());
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(express.json());
         app.use(require('./routes')(client));
+
+        app.use(Sentry.Handlers.errorHandler());
 
         app.use((err, req, res, _) => {
             client.logger?.request(req, 'error', err);
