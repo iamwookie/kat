@@ -1,4 +1,4 @@
-// This is the command handler, CODENAME: Commander v6.3.0
+// This is the command handler, CODENAME: Commander v6.3.1
 
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -11,22 +11,22 @@ const CommanderModule = require('@commander/module');
 const ActionEmbed = require('@utils/embeds/action');
 
 // -----------------------------------
-const perms = [ // 137476033600
+const perms = new Discord.PermissionsBitField([
     // GENERAL
-    Discord.PermissionFlagsBits.ViewChannel,
+    Discord.PermissionsBitField.Flags.ViewChannel,
     // TEXT
-    Discord.PermissionFlagsBits.SendMessages,
-    Discord.PermissionFlagsBits.EmbedLinks,
-    Discord.PermissionFlagsBits.AttachFiles,
-    Discord.PermissionFlagsBits.ReadMessageHistory,
-    Discord.PermissionFlagsBits.UseExternalEmojis,
-    Discord.PermissionFlagsBits.UseExternalStickers,
-    Discord.PermissionFlagsBits.AddReactions,
+    Discord.PermissionsBitField.Flags.SendMessages,
+    Discord.PermissionsBitField.Flags.EmbedLinks,
+    Discord.PermissionsBitField.Flags.AttachFiles,
+    Discord.PermissionsBitField.Flags.ReadMessageHistory,
+    Discord.PermissionsBitField.Flags.UseExternalEmojis,
+    Discord.PermissionsBitField.Flags.UseExternalStickers,
+    Discord.PermissionsBitField.Flags.AddReactions,
     // VOICE
-    Discord.PermissionFlagsBits.Connect,
-    Discord.PermissionFlagsBits.Speak,
-    Discord.PermissionFlagsBits.UseVAD
-];
+    Discord.PermissionsBitField.Flags.Connect,
+    Discord.PermissionsBitField.Flags.Speak,
+    Discord.PermissionsBitField.Flags.UseVAD
+]);
 
 class Commander {
     constructor(client) {
