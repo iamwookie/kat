@@ -52,15 +52,15 @@ client.once(Events.ClientReady, async (client) => {
     client.database = await CommanderDatabase.initialize(client);
     client.commander = await Commander.initialize(client);
     client.twitch = await TwitchManager.initialize(client);
-    client.server = await Server(client).catch(client.logger?.error);
+    client.server = await Server(client).catch(err => client.logger?.error(err));
     // ------------------------------------
     console.log(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`.magenta.bold.underline);
     console.log(`>>> App Loaded In: ${(Date.now() - now)}ms\n`.magenta.bold.underline);
 });
 
-client.on(Events.Error, client.logger?.error);
+client.on(Events.Error, err => client.logger?.error(err));
 
-if (process.env.NODE_ENV != 'production') client.on(Events.Debug, client.logger?.debug);
+if (process.env.NODE_ENV != 'production') client.on(Events.Debug, msg => client.logger?.debug(msg));
 
 client.login(process.env.BOT_TOKEN);
 
