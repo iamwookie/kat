@@ -4,7 +4,7 @@ const { EmbedBuilder } = require('discord.js');
 const { asap } = require('@configs/server.json');
 const { channels } = asap;
 
-exports.createUnbox = client => {
+exports.unboxHook = client => {
     return async (req, res) => {
         try {
             const body = req.body;
@@ -55,7 +55,7 @@ exports.createUnbox = client => {
     };
 };
 
-exports.createSuits = client => {
+exports.suitsHook = client => {
     return async (req, res) => {
         try {
             const body = req.body;
@@ -106,7 +106,7 @@ exports.createSuits = client => {
     };
 };
 
-exports.createStaff = client => {
+exports.staffHook = client => {
     return async (req, res) => {
         try {
             const body = req.body;
