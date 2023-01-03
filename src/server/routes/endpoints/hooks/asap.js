@@ -8,7 +8,7 @@ module.exports = (client) => {
     router.post('/unbox', unboxHook(client));
 
     // /hooks/asap/suit
-    router.post('/suit', suitsHook(client));
+    router.post('/suits', suitsHook(client));
 
     // /hooks/asap/staff
     router.post('/staff', staffHook(client));
