@@ -1,8 +1,8 @@
 
 const { EmbedBuilder } = require('discord.js');
 
-const { asap } = require('@configs/server.json');
-const { channels } = asap;
+const { hooks } = require('@configs/server.json');
+const { asap } = hooks;
 
 exports.unboxHook = client => {
     return async (req, res) => {
@@ -27,9 +27,6 @@ exports.unboxHook = client => {
                 !crateName
             ) return res.status(400).send('Bad Request');
 
-            const channel = await client.channels.fetch(channels.unbox);
-            if (!channel) return res.status(500).send('Internal Server Error');
-
             const embed = new EmbedBuilder()
                 .setTitle('ASAP Unbox')
                 .setDescription(`**${name}** has received **${itemName}** from **${crateName}** 🎁!`)
@@ -41,7 +38,11 @@ exports.unboxHook = client => {
                     { name: 'Crate', value: `\`${crateName}\``, inline: true }
                 ]);
 
-            await channel.send({ embeds: [embed] });
+            for (const c of asap.unbox) {
+                const channel = await client.channels.fetch(c);
+                if (!channel) return res.status(500).send('Internal Server Error');
+                await channel.send({ embeds: [embed] });
+            }
 
             return res.status(200).send('OK');
         } catch (err) {
@@ -78,9 +79,6 @@ exports.suitsHook = client => {
                 !killerName
             ) return res.status(400).send('Bad Request');
 
-            const channel = await client.channels.fetch(channels.suits);
-            if (!channel) return res.status(500).send('Internal Server Error');
-
             const embed = new EmbedBuilder()
                 .setTitle('ASAP Suit Rips')
                 .setDescription(`**${name}** has lost **${itemName}** to **${killerName}** 💀!`)
@@ -92,7 +90,11 @@ exports.suitsHook = client => {
                     { name: 'Killer', value: `\`${killerName}\``, inline: true }
                 ]);
 
-            await channel.send({ embeds: [embed] });
+            for (const c of asap.suits) {
+                const channel = await client.channels.fetch(c);
+                if (!channel) return res.status(500).send('Internal Server Error');
+                await channel.send({ embeds: [embed] });
+            }
 
             return res.status(200).send('OK');
         } catch (err) {
@@ -149,7 +151,7 @@ exports.staffHook = client => {
                 ]);
             }
 
-            for (const c of channels.staff) {
+            for (const c of asap.staff) {
                 const channel = await client.channels.fetch(c);
                 if (!channel) return res.status(500).send('Internal Server Error');
                 await channel.send({ embeds: [embed] });

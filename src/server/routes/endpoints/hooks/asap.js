@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { unboxHook, suitsHook, staffHook } = require('@server/controllers/asap');
+const { unboxHook, suitsHook, staffHook } = require('@server/controllers/hooks/asap');
 
 module.exports = (client) => {
     // /hooks/asap/unbox
