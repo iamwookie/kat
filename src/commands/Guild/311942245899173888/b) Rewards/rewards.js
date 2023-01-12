@@ -47,9 +47,11 @@ module.exports = {
 
             const reward = await client.database.redis.hGet(prefix + steamId, 'discord');
             const boost = await client.database.redis.hGet(prefix + steamId, 'boost');
+            const rewardClaimed = reward == 1 || reward == -1
+            const boostClaimed = boost == 1 || boost == -1
             const premium = int.member.premiumSince;
 
-            if (!premium && reward != 0 || boost != 0) return int.editReply({ embeds: [new ActionEmbed('fail', 'You have already claimed all available rewards!', int.user)] });
+            if (!premium && rewardClaimed || boostClaimed) return int.editReply({ embeds: [new ActionEmbed('fail', 'You have already claimed all available rewards!', int.user)] });
 
             const row = new ActionRowBuilder();
 
