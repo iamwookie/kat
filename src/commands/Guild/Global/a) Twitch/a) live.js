@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ChannelType } = require('discord.js');
 
-const Commander = require('@commander');
 const TwitchManager = require('@lib/twitch/manager');
 
 const ActionEmbed = require('@utils/embeds/action');

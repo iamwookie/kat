@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require('discord.js');
 
 const play = require('play-dl');
 
-const Commander = require('@commander');
 const MusicSubscription = require('@lib/music/subscription');
 const Track = require('@lib/music/track');
 
