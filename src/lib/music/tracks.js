@@ -2,6 +2,9 @@ const DiscordVoice = require('@discordjs/voice');
 
 const play = require('play-dl');
 
+const MusicEmbed = require('@utils/embeds/music');
+const ActionEmbed = require('@utils/embeds/action');
+
 class Track {
     constructor(subscription, interaction, requestedBy, { onStart, onFinish, onError }) {
         this.client = interaction.client;
@@ -9,7 +12,7 @@ class Track {
         this.subscription = subscription;
         this.interaction = interaction;
         this.requestedBy = requestedBy;
-        
+
         this.onStart = onStart ? onStart : () => { };
         this.onFinish = onFinish ? onFinish : () => { };
         this.onError = onError ? onError : () => { };
@@ -20,7 +23,7 @@ class Track {
             try {
                 const stream = await play.stream(this.url, { quality: 3 });
                 const resource = DiscordVoice.createAudioResource(stream.stream, { metadata: this, inputType: stream.type });
-                
+
                 return resolve(resource);
             } catch (err) {
                 this.client.logger?.error(err);
@@ -57,8 +60,15 @@ class YouTubeTrack extends Track {
 }
 
 class SpotifyTrack extends Track {
-    constructor(subscription, data, requestedBy, { onStart, onFinish, onError }) {
-        super(subscription, requestedBy, { onStart, onFinish, onError });
+    constructor(subscription, data, requestedBy) {
+        super(subscription, requestedBy, {
+            onStart: () => {
+                this.interaction.channel.send({ embeds: [new MusicEmbed(this.interaction, this).setType('playing')] });
+            },
+            onError: () => {
+                this.interaction.channel.send({ embeds: [new ActionEmbed('fail', 'Failed to play a track!', this.requestedBy)] });
+            }
+        });
 
         if (!data instanceof play.SpotifyTrack) throw new Error('Data must be an instance of play.SpotifyTrack');
 
@@ -76,7 +86,7 @@ class SpotifyTrack extends Track {
                 if (!search || search.length < 0) throw new Error('No results found!');
                 const stream = await play.stream(search[0].url, { quality: 3 });
                 const resource = DiscordVoice.createAudioResource(stream.stream, { metadata: this, inputType: stream.type });
-                
+
                 return resolve(resource);
             } catch (err) {
                 this.client.logger?.error(err);
