@@ -8,43 +8,45 @@ const {
 } = require('@discordjs/voice');
 
 class MusicSubscription {
-    constructor(client, voiceConnection, channel) {
-        this.client = client;
+    constructor(interaction, voiceConnection, voiceChannel) {
+        this.client = interaction.client;
 
         this.voice = voiceConnection;
         this.player = createAudioPlayer();
 
-        this.channel = channel;
-        this.guild = channel.guild;
+        this.guild = voiceChannel.guild;
+        this.voiceChannel = voiceChannel;
+        this.textChannel = interaction.channel;
 
         this.queue = [];
 
         this.initializeListeners();
 
         this.voice.subscribe(this.player);
+
+        this.voice.on('error', (err) => {
+            console.error('Music (VOICE) >> Voice Error'.red);
+            console.error(err);
+
+            this.client.logger?.error(err);
+        });
     }
 
-    static async create(client, channel) {
+    static async create(interaction, voiceChannel) {
+        // remove in future
+        
         try {
             const sub = new MusicSubscription(
-                client,
+                interaction,
                 joinVoiceChannel({
-                    channelId: channel.id,
-                    guildId: channel.guild.id,
-                    adapterCreator: channel.guild.voiceAdapterCreator,
+                    channelId: voiceChannel.id,
+                    guildId: voiceChannel.guild.id,
+                    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
                 }),
-                channel
+                voiceChannel
             );
 
-            // if (cached && (cached.playing || cached.queue.length)) sub.merge(cached)
-            sub.voice.on('error', (err) => {
-                console.error('Music (VOICE) >> Voice Error'.red);
-                console.error(err);
-
-                client.logger?.error(err);
-            });
-
-            client.subscriptions.set(channel.guild.id, sub);
+            client.subscriptions.set(voiceChannel.guild.id, sub);
             client.logger?.info(`Music >> Subscription Created: ${sub.guild.name} (${sub.guild.id})`.brightGreen);
 
             return sub;
