@@ -1,41 +1,40 @@
-const Discord = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MusicEmbed, failEmbed } = require('@utils/other/embeds');
+const { SlashCommandBuilder } = require('discord.js');
+
+const MusicEmbed = require('@utils/embeds/music');
+const ActionEmbed = require('@utils/embeds/action');
 
 module.exports = {
     name: 'pause',
     group: 'Music',
     description: 'Pause the track.',
     cooldown: 5,
-    guildOnly: true,
 
     // SLASH
     data() {
-        let data = new SlashCommandBuilder()
-        .setName(this.name)
-        .setDescription(this.description);
-        return data;
+        return (
+            new SlashCommandBuilder()
+                .setName(this.name)
+                .setDescription(this.description)
+                .setDMPermission(false)
+        );
     },
 
-    async run(client, msg) {
-        let subscription = client.subscriptions.get(msg.guildId)
-        if (!subscription || !subscription.isPlayerPlaying()) {
-            let notplaying = new MusicEmbed(client, msg).setTitle('I\'m not playing anything!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [notplaying] }) : msg.reply({ embeds: [notplaying] }).catch(() => msg.channel.send({ embeds: [notplaying] }));
-        }
+    async run(client, int) {
+        let subscription = client.subscriptions.get(int.guildId);
+
+        if (!subscription || !subscription.isPlayerPlaying()) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('I\'m not playing anything!')] });
 
         try {
-            let track = subscription.playing;
-            subscription.pause()
+            subscription.pause();
             
-            let success = new MusicEmbed(client, msg, 'paused', track);
-            return msg instanceof Discord.CommandInteraction? await msg.editReply({ embeds: [success] }) : await msg.reply({ embeds: [success] }).catch(() => msg.channel.send({ embeds: [success] }));
-        } catch(err) {
-            console.error('Music Commands (ERROR) >> pause: Error Pausing Track'.red)
-			console.error(err);
+            return int.editReply({ embeds: [new MusicEmbed(client, int, 'paused', subscription.active)] });
+        } catch (err) {
+            console.error('Music Commands (ERROR) >> pause: Error Pausing Track'.red);
+            console.error(err);
+            
+            client.logger?.error(err);
 
-            let fail = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [fail] }) : msg.reply({ embeds: [fail] }).catch(() => msg.channel.send({ embeds: [fail] }));
+            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
         }
     }
 };

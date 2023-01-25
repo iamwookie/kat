@@ -1,69 +1,49 @@
-const Discord = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { failEmbed } = require('@utils/other/embeds');
+const { SlashCommandBuilder, EmbedBuilder, GuildMember } = require('discord.js');
 
-/*
-const io = require('@pm2/io');
-const usageCount = io.counter({
-    name: 'PPs Measured',
-    id: 'usage/commands/pp'
-});
-*/
+const ActionEmbed = require('@utils/embeds/action');
 
 module.exports = {
     name: 'chance',
-    aliases: ['chances'],
     group: 'Misc',
-    description: 'What are your chances at getting someone.',
+    description: 'Chances at getting someone.',
     format: '<?user>',
-    guildOnly: true,
 
     // SLASH
     data() {
-        let data = new SlashCommandBuilder()
-        .setName(this.name)
-        .setDescription(this.description)
-        .addMentionableOption(option => {
-            option.setName('user');
-            option.setDescription('The user to analyze.');
-            return option;
-        });
-        return data;
+        return (
+            new SlashCommandBuilder()
+                .setName(this.name)
+                .setDescription(this.description)
+                .setDMPermission(false)
+                .addMentionableOption(option => {
+                    option.setName('user');
+                    option.setDescription('The user to analyze.');
+                    return option;
+                })
+        );
     },
-    
 
-    async run(client, msg, args) {
-        // usageCount.inc();
-        // ------------
-        let author = msg instanceof Discord.CommandInteraction? msg.user : msg.author;
-        let calculation = Math.round(Math.random() * 100);
-        let reply = new Discord.MessageEmbed()
-        .setTitle(`:smirk: \u200b ${author.username}\'s Chances`)
-        .setDescription(`${calculation == 0? calculation : `-${calculation}`}%`)
-        .setColor('RANDOM')
-        .setAuthor({ name: author.tag, iconURL: author.avatarURL({ dynamic: true }) });
 
-        if (msg instanceof Discord.CommandInteraction? msg.options.getMentionable('user') : args) {
-            let mention = msg instanceof Discord.CommandInteraction? msg.options.getMentionable('user') : msg.mentions.members.first();
-            if(mention instanceof Discord.GuildMember) {
+    async run(client, int) {
+        const calculation = Math.round(Math.random() * 100);
+        const mention = int.options.getMentionable('user');
+
+        const reply = new EmbedBuilder()
+            .setTitle(`:smirk: \u200b ${int.user.username}\'s Chances`)
+            .setDescription(`${calculation}%`)
+            .setColor('Random')
+            .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) });
+
+        if (mention) {
+            if (mention instanceof GuildMember) {
                 reply.setTitle(`:smirk: \u200b ${mention.user.username}\'s Chances`);
-                if (mention.user.id == client.user.id) {
-                    let res = ':no_entry: ERROR: The measurement values are invalid.'
-                    return msg instanceof Discord.CommandInteraction? msg.editReply(res) : msg.reply(res).catch(() => msg.channel.send(res));
-                }
+
+                if (mention.user.id == client.user.id) return int.editReply(':no_entry: ERROR: The measurement values are invalid.');
             } else {
-                let noMention = failEmbed('You have not mentioned a valid user!', author);
-                return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [noMention] }) : msg.reply({ embeds: [noMention] }).catch(() => msg.channel.send({ embeds: [noMention] }));
-            }
-        } else {
-            if (author.id == '130065975956471808') {
-                return msg instanceof Discord.CommandInteraction? msg.editReply(gif) : msg.reply(gif).catch(() => msg.channel.send(gif));
-            }
-            if (author.id == '438438026566172682') {
-                reply.setDescription(`8${body.repeat(Math.floor(Math.random() * 5))}D`);
+                return int.editReply({ embeds: [new ActionEmbed('fail', 'You have not mentioned a valid user!', int.user)] });
             }
         }
 
-        msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [reply] }) : msg.reply({ embeds: [reply] }).catch(() => msg.channel.send({ embeds: [reply] }));
+        int.editReply({ embeds: [reply] });
     }
 };
