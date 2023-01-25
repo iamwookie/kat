@@ -1,40 +1,40 @@
-const Discord = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MusicEmbed } = require('@utils/other/embeds');
+const { SlashCommandBuilder } = require('discord.js');
+
+const MusicEmbed = require('@utils/embeds/music');
+const ActionEmbed = require('@utils/embeds/action');
 
 module.exports = {
     name: 'stop',
     aliases: ['dc'],
     group: 'Music',
-    description: 'Clear the queue and leave.',
+    description: 'Clear the queue and/or leave.',
     cooldown: 5,
-    guildOnly: true,
-    
+
     // SLASH
     data() {
-        let data = new SlashCommandBuilder()
-        .setName(this.name)
-        .setDescription(this.description);
-        return data;
+        return (
+            new SlashCommandBuilder()
+                .setName(this.name)
+                .setDescription(this.description)
+                .setDMPermission(false)
+        );
     },
 
-    async run(client, msg) {
-        let subscription = client.subscriptions.get(msg.guildId)
-        if (!subscription || !subscription.isPlayerPlaying()) {
-            let notplaying = new MusicEmbed(client, msg).setTitle('I\'m not playing anything!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [notplaying] }) : msg.reply({ embeds: [notplaying] }).catch(() => msg.channel.send({ embeds: [notplaying] }));
-        }
+    async run(client, int) {
+        const subscription = client.subscriptions.get(int.guildId);
+
+        if (!subscription) { return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('I\'m not playing anything!')] }); }
 
         try {
-			subscription.destroy();
-            let success = new MusicEmbed(client, msg).setTitle('👋 \u200b Stopped playing! Cya!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [success] }) : msg.reply({ embeds: [success] }).catch(() => msg.channel.send({ embeds: [success] }));
-		} catch (err) {
-			console.error('Music Commands (ERROR) >> stop: Error Stopping Track'.red)
-			console.error(err);
+            subscription.destroy();
+            return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle(subscription.isPlayerPaused() ? '👋 \u200b Discconected! Cya!' : '👋 \u200b Stopped playing! Cya!')] });
+        } catch (err) {
+            console.error('Music Commands (ERROR) >> stop: Error Stopping Track'.red);
+            console.error(err);
+            
+            client.logger?.error(err);
 
-            let fail = new MusicEmbed(client, msg).setTitle('An error occured! Contact a developer ASAP!');
-            return msg instanceof Discord.CommandInteraction? msg.editReply({ embeds: [fail] }) : msg.reply({ embeds: [fail] }).catch(() => msg.channel.send({ embeds: [fail] }));
-		}
+            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
+        }
     }
 };
