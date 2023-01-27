@@ -73,7 +73,7 @@ class Commander {
             } catch (err) {
                 console.error('Commander (ERROR) >> Error Running CLI Command'.red);
                 console.error(err);
-                
+
                 this.client.logger?.error(err);
             }
         });
@@ -94,7 +94,7 @@ class Commander {
             } catch (err) {
                 console.error('Commander (ERROR) >> Error Running Slash Command'.red);
                 console.error(err);
-                
+
                 this.client.logger?.error(err);
             }
         });
@@ -102,6 +102,8 @@ class Commander {
 
     static async initialize(client) {
         try {
+            client.permissions = perms;
+
             const commander = new Commander(client);
             await commander.registerCLICommands();
             await commander.registerGlobalCommands();
@@ -136,7 +138,7 @@ class Commander {
                 } catch (err) {
                     console.error('Commander (ERROR) >> Error Registering CLI Command'.red);
                     console.error(err);
-                    
+
                     this.client.logger?.error(err);
                 }
             }
@@ -163,7 +165,7 @@ class Commander {
                     } catch (err) {
                         console.error('Commander (ERROR) >> Error Registering Global Command'.red);
                         console.error(err);
-                        
+
                         this.client.logger?.error(err);
                     }
                 }
@@ -195,7 +197,7 @@ class Commander {
                         } catch (err) {
                             console.error('Commander (ERROR) >> Error Registering Guild Command'.red);
                             console.error(err);
-                            
+
                             this.client.logger?.error(err);
                         }
                     }
@@ -227,7 +229,7 @@ class Commander {
         } catch (err) {
             console.error('Commander (ERROR) >> Error Registering Global Slash Commands'.red);
             console.error(err);
-            
+
             this.client.logger?.error(err);
         }
 
@@ -258,7 +260,7 @@ class Commander {
                 } catch (err) {
                     console.error(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${k}`.red);
                     console.error(err);
-                    
+
                     this.client.logger?.error(err);
                 }
             }
@@ -266,7 +268,7 @@ class Commander {
         } catch (err) {
             console.error('Commander (ERROR) >> Error Registering Guild Slash Commands'.red);
             console.error(err);
-            
+
             this.client.logger?.error(err);
         }
     }
