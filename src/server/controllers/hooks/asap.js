@@ -154,7 +154,7 @@ exports.staffHook = client => {
             for (const c of asap.staff) {
                 const channel = await client.channels.fetch(c);
                 if (!channel) return res.status(500).send('Internal Server Error');
-                await channel.send({ embeds: [embed] });
+                await channel.send({ content: `\`${adminUser} (${adminSid})\` has ${ban} [\`${banUser} (${banUserSid})\`](${banUserProfile})!`, embeds: [embed] });
             }
 
             return res.status(200).send('OK');
