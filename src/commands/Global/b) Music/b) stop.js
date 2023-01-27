@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
-const MusicEmbed = require('@utils/embeds/music');
 const ActionEmbed = require('@utils/embeds/action');
+const MusicEmbed = require('@utils/embeds/music');
 
 module.exports = {
     name: 'stop',
@@ -22,19 +22,18 @@ module.exports = {
 
     async run(client, int) {
         const subscription = client.subscriptions.get(int.guildId);
-
-        if (!subscription) { return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('I\'m not playing anything!')] }); }
+        if (!subscription) { return int.editReply({ embeds: [new ActionEmbed('fail', 'I am not playing anything!', int.user)] }); }
 
         try {
             subscription.destroy();
-            return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle(subscription.isPlayerPaused() ? '👋 \u200b Discconected! Cya!' : '👋 \u200b Stopped playing! Cya!')] });
+
+            return int.editReply({ embeds: [new ActionEmbed('success', 'Successfully disconnected. Cya! 👋', int.user)] });
         } catch (err) {
+            client.logger?.error(err);
             console.error('Music Commands (ERROR) >> stop: Error Stopping Track'.red);
             console.error(err);
-            
-            client.logger?.error(err);
 
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
+            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured. A developer has been notified!', int.user)] });
         }
     }
 };

@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const play = require('play-dl');
 
 const MusicSubscription = require('@lib/music/subscription');
-const Track = require('@lib/music/track');
+const { YouTubeTrack, SpotifyTrack } = require('@lib/music/tracks');
 
 const MusicEmbed = require('@utils/embeds/music');
 const ActionEmbed = require('@utils/embeds/action');
@@ -24,131 +24,127 @@ module.exports = {
                 .setDMPermission(false)
                 .addStringOption(option => {
                     option.setName('query');
-                    option.setDescription('The name or URL of the song.');
+                    option.setDescription('The name or URL of the track.');
                     return option;
                 })
         );
     },
 
     async run(client, int) {
-        const channel = int.member.voice.channel;
+        const query = int.options.getString('query');
 
-        if (!channel) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('You are not in a channel!')] });
-
-        if (!channel.joinable || !channel.speakable) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('I can\'t play in that voice channel!')] });
+        const voiceChannel = int.member.voice.channel;
+        if (!voiceChannel) return int.editReply({ embeds: [new ActionEmbed('fail', 'You are not in a voice channel!', int.user)] });
+        if (!voiceChannel.joinable || !voiceChannel.speakable) return int.editReply({ embeds: [new ActionEmbed('fail', 'I can\'t play in that voice channel!', int.user)] });
 
         let subscription = client.subscriptions.get(int.guildId);
-
-        args = int.options.getString('query');
 
         if (subscription && subscription.isPlayerPaused()) {
             subscription.unpause();
 
-            const resumed = new MusicEmbed(client, int, 'resumed', subscription.active);
-
-            if (!args) return int.editReply({ embeds: [resumed] });
+            const resumed = new MusicEmbed(int).setResumed(subscription).setQueue(subscription);
+            if (!query) return int.editReply({ embeds: [resumed] });
 
             int.channel.send({ embeds: [resumed] });
         }
 
-        if (!args) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('What should I play?')] });
+        if (!query) return int.editReply({ embeds: [new ActionEmbed('fail', 'What should I play?', int.user)] });
 
-        if (!subscription) subscription = await MusicSubscription.create(client, channel);
+        if (!subscription) subscription = await MusicSubscription.create(int, voiceChannel);
 
         try {
-            const query = args;
-
-            const searching = new MusicEmbed(client, int, 'searching');
-
             if (query.startsWith('https://open.spotify.com/')) {
-                searching.setTitle('<a:loading:928668691997012028> \u200b Searching Spotify...');
-                reply = await int.editReply({ embeds: [searching] });
-
                 try {
                     if (play.is_expired()) await play.refreshToken();
 
                     const search = await play.spotify(query);
-                    data = search;
-                } catch (err) {
-                    reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('You have not provided a valid Spotify URL!')] }).catch(() => int.channel.send({ embeds: [notFound] }));
 
+                    if (search instanceof play.SpotifyTrack) {
+                        const track = new SpotifyTrack(subscription, int, search, {
+                            onStart: () => int.channel.send({ embeds: [new MusicEmbed(int).setPlaying(subscription).setQueue(subscription)] }),
+                            onError: () => int.channel.send({ embeds: [new ActionEmbed('fail', 'An error occured while playing a track!', int.user)] })
+                        });
+                        subscription.add(track);
+
+                        return int.editReply({ embeds: [new MusicEmbed(int).setEnqueued(track)] });
+                    } else if (search instanceof play.SpotifyPlaylist || search instanceof play.SpotifyAlbum) {
+                        const spotifyTracks = await search.all_tracks();
+
+                        for (const item of spotifyTracks) {
+                            const track = new SpotifyTrack(subscription, int, item, {
+                                onStart: () => int.channel.send({ embeds: [new MusicEmbed(int).setPlaying(subscription).setQueue(subscription)] }),
+                                onError: () => int.channel.send({ embeds: [new ActionEmbed('fail', 'An error occured while playing a track!', int.user)] })
+                            });
+                            subscription.add(track);
+                        }
+
+                        return int.editReply({ embeds: [new MusicEmbed(int).setEnqueued(search)] });
+                    } else {
+                        int.editReply({ embeds: [new ActionEmbed('fail', 'You have not provided a valid Spotify URL!', int.user)] });
+
+                        return subscription.destroy();
+                    }
+                } catch (err) {
                     client.logger?.error(err);
+                    int.editReply({ embeds: [new ActionEmbed('fail', 'You have not provided a valid Spotify URL!', int.user)] });
 
                     return subscription.destroy();
                 }
             } else if (query.startsWith('https://www.youtube.com/playlist' || 'https://youtube.com/playlist')) {
-                reply = await int.editReply({ embeds: [searching] });
-
                 try {
                     const search = await play.playlist_info(query, { incomplete: true });
-                    data = search;
-                } catch {
-                    reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('You have not provided a valid playlist URL!')] });
 
+                    if (search instanceof play.YouTubePlayList) {
+                        for (const video of search.videos) {
+                            const track = new YouTubeTrack(subscription, int, video, {
+                                onStart: () => int.channel.send({ embeds: [new MusicEmbed(int).setPlaying(subscription).setQueue(subscription)] }),
+                                onError: () => int.channel.send({ embeds: [new ActionEmbed('fail', 'An error occured while playing a track!', int.user)] })
+                            });
+                            subscription.add(track);
+                        }
+
+                        return int.editReply({ embeds: [new MusicEmbed(int).setEnqueued(search)] });
+                    } else {
+                        int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search result. Try again!', int.user)] });
+
+                        return subscription.destroy();
+                    }
+                } catch {
                     client.logger?.error(err);
+                    int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search result. Try again!', int.user)] });
 
                     return subscription.destroy();
                 }
             } else {
-                reply = await int.editReply({ embeds: [searching] });
+                try {
+                    const search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
 
-                const search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
-                data = search[0];
-            }
+                    if (search[0] instanceof play.YouTubeVideo) {
+                        const track = new YouTubeTrack(subscription, int, search[0], {
+                            onStart: () => { int.channel.send({ embeds: [new MusicEmbed(int).setPlaying(subscription).setQueue(subscription)] }); },
+                            onError: () => int.channel.send({ embeds: [new ActionEmbed('fail', 'An error occured while playing a track!', int.user)] })
+                        });
+                        subscription.add(track);
 
-            if (
-                !data ||
-                !(
-                    data instanceof play.YouTubeVideo ||
-                    data instanceof play.YouTubePlayList ||
-                    data instanceof play.SpotifyTrack ||
-                    data instanceof play.SpotifyPlaylist ||
-                    data instanceof play.SpotifyAlbum
-                )
-            ) {
-                reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('Couldn\'t find your search result. Try again!')] });
-                return subscription.destroy();
-            }
+                        return int.editReply({ embeds: [new MusicEmbed(int).setEnqueued(track)] });
+                    } else {
+                        int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search result. Try again!', int.user)] });
 
-            const enqueued = new MusicEmbed(client, int, 'enqueued', data);
+                        return subscription.destroy();
+                    }
+                } catch (err) {
+                    client.logger?.error(err);
+                    int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search result. Try again!', int.user)] });
 
-            if (data instanceof play.YouTubePlayList) {
-                for (const youtubeVideo of data.videos) {
-                    const track = await Track.create(subscription, int, youtubeVideo, int.user);
-                    subscription.add(track);
+                    return subscription.destroy();
                 }
-
-                return reply.edit({ embeds: [enqueued] });
             }
-
-            if (data instanceof play.SpotifyPlaylist || data instanceof play.SpotifyAlbum) {
-                const adding = new MusicEmbed(client, int);
-                adding.setTitle('<a:loading:928668691997012028> \u200b Adding tracks...');
-                reply.edit({ embeds: [adding] });
-
-                const spotifyTracks = await data.all_tracks();
-
-                for (const spotifyTrack of spotifyTracks) {
-                    const track = await Track.create(subscription, int, spotifyTrack, int.user);
-                    subscription.add(track);
-                }
-
-                return reply.edit({ embeds: [enqueued] });
-            }
-
-            const track = await Track.create(subscription, int, data, int.user);
-            subscription.add(track);
-
-            console.log('Music Commands >> play: Added Track'.green);
-
-            return reply.edit({ embeds: [enqueued] });
         } catch (err) {
+            client.logger?.error(err);
             console.error('Music Commands (ERROR) >> play: Error Running Command'.red);
             console.error(err);
 
-            client.logger?.error(err);
-
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
+            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured. A developer has been notified!', int.user)] });
         }
     }
 };

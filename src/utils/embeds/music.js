@@ -1,91 +1,112 @@
 const { EmbedBuilder } = require('discord.js');
-const { SpotifyTrack, SpotifyPlaylist, SpotifyAlbum } = require('play-dl');
-const parseDuration = require('@utils/functions/parseDuration');
+const { SpotifyPlaylist, SpotifyAlbum, YouTubePlayList } = require('play-dl');
+const { YouTubeTrack, SpotifyTrack } = require('@lib/music/tracks');
+const progressbar = require('string-progressbar');
 
 class MusicEmbed extends EmbedBuilder {
-    constructor(client, int, type, info) {
+    constructor(interaction) {
         super();
 
-        this.client = client;
-        this.guild = int.guild;
-        this.author = int.user;
-        this.type = type;
-        this.info = info;
+        this.client = interaction.client;
+        this.guild = interaction.guild;
+        this.author = interaction.user;
 
-        if (this.info) {
-            if (this.info.spotify) this.info.url = this.info.spotify.url;
-            this.thumbnail = this.info.thumbnail?.url || this.info.thumbnails[0]?.url;
-        }
-
-        if (this.thumbnail) this.setThumbnail(this.thumbnail);
+        this.icons = {
+            youtube: '<:youtube:1067881972774477844>',
+            spotify: '<:spotify:1067881968697614476>',
+            purple: '<:purple:1068554599331537036>'
+        };
 
         this.setColor('#C167ED');
         this.setFooter({ text: `${this.guild.name} | 🎵 ${this.client.user.username} Global Music System`, iconURL: this.guild.iconURL({ dynamic: true }) });
-        this.setType(this.type);
     }
 
-    setType(type) {
-        // EMOJIS
-        let loading = '<a:loading:928668691997012028>';
+    #addIcon(item) { return `${item instanceof YouTubeTrack || item instanceof YouTubePlayList ? this.icons.youtube : ''} ${item instanceof SpotifyTrack || item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum ? this.icons.spotify : ''}`; }
 
-        switch (type) {
-            case 'searching':
-                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`${loading} \u200b Searching...`);
-                break;
-            case 'enqueued':
-                this.setAuthor({ name: `Requested By: ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
+    setItem(item) {
+        this.setAuthor({ name: `${item?.requestedBy ? 'Requested by: ' : ''}${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
+        if (item?.thumbnail) this.setThumbnail(item?.thumbnail.url);
 
-                if (this.info.type == 'playlist' || this.info.type == 'album') {
-                    if (this.info instanceof SpotifyPlaylist || this.info instanceof SpotifyAlbum) {
-                        this.info.title = this.info.name;
-                        this.info.videoCount = this.info.tracksCount;
-                    }
+        return this;
+    }
 
-                    this.setTitle(`Queue Updated [Playlist]`);
-                    this.setDescription(`Added \`${this.info.videoCount}\` Tracks From: [${this.info.title}](${this.info.url})`);
-                } else {
-                    if (this.info instanceof SpotifyTrack) {
-                        this.info.title = `${this.info.artists[0].name} - ${this.info.name}`;
-                        this.info.durationRaw = parseDuration(this.info.durationInSec);
-                    }
+    setEnqueued(item) {
+        if (item?.type == 'playlist' || item?.type == 'album') {
+            if (item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum) {
+                item.title = item?.name;
+                item.videoCount = item?.tracksCount;
+            }
 
-                    this.setTitle(`Queue Updated`);
-                    this.setDescription(`Added: [${this.info.title} [${this.info.durationRaw}]](${this.info.url})`);
+            this.addFields({ name: 'Enqueued:', value: `\`${item?.videoCount}\` tracks from ${this.#addIcon(item)} [\`${item?.title}\`](${item?.url})` });
+        } else {
+            this.addFields({ name: 'Enqueued:', value: `${this.#addIcon(item)} [\`${item?.title} [${item?.duration}]\`](${item?.url})` });
+        }
+
+        this.setItem(item);
+
+        return this;
+    }
+
+    setPlaying(subscription) {
+        if (subscription.active) {
+            const track = subscription.active;
+            const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
+            this.addFields({ name: 'Now Playing:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            this.setItem(track);
+        }
+
+        return this;
+    }
+
+    setPaused(subscription) {
+        if (subscription.active) {
+            const track = subscription.active;
+            const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
+            this.addFields({ name: 'Paused Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            this.setItem(track);
+        }
+
+        return this;
+    }
+
+    setResumed(subscription) {
+        if (subscription.active) {
+            const track = subscription.active;
+            const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
+            this.addFields({ name: 'Resumed Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            this.setItem(track);
+        }
+
+        return this;
+    }
+
+    setSkipped(subscription) {
+        if (subscription.active) {
+            const track = subscription.active;
+            this.addFields({ name: 'Skipped Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})` });
+            this.setItem(track);
+        }
+
+        return this;
+    }
+
+    setQueue(subscription) {
+        if (subscription.queue.length) {
+            try {
+                var res = '';
+
+                for (const [index, track] of subscription.queue.entries()) {
+                    if (res.length >= 840) return this.addFields({ name: 'Server Queue:', value: `${res}...` });
+                    res += `\`${index + 1}.\` - ${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n`;
                 }
 
-                break;
-            case 'playing':
-                this.setAuthor({ name: `Requested By: ${this.info.requestedBy.tag}`, iconURL: this.info.requestedBy.avatarURL({ dynamic: true }) });
-                this.setTitle(`Now Playing`);
-                this.setDescription(`[${this.info.title} [${this.info.duration}]](${this.info.url})`);
-                break;
-            case 'paused':
-                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`Track Paused`);
-                this.setDescription(`[${this.info.title} [${this.info.duration}]](${this.info.url})`);
-                break;
-            case 'queue':
-                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`Server Queue`);
-                break;
-            case 'skipped':
-                this.setAuthor({ name: `Requested By: ${this.info.requestedBy.tag}`, iconURL: this.info.requestedBy.avatarURL({ dynamic: true }) });
-                this.setTitle(`Track Skipped`);
-                this.setDescription(`[${this.info.title} [${this.info.duration}]](${this.info.url})`);
-                break;
-            case 'resumed':
-                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`Track Resumed`);
-                this.setDescription(`[${this.info.title} [${this.info.duration}]](${this.info.url})`);
-                break;
-            case 'lyrics':
-                this.setAuthor({ name: `Requested By: ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
-                this.setTitle(`Lryics`);
-                break;
-            default:
-                this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL({ dynamic: true }) });
+                this.addFields({ name: 'Server Queue:', value: `${res}` });
+            } catch (err) {
+                this.client.logger?.error(err);
+            }
         }
+
+        return this;
     }
 }
 

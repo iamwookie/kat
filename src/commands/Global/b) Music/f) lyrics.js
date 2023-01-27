@@ -22,46 +22,39 @@ module.exports = {
                 .setDMPermission(false)
                 .addStringOption(option => {
                     option.setName('query');
-                    option.setDescription('The name of the song.');
+                    option.setDescription('The name of the track.');
                     return option;
                 })
         );
     },
 
     async run(client, int) {
-        args = int.options.getString('query');
-        let song = '';
+        var query = int.options.getString('query');
+        const subscription = client.subscriptions.get(int.guildId);
 
-        if (!args) {
-            const subscription = client.subscriptions.get(int.guildId);
+        if (!query) {
+            if (!subscription || !subscription.isPlayerPlaying()) return int.editReply({ embeds: [new ActionEmbed('fail', 'I am not playing anything!', int.user)] });
 
-            if (!subscription || !subscription.isPlayerPlaying()) return int.editReply({ embeds: [new MusicEmbed(client, int).setTitle('I\'m not playing anything!')] });
-
-            song = subscription.active.title;
-        } else {
-            song = args;
+            query = subscription.active.title;
         }
 
         try {
-            const reply = await int.editReply({ embeds: [new MusicEmbed(client, int, 'searching')] });
-            const search = await genius.songs.search(song);
-            
-            let lyrics = search[0] ? await search[0].lyrics() : 'Couldn\'t find those lyrics!';
+            const search = await genius.songs.search(query);
 
+            var lyrics = search[0] ? await search[0].lyrics() : null;
+            if (!lyrics) return int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search results!', int.user)] });
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + '...\n\n**NOTE: Lyrics are too long to display.**';
 
-            let success = new MusicEmbed(client, int, 'lyrics');
+            const success = new MusicEmbed(int).setItem(subscription?.active);
+            search[0] ? success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`) : success.setDescription(lyrics);
 
-            search[0] ? success.setDescription(`**Song: ${search[0].artist.name} - ${search[0].title}**\n\n${lyrics}\n\n**Lyrics provided by [Genius](https://genius.com)**`) : success.setTitle(lyrics);
-
-            return reply.edit({ embeds: [success] });
+            return int.editReply({ embeds: [success] });
         } catch (err) {
+            client.logger?.error(err);
             console.error('Music Commands (ERROR) >> lyrics: Error Getting Track Lyrics'.red);
             console.error(err);
-            
-            client.logger?.error(err);
 
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });
+            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured. A developer has been notified!', int.user)] });
         }
     }
 };
