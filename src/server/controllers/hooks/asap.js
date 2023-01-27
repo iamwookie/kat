@@ -46,10 +46,9 @@ exports.unboxHook = client => {
 
             return res.status(200).send('OK');
         } catch (err) {
+            client.logger?.request(req, 'error', err);
             console.error('ASAP Controller (ERROR) >> Error Creating Unbox Log'.red);
             console.error(err);
-
-            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }
@@ -98,10 +97,9 @@ exports.suitsHook = client => {
 
             return res.status(200).send('OK');
         } catch (err) {
+            client.logger?.request(req, 'error', err);
             console.error('ASAP Controller (ERROR) >> Error Creating Suit Rip Log'.red);
             console.error(err);
-
-            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }
@@ -159,10 +157,9 @@ exports.staffHook = client => {
 
             return res.status(200).send('OK');
         } catch (err) {
+            client.logger?.request(req, 'error', err);
             console.error('ASAP Controller (ERROR) >> Error Creating Staff Log'.red);
             console.error(err);
-
-            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }
