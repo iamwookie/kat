@@ -1,5 +1,4 @@
-const Discord = require('discord.js');
-const Commander = require('@commander');
+const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
 const ActionEmbed = require('@utils/embeds/action');
 
 class ColorManager {
@@ -10,7 +9,7 @@ class ColorManager {
 
     static async initialize(client, guild) {
         try {
-            let manager = new ColorManager(client, guild);
+            const manager = new ColorManager(client, guild);
             await manager.#loadColors();
             client.colors.set(guild.id, manager);
 
@@ -51,7 +50,7 @@ class ColorManager {
                 const role = await interaction.guild.roles.fetch(color);
                 if (role) await interaction.member.roles.add(color);
 
-                const success = new Discord.EmbedBuilder()
+                const success = new EmbedBuilder()
                     .setTitle('Colors')
                     .setDescription('Your selected color was applied.')
                     .addFields([{ name: 'Color Applied', value: `\`${role.name}\`` }])
@@ -78,12 +77,12 @@ class ColorManager {
     // Public
 
     async createMenu(int) {
-        let embed = new Discord.EmbedBuilder()
+        const embed = new EmbedBuilder()
             .setTitle('Colors')
             .setDescription('Select a color to apply.')
             .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) });
 
-        let color = this.#getColor(int.member);
+        const color = this.#getColor(int.member);
 
         if (color) {
             embed.setColor(color.hexColor);
@@ -101,12 +100,12 @@ class ColorManager {
 
         if (!options.length) return;
 
-        let menu = new Discord.SelectMenuBuilder()
+        const menu = new StringSelectMenuBuilder()
             .setCustomId('menu')
             .setPlaceholder('Color options...')
             .addOptions(options);
 
-        let row = new Discord.ActionRowBuilder()
+        const row = new ActionRowBuilder()
             .addComponents(menu);
 
         await this.#createListener(int);
@@ -130,7 +129,7 @@ class ColorManager {
         }
     }
 
-    
+
 }
 
 module.exports = ColorManager;

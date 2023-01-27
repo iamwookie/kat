@@ -3,21 +3,26 @@ const helmet = require('helmet');
 const bodyParser = require("body-parser");
 // ------------------------------------
 const { port } = require('@configs/server.json');
-const { createLog } = require('@server/utils/logs');
 
 const app = express();
+
+const Sentry = require('@sentry/node');
 
 module.exports = (client) => {
     return new Promise((resolve, reject) => {
         if (app.get('env') == 'production') app.set('trust proxy', 1);
+
+        app.use(Sentry.Handlers.requestHandler());
 
         app.use(helmet());
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(express.json());
         app.use(require('./routes')(client));
 
-        app.use((err, req, res, next) => {
-            createLog(req, 'Error Occured', 'error', err);
+        app.use(Sentry.Handlers.errorHandler());
+
+        app.use((err, req, res, _) => {
+            client.logger?.request(req, 'error', err);
             return res.status(500).send('Internal Server Error');
         });
 

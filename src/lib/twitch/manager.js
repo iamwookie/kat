@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
-const Commander = require('@commander');
+
 const { ClientCredentialsAuthProvider } = require('@twurple/auth');
 const { ApiClient } = require('@twurple/api');
+
 const TwitchEmbed = require('@utils/embeds/twitch');
 
 class TwitchManager {

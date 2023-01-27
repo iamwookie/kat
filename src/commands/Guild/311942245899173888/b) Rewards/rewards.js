@@ -1,7 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
-const Commander = require('@commander');
-
 const ActionEmbed = require('@utils/embeds/action');
 
 module.exports = {
@@ -31,12 +29,10 @@ module.exports = {
         if (!client.database) return int.editReply({ embeds: [new ActionEmbed('fail', 'Database not online!', int.user)] });
 
         const prefix = 'd:rewards_';
-
         const errorEmbed = new ActionEmbed('fail', 'An error occurred while claiming your rewards. A developer has been notified!', int.user);
 
         try {
             const steamId = await client.database.redis.hGet('asap:link', int.user.id);
-
             if (!steamId) {
                 const row = new ActionRowBuilder()
                     .addComponents(
@@ -51,9 +47,11 @@ module.exports = {
 
             const reward = await client.database.redis.hGet(prefix + steamId, 'discord');
             const boost = await client.database.redis.hGet(prefix + steamId, 'boost');
+            const rewardClaimed = reward == 1 || reward == -1
+            const boostClaimed = boost == 1 || boost == -1
             const premium = int.member.premiumSince;
 
-            if (!premium && reward == 1 || boost == 1) return int.editReply({ embeds: [new ActionEmbed('fail', 'You have already claimed all available rewards!', int.user)] });
+            if (!premium && rewardClaimed || boostClaimed) return int.editReply({ embeds: [new ActionEmbed('fail', 'You have already claimed all available rewards!', int.user)] });
 
             const row = new ActionRowBuilder();
 
@@ -76,7 +74,6 @@ module.exports = {
             }
 
             const reply = await int.editReply({ embeds: [new ActionEmbed('success', 'Click the buttons below to claim your rewards!', int.user)], components: [row] });
-
             const filter = interaction => interaction.user.id == int.user.id;
             const collector = reply.createMessageComponentCollector({ filter, max: 1, time: 30_000 });
 
@@ -112,7 +109,7 @@ module.exports = {
                 if (collector.endReason == 'time') int.editReply({ embeds: [new ActionEmbed('fail', 'You did not claim your rewards in time!', int.user)], components: [] });
             });
         } catch (err) {
-            console.error('Guild Commands (ERROR): rewards');
+            console.error('Guild Commands (ERROR): rewards'.red);
             console.error(err);
             
             client.logger?.error(err);

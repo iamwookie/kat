@@ -1,15 +1,12 @@
-const { EmbedBuilder } = require('@discordjs/builders');
+const fs = require('fs');
 
 const Sentry = require('@sentry/node');
-require('@sentry/tracing');
+
+const { EmbedBuilder } = require('discord.js');
 
 class CommanderLogger {
     constructor(client) {
         this.client = client;
-        this.sentry = Sentry.init({
-            dsn: process.env.SENTRY_DSN,
-            maxBreadcrumbs: 50
-        });
 
         console.log('>>> Logger Initialized!'.brightGreen.bold.underline);
     }
@@ -20,7 +17,7 @@ class CommanderLogger {
         console.error(`Logger (FATAL) (${eventId}): A Fatal Error Has Occured!`.red);
         console.error(err);
 
-        this.warnDev(eventId);
+        this.notify(eventId);
 
         process.exit();
     }
@@ -31,7 +28,7 @@ class CommanderLogger {
         console.error(`Logger (ERROR) (${eventId}): An Error Has Occured!`.red);
         console.error(err);
 
-        this.warnDev(eventId);
+        this.notify(eventId);
     }
 
     warn(msg) {
@@ -46,20 +43,34 @@ class CommanderLogger {
         console.log('Logger (DEBUG): '.blue + msg);
     }
 
-    async warnDev(eventId) {
+    request(req, scope, error) {
+        if (error) this.error(error);
+
+        const time = Date.now();
+
+        if (this.lastIp && this.lastIp == req.ip) return console.log('Logger (REQUEST): Received Duplicate Request'.red);
+
+        this.lastIp = req.ip;
+
+        fs.appendFile(`./${scope}.log`, `CODE: '${time}' IP: '${req.ip} ${error ? '\nERROR: ' + error.stack : ''}\n`, async (err) => {
+            if (err) this.error(err);
+            return console.log(`Logger (REQUEST): Logged Request >> SCOPE: ${scope} CODE: ${time}, IP: ${req.ip}`.yellow);
+        });
+    }
+
+    async notify(eventId) {
         try {
             const dev = await this.client.users.fetch(this.client.dev);
 
             const embed = new EmbedBuilder()
-                .setColor('#F04947')
+                .setColor('Red')
                 .setTitle('Uh Oh!')
                 .setDescription(`A error in the internal code has occured.`)
-                .addFields([{ name: 'Event ID', value: `\`${eventId}\``, inline: true }])
-                .setThumbnail('https://icon-library.com/images/image-error-icon/image-error-icon-17.jpg');
+                .addFields([{ name: 'Event ID', value: `\`${eventId}\``, inline: true }]);
 
             await dev.send({ embeds: [embed] }).catch(() => { return; });
         } catch (err) {
-            console.error('Logger (ERROR) >> Error Warning Dev!'.red);
+            console.error('Logger (ERROR): Error Warning Dev!'.red);
             console.error(err);
         }
     }

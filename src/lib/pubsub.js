@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const Commander = require('@commander');
 
 class PubSubClient {
     static cache = new Discord.Collection();

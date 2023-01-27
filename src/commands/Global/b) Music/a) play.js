@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require('discord.js');
 
 const play = require('play-dl');
 
-const Commander = require('@commander');
 const MusicSubscription = require('@lib/music/subscription');
 const Track = require('@lib/music/track');
 
@@ -67,12 +66,12 @@ module.exports = {
 
                 try {
                     if (play.is_expired()) await play.refreshToken();
-                    
+
                     const search = await play.spotify(query);
                     data = search;
                 } catch (err) {
                     reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('You have not provided a valid Spotify URL!')] }).catch(() => int.channel.send({ embeds: [notFound] }));
-                    
+
                     client.logger?.error(err);
 
                     return subscription.destroy();
@@ -92,18 +91,21 @@ module.exports = {
                 }
             } else {
                 reply = await int.editReply({ embeds: [searching] });
-                
+
                 const search = await play.search(query, { limit: 1, source: { youtube: 'video' } });
                 data = search[0];
             }
 
-            if (!data ||
-                !(data instanceof play.YouTubeVideo
-                    || data instanceof play.YouTubePlayList
-                    || data instanceof play.SpotifyTrack
-                    || data instanceof play.SpotifyPlaylist
-                    || data instanceof play.SpotifyAlbum
-                )) {
+            if (
+                !data ||
+                !(
+                    data instanceof play.YouTubeVideo ||
+                    data instanceof play.YouTubePlayList ||
+                    data instanceof play.SpotifyTrack ||
+                    data instanceof play.SpotifyPlaylist ||
+                    data instanceof play.SpotifyAlbum
+                )
+            ) {
                 reply.edit({ embeds: [new MusicEmbed(client, int).setTitle('Couldn\'t find your search result. Try again!')] });
                 return subscription.destroy();
             }
@@ -143,7 +145,7 @@ module.exports = {
         } catch (err) {
             console.error('Music Commands (ERROR) >> play: Error Running Command'.red);
             console.error(err);
-            
+
             client.logger?.error(err);
 
             return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured! A developer has been notified!', int.user)] });

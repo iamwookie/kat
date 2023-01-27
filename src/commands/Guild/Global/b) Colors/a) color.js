@@ -8,6 +8,7 @@ module.exports = {
     name: 'color',
     group: 'Color',
     description: 'Set colors for yourself via roles.',
+    ephemeral: true,
 
     // AUTHORIZATION
     guilds: [],

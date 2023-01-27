@@ -1,7 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
 
-const Commander = require('@commander');
-
 const GeniusLyrics = require("genius-lyrics");
 const genius = new GeniusLyrics.Client(process.env.GENIUS_API_KEY);
 
