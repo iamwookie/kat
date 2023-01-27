@@ -6,7 +6,7 @@ exports.fetchInvite = client => {
             url.searchParams.append('permissions', client.permissions?.bitfield);
             url.searchParams.append('scope', 'bot applications.commands');
 
-            return res.redirect(301, url.toString())
+            return res.redirect(url.toString())
         } catch (err) {
             client.logger?.request(req, 'error', err);
             console.error('Invite Controller (ERROR) >> Error Getting Invite'.red);
