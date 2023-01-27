@@ -1,7 +1,7 @@
 const { createClient } = require('redis');
 
 module.exports = async (client) => {
-    const redis = createClient({ 
+    const redis = createClient({
         url: process.env.REDIS_URL,
         socket: {
             reconnectStrategy: (retries) => {

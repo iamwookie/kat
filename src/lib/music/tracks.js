@@ -2,16 +2,13 @@ const DiscordVoice = require('@discordjs/voice');
 
 const play = require('play-dl');
 
-const MusicEmbed = require('@utils/embeds/music');
-const ActionEmbed = require('@utils/embeds/action');
-
 class Track {
-    constructor(subscription, interaction, requestedBy, { onStart, onFinish, onError }) {
+    constructor(subscription, interaction, { onStart, onFinish, onError }) {
         this.client = interaction.client;
 
         this.subscription = subscription;
         this.interaction = interaction;
-        this.requestedBy = requestedBy;
+        this.requestedBy = interaction.user;
 
         this.onStart = onStart ? onStart : () => { };
         this.onFinish = onFinish ? onFinish : () => { };
@@ -36,8 +33,7 @@ class Track {
         });
     }
 
-    durationToString() {
-        const time = this.duration;
+    parseDuration(time) {
         const hours = Math.floor(time / 3600);
         const minutes = Math.floor(time / 60);
         const seconds = time - minutes * 60;
@@ -46,8 +42,8 @@ class Track {
 }
 
 class YouTubeTrack extends Track {
-    constructor(subscription, data, requestedBy, { onStart, onFinish, onError }) {
-        super(subscription, requestedBy, { onStart, onFinish, onError });
+    constructor(subscription, interaction, data, { ...options }) {
+        super(subscription, interaction, { ...options });
 
         if (!data instanceof play.YouTubeVideo) throw new Error('Data must be an instance of play.YouTubeVideo');
 
@@ -55,27 +51,23 @@ class YouTubeTrack extends Track {
 
         this.raw = data;
         this.duration = data.durationRaw;
+        this.durationRaw = data.durationInSec;
         this.thumbnail = data.thumbnails[0];
     }
 }
 
 class SpotifyTrack extends Track {
-    constructor(subscription, data, requestedBy) {
-        super(subscription, requestedBy, {
-            onStart: () => {
-                this.interaction.channel.send({ embeds: [new MusicEmbed(this.interaction, this).setType('playing')] });
-            },
-            onError: () => {
-                this.interaction.channel.send({ embeds: [new ActionEmbed('fail', 'Failed to play a track!', this.requestedBy)] });
-            }
-        });
+    constructor(subscription, interaction, data, { ...options }) {
+        super(subscription, interaction, { ...options });
 
         if (!data instanceof play.SpotifyTrack) throw new Error('Data must be an instance of play.SpotifyTrack');
 
-        Object.assign(this, data.spotify);
+        Object.assign(this, data);
 
         this.raw = data.spotify;
-        this.duration = data.durationInMs;
+        this.title = `${data.name} - ${data.artists[0].name}`;
+        this.duration = this.parseDuration(data.durationInSec);
+        this.durationRaw = data.durationInSec;
         this.thumbnail = data.thumbnail;
     }
 
@@ -100,4 +92,4 @@ class SpotifyTrack extends Track {
     }
 }
 
-module.exports = { Track, YouTubeTrack, SpotifyTrack };
+module.exports = { YouTubeTrack, SpotifyTrack };

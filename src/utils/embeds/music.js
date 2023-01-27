@@ -1,87 +1,112 @@
 const { EmbedBuilder } = require('discord.js');
-const { SpotifyPlaylist, SpotifyAlbum } = require('play-dl');
+const { SpotifyPlaylist, SpotifyAlbum, YouTubePlayList } = require('play-dl');
 const { YouTubeTrack, SpotifyTrack } = require('@lib/music/tracks');
 const progressbar = require('string-progressbar');
 
 class MusicEmbed extends EmbedBuilder {
-    constructor(interaction, item) {
+    constructor(interaction) {
         super();
 
         this.client = interaction.client;
         this.guild = interaction.guild;
-        this.author = item.requestedBy || interaction.user;
-        this.item = item;
-        this.type = type;
+        this.author = interaction.user;
 
         this.icons = {
-            youtube: '<:youtube:928668691997012028>',
-            spotify: '<:spotify:928668691997012028>'
-        }
-
-        if (this.item.thumbnail) this.setThumbnail(this.item.thumbnail.url);
+            youtube: '<:youtube:1067881972774477844>',
+            spotify: '<:spotify:1067881968697614476>',
+            purple: '<:purple:1068554599331537036>'
+        };
 
         this.setColor('#C167ED');
-        this.setAuthor({ name: `${this.item.requestedBy && 'Requested by: '} ${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });      
         this.setFooter({ text: `${this.guild.name} | 🎵 ${this.client.user.username} Global Music System`, iconURL: this.guild.iconURL({ dynamic: true }) });
     }
 
-    setType(type) {
-        switch (type) {
-            case 'enqueued':
-                if (this.item.type == 'playlist' || this.item.type == 'album') {
-                    if (this.item instanceof SpotifyPlaylist || this.item instanceof SpotifyAlbum) {
-                        this.item.title = this.item.name;
-                        this.item.videoCount = this.item.tracksCount;
-                    }
+    #addIcon(item) { return `${item instanceof YouTubeTrack || item instanceof YouTubePlayList ? this.icons.youtube : ''} ${item instanceof SpotifyTrack || item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum ? this.icons.spotify : ''}`; }
 
-                    this.setDescription(`Enqueued \`${this.item.videoCount}\` tracks from: \`[${this.item.title}](${this.item.url})\``);
-                } else {
-                    if (this.item instanceof SpotifyTrack) {
-                        this.item.title = `${this.item.artists[0].name} - ${this.item.name}`;
-                        this.item.durationRaw = parseDuration(this.item.durationInSec);
-                    }
+    setItem(item) {
+        this.setAuthor({ name: `${item?.requestedBy ? 'Requested by: ' : ''}${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
+        if (item?.thumbnail) this.setThumbnail(item?.thumbnail.url);
 
-                    this.setDescription(`Enqueued: \`[${this.item.title} [${this.item.durationRaw}]](${this.item.url})\``);
-                }
-
-                break;
-            case 'playing':
-                this.setDescription(`Now playing: [${this.item.title} [${this.item.duration}]](${this.item.url})`);
-                break;
-            case 'paused':
-                this.setTitle(`Track Paused`);
-                this.setDescription(`[${this.item.title} [${this.item.duration}]](${this.item.url})`);
-                break;
-            case 'queue':
-                this.setTitle(`Server Queue`);
-                this.createQueue(this.subscription.queue);
-                break;
-            case 'skipped':
-                this.setDescription(`Track Skipped: \`[${this.item.title} [${this.item.duration}]](${this.item.url})\``);
-                break;
-            case 'resumed':
-                this.setDescription(`Track Resumed: \`[${this.item.title} [${this.item.duration}]](${this.item.url})\``);
-                break;
-        }
+        return this;
     }
 
-    createQueue(subscription) {
-        let res = '';
+    setEnqueued(item) {
+        if (item?.type == 'playlist' || item?.type == 'album') {
+            if (item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum) {
+                item.title = item?.name;
+                item.videoCount = item?.tracksCount;
+            }
 
+            this.addFields({ name: 'Enqueued:', value: `\`${item?.videoCount}\` tracks from ${this.#addIcon(item)} [\`${item?.title}\`](${item?.url})` });
+        } else {
+            this.addFields({ name: 'Enqueued:', value: `${this.#addIcon(item)} [\`${item?.title} [${item?.duration}]\`](${item?.url})` });
+        }
+
+        this.setItem(item);
+
+        return this;
+    }
+
+    setPlaying(subscription) {
         if (subscription.active) {
             const track = subscription.active;
             const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
-            res += `Now Playing: \`${track.title} [${track.duration}](${track.url})\`\n`;
-            res += `${progressbar.splitBar(track.durationRaw, playbackDuration, 30)[0]}\n\n`;
+            this.addFields({ name: 'Now Playing:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            this.setItem(track);
         }
 
+        return this;
+    }
+
+    setPaused(subscription) {
+        if (subscription.active) {
+            const track = subscription.active;
+            const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
+            this.addFields({ name: 'Paused Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            this.setItem(track);
+        }
+
+        return this;
+    }
+
+    setResumed(subscription) {
+        if (subscription.active) {
+            const track = subscription.active;
+            const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
+            this.addFields({ name: 'Resumed Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            this.setItem(track);
+        }
+
+        return this;
+    }
+
+    setSkipped(subscription) {
+        if (subscription.active) {
+            const track = subscription.active;
+            this.addFields({ name: 'Skipped Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})` });
+            this.setItem(track);
+        }
+
+        return this;
+    }
+
+    setQueue(subscription) {
         if (subscription.queue.length) {
-            subscription.queue.map((track, index) => {
-                res += `${index + 1}. \`${track instanceof YouTubeTrack && this.icons.youtube} ${track instanceof SpotifyTrack && this.icons.spotify} ${track.title} [${track.duration}](${track.url})\`\n`;
-            });
+            try {
+                var res = '';
+
+                for (const [index, track] of subscription.queue.entries()) {
+                    if (res.length >= 840) return this.addFields({ name: 'Server Queue:', value: `${res}...` });
+                    res += `\`${index + 1}.\` - ${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n`;
+                }
+
+                this.addFields({ name: 'Server Queue:', value: `${res}` });
+            } catch (err) {
+                this.client.logger?.error(err);
+            }
         }
 
-        return res;
+        return this;
     }
 }
 

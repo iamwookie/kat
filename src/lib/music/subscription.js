@@ -20,7 +20,7 @@ class MusicSubscription {
 
         this.queue = [];
 
-        this.initializeListeners();
+        this.#initializeListeners();
 
         this.voice.subscribe(this.player);
 
@@ -32,39 +32,7 @@ class MusicSubscription {
         });
     }
 
-    static async create(interaction, voiceChannel) {
-        // remove in future
-        
-        try {
-            const sub = new MusicSubscription(
-                interaction,
-                joinVoiceChannel({
-                    channelId: voiceChannel.id,
-                    guildId: voiceChannel.guild.id,
-                    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-                }),
-                voiceChannel
-            );
-
-            client.subscriptions.set(voiceChannel.guild.id, sub);
-            client.logger?.info(`Music >> Subscription Created: ${sub.guild.name} (${sub.guild.id})`.brightGreen);
-
-            return sub;
-        } catch (err) {
-            console.error('Music (ERROR) >> Error Creating Subscription');
-            console.error(err);
-            
-            client.logger?.error(err);
-        }
-    }
-
-    destroy() {
-        if (!this.isVoiceDestroyed()) this.voice.destroy();
-        this.client.subscriptions.delete(this.guild.id);
-        this.client.logger?.warn(`Music >> Subscription Destroyed: ${this.guild.name} (${this.guild.id})`.yellow);
-    }
-
-    initializeListeners() {
+    #initializeListeners() {
         // Configure voice connection
 
         this.voice.on('stateChange', async (_, newState) => {
@@ -73,7 +41,7 @@ class MusicSubscription {
 
                 if (newState.reason == VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
                     this.client.logger?.warn('Music (VOICE) >> Connection Disconnected (Code 4014)'.yellow);
-                    await this.connect(5000);
+                    await this.#connect(5000);
                 } else if (voice.rejoinAttempts < 5) {
                     voice.rejoinAttempts + 1;
                     voice.rejoin();
@@ -82,11 +50,11 @@ class MusicSubscription {
                 }
             } else if (newState.status == VoiceConnectionStatus.Destroyed) {
                 this.client.logger?.warn('Music >> (VOICE) Connection Destroyed'.yellow);
-                
+
                 this.destroy();
             } else if (!this.readyLock && (newState.status == VoiceConnectionStatus.Connecting || newState.status == VoiceConnectionStatus.Signalling)) {
                 // this.client.logger?.warn('Music >> (VOICE) Connection Connecting / Signalling'.yellow);
-                await this.connect(20_000);
+                await this.#connect(20_000);
             }
         });
 
@@ -98,7 +66,7 @@ class MusicSubscription {
             if (newState.status == AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                 this.active = null;
                 oldState.resource.metadata.onFinish();
-                this.process();
+                this.#process();
             } else if (newState.status == AudioPlayerStatus.Playing && oldState.status !== AudioPlayerStatus.AutoPaused) {
                 this.client.logger?.info('Music (PLAYER) >> Playing Track: '.green);
                 console.log({
@@ -112,7 +80,7 @@ class MusicSubscription {
         });
     }
 
-    async connect(timeout) {
+    async #connect(timeout) {
         if (!this.readyLock) {
             try {
                 await entersState(this.voice, VoiceConnectionStatus.Ready, timeout);
@@ -125,11 +93,11 @@ class MusicSubscription {
         }
     }
 
-    async process() {
+    async #process() {
         if (this.queueLocked || this.player.state.status !== AudioPlayerStatus.Idle) return;
 
         this.queueLocked = true;
-        if (!this.isVoiceReady()) await this.connect(20000);
+        if (!this.isVoiceReady()) await this.#connect(20000);
 
         const track = this.queue.shift();
         if (!track) return this.destroy();
@@ -142,20 +110,52 @@ class MusicSubscription {
         } catch (err) {
             console.error('Music (ERROR) >> Error Playing Track'.red);
             console.error(err);
-            
+
             this.client.logger?.error(err);
 
             track.onError(err);
             this.queueLocked = false;
-            this.process();
+            this.#process();
         }
+    }
+
+    static async create(interaction, voiceChannel) {
+        // remove in future
+
+        try {
+            const sub = new MusicSubscription(
+                interaction,
+                joinVoiceChannel({
+                    channelId: voiceChannel.id,
+                    guildId: voiceChannel.guild.id,
+                    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+                }),
+                voiceChannel
+            );
+
+            interaction.client.subscriptions.set(voiceChannel.guild.id, sub);
+            interaction.client.logger?.info(`Music >> Subscription Created: ${sub.guild.name} (${sub.guild.id})`.brightGreen);
+
+            return sub;
+        } catch (err) {
+            console.error('Music (ERROR) >> Error Creating Subscription');
+            console.error(err);
+
+            interaction.client.logger?.error(err);
+        }
+    }
+
+    destroy() {
+        if (!this.isVoiceDestroyed()) this.voice.destroy();
+        this.client.subscriptions.delete(this.guild.id);
+        this.client.logger?.warn(`Music >> Subscription Destroyed: ${this.guild.name} (${this.guild.id})`.yellow);
     }
 
     // Actions
 
-    add(track) {
+    async add(track) {
         this.queue.push(track);
-        this.process();
+        await this.#process();
     }
 
     clear() {

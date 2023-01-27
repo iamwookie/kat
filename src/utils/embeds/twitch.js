@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 
-export default class TwitchEmbed extends EmbedBuilder {
+class TwitchEmbed extends EmbedBuilder {
     constructor(user, stream, image) {
         super();
 
@@ -16,3 +16,5 @@ export default class TwitchEmbed extends EmbedBuilder {
         ]);
     }
 }
+
+module.exports = TwitchEmbed;

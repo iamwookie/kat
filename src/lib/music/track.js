@@ -55,7 +55,7 @@ class Track {
         } catch (err) {
             console.error('Music >> Error Creating Track'.red);
             console.error(err);
-            
+
             subscription.client.logger?.error(err);
         }
     }

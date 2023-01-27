@@ -21,7 +21,7 @@ class TwitchManager {
         } catch (err) {
             console.error('TwitchManager (ERROR) >> Error Initializing'.red);
             console.error(err);
-            
+
             this.client.logger?.error(err);
         }
     }
@@ -56,7 +56,7 @@ class TwitchManager {
                     } catch (err) {
                         console.error(`TwitchManager (ERROR) >> Error Sending Notification`.red);
                         console.error(err);
-                        
+
                         this.client.logger?.error(err);
                     }
                 });
@@ -65,7 +65,7 @@ class TwitchManager {
             } catch (err) {
                 console.error('TwitchManager (ERROR) >> Failed To Create Listener'.red);
                 console.error(err);
-                
+
                 this.client.logger?.error(err);
             }
         }
