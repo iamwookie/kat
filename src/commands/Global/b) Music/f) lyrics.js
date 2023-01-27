@@ -43,7 +43,7 @@ module.exports = {
 
             var lyrics = search[0] ? await search[0].lyrics() : null;
             if (!lyrics) return int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search results!', int.user)] });
-            if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + '...\n\n**NOTE: Lyrics are too long to display.**';
+            if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + '\n...';
 
             const success = new MusicEmbed(int).setItem(subscription?.active);
             search[0] ? success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`) : success.setDescription(lyrics);
