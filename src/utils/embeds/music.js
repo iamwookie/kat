@@ -14,7 +14,7 @@ class MusicEmbed extends EmbedBuilder {
         this.icons = {
             youtube: '<:youtube:1067881972774477844>',
             spotify: '<:spotify:1067881968697614476>',
-            purple: '<:purple:1068554599331537036>'
+            slider: '<:purple:1068554599331537036>'
         };
 
         this.setColor('#C167ED');
@@ -53,7 +53,10 @@ class MusicEmbed extends EmbedBuilder {
         if (subscription.active) {
             const track = subscription.active;
             const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
-            this.addFields({ name: 'Now Playing:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
+            if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
+
+            this.addFields({ name: 'Now Playing:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
             this.setItem(track);
         }
 
@@ -64,7 +67,10 @@ class MusicEmbed extends EmbedBuilder {
         if (subscription.active) {
             const track = subscription.active;
             const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
-            this.addFields({ name: 'Paused Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
+            if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
+
+            this.addFields({ name: 'Paused Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
             this.setItem(track);
         }
 
@@ -75,7 +81,10 @@ class MusicEmbed extends EmbedBuilder {
         if (subscription.active) {
             const track = subscription.active;
             const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
-            this.addFields({ name: 'Resumed Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.purple)[0]}` });
+            var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
+            if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
+
+            this.addFields({ name: 'Resumed Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
             this.setItem(track);
         }
 
@@ -85,6 +94,7 @@ class MusicEmbed extends EmbedBuilder {
     setSkipped(subscription) {
         if (subscription.active) {
             const track = subscription.active;
+            
             this.addFields({ name: 'Skipped Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})` });
             this.setItem(track);
         }
