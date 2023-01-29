@@ -5,7 +5,7 @@ class CommanderModule {
         this.commander = commander;
         this.options = options;
 
-        Object.assign(this, module);
+        Object.assign(this, options);
 
         if (this.events) {
             for (const event in this.commander.client._events) {
