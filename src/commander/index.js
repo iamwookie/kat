@@ -289,7 +289,7 @@ class Commander {
                     delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)];
 
                     const object = require(`${globalPath}/${folder}/${file}`);
-                    const module = new CommanderModule(object, this);
+                    const module = new CommanderModule(this, object);
 
                     await module.initialize(this.client);
 
@@ -309,7 +309,7 @@ class Commander {
                         delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)];
 
                         const object = require(`${guildPath}/${folder}/${subFolder}/${file}`);
-                        const module = new CommanderModule(object, this);
+                        const module = new CommanderModule(this, object);
                         if (!module.guilds || !module.guilds.includes(folder)) this.client.logger?.warn(`Commander >> Guild Not Set For Guild Module: ${module.name}`);
 
                         module.initialize(this.client);

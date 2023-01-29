@@ -1,13 +1,11 @@
 const Discord = require('discord.js');
 
 class CommanderModule {
-    constructor(module, commander) {
+    constructor(commander, options) {
         this.commander = commander;
-        this.module = module;
+        this.options = options;
 
-        for (const key in module) {
-            this[key] = module[key];
-        }
+        Object.assign(this, module);
 
         if (this.events) {
             for (const event in this.commander.client._events) {

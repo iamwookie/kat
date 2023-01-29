@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 class CommanderCommand {
     constructor(commander, options) {
         this.commander = commander;
+        this.options = options;
 
         Object.assign(this, options);
 
