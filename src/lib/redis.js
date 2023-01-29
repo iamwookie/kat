@@ -13,7 +13,7 @@ module.exports = async (client) => {
 
     redis.on('connect', () => client.logger?.info('Redis >> Client Connected'));
     redis.on('end', () => client.logger?.info('Redis >> Client Disconnected'));
-    redis.on('error', (err) => {
+    redis.on('error', err => {
         console.error('Redis >> Client Error'.red);
         console.error(err);
 

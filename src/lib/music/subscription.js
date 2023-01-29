@@ -24,7 +24,7 @@ class MusicSubscription {
 
         this.voice.subscribe(this.player);
 
-        this.voice.on('error', (err) => {
+        this.voice.on('error', err => {
             console.error('Music (VOICE) >> Voice Error'.red);
             console.error(err);
 

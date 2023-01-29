@@ -47,7 +47,7 @@ client.logger = new CommanderLogger(client);
 
 console.log('>>> Loading...\n'.magenta.bold.underline);
 
-client.once(Events.ClientReady, async (client) => {
+client.once(Events.ClientReady, async client => {
     // ------------------------------------
     client.database = await CommanderDatabase.initialize(client);
     client.commander = await Commander.initialize(client);

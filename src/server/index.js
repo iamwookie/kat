@@ -1,4 +1,5 @@
 const express = require('express');
+const Sentry = require('@sentry/node');
 const helmet = require('helmet');
 const bodyParser = require("body-parser");
 // ------------------------------------
@@ -6,9 +7,7 @@ const { port } = require('@configs/server.json');
 
 const app = express();
 
-const Sentry = require('@sentry/node');
-
-module.exports = (client) => {
+module.exports = client => {
     return new Promise((resolve, reject) => {
         if (app.get('env') == 'production') app.set('trust proxy', 1);
 
@@ -26,7 +25,7 @@ module.exports = (client) => {
             return res.status(500).send('Internal Server Error');
         });
 
-        app.listen(port, async (err) => {
+        app.listen(port, async err => {
             if (err) return reject(err);
             console.log(`>>> Server Initialized On Port: ${port}`.brightGreen.bold.underline);
             return resolve(app);

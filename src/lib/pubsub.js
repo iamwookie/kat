@@ -12,7 +12,7 @@ class PubSubClient {
 
             this.pubsub.on('connect', () => console.log('[PubSubClient] '.red + 'PubSub Connected'));
             this.pubsub.on('end', () => console.log('[PubSubClient] '.red + 'PubSub Disconnected'));
-            this.pubsub.on('error', (err) => console.log('PubSubClient Error', err));
+            this.pubsub.on('error', err => console.log('PubSubClient Error', err));
 
             this.pubsub.connect();
         } catch (err) {

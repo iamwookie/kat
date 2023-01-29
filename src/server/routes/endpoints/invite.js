@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { fetchInvite } = require('@server/controllers/invite');
 
-module.exports = (client) => {
+module.exports = client => {
     // /users/:id
     router.get('/', fetchInvite(client));
 
