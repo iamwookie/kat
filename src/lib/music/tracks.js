@@ -1,4 +1,4 @@
-const DiscordVoice = require('@discordjs/voice');
+const { createAudioResource } = require('@discordjs/voice');
 
 const play = require('play-dl');
 
@@ -18,8 +18,8 @@ class Track {
     async createResource() {
         return new Promise(async (resolve, reject) => {
             try {
-                const stream = await play.stream(this.url, { quality: 3 });
-                const resource = DiscordVoice.createAudioResource(stream.stream, { metadata: this, inputType: stream.type });
+                const stream = await play.stream(this.url, { quality: 2 });
+                const resource = createAudioResource(stream.stream, { metadata: this, inputType: stream.type });
 
                 return resolve(resource);
             } catch (err) {
@@ -77,7 +77,7 @@ class SpotifyTrack extends Track {
                 const search = await play.search(this.artists[0].name + ' - ' + this.name, { limit: 1, source: { youtube: 'video' } });
                 if (!search || search.length < 0) throw new Error('No results found!');
                 const stream = await play.stream(search[0].url, { quality: 3 });
-                const resource = DiscordVoice.createAudioResource(stream.stream, { metadata: this, inputType: stream.type });
+                const resource = createAudioResource(stream.stream, { metadata: this, inputType: stream.type });
 
                 return resolve(resource);
             } catch (err) {
