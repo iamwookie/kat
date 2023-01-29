@@ -66,8 +66,8 @@ class CommanderLogger {
 
         const time = Date.now();
 
-        if (this.#lastIp && this.#lastIp == req.ip) return console.log('Logger (REQUEST): Received Duplicate Request'.red);
-        this.#lastIp = req.ip;
+        if (this.lastIp && this.lastIp == req.ip) return console.log('Logger (REQUEST): Received Duplicate Request'.red);
+        this.lastIp = req.ip;
 
         fs.appendFile(`./${scope}.log`, `CODE: '${time}' IP: '${req.ip} ${error ? '\nERROR: ' + error.stack : ''}\n`, async err => {
             if (err) this.error(err);
