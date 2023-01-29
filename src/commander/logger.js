@@ -14,7 +14,6 @@ class CommanderLogger {
     async #notify(eventId) {
         try {
             const dev = await this.client.users.fetch(this.client.dev);
-
             const embed = new EmbedBuilder()
                 .setColor('Red')
                 .setTitle('Uh Oh!')
@@ -67,12 +66,12 @@ class CommanderLogger {
 
         const time = Date.now();
 
-        if (this.lastIp && this.lastIp == req.ip) return console.log('Logger (REQUEST): Received Duplicate Request'.red);
-
-        this.lastIp = req.ip;
+        if (this.#lastIp && this.#lastIp == req.ip) return console.log('Logger (REQUEST): Received Duplicate Request'.red);
+        this.#lastIp = req.ip;
 
         fs.appendFile(`./${scope}.log`, `CODE: '${time}' IP: '${req.ip} ${error ? '\nERROR: ' + error.stack : ''}\n`, async (err) => {
             if (err) this.error(err);
+
             return console.log(`Logger (REQUEST): Logged Request >> SCOPE: ${scope} CODE: ${time}, IP: ${req.ip}`.yellow);
         });
     }
