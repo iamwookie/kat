@@ -24,25 +24,27 @@ class MusicEmbed extends EmbedBuilder {
     #addIcon(item) { return `${item instanceof YouTubeTrack || item instanceof YouTubePlayList ? this.icons.youtube : ''} ${item instanceof SpotifyTrack || item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum ? this.icons.spotify : ''}`; }
 
     setItem(item) {
-        this.setAuthor({ name: `${item?.requestedBy ? 'Requested by: ' : ''}${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
-        if (item?.thumbnail) this.setThumbnail(item?.thumbnail.url);
+        this.item = item;
+
+        this.setAuthor({ name: `${this.item?.requestedBy ? 'Requested By: ' : ''}${this.author.tag}`, iconURL: this.author.avatarURL({ dynamic: true }) });
+        if (this.item?.thumbnail) this.setThumbnail(this.item?.thumbnail.url);
 
         return this;
     }
 
-    setEnqueued(item) {
-        if (item?.type == 'playlist' || item?.type == 'album') {
-            if (item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum) {
-                item.title = item?.name;
-                item.videoCount = item?.tracksCount;
+    setEnqueued(subscription) {
+        if (!this.item) return this;
+
+        if (this.item?.type == 'playlist' || this.item?.type == 'album') {
+            if (this.item instanceof SpotifyPlaylist || this.item instanceof SpotifyAlbum) {
+                this.item.title = this.item?.name;
+                this.item.videoCount = this.item?.tracksCount;
             }
 
-            this.addFields({ name: 'Enqueued:', value: `\`${item?.videoCount}\` tracks from ${this.#addIcon(item)} [\`${item?.title}\`](${item?.url})` });
+            this.addFields({ name: 'Enqueued:', value: `\`${this.item?.videoCount}\` tracks from ${this.#addIcon(this.item)} [\`${this.item?.title}\`](${this.item?.url})` });
         } else {
-            this.addFields({ name: 'Enqueued:', value: `${this.#addIcon(item)} [\`${item?.title} [${item?.duration}]\`](${item?.url})` });
+            this.addFields({ name: 'Enqueued:', value: `\`${subscription?.queue.length}\`. - ${this.#addIcon(this.item)} [\`${this.item?.title} [${this.item?.duration}]\`](${this.item?.url})` });
         }
-
-        this.setItem(item);
 
         return this;
     }

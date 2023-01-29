@@ -66,7 +66,7 @@ module.exports = {
                         });
                         subscription.add(track);
 
-                        return int.editReply({ embeds: [new MusicEmbed(int).setEnqueued(track)] });
+                        return int.editReply({ embeds: [new MusicEmbed(int).setItem(track).setEnqueued(subscription)] });
                     } else if (search instanceof play.SpotifyPlaylist || search instanceof play.SpotifyAlbum) {
                         const spotifyTracks = await search.all_tracks();
 
@@ -78,7 +78,7 @@ module.exports = {
                             subscription.add(track);
                         }
 
-                        return int.editReply({ embeds: [new MusicEmbed(int).setEnqueued(search)] });
+                        return int.editReply({ embeds: [new MusicEmbed(int).setItem(search).setEnqueued(subscription)] });
                     } else {
                         int.editReply({ embeds: [new ActionEmbed('fail', 'You have not provided a valid Spotify URL!', int.user)] });
 
@@ -103,7 +103,7 @@ module.exports = {
                             subscription.add(track);
                         }
 
-                        return int.editReply({ embeds: [new MusicEmbed(int).setEnqueued(search)] });
+                        return int.editReply({ embeds: [new MusicEmbed(int).setItem(search).setEnqueued(subscription)] });
                     } else {
                         int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search result. Try again!', int.user)] });
 
@@ -126,7 +126,7 @@ module.exports = {
                         });
                         subscription.add(track);
 
-                        return int.editReply({ embeds: [new MusicEmbed(int).setEnqueued(track)] });
+                        return int.editReply({ embeds: [new MusicEmbed(int).setItem(track).setEnqueued(subscription)] });
                     } else {
                         int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search result. Try again!', int.user)] });
 
