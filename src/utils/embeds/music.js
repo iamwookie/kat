@@ -21,7 +21,15 @@ class MusicEmbed extends EmbedBuilder {
         this.setFooter({ text: `${this.guild.name} | 🎵 ${this.client.user.username} Global Music System`, iconURL: this.guild.iconURL({ dynamic: true }) });
     }
 
-    #addIcon(item) { return `${item instanceof YouTubeTrack || item instanceof YouTubePlayList ? this.icons.youtube : ''} ${item instanceof SpotifyTrack || item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum ? this.icons.spotify : ''}`; }
+    #getServiceIcon(item) {
+        if (item instanceof YouTubeTrack || item instanceof YouTubePlayList) {
+            return this.icons.youtube;
+        } else if (item instanceof SpotifyTrack || item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum) {
+            return this.icons.spotify;
+        } else {
+            return '';
+        }
+    }
 
     setItem(item) {
         this.item = item;
@@ -41,9 +49,9 @@ class MusicEmbed extends EmbedBuilder {
                 this.item.videoCount = this.item?.tracksCount;
             }
 
-            this.addFields({ name: 'Enqueued:', value: `\`${this.item?.videoCount}\` tracks from ${this.#addIcon(this.item)} [\`${this.item?.title}\`](${this.item?.url})` });
+            this.addFields({ name: 'Enqueued:', value: `\`${this.item?.videoCount}\` tracks from ${this.#getServiceIcon(this.item)} [\`${this.item?.title}\`](${this.item?.url})` });
         } else {
-            this.addFields({ name: 'Enqueued:', value: `\`${subscription?.queue.length + 1}\`. - ${this.#addIcon(this.item)} [\`${this.item?.title} [${this.item?.duration}]\`](${this.item?.url})` });
+            this.addFields({ name: 'Enqueued:', value: `\`${subscription?.queue.length + 1}\`. - ${this.#getServiceIcon(this.item)} [\`${this.item?.title} [${this.item?.duration}]\`](${this.item?.url})` });
         }
 
         return this;
@@ -56,7 +64,7 @@ class MusicEmbed extends EmbedBuilder {
             var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
             if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
 
-            this.addFields({ name: 'Now Playing:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
+            this.addFields({ name: 'Now Playing:', value: `${this.#getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
             this.setItem(track);
         }
 
@@ -70,7 +78,7 @@ class MusicEmbed extends EmbedBuilder {
             var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
             if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
 
-            this.addFields({ name: 'Paused Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
+            this.addFields({ name: 'Paused Track:', value: `${this.#getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
             this.setItem(track);
         }
 
@@ -84,7 +92,7 @@ class MusicEmbed extends EmbedBuilder {
             var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
             if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
 
-            this.addFields({ name: 'Resumed Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
+            this.addFields({ name: 'Resumed Track:', value: `${this.#getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
             this.setItem(track);
         }
 
@@ -94,8 +102,8 @@ class MusicEmbed extends EmbedBuilder {
     setSkipped(subscription) {
         if (subscription.active) {
             const track = subscription.active;
-            
-            this.addFields({ name: 'Skipped Track:', value: `${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})` });
+
+            this.addFields({ name: 'Skipped Track:', value: `${this.#getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})` });
             this.setItem(track);
         }
 
@@ -109,7 +117,7 @@ class MusicEmbed extends EmbedBuilder {
 
                 for (const [index, track] of subscription.queue.entries()) {
                     if (res.length >= 840) return this.addFields({ name: 'Server Queue:', value: `${res}...` });
-                    res += `\`${index + 1}.\` - ${this.#addIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n`;
+                    res += `\`${index + 1}.\` - ${this.#getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n`;
                 }
 
                 this.addFields({ name: 'Server Queue:', value: `${res}` });
