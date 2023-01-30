@@ -3,19 +3,15 @@ const { formatTime, formatBytes } = require('@utils/formatters');
 exports.fetchStats = client => {
     return async (req, res) => {
         try {
-            const uptime = formatTime(client.uptime);
-            const ram_usage = formatBytes(process.memoryUsage().heapUsed);
-            const ws_ping = client.ws.ping;
-            const guilds = client.guilds.cache.size;
-            const users = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
-
-            return res.json({
-                uptime,
-                ram_usage,
-                ws_ping,
-                guilds,
-                users
-            });
+            const data = {
+                uptime: formatTime(client.uptime),
+                ram_usage: formatBytes(process.memoryUsage().heapUsed),
+                ws_ping: client.ws.ping,
+                guilds: client.guilds.cache.size,
+                users: client.guilds.cache.reduce((a, g) => a + g.memberCount, 0)
+            }
+            
+            return res.json(data);
         } catch (err) {
             client.logger?.request(req, 'error', err);
             console.error('Stats Controller (ERROR) >> Error Getting Stats'.red);
