@@ -61,7 +61,7 @@ class MusicEmbed extends EmbedBuilder {
         if (subscription.active) {
             const track = subscription.active;
             const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
-            var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
+            let progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
             if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
 
             this.addFields({ name: 'Now Playing:', value: `${this.#getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
@@ -75,7 +75,7 @@ class MusicEmbed extends EmbedBuilder {
         if (subscription.active) {
             const track = subscription.active;
             const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
-            var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
+            let progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
             if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
 
             this.addFields({ name: 'Paused Track:', value: `${this.#getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
@@ -89,7 +89,7 @@ class MusicEmbed extends EmbedBuilder {
         if (subscription.active) {
             const track = subscription.active;
             const playbackDuration = Math.round((subscription.player.state.playbackDuration) / 1000);
-            var progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
+            let progressBar = progressbar.splitBar(track.durationRaw, playbackDuration, 26, '▬', this.icons.slider)[0];
             if (playbackDuration == 0) progressBar = this.icons.slider + progressBar.slice(1);
 
             this.addFields({ name: 'Resumed Track:', value: `${this.#getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
@@ -113,7 +113,7 @@ class MusicEmbed extends EmbedBuilder {
     setQueue(subscription) {
         if (subscription.queue.length) {
             try {
-                var res = '';
+                let res = '';
 
                 for (const [index, track] of subscription.queue.entries()) {
                     if (res.length >= 840) return this.addFields({ name: 'Server Queue:', value: `${res}...` });

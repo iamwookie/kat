@@ -31,7 +31,7 @@ module.exports = {
                 if (x.hidden || x.disabled || (x.guilds && (!int.guild || !x.guilds.includes(int.guild.id)) || (x.users && !x.users.includes(int.user.id)))) return;
 
                 if (x.aliases) {
-                    var aliasmsg = "";
+                    let aliasmsg = "";
                     for (const alias of x.aliases) {
                         aliasmsg += `, ${client.prefix}${alias}`;
                     }
