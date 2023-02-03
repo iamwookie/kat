@@ -7,6 +7,7 @@ const { YouTubeTrack, SpotifyTrack } = require('@lib/music/tracks');
 
 const MusicEmbed = require('@utils/embeds/music');
 const ActionEmbed = require('@utils/embeds/action');
+const ErrorEmbed = require('@utils/embeds/error');
 
 module.exports = {
     name: 'play',
@@ -37,7 +38,7 @@ module.exports = {
         if (!voiceChannel) return int.editReply({ embeds: [new ActionEmbed('fail', 'You are not in a voice channel!', int.user)] });
         if (!voiceChannel.joinable || !voiceChannel.speakable) return int.editReply({ embeds: [new ActionEmbed('fail', 'I can\'t play in that voice channel!', int.user)] });
 
-        let subscription = client.subscriptions.get(int.guildId);
+        const subscription = client.subscriptions.get(int.guildId);
 
         if (subscription && subscription.isPlayerPaused()) {
             subscription.unpause();
@@ -140,11 +141,11 @@ module.exports = {
                 }
             }
         } catch (err) {
-            client.logger?.error(err);
+            const eventId = client.logger?.error(err);
             console.error('Music Commands (ERROR) >> play: Error Running Command'.red);
             console.error(err);
 
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured. A developer has been notified!', int.user)] });
+            return int.editReply({ embeds: [new ErrorEmbed(eventId)] });
         }
     }
 };

@@ -5,6 +5,7 @@ const genius = new GeniusLyrics.Client(process.env.GENIUS_API_KEY);
 
 const MusicEmbed = require('@utils/embeds/music');
 const ActionEmbed = require('@utils/embeds/action');
+const ErrorEmbed = require('@utils/embeds/error');
 
 module.exports = {
     name: 'lyrics',
@@ -50,11 +51,11 @@ module.exports = {
 
             return int.editReply({ embeds: [success] });
         } catch (err) {
-            client.logger?.error(err);
+            const eventId = client.logger?.error(err);
             console.error('Music Commands (ERROR) >> lyrics: Error Getting Track Lyrics'.red);
             console.error(err);
 
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured. A developer has been notified!', int.user)] });
+            return int.editReply({ embeds: [new ErrorEmbed(eventId)] });
         }
     }
 };

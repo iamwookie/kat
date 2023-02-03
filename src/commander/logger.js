@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const Sentry = require('@sentry/node');
 
-const { EmbedBuilder } = require('discord.js');
+const ErrorEmbed = require('@utils/embeds/error');
 
 class CommanderLogger {
     constructor(client) {
@@ -14,13 +14,9 @@ class CommanderLogger {
     async #notify(eventId) {
         try {
             const dev = await this.client.users.fetch(this.client.dev);
-            const embed = new EmbedBuilder()
-                .setColor('Red')
-                .setTitle('Uh Oh!')
-                .setDescription(`A error in the internal code has occured.`)
-                .addFields([{ name: 'Event ID', value: `\`${eventId}\``, inline: true }]);
+            const embed = new ErrorEmbed(eventId);
 
-            await dev.send({ embeds: [embed] }).catch(() => { return; });
+            await dev.send({ embeds: [embed] });
         } catch (err) {
             console.error('Logger (ERROR): Error Warning Dev!'.red);
             console.error(err);

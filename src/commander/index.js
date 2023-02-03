@@ -9,6 +9,7 @@ const CommanderCommand = require('@commander/command');
 const CommanderModule = require('@commander/module');
 
 const ActionEmbed = require('@utils/embeds/action');
+const ErrorEmbed = require('@utils/embeds/error');
 
 // -----------------------------------
 const perms = new Discord.PermissionsBitField([
@@ -71,14 +72,13 @@ class Commander {
                 // Breakline
                 console.log('');
             } catch (err) {
+                this.client.logger?.error(err);
                 console.error('Commander (ERROR) >> Error Running CLI Command'.red);
                 console.error(err);
-
-                this.client.logger?.error(err);
             }
         });
 
-        // Discord Commands
+        // Slash Commands
         this.client.on(Discord.Events.InteractionCreate, async interaction => {
             if (interaction.type !== Discord.InteractionType.ApplicationCommand) return;
 
@@ -92,10 +92,11 @@ class Commander {
             try {
                 await command.run(this.client, interaction);
             } catch (err) {
+                const eventId = this.client.logger?.error(err);
                 console.error('Commander (ERROR) >> Error Running Slash Command'.red);
                 console.error(err);
-
-                this.client.logger?.error(err);
+            
+                interaction.editReply({ embeds: [new ErrorEmbed(eventId)] });
             }
         });
     }

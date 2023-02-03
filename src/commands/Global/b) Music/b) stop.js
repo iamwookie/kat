@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 const ActionEmbed = require('@utils/embeds/action');
-const MusicEmbed = require('@utils/embeds/music');
+const ErrorEmbed = require('@utils/embeds/error');
 
 module.exports = {
     name: 'stop',
@@ -29,11 +29,11 @@ module.exports = {
 
             return int.editReply({ embeds: [new ActionEmbed('success', 'Successfully disconnected. Cya! 👋', int.user)] });
         } catch (err) {
-            client.logger?.error(err);
+            const eventId = client.logger?.error(err);
             console.error('Music Commands (ERROR) >> stop: Error Stopping Track'.red);
             console.error(err);
 
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured. A developer has been notified!', int.user)] });
+            return int.editReply({ embeds: [new ErrorEmbed(eventId)] });
         }
     }
 };

@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 
 const MusicEmbed = require('@utils/embeds/music');
 const ActionEmbed = require('@utils/embeds/action');
+const ErrorEmbed = require('@utils/embeds/error');
 
 module.exports = {
     name: 'skip',
@@ -29,11 +30,11 @@ module.exports = {
 
             return int.editReply({ embeds: [new MusicEmbed(int).setSkipped(subscription)] });
         } catch (err) {
-            client.logger?.error(err);
+            const eventId = client.logger?.error(err);
             console.error('Music Commands (ERROR) >> skip: Error Skipping Track'.red);
             console.error(err);
 
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'An error occured. A developer has been notified!', int.user)] });
+            return int.editReply({ embeds: [new ErrorEmbed(eventId)] });
         }
     }
 };
