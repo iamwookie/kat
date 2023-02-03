@@ -25,10 +25,9 @@ class MusicSubscription {
         this.voice.subscribe(this.player);
 
         this.voice.on('error', err => {
+            this.client.logger?.error(err);
             console.error('Music (VOICE) >> Voice Error'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         });
     }
 
@@ -108,10 +107,9 @@ class MusicSubscription {
             this.queueLocked = false;
             this.active = track;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('Music (ERROR) >> Error Playing Track'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
 
             track.onError(err);
             this.queueLocked = false;
@@ -138,10 +136,9 @@ class MusicSubscription {
 
             return sub;
         } catch (err) {
+            interaction.client.logger?.error(err);
             console.error('Music (ERROR) >> Error Creating Subscription');
             console.error(err);
-
-            interaction.client.logger?.error(err);
         }
     }
 
@@ -153,9 +150,9 @@ class MusicSubscription {
 
     // Actions
 
-    async add(track) {
+    add(track) {
         this.queue.push(track);
-        await this.#process();
+        this.#process();
     }
 
     clear() {
