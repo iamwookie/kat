@@ -51,7 +51,7 @@ class MusicEmbed extends EmbedBuilder {
 
             this.addFields({ name: 'Enqueued:', value: `\`${this.item?.videoCount}\` tracks from ${this.#getServiceIcon(this.item)} [\`${this.item?.title}\`](${this.item?.url})` });
         } else {
-            this.addFields({ name: 'Enqueued:', value: `\`${subscription?.queue.length + 1}.\` - ${this.#getServiceIcon(this.item)} [\`${this.item?.title} [${this.item?.duration}]\`](${this.item?.url})` });
+            this.addFields({ name: 'Enqueued:', value: `\`${subscription?.queue.length}.\` - ${this.#getServiceIcon(this.item)} [\`${this.item?.title} [${this.item?.duration}]\`](${this.item?.url})` });
         }
 
         return this;
