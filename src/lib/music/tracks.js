@@ -3,16 +3,16 @@ const { createAudioResource } = require('@discordjs/voice');
 const play = require('play-dl');
 
 class Track {
-    constructor(subscription, interaction, { onStart, onFinish, onError }) {
+    constructor(subscription, interaction, { ...options }) {
         this.client = interaction.client;
 
         this.subscription = subscription;
         this.interaction = interaction;
         this.requestedBy = interaction.user;
 
-        this.onStart = onStart ? onStart : () => { };
-        this.onFinish = onFinish ? onFinish : () => { };
-        this.onError = onError ? onError : () => { };
+        this.onStart = options.onStart ? options.onStart : () => { };
+        this.onFinish = options.onFinish ? options.onFinish : () => { };
+        this.onError = options.onError ? options.onError : () => { };
     }
 
     async createResource() {
