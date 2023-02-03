@@ -117,31 +117,6 @@ class MusicSubscription {
         }
     }
 
-    static async create(interaction, voiceChannel) {
-        // remove in future
-
-        try {
-            const sub = new MusicSubscription(
-                interaction,
-                joinVoiceChannel({
-                    channelId: voiceChannel.id,
-                    guildId: voiceChannel.guild.id,
-                    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-                }),
-                voiceChannel
-            );
-
-            interaction.client.subscriptions.set(voiceChannel.guild.id, sub);
-            interaction.client.logger?.info(`Music >> Subscription Created: ${sub.guild.name} (${sub.guild.id})`.brightGreen);
-
-            return sub;
-        } catch (err) {
-            interaction.client.logger?.error(err);
-            console.error('Music (ERROR) >> Error Creating Subscription');
-            console.error(err);
-        }
-    }
-
     destroy() {
         if (!this.isVoiceDestroyed()) this.voice.destroy();
         this.client.subscriptions.delete(this.guild.id);

@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { joinVoiceChannel } = require('@discordjs/voice');
 
 const play = require('play-dl');
 
@@ -51,7 +52,26 @@ module.exports = {
 
         if (!query) return int.editReply({ embeds: [new ActionEmbed('fail', 'What should I play?', int.user)] });
 
-        if (!subscription) subscription = await MusicSubscription.create(int, voiceChannel);
+        if (!subscription) {
+            try {
+                subscription = new MusicSubscription(
+                    int,
+                    joinVoiceChannel({
+                        channelId: voiceChannel.id,
+                        guildId: voiceChannel.guild.id,
+                        adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+                    }),
+                    voiceChannel
+                );
+    
+                client.subscriptions.set(voiceChannel.guild.id, subscription);
+                client.logger?.info(`Music >> Subscription Created: ${subscription.guild.name} (${subscription.guild.id})`.brightGreen);
+            } catch (err) {
+                client.logger?.error(err);
+                console.error('Music (ERROR) >> Error Creating Subscription');
+                console.error(err);
+            }
+        }
 
         try {
             if (query.startsWith('https://open.spotify.com/')) {
@@ -122,10 +142,12 @@ module.exports = {
 
                     if (search[0] instanceof play.YouTubeVideo) {
                         const track = new YouTubeTrack(subscription, int, search[0], {
-                            onStart: () => { int.channel.send({ embeds: [new MusicEmbed(int).setPlaying(subscription).setQueue(subscription)] }); },
+                            onStart: () => int.channel.send({ embeds: [new MusicEmbed(int).setPlaying(subscription).setQueue(subscription)] }),
                             onError: () => int.channel.send({ embeds: [new ActionEmbed('fail', 'An error occured while playing a track!', int.user)] })
                         });
                         subscription.add(track);
+
+                        console.log(subscription.queue.length)
 
                         return int.editReply({ embeds: [new MusicEmbed(int).setItem(track).setEnqueued(subscription)] });
                     } else {
