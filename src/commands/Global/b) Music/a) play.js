@@ -38,7 +38,7 @@ module.exports = {
         if (!voiceChannel) return int.editReply({ embeds: [new ActionEmbed('fail', 'You are not in a voice channel!', int.user)] });
         if (!voiceChannel.joinable || !voiceChannel.speakable) return int.editReply({ embeds: [new ActionEmbed('fail', 'I can\'t play in that voice channel!', int.user)] });
 
-        const subscription = client.subscriptions.get(int.guildId);
+        let subscription = client.subscriptions.get(int.guildId);
 
         if (subscription && subscription.isPlayerPaused()) {
             subscription.unpause();
