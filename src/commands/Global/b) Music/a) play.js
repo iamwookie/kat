@@ -147,8 +147,6 @@ module.exports = {
                         });
                         subscription.add(track);
 
-                        console.log(subscription.queue.length)
-
                         return int.editReply({ embeds: [new MusicEmbed(int).setItem(track).setEnqueued(subscription)] });
                     } else {
                         int.editReply({ embeds: [new ActionEmbed('fail', 'Couldn\'t find your search result. Try again!', int.user)] });
