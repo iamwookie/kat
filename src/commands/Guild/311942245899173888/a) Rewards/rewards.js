@@ -84,10 +84,9 @@ module.exports = {
                         await client.database.redis.hSet(prefix + steamId, 'discord', 1);
                         int.editReply({ embeds: [new ActionEmbed('success', 'Success! You can now claim your join rewards in-game using the `!rewards` command!', int.user)], components: [] });
                     } catch (err) {
+                        client.logger?.error(err);
                         console.error('Guild Commands (ERROR): rewards: Error Claiming Join Reward');
                         console.error(err);
-                        
-                        client.logger?.error(err);
 
                         int.editReply({ embeds: [errorEmbed], components: [] });
                     }
@@ -96,10 +95,9 @@ module.exports = {
                         await client.database.redis.hSet(prefix + steamId, 'boost', 1);
                         int.editReply({ embeds: [new ActionEmbed('success', 'Success! You can now claim your boost rewards in-game using the `!rewards` command!', int.user)], components: [] });
                     } catch (err) {
+                        client.logger?.error(err);
                         console.error('Guild Commands (ERROR): rewards: Error Claiming Boost Reward');
                         console.error(err);
-                        
-                        client.logger?.error(err);
 
                         int.editReply({ embeds: [errorEmbed], components: [] });
                     }

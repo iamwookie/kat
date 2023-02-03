@@ -21,10 +21,9 @@ class CommanderDatabase {
 
             return database;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('CommanderDatabase (ERROR) >> Error Initializing'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         }
     }
 
@@ -85,10 +84,9 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
 
             return false;
         }
@@ -112,10 +110,9 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('CommanderDatabase (ERROR) >> Error Deleting Value'.red);
             console.error(err);
-            
-            this.client.logger?.error(err);
 
             return false;
         }
@@ -144,10 +141,9 @@ class CommanderDatabase {
 
             await this.#load();
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
             console.error(err);
-            
-            this.client.logger?.error(err);
         }
     }
 

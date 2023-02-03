@@ -15,10 +15,9 @@ class ColorManager {
 
             return manager;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('ColorManager (ERROR) >> Error Creating'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         }
     }
 
@@ -28,10 +27,9 @@ class ColorManager {
         try {
             this.colors = this.client.database ? await this.client.database.get(this.guild.id, 'colors') || [] : [];
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('ColorManager (ERROR) >> Error Loading Colors'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         }
     }
 
@@ -122,10 +120,9 @@ class ColorManager {
 
             return role;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('ColorManager (ERROR) >> Error Adding Color'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         }
     }
 

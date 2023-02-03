@@ -137,10 +137,9 @@ class Commander {
 
                     this.cli.set(command.name, command);
                 } catch (err) {
+                    this.client.logger?.error(err);
                     console.error('Commander (ERROR) >> Error Registering CLI Command'.red);
                     console.error(err);
-
-                    this.client.logger?.error(err);
                 }
             }
         }
@@ -164,10 +163,9 @@ class Commander {
 
                         this.commands.set(command.name, command);
                     } catch (err) {
+                        this.client.logger?.error(err);
                         console.error('Commander (ERROR) >> Error Registering Global Command'.red);
                         console.error(err);
-
-                        this.client.logger?.error(err);
                     }
                 }
             }
@@ -196,10 +194,9 @@ class Commander {
 
                             this.commands.set(command.name, command);
                         } catch (err) {
+                            this.client.logger?.error(err);
                             console.error('Commander (ERROR) >> Error Registering Guild Command'.red);
                             console.error(err);
-
-                            this.client.logger?.error(err);
                         }
                     }
                 }
@@ -228,10 +225,9 @@ class Commander {
 
             console.log(`Commander >> Successfully Registered ${res.length} Global Command(s).`.brightGreen);
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('Commander (ERROR) >> Error Registering Global Slash Commands'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         }
 
         try {
@@ -259,18 +255,16 @@ class Commander {
                     const res = await this.rest.put(Discord.Routes.applicationGuildCommands(process.env.BOT_APP_ID, k), { body: commands });
                     console.log(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`.brightGreen);
                 } catch (err) {
+                    this.client.logger?.error(err);
                     console.error(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${k}`.red);
                     console.error(err);
-
-                    this.client.logger?.error(err);
                 }
             }
             console.log('Commander >> Successfully Registered All Guild Commands.'.brightGreen);
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('Commander (ERROR) >> Error Registering Guild Slash Commands'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         }
     }
 

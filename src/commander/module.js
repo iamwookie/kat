@@ -33,10 +33,9 @@ class CommanderModule {
 
             client.logger?.info(`Commander >> Loaded ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`);
         } catch (err) {
+            client.logger?.error(err);
             console.error(`Commander >> Failed to Load ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.red);
             console.error(err);
-
-            client.logger?.error(err);
         }
     }
 }

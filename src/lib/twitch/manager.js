@@ -19,10 +19,9 @@ class TwitchManager {
 
             return twitch;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('TwitchManager (ERROR) >> Error Initializing'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         }
     }
 
@@ -54,19 +53,17 @@ class TwitchManager {
                             if (channel) channel.send({ content: "@everyone", embeds: [embed] });
                         }
                     } catch (err) {
+                        this.client.logger?.error(err);
                         console.error(`TwitchManager (ERROR) >> Error Sending Notification`.red);
                         console.error(err);
-
-                        this.client.logger?.error(err);
                     }
                 });
 
                 this.listeners.set(user.id, subscription);
             } catch (err) {
+                this.client.logger?.error(err);
                 console.error('TwitchManager (ERROR) >> Failed To Create Listener'.red);
                 console.error(err);
-
-                this.client.logger?.error(err);
             }
         }
 
