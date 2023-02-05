@@ -1,7 +1,6 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 const ActionEmbed = require('@utils/embeds/action');
-const ErrorEmbed = require('@utils/embeds/error');
 
 module.exports = {
     name: 'unbanall',

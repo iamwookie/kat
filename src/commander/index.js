@@ -204,7 +204,7 @@ class Commander {
         }
     }
 
-    async updateCommands() {
+    async updateGlobalCommands() {
         try {
             let commands = [];
 
@@ -222,14 +222,15 @@ class Commander {
             }
 
             const res = await this.rest.put(Discord.Routes.applicationCommands(process.env.BOT_APP_ID), { body: commands });
-
             console.log(`Commander >> Successfully Registered ${res.length} Global Command(s).`.brightGreen);
         } catch (err) {
             this.client.logger?.error(err);
             console.error('Commander (ERROR) >> Error Registering Global Slash Commands'.red);
             console.error(err);
         }
+    }
 
+    async updateGuildCommands() {
         try {
             for (const [k, g] of this.guilds) {
                 let commands = [];
