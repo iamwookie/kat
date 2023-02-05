@@ -27,7 +27,7 @@ exports.fetchInvite = client => {
         try {
             const url = new URL('https://discord.com/api/oauth2/authorize');
             url.searchParams.append('client_id', process.env.BOT_APP_ID);
-            url.searchParams.append('permissions', client.permissions?.bitfield);
+            url.searchParams.append('permissions', req.query.admin ? 8 : client.permissions?.bitfield);
             url.searchParams.append('scope', 'bot applications.commands');
 
             return res.redirect(url.toString())
