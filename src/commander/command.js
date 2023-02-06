@@ -53,12 +53,11 @@ class CommanderCommand {
         if (!this.cooldown || !this.cooldowns) return;
 
         const now = Date.now();
-        const cooldown = this.cooldown * 1000;
 
+        const cooldown = this.cooldown * 1000;
         if (!this.cooldowns.has(guild?.id || 'dm')) this.cooldowns.set(guild?.id || 'dm', new Discord.Collection());
 
         const cooldowns = this.cooldowns.get(guild?.id || 'dm');
-
         if (!cooldowns.has(user.id)) cooldowns.set(user.id, now + cooldown);
 
         setTimeout(() => cooldowns.delete(user.id), cooldown);

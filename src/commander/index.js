@@ -87,7 +87,7 @@ class Commander {
 
             await interaction.deferReply({ ephemeral: command.ephemeral });
 
-            if (!this.validate(interaction, command)) return;
+            if (!this.#validate(interaction, command)) return;
 
             try {
                 await command.run(this.client, interaction);
@@ -99,6 +99,29 @@ class Commander {
                 interaction.editReply({ embeds: [new ErrorEmbed(eventId)] });
             }
         });
+    }
+
+    #validate(interaction, command) {
+        if (command.users && !command.users.includes(interaction.user.id)) {
+            interaction.editReply({ embeds: [new ActionEmbed('fail', 'You are not allowed to use this command!', interaction.user)] });
+            return false;
+        }
+
+        if (command.cooldown && command.cooldowns) {
+            const context = interaction.guild?.id || 'dm';
+
+            if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
+                const cooldown = command.cooldowns.get(context).get(interaction.user.id);
+                const secondsLeft = (cooldown - Date.now()) / 1000;
+
+                interaction.editReply({ embeds: [new ActionEmbed('fail', `Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`, interaction.user)] });
+                return false;
+            }
+
+            command.applyCooldown(interaction.guild, interaction.user);
+        }
+
+        return true;
     }
 
     static async initialize(client) {
@@ -315,29 +338,6 @@ class Commander {
                 }
             }
         }
-    }
-
-    validate(interaction, command) {
-        if (command.users && !command.users.includes(interaction.user.id)) {
-            interaction.editReply({ embeds: [new ActionEmbed('fail', 'You are not allowed to use this command!', interaction.user)] });
-            return false;
-        }
-
-        if (command.cooldown && command.cooldowns) {
-            const context = interaction.guild?.id || 'dm';
-
-            if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
-                const cooldown = command.cooldowns.get(context).get(interaction.user.id);
-                const secondsLeft = (cooldown - Date.now()) / 1000;
-
-                interaction.editReply({ embeds: [new ActionEmbed('fail', `Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`, interaction.user)] });
-                return false;
-            }
-
-            command.applyCooldown(interaction.guild, interaction.user);
-        }
-
-        return true;
     }
 }
 
