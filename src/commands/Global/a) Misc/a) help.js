@@ -23,27 +23,31 @@ module.exports = {
             .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL({ dynamic: true }) })
             .setFooter({ text: 'Parameters with a \'?\' at the start are optional.' });
 
-        client.commander.groups.forEach((group, key) => {
-            if (key == 'CLI') return;
+        console.log('ran');
+
+        for (const [key, group] of client.commander.groups) {
+            if (key == 'CLI') continue;
 
             let reply = '';
-            group.forEach(async x => {
-                if (x.hidden || x.disabled || (x.guilds && (!int.guild || !x.guilds.includes(int.guild.id)) || (x.users && !x.users.includes(int.user.id)))) return;
+
+            for (const [_, command] of group) {
+                if (command.hidden || command.disabled || (command.guilds && (!int.guild || !command.guilds.includes(int.guild.id)) || (command.users && !command.users.includes(int.user.id)))) continue;
 
                 let aliasmsg = '';
 
-                if (x.aliases) {
-                    for (const alias of x.aliases) {
+                if (command.aliases) {
+                    for (const alias of command.aliases) {
                         aliasmsg += `, ${client.prefix}${alias}`;
                     }
 
-                    reply += `\`\`${client.prefix}${x.name}${aliasmsg}${x.format ? ` ${x.format.replace('[prefix]', client.prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${x.description}\n`;
+                    reply += `\`\`${client.prefix}${command.name}${aliasmsg}${command.format ? ` ${command.format.replace('[prefix]', client.prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${command.description}\n`;
                 } else {
-                    reply += `\`\`${client.prefix}${x.name}${x.format ? ` ${x.format.replace('[prefix]', client.prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${x.description}\n`;
+                    reply += `\`\`${client.prefix}${command.name}${command.format ? ` ${command.format.replace('[prefix]', client.prefix).replace('[aliases]', aliasmsg)}` : ''}\`\` → ${command.description}\n`;
                 }
-            });
+            }
+
             if (reply) replyEmbed.addFields([{ name: `${key} Commands`, value: reply }]);
-        });
+        }
 
         int.editReply({ embeds: [replyEmbed] });
     }
