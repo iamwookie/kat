@@ -108,7 +108,7 @@ class ColorManager {
             if (role && !int.member.roles.cache.has(color)) options.push({ label: role.name, value: role.id });
         }
 
-        if (!options.length) return;
+        if (!options.length) return [];
 
         const menu = new StringSelectMenuBuilder()
             .setCustomId('menu')
