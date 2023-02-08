@@ -30,8 +30,9 @@ module.exports = {
             group.forEach(async x => {
                 if (x.hidden || x.disabled || (x.guilds && (!int.guild || !x.guilds.includes(int.guild.id)) || (x.users && !x.users.includes(int.user.id)))) return;
 
+                let aliasmsg = "";
+
                 if (x.aliases) {
-                    let aliasmsg = "";
                     for (const alias of x.aliases) {
                         aliasmsg += `, ${client.prefix}${alias}`;
                     }
