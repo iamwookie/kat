@@ -1,5 +1,7 @@
 const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
+
 const ActionEmbed = require('@utils/embeds/action');
+const ErrorEmbed = require('@utils/embeds/error');
 
 class ColorManager {
     constructor(client, guild) {
@@ -46,7 +48,17 @@ class ColorManager {
                 }
 
                 const role = await interaction.guild.roles.fetch(color);
-                if (role) await interaction.member.roles.add(color);
+                if (role) {
+                    try {
+                        await interaction.member.roles.add(color);
+                    } catch (err) {
+                        this.client.logger?.error(err);
+                        console.error('ColorManager (ERROR) >> Error Adding Role'.red);
+                        console.error(err);
+
+                        return int.editReply({ embeds: [new ErrorEmbed(err)], components: [] });
+                    }
+                }
 
                 const success = new EmbedBuilder()
                     .setTitle('Colors')
