@@ -28,12 +28,9 @@ module.exports = {
         for (const [key, group] of client.commander.groups) {
             if (key == 'CLI') continue;
 
-            console.log(key)
-
             let reply = '';
 
             for (const [_, command] of group) {
-                console.log(command.users)
                 if (command.hidden || command.disabled || (command.guilds && (!int.guild || !command.guilds.includes(int.guild.id)) || (command.users && !command.users.includes(int.user.id)))) continue;
 
                 let aliasmsg = '';
