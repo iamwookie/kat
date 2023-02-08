@@ -30,7 +30,7 @@ module.exports = {
             group.forEach(async x => {
                 if (x.hidden || x.disabled || (x.guilds && (!int.guild || !x.guilds.includes(int.guild.id)) || (x.users && !x.users.includes(int.user.id)))) return;
 
-                let aliasmsg = "";
+                let aliasmsg = '';
 
                 if (x.aliases) {
                     for (const alias of x.aliases) {
