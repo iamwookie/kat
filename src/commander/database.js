@@ -57,7 +57,6 @@ class CommanderDatabase {
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Loading (SHUTDOWN)'.red);
             console.error(err);
-            this.loadLocked = false;
 
             this.client.logger?.fatal(err);
         }
