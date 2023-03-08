@@ -41,11 +41,11 @@ class MusicSubscription {
                 if (newState.reason == VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
                     this.client.logger?.warn('Music (VOICE) >> Connection Disconnected (Code 4014)'.yellow);
                     await this.#connect(5000);
-                } else if (voice.rejoinAttempts < 5) {
-                    voice.rejoinAttempts + 1;
-                    voice.rejoin();
+                } else if (this.voice.rejoinAttempts < 5) {
+                    this.voice.rejoinAttempts + 1;
+                    this.voice.rejoin();
                 } else {
-                    voice.destroy();
+                    this.voice.destroy();
                 }
             } else if (newState.status == VoiceConnectionStatus.Destroyed) {
                 this.client.logger?.warn('Music >> (VOICE) Connection Destroyed'.yellow);
