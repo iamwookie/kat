@@ -1,13 +1,11 @@
 const Discord = require('discord.js');
 
 class CommanderModule {
-    constructor(module, commander) {
+    constructor(commander, options) {
         this.commander = commander;
-        this.module = module;
+        this.options = options;
 
-        for (const key in module) {
-            this[key] = module[key];
-        }
+        Object.assign(this, options);
 
         if (this.events) {
             for (const event in this.commander.client._events) {
@@ -35,10 +33,9 @@ class CommanderModule {
 
             client.logger?.info(`Commander >> Loaded ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`);
         } catch (err) {
+            client.logger?.error(err);
             console.error(`Commander >> Failed to Load ${this.guilds ? 'Guild' : 'Global'} Module: ${this.name}`.red);
             console.error(err);
-
-            client.logger?.error(err);
         }
     }
 }

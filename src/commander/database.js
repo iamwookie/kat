@@ -1,5 +1,4 @@
 const Discord = require("discord.js");
-const Commander = require('@commander');
 const redis = require('@lib/redis');
 
 class CommanderDatabase {
@@ -21,10 +20,9 @@ class CommanderDatabase {
 
             return database;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('CommanderDatabase (ERROR) >> Error Initializing'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
         }
     }
 
@@ -58,7 +56,6 @@ class CommanderDatabase {
         } catch (err) {
             console.error('CommanderDatabase (ERROR) >> Error Loading (SHUTDOWN)'.red);
             console.error(err);
-            this.loadLocked = false;
 
             this.client.logger?.fatal(err);
         }
@@ -85,10 +82,9 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
             console.error(err);
-
-            this.client.logger?.error(err);
 
             return false;
         }
@@ -112,10 +108,9 @@ class CommanderDatabase {
 
             return true;
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('CommanderDatabase (ERROR) >> Error Deleting Value'.red);
             console.error(err);
-            
-            this.client.logger?.error(err);
 
             return false;
         }
@@ -144,10 +139,9 @@ class CommanderDatabase {
 
             await this.#load();
         } catch (err) {
+            this.client.logger?.error(err);
             console.error('CommanderDatabase (ERROR) >> Error Setting Value'.red);
             console.error(err);
-            
-            this.client.logger?.error(err);
         }
     }
 

@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const { fetchUser } = require('@server/controllers/user');
+const { fetchInvite } = require('@server/controllers/kat');
 
 module.exports = client => {
     // /users/:id
-    router.get('/:id', fetchUser(client));
+    router.get('/', fetchInvite(client));
 
     return router;
 };
-

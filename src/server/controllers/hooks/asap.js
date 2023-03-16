@@ -4,7 +4,7 @@ const { EmbedBuilder } = require('discord.js');
 const { hooks } = require('@configs/server.json');
 const { asap } = hooks;
 
-exports.unboxHook = client => {
+exports.sendUnbox = client => {
     return async (req, res) => {
         try {
             const body = req.body;
@@ -46,17 +46,16 @@ exports.unboxHook = client => {
 
             return res.status(200).send('OK');
         } catch (err) {
+            client.logger?.request(req, 'error', err);
             console.error('ASAP Controller (ERROR) >> Error Creating Unbox Log'.red);
             console.error(err);
-
-            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }
     };
 };
 
-exports.suitsHook = client => {
+exports.sendSuits = client => {
     return async (req, res) => {
         try {
             const body = req.body;
@@ -98,17 +97,16 @@ exports.suitsHook = client => {
 
             return res.status(200).send('OK');
         } catch (err) {
+            client.logger?.request(req, 'error', err);
             console.error('ASAP Controller (ERROR) >> Error Creating Suit Rip Log'.red);
             console.error(err);
-
-            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }
     };
 };
 
-exports.staffHook = client => {
+exports.sendStaff = client => {
     return async (req, res) => {
         try {
             const body = req.body;
@@ -154,15 +152,14 @@ exports.staffHook = client => {
             for (const c of asap.staff) {
                 const channel = await client.channels.fetch(c);
                 if (!channel) return res.status(500).send('Internal Server Error');
-                await channel.send({ embeds: [embed] });
+                await channel.send({ content: `\`${adminUser} (${adminSid})\` has ${ban} \`${banUser} (${banUserSid})\`!`, embeds: [embed] });
             }
 
             return res.status(200).send('OK');
         } catch (err) {
+            client.logger?.request(req, 'error', err);
             console.error('ASAP Controller (ERROR) >> Error Creating Staff Log'.red);
             console.error(err);
-
-            client.logger?.request(req, 'error', err);
 
             return res.status(500).send('Internal Server Error');
         }

@@ -42,11 +42,10 @@ module.exports = {
         let manager = client.colors.get(int.guildId);
         if (!manager) manager = await ColorManager.initialize(client, int.guild);
 
-        let command = int.options.getSubcommand();
+        const command = int.options.getSubcommand();
 
         if (command == 'set') {
-            let [embed, row] = await manager.createMenu(int);
-
+            const [embed, row] = await manager.createMenu(int);
             if (!embed) return int.editReply({ embeds: [new ActionEmbed('fail', 'No color options available!', int.user)] });
 
             return int.editReply({ embeds: [embed], components: [row] });
@@ -54,15 +53,12 @@ module.exports = {
 
         if (command == 'add') {
             const admin = await client.database.get(int.guild.id, 'colorAdmin');
-
             if (int.user.id != client.dev && int.user.id != int.guild.owner && (admin ? !int.member.roles.cache.has(admin) : true)) return int.editReply({ embeds: [new ActionEmbed('fail', 'You do not have permission to use this command!', int.user)] });
 
             const role = int.options.getRole('role');
-
             if (manager.colors.includes(role.id)) return int.editReply({ embeds: [new ActionEmbed('fail', 'This role is already a color!', int.user)] });
 
             const colorRole = await manager.addColor(role);
-
             if (!colorRole) return int.editReply({ embeds: [new ActionEmbed('fail', 'Error creating color!', int.user)] });
 
             const embed = new EmbedBuilder()

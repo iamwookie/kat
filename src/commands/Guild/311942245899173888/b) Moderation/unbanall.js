@@ -1,10 +1,11 @@
 const { SlashCommandBuilder } = require('discord.js');
+
 const ActionEmbed = require('@utils/embeds/action');
 
 module.exports = {
     name: 'unbanall',
     group: 'Moderation',
-    description: 'Unban everyone.',
+    description: 'Unban everyone from the Discord.',
 
     // AUTHORIZATION
     guilds: [],
@@ -21,20 +22,18 @@ module.exports = {
     },
 
     async run(client, int) {
-        let bans = await int.guild.bans.fetch();
+        const bans = await int.guild.bans.fetch();
 
-        await int.editReply({ embeds: [new ActionEmbed('success', 'Unbanning all users!', int.user)] });
-
+        let count = 0;
         for (const [_, ban] of bans) {
             try {
                 await int.guild.members.unban(ban.user);
-                int.channel.send(`Unbanned ${ban.user.tag}.`);
+                count++;
             } catch (err) {
-                console.error(err);
-                int.channel.send(`Failed to unban ${ban.user.tag}.`);
-            }         
+                client.logger?.error(err);
+            }
         }
 
-        int.channel.send('Done. EZPZ.');
+        return int.editReply({ embeds: [new ActionEmbed('success', `Unbanned \`${count}\` users from the Discord!`, int.user)] });
     }
 };

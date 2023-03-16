@@ -4,6 +4,7 @@ const TwitchManager = require('@lib/twitch/manager');
 
 const ActionEmbed = require('@utils/embeds/action');
 const TwitchEmbed = require('@utils/embeds/twitch');
+
 // -----------------------------------
 
 module.exports = {
@@ -95,10 +96,9 @@ module.exports = {
                     const channel = await int.guild.channels.fetch(channelId);
                     if (channel) channel.send({ content: "@everyone", embeds: [embed] });
                 } catch (err) {
+                    client.logger?.error(err);
                     console.error(`Guild Commands (ERROR) (${int.guild.id}) >> live: Failed To Fetch Channel`.red);
                     console.error(err);
-                    
-                    client.logger?.error(err);
 
                     return int.editReply({ embeds: [new ActionEmbed('fail', 'Failed to send message(s)! Are you sure I have enough permissions? Try running the setup again if this message keeps appearing.', int.user)] });
                 }

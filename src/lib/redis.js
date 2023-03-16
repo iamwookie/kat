@@ -1,7 +1,7 @@
 const { createClient } = require('redis');
 
 module.exports = async (client) => {
-    const redis = createClient({ 
+    const redis = createClient({
         url: process.env.REDIS_URL,
         socket: {
             reconnectStrategy: (retries) => {
@@ -13,11 +13,10 @@ module.exports = async (client) => {
 
     redis.on('connect', () => client.logger?.info('Redis >> Client Connected'));
     redis.on('end', () => client.logger?.info('Redis >> Client Disconnected'));
-    redis.on('error', (err) => {
+    redis.on('error', err => {
+        client.logger?.error(err);
         console.error('Redis >> Client Error'.red);
         console.error(err);
-
-        client.logger?.error(err);
     });
 
     await redis.connect();
