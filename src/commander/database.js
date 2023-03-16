@@ -1,5 +1,4 @@
 const Discord = require("discord.js");
-const Commander = require('@commander');
 const redis = require('@lib/redis');
 
 class CommanderDatabase {
