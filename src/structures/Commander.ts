@@ -1,9 +1,10 @@
 // This is the command handler, CODENAME: Commander v7.0.0
+import { KATClient } from "./Client.js";
 
 import readline, { Interface } from "readline";
-import { KATClient } from "./Client.js";
 import { REST, Routes, Events, CommandInteraction, InteractionType, Collection, Snowflake, ChatInputCommandInteraction } from "discord.js";
-import { CommanderCommand, CommanderModule } from "../commander/index.js";
+import { Command }from "./Command.js";
+import { Module } from "./Module.js";
 import { ActionEmbed, ErrorEmbed } from "@utils/embeds/index.js";
 
 import chalk from "chalk";
@@ -25,22 +26,13 @@ export class Commander {
     public global: Collection<string, any> = new Collection();
     public guilds: Collection<Snowflake, any> = new Collection();
 
-    public groups: Collection<string, Collection<string, CommanderCommand>> = new Collection();
-    public commands: Collection<string, CommanderCommand> = new Collection();
-    public modules: Collection<string, CommanderModule> = new Collection();
+    public groups: Collection<string, Collection<string, Command>> = new Collection();
+    public commands: Collection<string, Command> = new Collection();
+    public modules: Collection<string, Module> = new Collection();
     public aliases: Collection<string, string> = new Collection();
 
     constructor(public readonly client: KATClient) {
         this.client = client;
-
-        // Music
-        this.client.subscriptions = this.client.subscriptions || new Collection();
-
-        // Guilds
-        // this.client.linkSessions = this.client.linkSessions || new Collection();
-
-        // Colors
-        this.client.colors = this.client.colors || new Collection();
 
         // CLI Commands
         this.readline.on("line", async (line) => {
@@ -87,24 +79,24 @@ export class Commander {
         });
     }
 
-    static async initialize(client: KATClient) {
-        try {
-            const commander = new Commander(client);
-            await commander.initializeCLICommands();
-            await commander.initializeGlobalCommands();
-            await commander.initializeGuildCommands();
-            // await commander.initializeModules();
+    // static async initialize(client: KATClient) {
+    //     try {
+    //         const commander = new Commander(client);
+    //         await commander.initializeCLICommands();
+    //         await commander.initializeGlobalCommands();
+    //         await commander.initializeGuildCommands();
+    //         // await commander.initializeModules();
 
-            console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
+    //         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
 
-            return commander;
-        } catch (err) {
-            console.error(chalk.red("Commander (ERROR) >> Error Initializing"));
-            console.error(err);
+    //         return commander;
+    //     } catch (err) {
+    //         console.error(chalk.red("Commander (ERROR) >> Error Initializing"));
+    //         console.error(err);
 
-            client.logger.fatal(err);
-        }
-    }
+    //         client.logger.fatal(err);
+    //     }
+    // }
 
     private validate(interaction: CommandInteraction, command: any) {
         if (command.users && !command.users.includes(interaction.user.id)) {
@@ -253,7 +245,7 @@ export class Commander {
     //                 // delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)];
 
     //                 const object = await import(`${globalPath}/${folder}/${file}`);
-    //                 const module = new CommanderModule(this, object);
+    //                 const module = new Module(this, object);
 
     //                 await module.initialize(this.client);
 
@@ -273,7 +265,7 @@ export class Commander {
     //                     // delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)];
 
     //                     const object = await import(`${guildPath}/${folder}/${subFolder}/${file}`);
-    //                     const module = new CommanderModule(this, object);
+    //                     const module = new Module(this, object);
     //                     if (!module.guilds || !module.guilds.includes(folder)) this.client.logger.warn(`Commander >> Guild Not Set For Guild Module: ${module.name}`);
 
     //                     module.initialize(this.client);

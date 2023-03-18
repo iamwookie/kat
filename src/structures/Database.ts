@@ -1,9 +1,10 @@
-import { Client, Collection, Snowflake } from "discord.js";
+import { KATClient } from "./Client.js";
+import { Collection, Snowflake } from "discord.js";
 import { createClient } from "redis";
 
 import chalk from "chalk";
 
-export class CommanderDatabase {
+export class Database {
     private prefix: string = "cat:";
 
     public redis: ReturnType<typeof createClient>;
@@ -11,32 +12,51 @@ export class CommanderDatabase {
     public access: Collection<string, { [key: string]: any }> = new Collection();
 
     constructor(
-        private readonly client: Client
+        private readonly client: KATClient
     ) {
         this.client = client;
     }
 
-    static async initialize(client: Client): Promise<CommanderDatabase | undefined> {
-        try {
-            const database = new CommanderDatabase(client);
-            await database.connect();
-            await database.load();
+    // Private
 
-            console.log(
-                chalk.greenBright.bold.underline(">>> Database Initialized")
+    async connect(): Promise<void> {
+        try {
+            this.redis = createClient({
+                url: process.env.REDIS_URL,
+                socket: {
+                    reconnectStrategy: (retries) => {
+                        if (retries > 3)
+                            return new Error(
+                                chalk.red("Redis >> Failed To Connect")
+                            );
+                        return Math.min(retries * 100, 3000);
+                    },
+                },
+            });
+
+            this.redis.on("connect", () =>
+                this.client.logger.info("Redis >> KATClient Connected")
             );
 
-            return database;
+            this.redis.on("end", () =>
+                this.client.logger.info("Redis >> KATClient Disconnected")
+            );
+
+            this.redis.on("error", (err) => {
+                this.client.logger.error(err);
+                console.error(chalk.red("Redis >> KATClient Error"));
+                console.error(err);
+            });
+
+            await this.redis.connect();
         } catch (err) {
-            client.logger.error(err);
-            console.error(chalk.red("CommanderDatabase (ERROR) >> Error Initializing"));
+            this.client.logger.error(err);
+            console.error(chalk.red("CommanderDatabase (ERROR) >> Error Connecting (SHUTDOWN)"));
             console.error(err);
         }
     }
 
-    // Private
-
-    private async load() {
+    async load() {
         try {
             let guilds = await this.redis.hGetAll(this.withPrefix("guilds"));
 
@@ -66,43 +86,6 @@ export class CommanderDatabase {
             console.error(err);
 
             this.client.logger.fatal(err);
-        }
-    }
-
-    private async connect(): Promise<void> {
-        try {
-            this.redis = createClient({
-                url: process.env.REDIS_URL,
-                socket: {
-                    reconnectStrategy: (retries) => {
-                        if (retries > 3)
-                            return new Error(
-                                chalk.red("Redis >> Failed To Connect")
-                            );
-                        return Math.min(retries * 100, 3000);
-                    },
-                },
-            });
-
-            this.redis.on("connect", () =>
-                this.client.logger.info("Redis >> Client Connected")
-            );
-
-            this.redis.on("end", () =>
-                this.client.logger.info("Redis >> Client Disconnected")
-            );
-
-            this.redis.on("error", (err) => {
-                this.client.logger.error(err);
-                console.error(chalk.red("Redis >> Client Error"));
-                console.error(err);
-            });
-
-            await this.redis.connect();
-        } catch (err) {
-            this.client.logger.error(err);
-            console.error(chalk.red("CommanderDatabase (ERROR) >> Error Connecting (SHUTDOWN)"));
-            console.error(err);
         }
     }
 

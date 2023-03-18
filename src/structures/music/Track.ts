@@ -1,8 +1,9 @@
-import { Client, CommandInteraction, User } from "discord.js";
+import { KATClient } from "@structures/index.js";
+import { CommandInteraction, User } from "discord.js";
 import { createAudioResource, AudioResource } from "@discordjs/voice";
 
 import play from "play-dl";
-import { MusicSubscription } from "./index.js";
+import { Subscription as MusicSubscription } from "./Subscription.js";
 import { formatDuration } from "src/utils/helpers.js";
 
 import chalk from "chalk";
@@ -14,7 +15,6 @@ export type TrackMetadata = {
 };
 
 abstract class Track {
-    public client: Client;
     public requestedBy: User;
 
     public onStart: () => void;
@@ -32,11 +32,12 @@ abstract class Track {
     public type: "video" | "track" | "playlist" | "album" | "channel";
 
     constructor(
+        public client: KATClient,
         public subscription: MusicSubscription,
         public interaction: CommandInteraction,
         { ...options }: TrackMetadata
     ) {
-        this.client = interaction.client;
+        this.client = client;
 
         this.subscription = subscription;
         this.interaction = interaction;
@@ -67,8 +68,8 @@ abstract class Track {
 }
 
 export class YouTubeTrack extends Track {
-    constructor(subscription: MusicSubscription, interaction: CommandInteraction, data: play.YouTubeVideo, { ...options }: TrackMetadata) {
-        super(subscription, interaction, { ...options });
+    constructor(client: KATClient, subscription: MusicSubscription, interaction: CommandInteraction, data: play.YouTubeVideo, { ...options }: TrackMetadata) {
+        super(client, subscription, interaction, { ...options });
 
         this.raw = data;
         this.url = data.url;
@@ -86,8 +87,8 @@ export class SpotifyTrack extends Track {
     private name: string;
     private artists: any[];
 
-    constructor(subscription: MusicSubscription, interaction: CommandInteraction, data: play.SpotifyTrack, { ...options }: TrackMetadata) {
-        super(subscription, interaction, { ...options });
+    constructor(client: KATClient, subscription: MusicSubscription, interaction: CommandInteraction, data: play.SpotifyTrack, { ...options }: TrackMetadata) {
+        super(client, subscription, interaction, { ...options });
 
         this.raw = data;
         this.url = data.url;

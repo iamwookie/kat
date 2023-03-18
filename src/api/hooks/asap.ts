@@ -1,4 +1,5 @@
-import { Client, TextChannel, ColorResolvable } from "discord.js";
+import { KATClient as Client } from "@structures/index.js";
+import { TextChannel, ColorResolvable } from "discord.js";
 import { Request, Response } from "express";
 import { EmbedBuilder } from "discord.js";
 

@@ -1,5 +1,5 @@
 import { User } from "discord.js";
-import { YouTubeTrack, SpotifyTrack } from "@lib/music/tracks.js";
+import { YouTubeTrack, SpotifyTrack } from "@src/structures/music/Track.js";
 import { YouTubePlayList, SpotifyPlaylist, SpotifyAlbum } from "play-dl";
 import stringProgressBar from "string-progressbar";
 import emojis from "./emojis.json" assert { type: "json" };

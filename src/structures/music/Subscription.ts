@@ -1,5 +1,6 @@
+import { KATClient } from "@structures/index.js";
+
 import {
-    Client,
     Guild,
     VoiceBasedChannel,
     TextBasedChannel
@@ -9,7 +10,7 @@ import {
     YouTubeTrack,
     SpotifyTrack,
     TrackMetadata
-} from "./tracks.js";
+} from "./Track.js";
 
 import {
     createAudioPlayer,
@@ -23,7 +24,7 @@ import {
 
 import chalk from "chalk";
 
-export class MusicSubscription {
+export class Subscription {
     private queueLocked: boolean = false;
     private readyLock: boolean = false;
 
@@ -33,7 +34,7 @@ export class MusicSubscription {
     public active: YouTubeTrack | SpotifyTrack | null = null;
 
     constructor(
-        private client: Client,
+        private client: KATClient,
         private voiceConnection: VoiceConnection,
         private voiceChannel: VoiceBasedChannel | null,
         private textChannel: TextBasedChannel | null,

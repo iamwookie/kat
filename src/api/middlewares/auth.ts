@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { KATClient as Client } from "@structures/index.js";
 import { Request, Response, NextFunction } from "express";
 
 export function withAuth(client: Client) {

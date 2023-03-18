@@ -1,5 +1,5 @@
+import { KATClient as Client } from "@structures/index.js";
 import { Router, Request, Response } from 'express';
-import { Client } from 'discord.js';
 
 import { withLimiter } from '@api/middlewares/limiter.js';
 

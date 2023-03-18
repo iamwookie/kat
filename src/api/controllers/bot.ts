@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { KATClient as Client } from "@structures/index.js";
 import { Request, Response } from "express";
 import { formatTime, formatBytes } from "@src/utils/helpers.js";
 

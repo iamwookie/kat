@@ -1,5 +1,6 @@
+import { KATClient as Client } from "@structures/index.js";
 import { Router } from 'express';
-import { Client } from 'discord.js';
+
 import { fetchUser } from '@api/controllers/user.js';
 
 const router = Router();

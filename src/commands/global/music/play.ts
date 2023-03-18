@@ -1,16 +1,16 @@
-import { Commander, CommanderCommand } from "@src/commander/index.js";
+import { KATClient, Commander, Command } from "@structures/index.js";
 
-import { Client, ChatInputCommandInteraction, GuildMember, TextChannel, VoiceBasedChannel, VoiceChannel } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, TextChannel, VoiceBasedChannel, VoiceChannel } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { joinVoiceChannel } from "@discordjs/voice";
 
 import play from "play-dl";
-import { MusicSubscription, YouTubeTrack, SpotifyTrack } from "@lib/music/index.js";
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack } from "@structures/index.js";
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
 
 import chalk from "chalk";
 
-export class PlayCommand extends CommanderCommand {
+export class PlayCommand extends Command {
     constructor(commander: Commander) {
         super(commander);
 
@@ -30,9 +30,10 @@ export class PlayCommand extends CommanderCommand {
                     return option;
                 });
         };
+    }
 
-        this.execute = async (client: Client, int: ChatInputCommandInteraction) => {
-            const query = int.options.getString("query");
+    async execute(client: KATClient, int: ChatInputCommandInteraction) {
+        const query = int.options.getString("query");
 
             const voiceChannel: VoiceBasedChannel | null = (int.member as GuildMember)?.voice.channel;
             if (!voiceChannel) return int.editReply({ embeds: [new ActionEmbed("fail", "You are not in a voice channel!", int.user)] });
@@ -81,7 +82,7 @@ export class PlayCommand extends CommanderCommand {
                         const search = await play.spotify(query);
 
                         if (search instanceof play.SpotifyTrack) {
-                            const track = new SpotifyTrack(subscription, int, search, {
+                            const track = new SpotifyTrack(client, subscription, int, search, {
                                 onError: () => (int.channel as TextChannel)?.send({ embeds: [new ActionEmbed("fail", "An error occured while playing a track!", int.user)] }),
                             });
                             subscription.add(track);
@@ -91,7 +92,7 @@ export class PlayCommand extends CommanderCommand {
                             const spotifyTracks = await search.all_tracks();
 
                             for (const item of spotifyTracks) {
-                                const track = new SpotifyTrack(subscription, int, item, {
+                                const track = new SpotifyTrack(client, subscription, int, item, {
                                     onError: () => (int.channel as TextChannel)?.send({ embeds: [new ActionEmbed("fail", "An error occured while playing a track!", int.user)] }),
                                 });
                                 subscription.add(track);
@@ -115,7 +116,7 @@ export class PlayCommand extends CommanderCommand {
 
                         if (search instanceof play.YouTubePlayList) {
                             for (const video of (search as any).videos) {
-                                const track = new YouTubeTrack(subscription, int, video, {
+                                const track = new YouTubeTrack(client, subscription, int, video, {
                                     onError: () => (int.channel as TextChannel)?.send({ embeds: [new ActionEmbed("fail", "An error occured while playing a track!", int.user)] }),
                                 });
                                 subscription.add(track);
@@ -138,7 +139,7 @@ export class PlayCommand extends CommanderCommand {
                         const search = await play.search(query, { limit: 1, source: { youtube: "video" } });
 
                         if (search[0] instanceof play.YouTubeVideo) {
-                            const track = new YouTubeTrack(subscription, int, search[0], {
+                            const track = new YouTubeTrack(client, subscription, int, search[0], {
                                 onError: () => (int.channel as TextChannel)?.send({ embeds: [new ActionEmbed("fail", "An error occured while playing a track!", int.user)] }),
                             });
                             subscription.add(track);
@@ -163,6 +164,5 @@ export class PlayCommand extends CommanderCommand {
 
                 return int.editReply({ embeds: [new ErrorEmbed(eventId)] });
             }
-        };
-    }
+        }
 }

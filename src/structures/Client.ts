@@ -1,13 +1,14 @@
-import Config from '@configs/bot.json' assert { type: 'json' };
+import Config from "../configs/bot.json" assert { type: "json" };
 
-import { Client, ClientOptions, Collection, PermissionsBitField } from 'discord.js';
-import { Logger } from './Logger.js';
-import { Commander } from './Commander.js';
+import { Client, ClientOptions, Events, Collection, PermissionsBitField } from "discord.js";
+import { Logger } from "./Logger.js";
+import { Database } from "./Database.js";
+import { Commander } from "./Commander.js";
 
-const perms = 
+import chalk from "chalk";
 
 export class KATClient extends Client {
-    public perms: PermissionsBitField = new PermissionsBitField([
+    public permissions: PermissionsBitField = new PermissionsBitField([
         // GENERAL
         PermissionsBitField.Flags.ViewChannel,
         // TEXT
@@ -28,6 +29,7 @@ export class KATClient extends Client {
     public prefix: string = Config.prefix;
 
     public logger: Logger = new Logger(this);
+    public database: Database = new Database(this);
     public commander: Commander = new Commander(this);
 
     public subscriptions: Collection<any, any> = new Collection();
@@ -35,5 +37,24 @@ export class KATClient extends Client {
 
     constructor(options: ClientOptions) {
         super(options);
+
+        this.on(Events.Error, (err) => { this.logger.error(err) });
+
+        this.on(Events.ClientReady, (client) => {
+            console.log(chalk.magenta.bold.underline(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`));
+        });
+
+        if (process.env.NODE_ENV != "production") this.on(Events.Debug, msg => { this.logger.debug(msg) });
+    }
+
+    async initialize(): Promise<void> {
+        await this.database.connect();
+        await this.database.load();
+        console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));
+
+        await this.commander.initializeCLICommands();
+        await this.commander.initializeGlobalCommands();
+        await this.commander.initializeGuildCommands();
+        console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
     }
 }

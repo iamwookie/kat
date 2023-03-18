@@ -1,16 +1,15 @@
-import { Commander } from "@src/commander/index.js";
+import { KATClient } from "./Client.js";
+import { Commander } from "./Commander.js";
 import {
-    Client,
     User,
     Guild,
-    Message,
     ChatInputCommandInteraction,
     SlashCommandBuilder,
     Collection,
     Snowflake,
 } from "discord.js";
 
-export class CommanderCommand {
+export class Command {
     public name: string;
     public group: string;
     public aliases?: string[];
@@ -25,17 +24,16 @@ export class CommanderCommand {
 
     public data: () => Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
 
-    public execute: (
-        client: Client,
-        interaction: ChatInputCommandInteraction
-    ) => Promise<void | Message>;
-
     public cooldowns: Collection<Snowflake, Collection<Snowflake, number>> = new Collection();
 
     constructor(
         private commander: Commander,
     ) {
         this.commander = commander;
+    }
+
+    async execute(client: KATClient, interaction: ChatInputCommandInteraction): Promise<any> {
+        return Promise.resolve();
     }
 
     async initialize() {
