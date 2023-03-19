@@ -44,7 +44,7 @@ export class PlayCommand extends Command {
 
         let subscription: MusicSubscription = client.subscriptions.get(int.guildId);
 
-        if (subscription && subscription.isPlayerPaused) {
+        if (subscription && subscription.paused) {
             subscription.unpause();
 
             const resumed = new MusicEmbed(int).setResumed(subscription).setQueue(subscription);

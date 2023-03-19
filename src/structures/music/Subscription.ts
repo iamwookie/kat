@@ -108,7 +108,7 @@ export class Subscription {
         if (this.queueLocked || this.player.state.status !== AudioPlayerStatus.Idle) return;
 
         this.queueLocked = true;
-        if (!this.isVoiceReady) await this.connect(20000);
+        if (!this.ready) await this.connect(20000);
 
         const track = this.queue.shift();
         if (!track) return this.destroy();
@@ -130,7 +130,7 @@ export class Subscription {
     }
 
     destroy() {
-        if (!this.isVoiceDestroyed) this.voiceConnection.destroy();
+        if (!this.destroyed) this.voiceConnection.destroy();
         this.client.subscriptions.delete(this.guild?.id);
         this.client.logger.warn(`Music >> Subscription Destroyed: ${this.guild?.name} (${this.guild?.id})`);
     }
@@ -157,19 +157,19 @@ export class Subscription {
 
     // Getters
 
-    get isVoiceReady() {
+    get ready() {
         return this.voiceConnection.state.status == VoiceConnectionStatus.Ready;
     }
 
-    get isVoiceDestroyed() {
+    get destroyed() {
         return this.voiceConnection.state.status == VoiceConnectionStatus.Destroyed;
     }
 
-    get isPlayerPlaying() {
+    get playing() {
         return this.player.state.status == AudioPlayerStatus.Playing;
     }
 
-    get isPlayerPaused() {
+    get paused() {
         return this.player.state.status == AudioPlayerStatus.Paused;
     }
 }
