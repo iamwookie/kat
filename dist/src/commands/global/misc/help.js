@@ -11,9 +11,11 @@ export class HelpCommand extends Command {
             content: "Stop it. Get some help.",
         };
         this.ephemeral = true;
-        this.data = new SlashCommandBuilder()
+    }
+    data() {
+        return new SlashCommandBuilder()
             .setName(this.name)
-            .setDescription(this.description.content);
+            .setDescription(this.description?.content);
     }
     async execute(client, int) {
         const replyEmbed = new EmbedBuilder()

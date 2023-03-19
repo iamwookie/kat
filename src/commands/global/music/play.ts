@@ -21,16 +21,18 @@ export class PlayCommand extends Command {
         };
 
         this.cooldown = 5;
+    }
 
-        this.data = new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description.content!)
-            .setDMPermission(false)
-            .addStringOption((option) => {
-                option.setName("query");
-                option.setDescription("The name or URL of the track.");
-                return option;
-            });
+    data() {
+        return new SlashCommandBuilder()
+        .setName(this.name)
+        .setDescription(this.description?.content!)
+        .setDMPermission(false)
+        .addStringOption((option) => {
+            option.setName("query");
+            option.setDescription("The name or URL of the track.");
+            return option;
+        });
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {

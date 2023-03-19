@@ -1,4 +1,4 @@
-import { Collection } from "discord.js";
+import { SlashCommandBuilder, Collection } from "discord.js";
 export class Command {
     commander;
     name;
@@ -11,11 +11,13 @@ export class Command {
     ephemeral;
     guilds;
     users;
-    data;
     cooldowns = new Collection();
     constructor(commander) {
         this.commander = commander;
         this.commander = commander;
+    }
+    data() {
+        return new SlashCommandBuilder();
     }
     async execute(client, interaction) {
         return Promise.resolve();

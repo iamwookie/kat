@@ -16,11 +16,13 @@ export class SkipCommand extends Command {
         };
 
         this.cooldown = 5;
+    }
 
-        this.data = new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description.content!)
-            .setDMPermission(false);
+    data() {
+        return new SlashCommandBuilder()
+        .setName(this.name)
+        .setDescription(this.description?.content!)
+        .setDMPermission(false);
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {

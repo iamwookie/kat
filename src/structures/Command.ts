@@ -19,15 +19,17 @@ export class Command {
 
     public guilds?: Snowflake[];
     public users?: Snowflake[];
-
-    public data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
-
+    
     public cooldowns: Collection<Snowflake, Collection<Snowflake, number>> = new Collection();
 
     constructor(
         private commander: Commander
     ) {
         this.commander = commander;
+    }
+
+    data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup"> {
+        return new SlashCommandBuilder()
     }
 
     async execute(client: KATClient, interaction: ChatInputCommandInteraction): Promise<any> {

@@ -98,25 +98,6 @@ export class Commander {
         });
     }
 
-    // static async initialize(client: KATClient) {
-    //     try {
-    //         const commander = new Commander(client);
-    //         await commander.initializeCLICommands();
-    //         await commander.initializeGlobalCommands();
-    //         await commander.initializeGuildCommands();
-    //         // await commander.initializeModules();
-
-    //         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
-
-    //         return commander;
-    //     } catch (err) {
-    //         console.error(chalk.red("Commander (ERROR) >> Error Initializing"));
-    //         console.error(err);
-
-    //         client.logger.fatal(err);
-    //     }
-    // }
-
     private validate(interaction: CommandInteraction, command: any) {
         if (command.users && !command.users.includes(interaction.user.id)) {
             interaction.editReply({ embeds: [new ActionEmbed("fail", "You are not allowed to use this command!", interaction.user)] });
