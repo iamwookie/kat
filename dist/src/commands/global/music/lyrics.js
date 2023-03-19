@@ -25,9 +25,9 @@ export class LyricsCommand extends Command {
         let query = int.options.getString("query");
         const subscription = client.subscriptions.get(int.guildId);
         if (!query) {
-            if (!subscription || !subscription.isPlayerPlaying())
+            if (!subscription || !subscription.playing)
                 return int.editReply({ embeds: [new ActionEmbed("fail", "I am not playing anything!", int.user)] });
-            query = subscription.active.title;
+            query = subscription.active?.title;
         }
         try {
             const search = await genius.songs.search(query);

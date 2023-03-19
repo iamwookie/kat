@@ -24,7 +24,7 @@ export class PauseCommand extends Command {
             return await int.editReply({ embeds: [new MusicEmbed(int).setTitle("I'm not playing anything!")] });
         try {
             subscription.destroy();
-            return await int.editReply({ embeds: [new MusicEmbed(int).setTitle(subscription.isPlayerPaused() ? "👋 \u200b Discconected! Cya!" : "👋 \u200b Stopped playing! Cya!")] });
+            return await int.editReply({ embeds: [new MusicEmbed(int).setTitle(subscription.paused ? "👋 \u200b Discconected! Cya!" : "👋 \u200b Stopped playing! Cya!")] });
         }
         catch (err) {
             const eventId = client.logger.error(err);

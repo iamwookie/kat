@@ -1,6 +1,7 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import { Subscription as MusicSubscription } from "@structures/index.js";
 import { ActionEmbed, MusicEmbed, ErrorEmbed } from "@src/utils/embeds/index.js";
 
 import GeniusLyrics from "genius-lyrics";
@@ -31,12 +32,12 @@ export class LyricsCommand extends Command {
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
         let query = int.options.getString("query");
-        const subscription = client.subscriptions.get(int.guildId);
+        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
 
         if (!query) {
-            if (!subscription || !subscription.isPlayerPlaying()) return int.editReply({ embeds: [new ActionEmbed("fail", "I am not playing anything!", int.user)] });
+            if (!subscription || !subscription.playing) return int.editReply({ embeds: [new ActionEmbed("fail", "I am not playing anything!", int.user)] });
 
-            query = subscription.active.title;
+            query = subscription.active?.title!;
         }
 
         try {
@@ -46,7 +47,7 @@ export class LyricsCommand extends Command {
             if (!lyrics) return int.editReply({ embeds: [new ActionEmbed("fail", "Couldn't find your search results!", int.user)] });
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + "\n...";
 
-            const success = new MusicEmbed(int).setItem(subscription?.active);
+            const success = new MusicEmbed(int).setItem(subscription?.active!);
             search[0]
                 ? success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`)
                 : success.setDescription(lyrics);

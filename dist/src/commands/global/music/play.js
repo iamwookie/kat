@@ -35,7 +35,7 @@ export class PlayCommand extends Command {
         if (!voiceChannel.joinable || !voiceChannel.speakable)
             return int.editReply({ embeds: [new ActionEmbed("fail", "I can't play in that voice channel!", int.user)] });
         let subscription = client.subscriptions.get(int.guildId);
-        if (subscription && subscription.isPlayerPaused) {
+        if (subscription && subscription.paused) {
             subscription.unpause();
             const resumed = new MusicEmbed(int).setResumed(subscription).setQueue(subscription);
             if (!query)

@@ -1,6 +1,7 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import { Subscription as MusicSubscription } from "@structures/index.js";
 import { ActionEmbed, MusicEmbed, ErrorEmbed } from "@src/utils/embeds/index.js";
 
 import chalk from "chalk";
@@ -26,8 +27,8 @@ export class SkipCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
-        const subscription = client.subscriptions.get(int.guildId);
-        if (!subscription || !subscription.isPlayerPlaying()) return int.editReply({ embeds: [new ActionEmbed('fail', 'I am not playing anything!', int.user)] });
+        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        if (!subscription || !subscription.playing) return int.editReply({ embeds: [new ActionEmbed('fail', 'I am not playing anything!', int.user)] });
         if (subscription.queue.length == 0) return int.editReply({ embeds: [new ActionEmbed('fail', 'Nothing to skip to. This is the last track!', int.user)] });
 
         try {

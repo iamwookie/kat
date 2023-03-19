@@ -1,6 +1,7 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import { Subscription as MusicSubscription } from "@structures/index.js";
 import { ActionEmbed, ErrorEmbed } from "@src/utils/embeds/index.js";
 
 import chalk from "chalk";
@@ -26,7 +27,7 @@ export class StopCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
-        const subscription = client.subscriptions.get(int.guildId);
+        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
         if (!subscription) return await int.editReply({ embeds: [new ActionEmbed('fail', 'I am not playing anything!', int.user)] });
 
         try {

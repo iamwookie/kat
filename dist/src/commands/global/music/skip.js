@@ -20,7 +20,7 @@ export class SkipCommand extends Command {
     }
     async execute(client, int) {
         const subscription = client.subscriptions.get(int.guildId);
-        if (!subscription || !subscription.isPlayerPlaying())
+        if (!subscription || !subscription.playing)
             return int.editReply({ embeds: [new ActionEmbed('fail', 'I am not playing anything!', int.user)] });
         if (subscription.queue.length == 0)
             return int.editReply({ embeds: [new ActionEmbed('fail', 'Nothing to skip to. This is the last track!', int.user)] });
