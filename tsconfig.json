@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "module": "esnext" /* Specify what module code is generated. */,
+        "moduleResolution": "nodenext" /* Specify how TypeScript looks up a file from a given module specifier. */,
+        "target": "es2022" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+
+        "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+        "resolveJsonModule": true /* Include modules imported with '.json' extension. */,
+        "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+
+        "strict": true /* Enable all strict type-checking options. */,
+        "strictPropertyInitialization": false /* Enable strict checking of property initialization in classes. */,
+        "skipLibCheck": true /* Skip type checking all .d.ts files. */,
+
+        "rootDir": "." /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
+        "outDir": "dist" /* Redirect output structure to the directory. */,
+
+        "baseUrl": "." /* Base directory to resolve non-relative module names. */,
+        "paths": {
+            "@src/*": ["src/*"],
+            "@configs/*": ["src/configs/*"],
+            "@structures/*": ["src/structures/*"],
+            "@commander/*": ["src/commander/*"],
+            "@commands/*": ["src/commands/*"],
+            "@api/*": ["src/api/*"],
+            "@lib/*": ["src/lib/*"],
+            "@utils/*": ["src/utils/*"]
+        }
+    }
+}
