@@ -1,20 +1,18 @@
 import { KATClient } from "./Client.js";
 import { Commander } from "./Commander.js";
-import {
-    User,
-    Guild,
-    ChatInputCommandInteraction,
-    SlashCommandBuilder,
-    Collection,
-    Snowflake,
-} from "discord.js";
+import { User, Guild, ChatInputCommandInteraction, SlashCommandBuilder, Collection, Snowflake } from "discord.js";
 
 export class Command {
     public name: string;
     public group: string;
     public aliases?: string[];
-    public description?: string;
-    public format?: string;
+
+    public description?: {
+        content?: string;
+        format?: string;
+    };
+
+    public hidden?: boolean;
     public disabled?: boolean;
     public cooldown?: number;
     public ephemeral?: boolean;
@@ -22,12 +20,12 @@ export class Command {
     public guilds?: Snowflake[];
     public users?: Snowflake[];
 
-    public data: () => Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
+    public data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
 
     public cooldowns: Collection<Snowflake, Collection<Snowflake, number>> = new Collection();
 
     constructor(
-        private commander: Commander,
+        private commander: Commander
     ) {
         this.commander = commander;
     }
@@ -55,7 +53,7 @@ export class Command {
 
         if (this.guilds) {
             for (const guildId of this.guilds) {
-                if (!this.commander.client.guilds.cache.has(guildId)) this.commander.client.logger?.warn(`Commander >> Guild (${guildId}) Not Found For Command: ${this.name}`);
+                if (!this.commander.client.guilds.cache.has(guildId)) this.commander.client.logger.warn(`Commander >> Guild (${guildId}) Not Found For Command: ${this.name}`);
 
                 const guild = this.commander.guilds.get(guildId) || {};
                 guild.commands = guild.commands || new Collection();
@@ -78,8 +76,7 @@ export class Command {
         const now = Date.now();
 
         const cooldown = this.cooldown * 1000;
-        if (!this.cooldowns.has(guild?.id || "dm"))
-            this.cooldowns.set(guild?.id || "dm", new Collection());
+        if (!this.cooldowns.has(guild?.id || "dm")) this.cooldowns.set(guild?.id || "dm", new Collection());
 
         const cooldowns = this.cooldowns.get(guild?.id || "dm");
         if (!cooldowns?.has(user.id)) cooldowns?.set(user.id, now + cooldown);

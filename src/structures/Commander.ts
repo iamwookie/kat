@@ -10,11 +10,30 @@ import { ActionEmbed, ErrorEmbed } from "@utils/embeds/index.js";
 import chalk from "chalk";
 
 // -----------------------------------
-import { PlayCommand } from "@commands/global/index.js";
+import {
+    PlayCommand,
+    HelpCommand,
+    StopCommand,
+    PauseCommand,
+    SkipCommand,
+    QueueCommand,
+    LyricsCommand,
+} from "@commands/global/index.js";
 
 const cliCommands: any = [];
 
-const globalCommands = [PlayCommand];
+const globalCommands = [
+    // Music
+    PlayCommand,
+    StopCommand,
+    PauseCommand,
+    SkipCommand,
+    QueueCommand,
+    LyricsCommand,
+
+    // Misc
+    HelpCommand,
+];
 
 const guildCommands: any = [];
 // -----------------------------------

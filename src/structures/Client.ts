@@ -1,9 +1,11 @@
 import Config from "../configs/bot.json" assert { type: "json" };
 
 import { Client, ClientOptions, Events, Collection, PermissionsBitField } from "discord.js";
+import { Express } from "express";
 import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
 import { Commander } from "./Commander.js";
+import Server from "@api/server.js";
 
 import chalk from "chalk";
 
@@ -31,6 +33,7 @@ export class KATClient extends Client {
     public logger: Logger = new Logger(this);
     public database: Database = new Database(this);
     public commander: Commander = new Commander(this);
+    public server: Express;
 
     public subscriptions: Collection<any, any> = new Collection();
     public colors: Collection<any, any> = new Collection();
@@ -48,6 +51,8 @@ export class KATClient extends Client {
     }
 
     async initialize(): Promise<void> {
+        this.server = await Server(this);
+
         await this.database.connect();
         await this.database.load();
         console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));

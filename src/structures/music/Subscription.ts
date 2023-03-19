@@ -1,17 +1,6 @@
 import { KATClient } from "@structures/index.js";
-
-import {
-    Guild,
-    VoiceBasedChannel,
-    TextBasedChannel
-} from "discord.js";
-
-import {
-    YouTubeTrack,
-    SpotifyTrack,
-    TrackMetadata
-} from "./Track.js";
-
+import { Guild, VoiceBasedChannel, TextBasedChannel } from "discord.js";
+import { YouTubeTrack, SpotifyTrack, TrackMetadata } from "./Track.js";
 import {
     createAudioPlayer,
     entersState,
@@ -37,7 +26,7 @@ export class Subscription {
         private client: KATClient,
         private voiceConnection: VoiceConnection,
         private voiceChannel: VoiceBasedChannel | null,
-        private textChannel: TextBasedChannel | null,
+        private textChannel: TextBasedChannel | null
     ) {
         this.client = client;
         this.voiceConnection = voiceConnection;
@@ -55,7 +44,6 @@ export class Subscription {
 
     private initializeListeners(): void {
         // Configure voice connection
-
         this.voiceConnection.on("error", (err) => {
             this.client.logger.error(err);
             console.error(chalk.red("Music (VOICE) >> Voice Error"));
@@ -80,16 +68,12 @@ export class Subscription {
 
                 this.destroy();
             } else if (!this.readyLock && (newState.status == VoiceConnectionStatus.Connecting || newState.status == VoiceConnectionStatus.Signalling)) {
-                // this.client.logger.warn('Music >> (VOICE) Connection Connecting / Signalling');
                 await this.connect(20_000);
             }
         });
 
         // Configure audio player
         this.player.on("stateChange", (oldState, newState) => {
-            // this.client.logger.info(`Music (PLAYER) >> Previous State: ${oldState.status}`.magenta);
-            // this.client.logger.info(`Music (PLAYER) >> New State: ${newState.status}`.magenta);
-
             if (newState.status == AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                 this.active = null;
                 (oldState.resource.metadata as TrackMetadata).onFinish?.();
@@ -112,7 +96,6 @@ export class Subscription {
         if (!this.readyLock) {
             try {
                 await entersState(this.voiceConnection, VoiceConnectionStatus.Ready, timeout);
-                // this.client.logger.info('Music (VOICE) >> Connection Ready'.brightGreen);
             } catch (err) {
                 if (this.voiceConnection.state.status !== VoiceConnectionStatus.Destroyed) this.voiceConnection.destroy();
             } finally {

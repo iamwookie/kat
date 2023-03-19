@@ -13,7 +13,7 @@ export class MusicEmbed extends EmbedBuilder {
     constructor(interaction: ChatInputCommandInteraction) {
         super();
 
-        this.client = interaction.client as Client;
+        this.client = interaction.client;
         this.guild = interaction.guild;
         this.author = interaction.user;
 
@@ -42,7 +42,7 @@ export class MusicEmbed extends EmbedBuilder {
             this.addFields({ name: "Enqueued:", value: `\`${trackCount}\` tracks from ${getServiceIcon(this.item)} [\`${name}\`](${this.item.url})` });
         } else {
             this.item = this.item as YouTubeTrack | SpotifyTrack;
-            console.log(getServiceIcon(this.item));
+ 
             this.addFields({
                 name: "Enqueued:",
                 value: `\`${subscription?.queue.length == 0 ? 1 : subscription?.queue.length}.\` - ${getServiceIcon(this.item)} [\`${this.item?.title} [${this.item?.duration}]\`](${this.item?.url})`,
