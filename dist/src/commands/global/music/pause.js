@@ -11,9 +11,11 @@ export class PauseCommand extends Command {
             content: "Pause the track. Use \`/play\` to unpause.",
         };
         this.cooldown = 5;
-        this.data = new SlashCommandBuilder()
+    }
+    data() {
+        return new SlashCommandBuilder()
             .setName(this.name)
-            .setDescription(this.description.content)
+            .setDescription(this.description?.content)
             .setDMPermission(false);
     }
     async execute(client, int) {

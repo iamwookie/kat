@@ -62,8 +62,6 @@ export class Logger {
         console.log(chalk.blue("Logger (DEBUG): " + msg));
     }
 
-    
-
     request(req: any, scope: 'access' | 'error', err?: Error | unknown): void {
         if (err) this.error(err);
 

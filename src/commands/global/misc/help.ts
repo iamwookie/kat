@@ -15,10 +15,12 @@ export class HelpCommand extends Command {
         };
 
         this.ephemeral = true;
+    }
 
-        this.data = new SlashCommandBuilder()
+    data() {
+        return new SlashCommandBuilder()
             .setName(this.name)
-            .setDescription(this.description.content!);
+            .setDescription(this.description?.content!);
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {

@@ -20,10 +20,12 @@ export class LyricsCommand extends Command {
         };
 
         this.cooldown = 5;
+    }
 
-        this.data = new SlashCommandBuilder()
+    data() {
+        return new SlashCommandBuilder()
             .setName(this.name)
-            .setDescription(this.description.content!)
+            .setDescription(this.description?.content!)
             .setDMPermission(false);
     }
 

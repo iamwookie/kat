@@ -13,11 +13,13 @@ export class QueueCommand extends Command {
             content: "View the server queue.",
         };
 
-        this.cooldown = 5;
+        this.cooldown = 5; 
+    }
 
-        this.data = new SlashCommandBuilder()
+    data() {
+        return new SlashCommandBuilder()
             .setName(this.name)
-            .setDescription(this.description.content!)
+            .setDescription(this.description?.content!)
             .setDMPermission(false);
     }
 

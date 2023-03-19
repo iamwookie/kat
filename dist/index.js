@@ -38,4 +38,5 @@ import chalk from "chalk";
     await client.initialize();
     await client.login(process.env.BOT_TOKEN);
     console.log(chalk.magenta.bold.underline(`\n>>> App Loaded In: ${Date.now() - now}ms`));
+    return client;
 })();

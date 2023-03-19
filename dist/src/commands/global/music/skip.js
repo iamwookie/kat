@@ -11,9 +11,11 @@ export class SkipCommand extends Command {
             content: "Skip the track.",
         };
         this.cooldown = 5;
-        this.data = new SlashCommandBuilder()
+    }
+    data() {
+        return new SlashCommandBuilder()
             .setName(this.name)
-            .setDescription(this.description.content)
+            .setDescription(this.description?.content)
             .setDMPermission(false);
     }
     async execute(client, int) {

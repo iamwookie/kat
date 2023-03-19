@@ -15,9 +15,11 @@ export class PlayCommand extends Command {
             format: "<?title/url>",
         };
         this.cooldown = 5;
-        this.data = new SlashCommandBuilder()
+    }
+    data() {
+        return new SlashCommandBuilder()
             .setName(this.name)
-            .setDescription(this.description.content)
+            .setDescription(this.description?.content)
             .setDMPermission(false)
             .addStringOption((option) => {
             option.setName("query");
