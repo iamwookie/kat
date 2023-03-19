@@ -10,6 +10,7 @@ export class HelpCommand extends Command {
         this.description = {
             content: "Stop it. Get some help.",
         };
+        this.ephemeral = true;
         this.data = new SlashCommandBuilder()
             .setName(this.name)
             .setDescription(this.description.content);
