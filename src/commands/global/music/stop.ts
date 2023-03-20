@@ -28,15 +28,15 @@ export class StopCommand extends Command {
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
         const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
-        if (!subscription) return await int.editReply({ embeds: [new ActionEmbed('fail', 'I am not playing anything!', int.user)] });
+        if (!subscription) return await int.editReply({ embeds: [] });
 
         try {
             subscription.destroy();
 
-            return await int.editReply({ embeds: [new ActionEmbed('success', 'Successfully disconnected. Cya! 👋', int.user)] });
+            return await int.editReply({ embeds: [new ActionEmbed("success").setUser(int.user).setDesc("Successfully disconnected. Cya! 👋")] });
         } catch (err) {
             const eventId = client.logger.error(err);
-            console.error(chalk.red('Music Commands (ERROR) >> stop: Error Running Command'));
+            console.error(chalk.red("Music Commands (ERROR) >> stop: Error Running Command"));
             console.error(err);
 
             return await int.editReply({ embeds: [new ErrorEmbed(eventId)] });

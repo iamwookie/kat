@@ -2,7 +2,7 @@ import { KATClient as Client, Commander, Command } from "@structures/index.js";
 
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
-import { MusicEmbed, ErrorEmbed } from "@src/utils/embeds/index.js";
+import { ActionEmbed, ErrorEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
 
 import chalk from "chalk";
 
@@ -29,7 +29,7 @@ export class PauseCommand extends Command {
     async execute(client: Client, int: ChatInputCommandInteraction) {
         const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
 
-        if (!subscription) return await int.editReply({ embeds: [new MusicEmbed(int).setTitle("I'm not playing anything!")] });
+        if (!subscription) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I'm not playing anything!")] });
 
         try {
             subscription.destroy();

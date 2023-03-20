@@ -21,16 +21,16 @@ export class SkipCommand extends Command {
     async execute(client, int) {
         const subscription = client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.playing)
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'I am not playing anything!', int.user)] });
+            return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The queue is empty or does not exist!")] });
         if (subscription.queue.length == 0)
-            return int.editReply({ embeds: [new ActionEmbed('fail', 'Nothing to skip to. This is the last track!', int.user)] });
+            return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("Nothing to skip to. This is the last track!")] });
         try {
             subscription.player.stop();
             return await int.editReply({ embeds: [new MusicEmbed(int).setSkipped(subscription)] });
         }
         catch (err) {
             const eventId = client.logger.error(err);
-            console.error(chalk.red('Music Commands (ERROR) >> skip: Error Running Command'));
+            console.error(chalk.red("Music Commands (ERROR) >> skip: Error Running Command"));
             console.error(err);
             return await int.editReply({ embeds: [new ErrorEmbed(eventId)] });
         }

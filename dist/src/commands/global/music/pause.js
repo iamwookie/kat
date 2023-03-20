@@ -1,6 +1,6 @@
 import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder } from "discord.js";
-import { MusicEmbed, ErrorEmbed } from "../../../utils/embeds/index.js";
+import { ActionEmbed, ErrorEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 import chalk from "chalk";
 export class PauseCommand extends Command {
     constructor(commander) {
@@ -21,7 +21,7 @@ export class PauseCommand extends Command {
     async execute(client, int) {
         const subscription = client.subscriptions.get(int.guildId);
         if (!subscription)
-            return await int.editReply({ embeds: [new MusicEmbed(int).setTitle("I'm not playing anything!")] });
+            return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I'm not playing anything!")] });
         try {
             subscription.destroy();
             return await int.editReply({ embeds: [new MusicEmbed(int).setTitle(subscription.paused ? "👋 \u200b Discconected! Cya!" : "👋 \u200b Stopped playing! Cya!")] });

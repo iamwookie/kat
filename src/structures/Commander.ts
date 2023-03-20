@@ -100,7 +100,7 @@ export class Commander {
 
     private validate(interaction: CommandInteraction, command: any) {
         if (command.users && !command.users.includes(interaction.user.id)) {
-            interaction.editReply({ embeds: [new ActionEmbed("fail", "You are not allowed to use this command!", interaction.user)] });
+            interaction.editReply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc("You are not allowed to use this command!")] });
             return false;
         }
 
@@ -111,7 +111,7 @@ export class Commander {
                 const cooldown = command.cooldowns.get(context).get(interaction.user.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
 
-                interaction.editReply({ embeds: [new ActionEmbed("fail", `Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`, interaction.user)] });
+                interaction.editReply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
 

@@ -1,35 +1,33 @@
 import { EmbedBuilder, User } from 'discord.js';
 
 export class ActionEmbed extends EmbedBuilder {
-    public embed_type: "success" | "fail" | "load";
-    public reply: string
-    public author?: User;
-
-    constructor(type: "success" | "fail" | "load", reply: string, author?: User) {
+    constructor(
+        public embedType: "success" | "fail" | "load"
+    ) {
         super();
 
-        this.embed_type = type;
-        this.reply = reply;
-        this.author = author;
+        this.embedType = embedType;
+    }
 
-        if (this.author) this.setAuthor({ name: this.author.tag, iconURL: this.author.avatarURL() ?? undefined });
+    public setUser(user: User) {
+        return super.setAuthor({ name: user.tag, iconURL: user.avatarURL() ?? undefined });
+    }
 
-        switch (type) {
+    public setDesc(description: string | null) {
+        switch (this.embedType) {
             case 'success':
                 this.setColor('Green');
-                this.setDescription(`✅ \u200b ${reply}`);
+                super.setDescription(`✅ \u200b ${description}`);
                 break;
             case 'fail':
                 this.setColor('Red');
-                this.setDescription(`🚫 \u200b ${reply}`);
-                break;
-            case 'load':
-                this.setColor('Yellow');
-                this.setDescription(`<a:loading:928668691997012028> \u200b ${reply}`);
+                super.setDescription(`🚫 \u200b ${description}`);
                 break;
             default:
                 this.setColor('White');
-                this.setDescription(`${reply}`);
+                super.setDescription(`${description}`);
         }
+
+        return this;
     }
 }

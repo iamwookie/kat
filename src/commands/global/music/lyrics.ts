@@ -35,7 +35,7 @@ export class LyricsCommand extends Command {
         const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
 
         if (!query) {
-            if (!subscription || !subscription.playing) return int.editReply({ embeds: [new ActionEmbed("fail", "I am not playing anything!", int.user)] });
+            if (!subscription || !subscription.playing) return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDescription("I am not playing anything!")] });
 
             query = subscription.active?.title!;
         }
@@ -44,7 +44,7 @@ export class LyricsCommand extends Command {
             const search = await genius.songs.search(query!);
 
             let lyrics = search[0] ? await search[0].lyrics() : null;
-            if (!lyrics) return int.editReply({ embeds: [new ActionEmbed("fail", "Couldn't find your search results!", int.user)] });
+            if (!lyrics) return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDescription("Couldn't find your search results!")] });
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + "\n...";
 
             const success = new MusicEmbed(int).setItem(subscription?.active!);
