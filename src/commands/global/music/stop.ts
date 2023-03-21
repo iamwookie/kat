@@ -11,6 +11,7 @@ export class StopCommand extends Command {
         super(commander);
 
         this.name = "stop";
+        this.aliases = ["dc"];
         this.group = "Music";
         this.description = {
             content: "Clear the queue and/or leave.",
