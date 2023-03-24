@@ -2,7 +2,7 @@ import { EmbedBuilder, User } from 'discord.js';
 
 export class ActionEmbed extends EmbedBuilder {
     constructor(
-        public embedType: "success" | "fail" | "load"
+        public embedType?: "success" | "fail"
     ) {
         super();
 
@@ -24,7 +24,6 @@ export class ActionEmbed extends EmbedBuilder {
                 super.setDescription(`🚫 \u200b ${description}`);
                 break;
             default:
-                this.setColor('White');
                 super.setDescription(`${description}`);
         }
 

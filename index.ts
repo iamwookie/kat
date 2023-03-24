@@ -12,8 +12,6 @@ import { RewriteFrames } from "@sentry/integrations";
 import chalk from "chalk";
 
 (async () => {
-    const now = Date.now();
-
     console.log(chalk.magenta.bold.underline(`\n>>> App Loading...\n`));
 
     Sentry.init({
@@ -42,8 +40,6 @@ import chalk from "chalk";
 
     await client.initialize();
     await client.login(process.env.BOT_TOKEN);
-
-    console.log(chalk.magenta.bold.underline(`\n>>> App Loaded In: ${Date.now() - now}ms`));
 
     return client;
 })();

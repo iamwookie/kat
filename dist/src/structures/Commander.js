@@ -4,6 +4,7 @@ import { ActionEmbed, ErrorEmbed } from "../utils/embeds/index.js";
 import chalk from "chalk";
 // -----------------------------------
 import { PlayCommand, HelpCommand, StopCommand, PauseCommand, SkipCommand, QueueCommand, LyricsCommand, } from "../commands/global/index.js";
+import { AddColorCommand, ColorCommand } from "../commands/guild/index.js";
 const cliCommands = [];
 const globalCommands = [
     // Music
@@ -16,7 +17,11 @@ const globalCommands = [
     // Misc
     HelpCommand,
 ];
-const guildCommands = [];
+const guildCommands = [
+    // Color
+    ColorCommand,
+    AddColorCommand
+];
 // -----------------------------------
 export class Commander {
     client;
@@ -181,8 +186,6 @@ export class Commander {
                     }
                     commands.push(command.data().toJSON());
                 }
-                if (!this.client.guilds.cache.has(k))
-                    continue;
                 try {
                     const res = await this.rest.put(Routes.applicationGuildCommands(process.env.BOT_APP_ID, k), { body: commands });
                     console.log(chalk.greenBright(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`));

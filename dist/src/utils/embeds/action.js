@@ -20,7 +20,6 @@ export class ActionEmbed extends EmbedBuilder {
                 super.setDescription(`🚫 \u200b ${description}`);
                 break;
             default:
-                this.setColor('White');
                 super.setDescription(`${description}`);
         }
         return this;

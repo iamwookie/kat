@@ -1,5 +1,6 @@
 export { YouTubeTrack, SpotifyTrack } from "./music/Track.js";
 export { Subscription } from "./music/Subscription.js";
+export { ColorClient } from "./ColorClient.js";
 export { Command } from "./Command.js";
 export { Commander } from "./Commander.js";
 export { Database } from "./Database.js";

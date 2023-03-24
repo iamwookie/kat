@@ -5,11 +5,15 @@ import { Express } from "express";
 import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
 import { Commander } from "./Commander.js";
+import { ColorClient } from "./ColorClient.js";
 import Server from "@api/server.js";
 
 import chalk from "chalk";
 
+
 export class KATClient extends Client {
+    public startTime: number = Date.now();
+
     public permissions: PermissionsBitField = new PermissionsBitField([
         // GENERAL
         PermissionsBitField.Flags.ViewChannel,
@@ -33,21 +37,25 @@ export class KATClient extends Client {
     public logger: Logger = new Logger(this);
     public database: Database = new Database(this);
     public commander: Commander = new Commander(this);
+    public colors: ColorClient = new ColorClient(this);
     public server: Express;
 
     public subscriptions: Collection<any, any> = new Collection();
-    public colors: Collection<any, any> = new Collection();
 
     constructor(options: ClientOptions) {
         super(options);
 
         this.on(Events.Error, (err) => { this.logger.error(err) });
 
-        this.on(Events.ClientReady, (client) => {
-            console.log(chalk.magenta.bold.underline(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`));
-        });
-
         if (process.env.NODE_ENV != "production") this.on(Events.Debug, msg => { this.logger.debug(msg) });
+
+        this.on(Events.ClientReady, async (client) => {
+            await this.colors.initialize();
+            console.log(chalk.greenBright.bold.underline(`\n>>> Colors Initialized`));
+
+            console.log(chalk.magenta.bold.underline(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`));
+            console.log(chalk.magenta.bold.underline(`>>> App Loaded In: ${Date.now() - this.startTime}ms`));
+        });
     }
 
     async initialize(): Promise<void> {
