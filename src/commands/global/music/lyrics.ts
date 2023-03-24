@@ -27,7 +27,13 @@ export class LyricsCommand extends Command {
         return new SlashCommandBuilder()
             .setName(this.name)
             .setDescription(this.description?.content!)
-            .setDMPermission(false);
+            .setDMPermission(false)
+            .addStringOption((option) => {
+                option.setName("query")
+                .setDescription("The name or URL of the track to search for.")
+                .setRequired(false);
+                return option;
+            });
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
