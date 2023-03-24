@@ -4,6 +4,7 @@ import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
 import { Commander } from "./Commander.js";
 import { ColorClient } from "./ColorClient.js";
+import { TwitchClient } from "./TwitchClient.js";
 import Server from "../api/server.js";
 import chalk from "chalk";
 export class KATClient extends Client {
@@ -30,6 +31,7 @@ export class KATClient extends Client {
     database = new Database(this);
     commander = new Commander(this);
     colors = new ColorClient(this);
+    twitch = new TwitchClient(this);
     server;
     subscriptions = new Collection();
     constructor(options) {

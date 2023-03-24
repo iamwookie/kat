@@ -5,7 +5,7 @@ export class AddColorCommand extends Command {
     constructor(commander) {
         super(commander);
         this.name = "add-color";
-        this.group = "Colors";
+        this.group = "Color";
         this.description = {
             content: "Add a color role.",
             format: "<role>",
@@ -33,6 +33,8 @@ export class AddColorCommand extends Command {
         });
     }
     async execute(client, int) {
+        if (!client.database)
+            return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The database is not online!")] });
         const role = int.options.getRole("role", true);
         const colors = client.colors.get(int.guildId);
         if (colors && Object.values(colors).includes(role.id))
