@@ -22,8 +22,8 @@ export class PlayCommand extends Command {
             .setDescription(this.description?.content)
             .setDMPermission(false)
             .addStringOption((option) => {
-            option.setName("query");
-            option.setDescription("The name or URL of the track.");
+            option.setName("query")
+                .setDescription("The name or URL of the track.");
             return option;
         });
     }

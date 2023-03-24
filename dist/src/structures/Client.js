@@ -3,9 +3,11 @@ import { Client, Events, Collection, PermissionsBitField } from "discord.js";
 import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
 import { Commander } from "./Commander.js";
+import { ColorClient } from "./ColorClient.js";
 import Server from "../api/server.js";
 import chalk from "chalk";
 export class KATClient extends Client {
+    startTime = Date.now();
     permissions = new PermissionsBitField([
         // GENERAL
         PermissionsBitField.Flags.ViewChannel,
@@ -27,17 +29,20 @@ export class KATClient extends Client {
     logger = new Logger(this);
     database = new Database(this);
     commander = new Commander(this);
+    colors = new ColorClient(this);
     server;
     subscriptions = new Collection();
-    colors = new Collection();
     constructor(options) {
         super(options);
         this.on(Events.Error, (err) => { this.logger.error(err); });
-        this.on(Events.ClientReady, (client) => {
-            console.log(chalk.magenta.bold.underline(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`));
-        });
         if (process.env.NODE_ENV != "production")
             this.on(Events.Debug, msg => { this.logger.debug(msg); });
+        this.on(Events.ClientReady, async (client) => {
+            await this.colors.initialize();
+            console.log(chalk.greenBright.bold.underline(`\n>>> Colors Initialized`));
+            console.log(chalk.magenta.bold.underline(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`));
+            console.log(chalk.magenta.bold.underline(`>>> App Loaded In: ${Date.now() - this.startTime}ms`));
+        });
     }
     async initialize() {
         this.server = await Server(this);
