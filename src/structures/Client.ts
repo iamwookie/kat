@@ -6,6 +6,7 @@ import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
 import { Commander } from "./Commander.js";
 import { ColorClient } from "./ColorClient.js";
+import { TwitchClient } from "./TwitchClient.js";
 import Server from "@api/server.js";
 
 import chalk from "chalk";
@@ -38,6 +39,7 @@ export class KATClient extends Client {
     public database: Database = new Database(this);
     public commander: Commander = new Commander(this);
     public colors: ColorClient = new ColorClient(this);
+    public twitch: TwitchClient = new TwitchClient(this);
     public server: Express;
 
     public subscriptions: Collection<any, any> = new Collection();

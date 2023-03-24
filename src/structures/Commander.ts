@@ -12,17 +12,18 @@ import chalk from "chalk";
 // -----------------------------------
 import {
     PlayCommand,
-    HelpCommand,
     StopCommand,
     PauseCommand,
     SkipCommand,
     QueueCommand,
     LyricsCommand,
+    HelpCommand,
 } from "@commands/global/index.js";
 
 import {
+    ColorCommand,
     AddColorCommand,
-    ColorCommand
+    TwitchCommand
 } from "@src/commands/guild/index.js";
 
 const cliCommands: any = [];
@@ -43,7 +44,10 @@ const globalCommands = [
 const guildCommands: any = [
     // Color
     ColorCommand,
-    AddColorCommand
+    AddColorCommand,
+
+    // Twitch
+    TwitchCommand,
 ];
 // -----------------------------------
 export class Commander {
@@ -207,40 +211,35 @@ export class Commander {
     }
 
     async registerGuildCommands() {
-        try {
-            for (const [k, g] of this.guilds) {
-                let commands = [];
+        for (const [k, g] of this.guilds) {
+            let commands = [];
 
-                if (!g.commands) continue;
+            if (!g.commands) continue;
 
-                for (const [_, command] of g.commands) {
-                    if (!command.data || command.disabled || command.hidden) continue;
+            for (const [_, command] of g.commands) {
+                if (!command.data || command.disabled || command.hidden) continue;
 
-                    if (command.aliases) {
-                        for (const alias of command.aliases) {
-                            let data = command.data().setName(alias);
-                            commands.push(data);
-                        }
+                if (command.aliases) {
+                    for (const alias of command.aliases) {
+                        let data = command.data().setName(alias);
+                        commands.push(data);
                     }
-
-                    commands.push(command.data().toJSON());
                 }
 
-                try {
-                    const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.BOT_APP_ID!, k), { body: commands });
-                    console.log(chalk.greenBright(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`));
-                } catch (err) {
-                    this.client.logger.error(err);
-                    console.error(chalk.red(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${k}`));
-                    console.error(err);
-                }
+                commands.push(command.data().toJSON());
             }
-            console.log(chalk.greenBright("Commander >> Successfully Registered All Guild Commands."));
-        } catch (err) {
-            this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Registering Guild Slash Commands"));
-            console.error(err);
+
+            try {
+                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.BOT_APP_ID!, k), { body: commands });
+                console.log(chalk.greenBright(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`));
+            } catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${k}`));
+                console.error(err);
+            }
         }
+
+        console.log(chalk.greenBright("Commander >> Successfully Registered All Guild Commands."));
     }
 
     // async initializeModules() {
