@@ -8,7 +8,7 @@ export class AddColorCommand extends Command {
         super(commander);
 
         this.name = "add-color";
-        this.group = "Colors";
+        this.group = "Color";
         this.description = {
             content: "Add a color role.",
             format: "<role>",
@@ -41,6 +41,8 @@ export class AddColorCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
+        if (!client.database) return await int.reply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The database is not online!")] });
+        
         const role = int.options.getRole("role", true);
         const colors = client.colors.get(int.guildId);
 
