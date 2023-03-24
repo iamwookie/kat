@@ -20,6 +20,11 @@ import {
     LyricsCommand,
 } from "@commands/global/index.js";
 
+import {
+    AddColorCommand,
+    ColorCommand
+} from "@src/commands/guild/index.js";
+
 const cliCommands: any = [];
 
 const globalCommands = [
@@ -35,7 +40,11 @@ const globalCommands = [
     HelpCommand,
 ];
 
-const guildCommands: any = [];
+const guildCommands: any = [
+    // Color
+    ColorCommand,
+    AddColorCommand
+];
 // -----------------------------------
 export class Commander {
     private readline: Interface = readline.createInterface(process.stdin);
@@ -216,8 +225,6 @@ export class Commander {
 
                     commands.push(command.data().toJSON());
                 }
-
-                if (!this.client.guilds.cache.has(k)) continue;
 
                 try {
                     const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.BOT_APP_ID!, k), { body: commands });

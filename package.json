@@ -7,7 +7,7 @@
     "scripts": {
         "start": "nodemon dist/index.js",
         "build": "tsc && tsc-alias",
-        "dev": "concurrently \"tsc -w\" \"tsc-alias -w\" \"nodemon dist/index.js\""
+        "dev": "concurrently \"tsc\" \"tsc-alias\" \"nodemon dist/index.js\""
     },
     "author": "wookie",
     "license": "ISC",
