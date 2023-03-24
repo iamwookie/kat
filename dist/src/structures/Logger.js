@@ -25,14 +25,16 @@ export class Logger {
         const eventId = Sentry.captureException(err);
         console.error(chalk.red(`Logger (FATAL) (${eventId}): A Fatal Error Has Occured!`));
         console.error(err);
-        this.notify(eventId);
+        if (this.client.readyTimestamp)
+            this.notify(eventId);
         process.exit();
     }
     error(err) {
         const eventId = Sentry.captureException(err);
         console.error(chalk.red(`Logger (ERROR) (${eventId}): An Error Has Occured!`));
         console.error(err);
-        this.notify(eventId);
+        if (this.client.readyTimestamp)
+            this.notify(eventId);
         return eventId;
     }
     warn(msg) {

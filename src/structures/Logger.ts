@@ -34,7 +34,7 @@ export class Logger {
         console.error(chalk.red(`Logger (FATAL) (${eventId}): A Fatal Error Has Occured!`));
         console.error(err);
 
-        this.notify(eventId);
+        if (this.client.readyTimestamp) this.notify(eventId);
 
         process.exit();
     }
@@ -45,7 +45,7 @@ export class Logger {
         console.error(chalk.red(`Logger (ERROR) (${eventId}): An Error Has Occured!`));
         console.error(err);
 
-        this.notify(eventId);
+        if (this.client.readyTimestamp) this.notify(eventId);
 
         return eventId;
     }

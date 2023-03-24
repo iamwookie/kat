@@ -43,24 +43,25 @@ export class Command {
             }
         }
 
-        if (this.guilds || this.users) {
-            if (this.commander.client.database) {
-                const data = await this.commander.client.database.getAccess(this.name);
-                if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
-                if (data.users && this.users) this.users.push(...data.users);
-            }
+        // ------- REVAMP COMMAND ACCESS MANAGER ------- //
+        // if (this.guilds || this.users) {
+        //     if (this.commander.client.database) {
+        //         const data = await this.commander.client.database.getAccess(this.name);
+        //         if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
+        //         if (data.users && this.users) this.users.push(...data.users);
+        //     }
 
-            if (this.users) this.users.push(this.commander.client.devId);
-        }
+        //     if (this.users) this.users.push(this.commander.client.devId);
+        // }
+
+        if (this.users) this.users.push(this.commander.client.devId);
 
         if (this.guilds) {
             for (const guildId of this.guilds) {
-                if (!this.commander.client.guilds.cache.has(guildId)) this.commander.client.logger.warn(`Commander >> Guild (${guildId}) Not Found For Command: ${this.name}`);
-
                 const guild = this.commander.guilds.get(guildId) || {};
                 guild.commands = guild.commands || new Collection();
-                guild.commands.set(this.name, this);
 
+                guild.commands.set(this.name, this);
                 this.commander.guilds.set(guildId, guild);
             }
         } else {
@@ -68,7 +69,6 @@ export class Command {
         }
 
         if (!this.commander.groups.has(this.group)) this.commander.groups.set(this.group, new Collection());
-
         this.commander.groups.get(this.group)?.set(this.name, this);
     }
 

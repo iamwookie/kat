@@ -1,13 +1,13 @@
 {
     "name": "cat-bot",
-    "version": "7.0.5",
+    "version": "7.1.0",
     "description": "",
     "main": "index.js",
     "type": "module",
     "scripts": {
         "start": "nodemon dist/index.js",
         "build": "tsc && tsc-alias",
-        "dev": "concurrently \"tsc -w\" \"tsc-alias -w\" \"nodemon dist/index.js\""
+        "dev": "concurrently \"tsc\" \"tsc-alias\" \"nodemon dist/index.js\""
     },
     "author": "wookie",
     "license": "ISC",
