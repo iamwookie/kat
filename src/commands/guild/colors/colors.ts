@@ -33,7 +33,7 @@ export class ColorCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
-        if (!client.database) return await int.reply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The database is not online!")] });
+        if (!client.database) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The database is not online!")] });
 
         const colors = client.colors.get(int.guildId);
         if (!colors || !colors.length) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There are no colors set for this guild!")] });

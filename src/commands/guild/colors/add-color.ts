@@ -41,7 +41,7 @@ export class AddColorCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
-        if (!client.database) return await int.reply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The database is not online!")] });
+        if (!client.database) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The database is not online!")] });
         
         const role = int.options.getRole("role", true);
         const colors = client.colors.get(int.guildId);
