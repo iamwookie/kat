@@ -34,7 +34,7 @@ export class ColorCommand extends Command {
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
         const colors = client.colors.get(int.guildId);
-        if (!colors) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There are no colors set for this guild!")] });
+        if (!colors || !colors.length) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There are no colors set for this guild!")] });
 
         const menu = new StringSelectMenuBuilder().setCustomId("color").setPlaceholder("Select a color");
 
@@ -48,6 +48,8 @@ export class ColorCommand extends Command {
 
             menu.addOptions({ label: role.name, value: role.id });
         }
+
+        if (!menu.options.length) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There are no colors set for this guild!")] });
 
         menu.addOptions({ label: "None", value: "none" });
 
