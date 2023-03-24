@@ -40,11 +40,15 @@ export class ColorClient {
         if (!this.guilds.get(guild)?.includes(id)) return;
 
         const data = this.guilds.get(guild) || [];
-        delete data[data.indexOf(id)];
+        data.splice(data.indexOf(id), 1);
 
         this.guilds.set(guild, data);
 
-        return await this.client.database.set(guild, "colors", data);
+        if (!data.length) {
+            return await this.client.database.delete(guild, "colors");
+        } else {
+            return await this.client.database.set(guild, "colors", data);
+        }
     }
 
     async clear(guild: Snowflake, member: GuildMember) {
