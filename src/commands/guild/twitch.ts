@@ -8,7 +8,7 @@ export class TwitchCommand extends Command {
         super(commander);
 
         this.name = "twitch";
-        this.group = "Misc";
+        this.group = "Twitch";
         this.description = {
             content: "Sends a twitch stream notification to a chosen channel.",
             format: "<streamer> <channel> <role>",
