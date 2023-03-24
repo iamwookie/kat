@@ -26,7 +26,7 @@ export class ColorCommand extends Command {
     }
     async execute(client, int) {
         const colors = client.colors.get(int.guildId);
-        if (!colors)
+        if (!colors || !colors.length)
             return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There are no colors set for this guild!")] });
         const menu = new StringSelectMenuBuilder().setCustomId("color").setPlaceholder("Select a color");
         for (const id of colors) {
@@ -37,6 +37,8 @@ export class ColorCommand extends Command {
             }
             menu.addOptions({ label: role.name, value: role.id });
         }
+        if (!menu.options.length)
+            return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There are no colors set for this guild!")] });
         menu.addOptions({ label: "None", value: "none" });
         const row = new ActionRowBuilder().addComponents(menu);
         await int.editReply({ embeds: [new ActionEmbed().setTitle("Color Menu").setUser(int.user).setDesc("Select a color from the menu below.")], components: [row] });
