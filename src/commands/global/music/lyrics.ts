@@ -1,5 +1,4 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
-
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
 import { ActionEmbed, MusicEmbed, ErrorEmbed } from "@src/utils/embeds/index.js";
@@ -41,26 +40,25 @@ export class LyricsCommand extends Command {
         const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
 
         if (!query) {
-            if (!subscription || !subscription.playing) return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDescription("I am not playing anything!")] });
-
-            query = subscription.active?.title!;
+            if (!subscription || !subscription.active) return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDescription("I am not playing anything!")] });
+            query = subscription.active.title!;
         }
 
         try {
-            const search = await genius.songs.search(query!);
+            const search = await genius.songs.search(query);
 
             let lyrics = search[0] ? await search[0].lyrics() : null;
             if (!lyrics) return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDescription("Couldn't find your search results!")] });
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + "\n...";
 
-            const success = new MusicEmbed(int).setItem(subscription?.active!);
+            const success = new MusicEmbed(subscription).setUser(int.user);
             search[0]
                 ? success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`)
                 : success.setDescription(lyrics);
 
             return int.editReply({ embeds: [success] });
         } catch (err) {
-            const eventId = client.logger?.error(err);
+            const eventId = client.logger.error(err);
             console.error(chalk.red("Music Commands (ERROR) >> lyrics: Error Getting Track Lyrics"));
             console.error(err);
 

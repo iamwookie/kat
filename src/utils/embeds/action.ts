@@ -16,11 +16,11 @@ export class ActionEmbed extends EmbedBuilder {
     public setDesc(description: string | null) {
         switch (this.embedType) {
             case 'success':
-                this.setColor('Green');
+                super.setColor('Green');
                 super.setDescription(`✅ \u200b ${description}`);
                 break;
             case 'fail':
-                this.setColor('Red');
+                super.setColor('Red');
                 super.setDescription(`🚫 \u200b ${description}`);
                 break;
             default:

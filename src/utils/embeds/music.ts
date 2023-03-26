@@ -1,116 +1,67 @@
 import { EmbedBuilder, Client, Guild, User, ChatInputCommandInteraction } from "discord.js";
 
-import { YouTubePlayList, SpotifyPlaylist, SpotifyAlbum } from "play-dl";
-import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack } from "@structures/index.js";
+import { Subscription as MusicSubscription, YouTubeTrack } from "@src/structures/index.js";
 import { getServiceIcon, createProgressBar } from "../helpers.js";
 
 export class MusicEmbed extends EmbedBuilder {
-    private client: Client;
-    private guild: Guild | null;
-    private author: User;
-    private item?: YouTubeTrack | SpotifyTrack | YouTubePlayList | SpotifyPlaylist | SpotifyAlbum;
-
-    constructor(interaction: ChatInputCommandInteraction) {
+    constructor(private subscription: MusicSubscription) {
         super();
 
-        this.client = interaction.client;
-        this.guild = interaction.guild;
-        this.author = interaction.user;
+        this.subscription = subscription;
 
-        this.setColor("#C167ED");
-        this.setFooter({ text: `${this.guild?.name} | 🎵 ${this.client.user?.username} Global Music System`, iconURL: this.guild?.iconURL()! });
+        super.setFooter({ text: `🎵 ${this.subscription.node.name}` });
     }
 
-    setItem(item: YouTubeTrack | SpotifyTrack | YouTubePlayList | SpotifyPlaylist | SpotifyAlbum) {
-        this.item = item;
-
-        this.setAuthor({ name: "requestedBy" in this.item ? `Requested By: ${this.item.requestedBy.tag}` : this.author.tag, iconURL: this.author.avatarURL() ?? undefined });
-        if (this.item?.thumbnail) this.setThumbnail(this.item?.thumbnail.url);
-
-        return this;
+    setUser(user: User) {
+        return super.setAuthor({ name: `Requested By: ${user.tag}`, iconURL: user.avatarURL() ?? undefined });
     }
 
-    setEnqueued(subscription: MusicSubscription) {
-        if (!this.item) return this;
+    setEnqueued(item: YouTubeTrack | null) {
+        if (!item) return this;
 
-        if (this.item?.type == "playlist" || this.item?.type == "album") {
-            this.item = this.item as YouTubePlayList | SpotifyPlaylist | SpotifyAlbum;
+        if (item.thumbnail) super.setThumbnail(item.thumbnail.url);
+        return super.addFields({
+            name: "Enqueued:",
+            value: `\`${this.subscription.queue.length == 0 ? 1 : this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+        });
+    }
 
-            const name = (this.item as YouTubePlayList).title ?? (this.item as SpotifyPlaylist | SpotifyAlbum).name;
-            const trackCount = (this.item as YouTubePlayList).videoCount ?? (this.item as SpotifyPlaylist | SpotifyAlbum).tracksCount;
+    setPlaying(item: YouTubeTrack | null) {
+        if (!item) return this;
 
-            this.addFields({ name: "Enqueued:", value: `\`${trackCount}\` tracks from ${getServiceIcon(this.item)} [\`${name}\`](${this.item.url})` });
-        } else {
-            this.item = this.item as YouTubeTrack | SpotifyTrack;
- 
-            this.addFields({
-                name: "Enqueued:",
-                value: `\`${subscription?.queue.length == 0 ? 1 : subscription?.queue.length}.\` - ${getServiceIcon(this.item)} [\`${this.item?.title} [${this.item?.duration}]\`](${this.item?.url})`,
-            });
+        if (item.thumbnail) super.setThumbnail(item.thumbnail.url);
+        return super.addFields({
+            name: "Now Playing:",
+            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.duration, item.durationRaw)}`,
+        });
+    }
+
+    setPaused(item: YouTubeTrack | null) {
+        if (!item) return this;
+
+        if (item.thumbnail) super.setThumbnail(item.thumbnail.url);
+        return super.addFields({
+            name: "Paused Track:",
+            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.player.position, item.durationRaw)}`,
+        });
+    }
+
+    setSkipped(item: YouTubeTrack | null) {
+        if(!item) return this;
+
+        return super.addFields({ name: "Skipped:", value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})` });
+    }
+
+    setQueue(queue: YouTubeTrack[]) {
+        if (!queue.length) return this;
+
+        let res = "";
+
+        for (const [index, track] of queue.entries()) {
+            if (res.length >= 840) return this.addFields({ name: "Server Queue:", value: `${res}...` });
+            res += `\`${index + 1}.\` - ${getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n`;
         }
 
-        return this;
-    }
-
-    setPlaying(subscription: MusicSubscription) {
-        if (subscription.active) {
-            const track = subscription.active;
-            const progressBar = createProgressBar("playbackDuration" in subscription.player.state ? subscription.player.state.playbackDuration : 0, track.durationRaw);
-
-            this.addFields({ name: "Now Playing:", value: `${getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
-            this.setItem(track);
-        }
-
-        return this;
-    }
-
-    setPaused(subscription: MusicSubscription) {
-        if (subscription.active) {
-            const track = subscription.active;
-            const progressBar = createProgressBar("playbackDuration" in subscription.player.state ? subscription.player.state.playbackDuration : 0, track.durationRaw);
-
-            this.addFields({ name: "Paused Track:", value: `${getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
-            this.setItem(track);
-        }
-
-        return this;
-    }
-
-    setResumed(subscription: MusicSubscription) {
-        if (subscription.active) {
-            const track = subscription.active;
-            const progressBar = createProgressBar("playbackDuration" in subscription.player.state ? subscription.player.state.playbackDuration : 0, track.durationRaw);
-
-            this.addFields({ name: "Resumed Track:", value: `${getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n${progressBar}` });
-            this.setItem(track);
-        }
-
-        return this;
-    }
-
-    setSkipped(subscription: MusicSubscription) {
-        if (subscription.active) {
-            const track = subscription.active;
-
-            this.addFields({ name: "Skipped Track:", value: `${getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})` });
-            this.setItem(track);
-        }
-
-        return this;
-    }
-
-    setQueue(subscription: MusicSubscription) {
-        if (subscription.queue.length) {
-            let res = "";
-
-            for (const [index, track] of subscription.queue.entries()) {
-                if (res.length >= 840) return this.addFields({ name: "Server Queue:", value: `${res}...` });
-                res += `\`${index + 1}.\` - ${getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n`;
-            }
-
-            this.addFields({ name: "Server Queue:", value: `${res}` });
-        }
-
-        return this;
+        return super.addFields({ name: "Server Queue:", value: `${res}` });
     }
 }

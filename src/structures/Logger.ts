@@ -28,7 +28,7 @@ export class Logger {
         }
     }
 
-    fatal(err: Error | unknown): void {
+    fatal(err: any): void {
         const eventId = Sentry.captureException(err);
 
         console.error(chalk.red(`Logger (FATAL) (${eventId}): A Fatal Error Has Occured!`));
@@ -39,7 +39,7 @@ export class Logger {
         process.exit();
     }
 
-    error(err: Error | unknown): string {
+    error(err: any): string {
         const eventId = Sentry.captureException(err);
 
         console.error(chalk.red(`Logger (ERROR) (${eventId}): An Error Has Occured!`));

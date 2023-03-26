@@ -33,6 +33,7 @@
         "libsodium-wrappers": "^0.7.9",
         "play-dl": "^1.9.6",
         "redis": "^4.0.2",
+        "shoukaku": "^3.3.1",
         "string-progressbar": "^1.0.4"
     },
     "devDependencies": {

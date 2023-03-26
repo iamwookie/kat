@@ -1,10 +1,7 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
-
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
-import { ActionEmbed, ErrorEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
-
-import chalk from "chalk";
+import { ActionEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
 
 export class PauseCommand extends Command {
     constructor(commander: Commander) {
@@ -28,18 +25,10 @@ export class PauseCommand extends Command {
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
         const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        if (!subscription || !subscription.active || subscription.paused) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I'm not playing anything!")] });
 
-        if (!subscription) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I'm not playing anything!")] });
-
-        try {
-            subscription.destroy();
-            return await int.editReply({ embeds: [new MusicEmbed(int).setTitle(subscription.paused ? "👋 \u200b Discconected! Cya!" : "👋 \u200b Stopped playing! Cya!")] });
-        } catch (err) {
-            const eventId = client.logger.error(err);
-            console.error(chalk.red("Music Commands (ERROR) >> pause: Error Running Command"));
-            console.error(err);
-
-            return await int.editReply({ embeds: [new ErrorEmbed(eventId)] });
-        }
+        const embed = new MusicEmbed(subscription).setUser(int.user).setPaused(subscription.active);
+        subscription.pause();
+        return await int.editReply({ embeds: [embed] });
     }
 }
