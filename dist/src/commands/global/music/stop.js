@@ -1,7 +1,6 @@
 import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder } from "discord.js";
-import { ActionEmbed, ErrorEmbed } from "../../../utils/embeds/index.js";
-import chalk from "chalk";
+import { ActionEmbed } from "../../../utils/embeds/index.js";
 export class StopCommand extends Command {
     constructor(commander) {
         super(commander);
@@ -22,16 +21,8 @@ export class StopCommand extends Command {
     async execute(client, int) {
         const subscription = client.subscriptions.get(int.guildId);
         if (!subscription)
-            return await int.editReply({ embeds: [] });
-        try {
-            subscription.destroy();
-            return await int.editReply({ embeds: [new ActionEmbed("success").setUser(int.user).setDesc("Successfully disconnected. Cya! 👋")] });
-        }
-        catch (err) {
-            const eventId = client.logger.error(err);
-            console.error(chalk.red("Music Commands (ERROR) >> stop: Error Running Command"));
-            console.error(err);
-            return await int.editReply({ embeds: [new ErrorEmbed(eventId)] });
-        }
+            return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I'm not playing anything!")] });
+        subscription.destroy();
+        return await int.editReply({ embeds: [new ActionEmbed("success").setUser(int.user).setDesc("Successfully disconnected. Cya! 👋")] });
     }
 }

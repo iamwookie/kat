@@ -1,7 +1,6 @@
 import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder } from "discord.js";
-import { ActionEmbed, MusicEmbed, ErrorEmbed } from "../../../utils/embeds/index.js";
-import chalk from "chalk";
+import { ActionEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class SkipCommand extends Command {
     constructor(commander) {
         super(commander);
@@ -20,19 +19,13 @@ export class SkipCommand extends Command {
     }
     async execute(client, int) {
         const subscription = client.subscriptions.get(int.guildId);
-        if (!subscription || !subscription.playing)
+        if (!subscription || !subscription.active || subscription.paused)
             return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The queue is empty or does not exist!")] });
         if (subscription.queue.length == 0)
-            return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("Nothing to skip to. This is the last track!")] });
-        try {
-            subscription.player.stop();
-            return await int.editReply({ embeds: [new MusicEmbed(int).setSkipped(subscription)] });
-        }
-        catch (err) {
-            const eventId = client.logger.error(err);
-            console.error(chalk.red("Music Commands (ERROR) >> skip: Error Running Command"));
-            console.error(err);
-            return await int.editReply({ embeds: [new ErrorEmbed(eventId)] });
-        }
+            return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("This is the last track in the queue!")] });
+        const embed = new MusicEmbed(subscription).setUser(int.user).setSkipped(subscription.active);
+        subscription.stop();
+        return await int.editReply({ embeds: [embed] });
     }
 }
+// START FULL OVERHAUL OF MUSIC NOW

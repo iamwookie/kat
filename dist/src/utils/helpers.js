@@ -1,5 +1,4 @@
-import { YouTubeTrack, SpotifyTrack } from "../structures/music/Track.js";
-import { YouTubePlayList, SpotifyPlaylist, SpotifyAlbum } from "play-dl";
+import { YouTubeTrack } from "../structures/index.js";
 import stringProgressBar from "string-progressbar";
 import emojis from "./emojis.json" assert { type: "json" };
 export function formatTime(time) {
@@ -39,20 +38,18 @@ export function formatUser(user) {
     };
 }
 export function getServiceIcon(item) {
-    if (item instanceof YouTubeTrack || item instanceof YouTubePlayList) {
+    if (item instanceof YouTubeTrack) {
         return emojis.music.youtube;
     }
-    else if (item instanceof SpotifyTrack || item instanceof SpotifyPlaylist || item instanceof SpotifyAlbum) {
-        return emojis.music.spotify;
-    }
     else {
-        return '';
+        return "";
     }
 }
 export function createProgressBar(playbackDuration, totalDuration) {
-    const duration = Math.round(playbackDuration / 1000);
-    let progressBar = stringProgressBar.splitBar(totalDuration, duration, 26, "▬", emojis.music.slider)[0];
-    if (duration == 0)
+    playbackDuration = Math.round(playbackDuration / 1000);
+    totalDuration = Math.round(totalDuration / 1000);
+    let progressBar = stringProgressBar.splitBar(totalDuration, playbackDuration, 26, "▬", emojis.music.slider)[0];
+    if (playbackDuration == 0)
         progressBar = emojis.music.slider + progressBar.slice(1);
     return progressBar;
 }

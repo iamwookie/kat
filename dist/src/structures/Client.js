@@ -3,6 +3,7 @@ import { Client, Events, Collection, PermissionsBitField } from "discord.js";
 import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
 import { Commander } from "./Commander.js";
+import { ShoukakuClient } from "./ShoukakuClient.js";
 import { ColorClient } from "./ColorClient.js";
 import { TwitchClient } from "./TwitchClient.js";
 import Server from "../api/server.js";
@@ -30,6 +31,7 @@ export class KATClient extends Client {
     logger = new Logger(this);
     database = new Database(this);
     commander = new Commander(this);
+    shoukaku = new ShoukakuClient(this);
     colors = new ColorClient(this);
     twitch = new TwitchClient(this);
     server;

@@ -1,16 +1,11 @@
-import { createAudioResource } from "@discordjs/voice";
-import play from "play-dl";
-import { formatDuration } from "../../../src/utils/helpers.js";
-import chalk from "chalk";
 class Track {
-    client;
-    subscription;
+    data;
+    info;
     interaction;
-    requestedBy;
+    requester;
     onStart;
     onFinish;
     onError;
-    raw;
     url;
     title;
     description;
@@ -18,80 +13,33 @@ class Track {
     durationRaw;
     thumbnail;
     type;
-    constructor(client, subscription, interaction, { ...options }) {
-        this.client = client;
-        this.subscription = subscription;
+    constructor(data, info, interaction, { ...options }) {
+        this.data = data;
+        this.info = info;
         this.interaction = interaction;
-        this.client = client;
-        this.subscription = subscription;
+        this.data = data;
+        this.info = info;
         this.interaction = interaction;
-        this.requestedBy = interaction.user;
+        this.requester = interaction.user;
         this.onStart = options.onStart ? options.onStart : () => { };
         this.onFinish = options.onFinish ? options.onFinish : () => { };
         this.onError = options.onError ? options.onError : () => { };
     }
-    async createResource() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const stream = await play.stream(this.url, { quality: 2 });
-                const resource = createAudioResource(stream.stream, { metadata: this, inputType: stream.type });
-                return resolve(resource);
-            }
-            catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Music >> Error Creating Stream"));
-                console.error(err);
-                this.onError(err);
-                return reject(err);
-            }
-        });
-    }
 }
 export class YouTubeTrack extends Track {
-    constructor(client, subscription, interaction, data, { ...options }) {
-        super(client, subscription, interaction, { ...options });
-        this.raw = data;
-        this.url = data.url;
-        this.type = data.type;
-        this.title = data.title;
-        this.description = data.description;
-        this.duration = data.durationRaw;
-        this.durationRaw = data.durationInSec;
-        this.thumbnail = data.thumbnails[0];
-    }
-}
-export class SpotifyTrack extends Track {
-    name;
-    artists;
-    constructor(client, subscription, interaction, data, { ...options }) {
-        super(client, subscription, interaction, { ...options });
-        this.raw = data;
-        this.url = data.url;
-        this.type = data.type;
-        this.title = `${data.name} - ${data.artists[0].name}`;
-        this.duration = formatDuration(data.durationInSec);
-        this.durationRaw = data.durationInSec;
-        this.thumbnail = data.thumbnail;
-        this.name = data.name;
-        this.artists = data.artists;
-    }
-    async createResource() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const search = await play.search(this.artists[0].name + " - " + this.name, { limit: 1, source: { youtube: "video" } });
-                if (!search || search.length < 0)
-                    throw new Error("No results found!");
-                const stream = await play.stream(search[0].url, { quality: 3 });
-                const resource = createAudioResource(stream.stream, { metadata: this, inputType: stream.type });
-                return resolve(resource);
-            }
-            catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Music >> Error Creating Spotify Stream"));
-                console.error(err);
-                this.onError(err);
-                return reject(err);
-            }
-        });
+    data;
+    info;
+    interaction;
+    constructor(data, info, interaction, { ...options }) {
+        super(data, info, interaction, { ...options });
+        this.data = data;
+        this.info = info;
+        this.interaction = interaction;
+        this.url = this.data.info.uri;
+        this.title = this.data.info.title;
+        this.description = this.info.video_details.description;
+        this.duration = this.info.video_details.durationRaw;
+        this.durationRaw = this.data.info.length;
+        this.thumbnail = this.info.video_details.thumbnails ? this.info.video_details.thumbnails[0] : undefined;
     }
 }
