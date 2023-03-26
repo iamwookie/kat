@@ -67,10 +67,10 @@ export class Commander {
             const command = this.commands.get(interaction.commandName) || this.commands.get(this.aliases.get(interaction.commandName));
             if (!command || command.disabled)
                 return;
-            await interaction.deferReply({ ephemeral: command.ephemeral });
             if (!this.validate(interaction, command))
                 return;
             try {
+                await interaction.deferReply({ ephemeral: command.ephemeral });
                 await command.execute(this.client, interaction);
             }
             catch (err) {
@@ -83,7 +83,7 @@ export class Commander {
     }
     validate(interaction, command) {
         if (command.users && !command.users.includes(interaction.user.id)) {
-            interaction.editReply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc("You are not allowed to use this command!")] });
+            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc("You are not allowed to use this command!")] });
             return false;
         }
         if (command.cooldown && command.cooldowns) {
@@ -91,7 +91,7 @@ export class Commander {
             if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
                 const cooldown = command.cooldowns.get(context).get(interaction.user.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-                interaction.editReply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
             command.applyCooldown(interaction.guild, interaction.user);
