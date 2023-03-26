@@ -4,7 +4,7 @@ import { ActionEmbed, ErrorEmbed } from "../utils/embeds/index.js";
 import chalk from "chalk";
 // -----------------------------------
 import { PlayCommand, StopCommand, PauseCommand, SkipCommand, QueueCommand, LyricsCommand, HelpCommand, } from "../commands/global/index.js";
-import { ColorCommand, AddColorCommand, TwitchCommand } from "../commands/guild/index.js";
+import { ColorCommand, AddColorCommand, TwitchCommand } from "../commands/reserved/index.js";
 const cliCommands = [];
 const globalCommands = [
     // Music
@@ -17,7 +17,7 @@ const globalCommands = [
     // Misc
     HelpCommand,
 ];
-const guildCommands = [
+const reservedCommands = [
     // Color
     ColorCommand,
     AddColorCommand,
@@ -130,9 +130,9 @@ export class Commander {
             }
         }
     }
-    async initializeGuildCommands() {
-        if (guildCommands.length) {
-            for (const GuildCommand of guildCommands) {
+    async initializeReservedCommands() {
+        if (reservedCommands.length) {
+            for (const GuildCommand of reservedCommands) {
                 try {
                     const command = new GuildCommand(this);
                     if (!command.guilds)

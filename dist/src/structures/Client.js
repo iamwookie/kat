@@ -55,7 +55,7 @@ export class KATClient extends Client {
         console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));
         await this.commander.initializeCLICommands();
         await this.commander.initializeGlobalCommands();
-        await this.commander.initializeGuildCommands();
+        await this.commander.initializeReservedCommands();
         await this.commander.registerGlobalCommands();
         await this.commander.registerGuildCommands();
         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
