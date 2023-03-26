@@ -70,7 +70,7 @@ export class KATClient extends Client {
 
         await this.commander.initializeCLICommands();
         await this.commander.initializeGlobalCommands();
-        await this.commander.initializeGuildCommands();
+        await this.commander.initializeReservedCommands();
         await this.commander.registerGlobalCommands();
         await this.commander.registerGuildCommands();
         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));

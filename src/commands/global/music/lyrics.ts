@@ -16,7 +16,7 @@ export class LyricsCommand extends Command {
         this.group = "Music";
         this.description = {
             content: "View the current tracks lyrics or search for one.",
-            format: "<?title>",
+            format: "<?title/url>",
         };
 
         this.cooldown = 5;

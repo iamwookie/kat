@@ -24,7 +24,7 @@ import {
     ColorCommand,
     AddColorCommand,
     TwitchCommand
-} from "@src/commands/guild/index.js";
+} from "@src/commands/reserved/index.js";
 
 const cliCommands: any = [];
 
@@ -41,7 +41,7 @@ const globalCommands = [
     HelpCommand,
 ];
 
-const guildCommands: any = [
+const reservedCommands: any = [
     // Color
     ColorCommand,
     AddColorCommand,
@@ -166,9 +166,9 @@ export class Commander {
         }
     }
 
-    async initializeGuildCommands() {
-        if (guildCommands.length) {
-            for (const GuildCommand of guildCommands) {
+    async initializeReservedCommands() {
+        if (reservedCommands.length) {
+            for (const GuildCommand of reservedCommands) {
                 try {
                     const command = new GuildCommand(this);
                     if (!command.guilds) this.client.logger.warn(`Commander >> Guild Not Set For Guild Command: ${command.name}`);

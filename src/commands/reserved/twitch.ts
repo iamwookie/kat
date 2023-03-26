@@ -11,7 +11,7 @@ export class TwitchCommand extends Command {
         this.group = "Twitch";
         this.description = {
             content: "Sends a twitch stream notification to a chosen channel.",
-            format: "<streamer> <channel> <role>",
+            format: "<streamer> <channel> <?role>",
         };
 
         this.cooldown = 5;
@@ -47,7 +47,6 @@ export class TwitchCommand extends Command {
             .addRoleOption((option) => {
                 option.setName("role")
                 .setDescription("The role to mention in the notification.")
-                .setRequired(true)
                 return option;
             })
     }
@@ -55,7 +54,7 @@ export class TwitchCommand extends Command {
     async execute(client: Client, int: ChatInputCommandInteraction) {
         const streamer = int.options.getString("streamer", true);
         const channel: GuildTextBasedChannel = int.options.getChannel("channel", true);
-        const role = int.options.getRole("role", true);
+        const role = int.options.getRole("role");
 
         const stream = await client.twitch.getStream(streamer);
         if (!stream) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("Streamer is invalid or not currently streaming!")] });
@@ -64,7 +63,7 @@ export class TwitchCommand extends Command {
         const image = stream.getThumbnailUrl(1280, 720);
 
         try {
-            await channel.send({ embeds: [new TwitchEmbed(user, stream, image)], content: role.toString() });
+            await channel.send({ embeds: [new TwitchEmbed(user, stream, image)], content: role?.toString() ?? undefined });
             return await int.editReply({ embeds: [new ActionEmbed("success").setUser(int.user).setDesc(`Sent a notification to ${channel}!`)] });
         } catch (err) {
             client.logger.error(err);
