@@ -27,9 +27,11 @@ export class Subscription {
         this.player = player;
         this.node = node;
 
-        this.client.on(Events.VoiceStateUpdate, (oldState) => {
+        this.client.on(Events.VoiceStateUpdate, (oldState, newState) => {
+            if (newState.id === this.client.user?.id && !newState.channel) return this.destroy();
             if (oldState.channelId !== this.voiceChannel.id) return;
-            if (oldState.channel?.members.size === 1) this.destroy();
+            if (newState.channel && newState.channel.members.has(this.client.user!.id)) this.voiceChannel = newState.channel;
+            if ((oldState.channel && oldState.channel.members.size <= 1) && (newState.channel && newState.channel?.members.size <= 1)) this.destroy();
         });
 
         this.shoukaku.on("disconnect", (name) => {
@@ -59,10 +61,12 @@ export class Subscription {
             this.process();
         });
 
-        this.player.on("closed", () => {
-            this.client.logger.info(`Music >> Closed Connection in ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`);
-            this.destroy();
-        });
+        // -----> REQUIRES FIXING FROM SHOUKAKU
+        //
+        // this.player.on("closed", (reason) => {
+        //     this.client.logger.warn(`Music >> Closed Connection in ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`);
+        //     this.destroy();
+        // });
     }
 
     static async create(client: Client, guild: Guild, voiceChannel: VoiceBasedChannel, textChannel: TextBasedChannel | null) {
