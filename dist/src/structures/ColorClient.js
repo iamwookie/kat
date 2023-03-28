@@ -9,7 +9,7 @@ export class ColorClient {
     async initialize() {
         const guilds = await this.client.guilds.fetch();
         for (const [_, guild] of guilds) {
-            const data = await this.client.database.get(guild.id, "colors");
+            const data = await this.client.database?.get(guild.id, "colors");
             if (!data)
                 continue;
             this.guilds.set(guild.id, data);
@@ -24,7 +24,7 @@ export class ColorClient {
         const data = this.guilds.get(guild) || [];
         data.push(id);
         this.guilds.set(guild, data);
-        return await this.client.database.set(guild, "colors", data);
+        return await this.client.database?.set(guild, "colors", data);
     }
     async delete(guild, id) {
         if (!this.guilds.get(guild)?.includes(id))
@@ -33,10 +33,10 @@ export class ColorClient {
         data.splice(data.indexOf(id), 1);
         this.guilds.set(guild, data);
         if (!data.length) {
-            return await this.client.database.delete(guild, "colors");
+            return await this.client.database?.delete(guild, "colors");
         }
         else {
-            return await this.client.database.set(guild, "colors", data);
+            return await this.client.database?.set(guild, "colors", data);
         }
     }
     async clear(guild, member) {

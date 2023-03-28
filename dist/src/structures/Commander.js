@@ -1,28 +1,28 @@
 import readline from "readline";
-import { REST, Routes, Events, InteractionType, Collection } from "discord.js";
-import { ActionEmbed, ErrorEmbed } from "../utils/embeds/index.js";
+import { REST, Routes, Collection } from "discord.js";
+import { ActionEmbed } from "../utils/embeds/index.js";
 import chalk from "chalk";
 // -----------------------------------
-import { PlayCommand, StopCommand, PauseCommand, SkipCommand, QueueCommand, LyricsCommand, HelpCommand, } from "../commands/global/index.js";
-import { ColorCommand, AddColorCommand, TwitchCommand } from "../commands/reserved/index.js";
+import * as Commands from "../commands/index.js";
+import * as Events from "../events/index.js";
 const cliCommands = [];
 const globalCommands = [
     // Music
-    PlayCommand,
-    StopCommand,
-    PauseCommand,
-    SkipCommand,
-    QueueCommand,
-    LyricsCommand,
+    Commands.PlayCommand,
+    Commands.StopCommand,
+    Commands.PauseCommand,
+    Commands.SkipCommand,
+    Commands.QueueCommand,
+    Commands.LyricsCommand,
     // Misc
-    HelpCommand,
+    Commands.HelpCommand,
 ];
 const reservedCommands = [
     // Color
-    ColorCommand,
-    AddColorCommand,
+    Commands.ColorCommand,
+    Commands.AddColorCommand,
     // Twitch
-    TwitchCommand,
+    Commands.TwitchCommand,
 ];
 // -----------------------------------
 export class Commander {
@@ -39,113 +39,82 @@ export class Commander {
     constructor(client) {
         this.client = client;
         this.client = client;
-        // CLI Commands
-        this.readline.on("line", async (line) => {
-            if (!line.startsWith(">"))
-                return;
-            const content = line.slice(1).trim().split(/ +/);
-            const commandText = content.shift()?.toLowerCase();
-            const args = content.join(" ");
-            const command = this.cli.get(commandText) || this.cli.get(this.aliases.get(commandText));
-            if (!command || command.disabled)
-                return;
-            try {
-                await command.execute(this.client, args);
-                // Breakline
-                console.log("");
-            }
-            catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
-                console.error(err);
-            }
-        });
-        // Slash Commands
-        this.client.on(Events.InteractionCreate, async (interaction) => {
-            if (interaction.type !== InteractionType.ApplicationCommand)
-                return;
-            const command = this.commands.get(interaction.commandName) || this.commands.get(this.aliases.get(interaction.commandName));
-            if (!command || command.disabled)
-                return;
-            if (!this.validate(interaction, command))
-                return;
-            try {
-                await interaction.deferReply({ ephemeral: command.ephemeral });
-                await command.execute(this.client, interaction);
-            }
-            catch (err) {
-                const eventId = this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Running Slash Command"));
-                console.error(err);
-                interaction.editReply({ embeds: [new ErrorEmbed(eventId)] });
-            }
-        });
     }
-    validate(interaction, command) {
-        if (command.users && !command.users.includes(interaction.user.id)) {
-            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc("You are not allowed to use this command!")] });
-            return false;
-        }
-        if (command.cooldown && command.cooldowns) {
-            const context = interaction.guild?.id || "dm";
-            if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
-                const cooldown = command.cooldowns.get(context).get(interaction.user.id);
-                const secondsLeft = (cooldown - Date.now()) / 1000;
-                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
-                return false;
-            }
-            command.applyCooldown(interaction.guild, interaction.user);
-        }
-        return true;
+    async initialize() {
+        this.initializeCLICommands();
+        this.initializeGlobalCommands();
+        this.initializeReservedCommands();
+        await this.registerGlobalCommands();
+        await this.registerReservedCommands();
+        this.intiliazeEvents();
     }
-    async initializeCLICommands() {
+    initializeCLICommands() {
         if (cliCommands.length) {
             for (const CLICommand of cliCommands) {
                 try {
                     const command = new CLICommand(this);
-                    await command.initialize();
+                    command.initialize();
                     this.cli.set(command.name, command);
                 }
                 catch (err) {
                     this.client.logger.error(err);
-                    console.error(chalk.red("Commander (ERROR) >> Error Registering CLI Command"));
+                    console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI Command"));
                     console.error(err);
                 }
             }
         }
     }
-    async initializeGlobalCommands() {
+    initializeGlobalCommands() {
         if (globalCommands.length) {
             for (const GlobalCommand of globalCommands) {
                 try {
                     const command = new GlobalCommand(this);
-                    await command.initialize();
+                    command.initialize();
                     this.commands.set(command.name, command);
                 }
                 catch (err) {
                     this.client.logger.error(err);
-                    console.error(chalk.red("Commander (ERROR) >> Error Registering Global Command"));
+                    console.error(chalk.red("Commander (ERROR) >> Error Initializing Global Command"));
                     console.error(err);
                 }
             }
+            this.client.logger.info(`Commander >> Successfully Initialized ${globalCommands.length} Global Commands`);
         }
     }
-    async initializeReservedCommands() {
+    initializeReservedCommands() {
         if (reservedCommands.length) {
             for (const GuildCommand of reservedCommands) {
                 try {
                     const command = new GuildCommand(this);
                     if (!command.guilds)
                         this.client.logger.warn(`Commander >> Guild Not Set For Guild Command: ${command.name}`);
-                    await command.initialize();
+                    command.initialize();
                     this.commands.set(command.name, command);
                 }
                 catch (err) {
                     this.client.logger.error(err);
-                    console.error(chalk.red("Commander (ERROR) >> Error Registering Guild Command"));
+                    console.error(chalk.red("Commander (ERROR) >> Error Initializing Guild Command"));
                     console.error(err);
                 }
             }
+            this.client.logger.info(`Commander >> Successfully Initialized ${reservedCommands.length} Reserved Commands`);
+        }
+    }
+    intiliazeEvents() {
+        const events = Object.values(Events);
+        if (events.length) {
+            for (const GlobalEvent of events) {
+                try {
+                    const event = new GlobalEvent(this.client, this);
+                    this.client.on(event.name, event.execute.bind(event));
+                }
+                catch (err) {
+                    this.client.logger.error(err);
+                    console.error(chalk.red("Commander (ERROR) >> Error Registering Event"));
+                    console.error(err);
+                }
+            }
+            this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Events`);
         }
     }
     async registerGlobalCommands() {
@@ -163,7 +132,7 @@ export class Commander {
                 commands.push(command.data().toJSON());
             }
             const res = await this.rest.put(Routes.applicationCommands(process.env.BOT_APP_ID), { body: commands });
-            console.log(chalk.greenBright(`Commander >> Successfully Registered ${res.length} Global Command(s).`));
+            this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s).`);
         }
         catch (err) {
             this.client.logger.error(err);
@@ -171,7 +140,7 @@ export class Commander {
             console.error(err);
         }
     }
-    async registerGuildCommands() {
+    async registerReservedCommands() {
         for (const [k, g] of this.guilds) {
             let commands = [];
             if (!g.commands)
@@ -189,7 +158,7 @@ export class Commander {
             }
             try {
                 const res = await this.rest.put(Routes.applicationGuildCommands(process.env.BOT_APP_ID, k), { body: commands });
-                console.log(chalk.greenBright(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`));
+                this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`);
             }
             catch (err) {
                 this.client.logger.error(err);
@@ -197,6 +166,23 @@ export class Commander {
                 console.error(err);
             }
         }
-        console.log(chalk.greenBright("Commander >> Successfully Registered All Guild Commands."));
+        this.client.logger.info("Commander >> Successfully Registered All Guild Commands.");
+    }
+    validate(interaction, command) {
+        if (command.users && !command.users.includes(interaction.user.id)) {
+            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc("You are not allowed to use this command!")] });
+            return false;
+        }
+        if (command.cooldown && command.cooldowns) {
+            const context = interaction.guild?.id || "dm";
+            if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
+                const cooldown = command.cooldowns.get(context).get(interaction.user.id);
+                const secondsLeft = (cooldown - Date.now()) / 1000;
+                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                return false;
+            }
+            command.applyCooldown(interaction.guild, interaction.user);
+        }
+        return true;
     }
 }

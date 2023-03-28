@@ -11,7 +11,10 @@ export class Database {
         this.client = client;
         this.client = client;
     }
-    // Private
+    async initialize() {
+        await this.connect();
+        await this.load();
+    }
     async connect() {
         try {
             this.redis = createClient({
@@ -35,36 +38,30 @@ export class Database {
         }
         catch (err) {
             this.client.logger.error(err);
-            console.error(chalk.red("CommanderDatabase (ERROR) >> Error Connecting (SHUTDOWN)"));
+            this.client.database = undefined;
+            console.error(chalk.red("CommanderDatabase (ERROR) >> Error Connecting"));
             console.error(err);
         }
     }
     async load() {
         try {
-            let guilds = await this.redis.hGetAll(this.withPrefix("guilds"));
+            const guilds = await this.redis.hGetAll(this.withPrefix("guilds"));
             this.guilds.clear();
             if (Object.keys(guilds).length) {
                 for (const guild in guilds) {
                     this.guilds.set(guild, JSON.parse(guilds[guild]));
                 }
             }
-            let access = await this.redis.hGetAll(this.withPrefix("access"));
-            this.access.clear();
-            if (Object.keys(access).length) {
-                for (const command in access) {
-                    this.access.set(command, JSON.parse(access[command]));
-                }
-            }
             this.client.logger.info("CommanderDatabase >> Data Loaded");
             return true;
         }
         catch (err) {
-            console.error(chalk.red("CommanderDatabase (ERROR) >> Error Loading (SHUTDOWN)"));
+            this.client.logger.error(err);
+            this.client.database = undefined;
+            console.error(chalk.red("CommanderDatabase (ERROR) >> Error Loading Data"));
             console.error(err);
-            this.client.logger.fatal(err);
         }
     }
-    // Public
     async get(guild, key) {
         if (!this.guilds)
             await this.load();
@@ -137,16 +134,5 @@ export class Database {
             console.error(chalk.red("CommanderDatabase (ERROR) >> Error Setting Value"));
             console.error(err);
         }
-    }
-    // Twitch
-    async getTwitch() {
-        if (!this.guilds)
-            await this.load();
-        let res = [];
-        for (const [_, data] of this.guilds) {
-            if (data.twitch)
-                res.push(data.twitch);
-        }
-        return res;
     }
 }

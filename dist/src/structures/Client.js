@@ -50,14 +50,9 @@ export class KATClient extends Client {
     }
     async initialize() {
         this.server = await Server(this);
-        await this.database.connect();
-        await this.database.load();
+        await this.database?.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));
-        await this.commander.initializeCLICommands();
-        await this.commander.initializeGlobalCommands();
-        await this.commander.initializeReservedCommands();
-        await this.commander.registerGlobalCommands();
-        await this.commander.registerGuildCommands();
+        await this.commander.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
     }
 }

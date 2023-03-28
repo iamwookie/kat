@@ -1,6 +1,3 @@
-import { Events } from "discord.js";
-import chalk from "chalk";
-import { ActionEmbed } from "../../utils/embeds/action.js";
 export class Subscription {
     client;
     guild;
@@ -25,38 +22,9 @@ export class Subscription {
         this.textChannel = textChannel;
         this.player = player;
         this.node = node;
-        this.client.on(Events.VoiceStateUpdate, (oldState, newState) => {
-            if (newState.id === this.client.user?.id && !newState.channel)
-                return this.destroy();
-            if (oldState.channelId !== this.voiceChannel.id)
-                return;
-            if (newState.channel && newState.channel.members.has(this.client.user.id))
-                this.voiceChannel = newState.channel;
-            if ((oldState.channel && oldState.channel.members.size <= 1) && (newState.channel && newState.channel?.members.size <= 1))
-                this.destroy();
-        });
-        this.shoukaku.on("disconnect", (name) => {
-            if (name === this.node.name) {
-                this.textChannel?.send({ embeds: [new ActionEmbed("fail").setDesc("The voice node has disconnected. Try playing another track!")] }).catch((err) => { this.client.logger.error(err); });
-                this.destroy();
-            }
-        });
-        this.player.on("exception", (reason) => {
-            this.client.logger.error(reason);
-            console.error(chalk.red(`Music >> Exception in ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`));
-            this.active?.onError(reason);
-            this.active = null;
-            this.process();
-        });
-        this.player.on("start", () => {
-            this.active?.onStart();
-            this.client.logger.info(`Music >> Started Playing in ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`);
-        });
-        this.player.on("end", () => {
-            this.active?.onFinish();
-            this.active = null;
-            this.process();
-        });
+        this.player.on("exception", (reason) => this.client.emit("playerException", this, reason));
+        this.player.on("start", (data) => this.client.emit("playerStart", this, data));
+        this.player.on("end", (reason) => this.client.emit("playerEnd", this, reason));
         // -----> REQUIRES FIXING FROM SHOUKAKU
         //
         // this.player.on("closed", (reason) => {
@@ -84,6 +52,7 @@ export class Subscription {
         this.active = null;
         this.player.connection.disconnect();
         this.client.subscriptions.delete(this.guild.id);
+        this.client.logger.warn(`Music >> Subscription Destroyed for ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`);
     }
     process() {
         const track = this.queue.shift();

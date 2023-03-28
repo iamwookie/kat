@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, Collection } from "discord.js";
+import { Collection } from "discord.js";
 export class Command {
     commander;
     name;
@@ -16,27 +16,12 @@ export class Command {
         this.commander = commander;
         this.commander = commander;
     }
-    data() {
-        return new SlashCommandBuilder();
-    }
-    async execute(client, interaction) {
-        return Promise.resolve();
-    }
-    async initialize() {
+    initialize() {
         if (this.aliases) {
             for (const alias of this.aliases) {
                 this.commander.aliases.set(alias, this.name);
             }
         }
-        // ------- REVAMP COMMAND ACCESS MANAGER ------- //
-        // if (this.guilds || this.users) {
-        //     if (this.commander.client.database) {
-        //         const data = await this.commander.client.database.getAccess(this.name);
-        //         if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
-        //         if (data.users && this.users) this.users.push(...data.users);
-        //     }
-        //     if (this.users) this.users.push(this.commander.client.devId);
-        // }
         if (this.users)
             this.users.push(this.commander.client.devId);
         if (this.guilds) {
