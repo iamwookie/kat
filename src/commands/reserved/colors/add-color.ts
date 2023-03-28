@@ -45,7 +45,6 @@ export class AddColorCommand extends Command {
         
         const role = int.options.getRole("role", true);
         const colors = client.colors.get(int.guildId);
-
         if (colors && Object.values(colors).includes(role.id)) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("This role is already a color!")] });
 
         await client.colors.create(int.guildId!, role.id);

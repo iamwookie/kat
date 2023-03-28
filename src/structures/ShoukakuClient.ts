@@ -31,23 +31,10 @@ export class ShoukakuClient extends Shoukaku {
 
         this.client = client;
 
-        this.on("error", (name, error) => {
-            const node = this.nodes.get(name);
-            if (node?.reconnects == 0) this.client.logger.error(error);
-            console.error(chalk.red(`Music >> Lavalink Node: ${name} has had an error!`));
-        })
-
-        this.on("ready", (name) => {
-            this.client.logger.info(`Music >> Lavalink Node: ${name} is now connected!`);
-        });
-
-        this.on("disconnect", (name) => {
-            console.error(chalk.red(`Music >> Lavalink Node: ${name} has disconnected!`));
-        });
-
-        this.on("close", (name, code) => {
-            this.client.logger.warn(`Music >> Lavalink Node: ${name} has closed with code ${code}!`);
-        });
+        this.on("error", (name, error) => this.client.emit("nodeError", name, error));
+        this.on("ready", (name) => this.client.emit("nodeReady", name));
+        this.on("disconnect", (name) => this.client.emit("nodeDisconnect", name));
+        this.on("close", (name, code) => this.client.emit("nodeClose", name, code));
         
         chalk.greenBright.bold.underline(">>> Shoukaku Initialized")
     }

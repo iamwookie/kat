@@ -36,7 +36,7 @@ export class KATClient extends Client {
     public prefix: string = Config.prefix;
 
     public logger: Logger = new Logger(this);
-    public database: Database = new Database(this);
+    public database?: Database = new Database(this);
     public commander: Commander = new Commander(this);
     public shoukaku: ShoukakuClient = new ShoukakuClient(this);
     public colors: ColorClient = new ColorClient(this);
@@ -64,15 +64,10 @@ export class KATClient extends Client {
     async initialize(): Promise<void> {
         this.server = await Server(this);
 
-        await this.database.connect();
-        await this.database.load();
+        await this.database?.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));
 
-        await this.commander.initializeCLICommands();
-        await this.commander.initializeGlobalCommands();
-        await this.commander.initializeReservedCommands();
-        await this.commander.registerGlobalCommands();
-        await this.commander.registerGuildCommands();
+        await this.commander.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
     }
 }

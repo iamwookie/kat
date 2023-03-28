@@ -14,7 +14,7 @@ export class ColorClient {
         const guilds = await this.client.guilds.fetch();
 
         for (const [_, guild] of guilds) {
-            const data = await this.client.database.get(guild.id, "colors");
+            const data = await this.client.database?.get(guild.id, "colors");
             if (!data) continue;
 
             this.guilds.set(guild.id, data);
@@ -33,7 +33,7 @@ export class ColorClient {
 
         this.guilds.set(guild, data);
 
-        return await this.client.database.set(guild, "colors", data);
+        return await this.client.database?.set(guild, "colors", data);
     }
 
     async delete(guild: Snowflake, id: Snowflake) {
@@ -45,9 +45,9 @@ export class ColorClient {
         this.guilds.set(guild, data);
 
         if (!data.length) {
-            return await this.client.database.delete(guild, "colors");
+            return await this.client.database?.delete(guild, "colors");
         } else {
-            return await this.client.database.set(guild, "colors", data);
+            return await this.client.database?.set(guild, "colors", data);
         }
     }
 

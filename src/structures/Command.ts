@@ -2,7 +2,7 @@ import { KATClient } from "./Client.js";
 import { Commander } from "./Commander.js";
 import { User, Guild, ChatInputCommandInteraction, SlashCommandBuilder, Collection, Snowflake } from "discord.js";
 
-export class Command {
+export abstract class Command {
     public name: string;
     public group: string;
     public aliases?: string[];
@@ -22,37 +22,21 @@ export class Command {
     
     public cooldowns: Collection<Snowflake, Collection<Snowflake, number>> = new Collection();
 
+    abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
+    abstract execute(client: KATClient, interaction: ChatInputCommandInteraction): Promise<any>;
+
     constructor(
         private commander: Commander
     ) {
         this.commander = commander;
     }
 
-    data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup"> {
-        return new SlashCommandBuilder()
-    }
-
-    async execute(client: KATClient, interaction: ChatInputCommandInteraction): Promise<any> {
-        return Promise.resolve();
-    }
-
-    async initialize() {
+    initialize() {
         if (this.aliases) {
             for (const alias of this.aliases) {
                 this.commander.aliases.set(alias, this.name);
             }
         }
-
-        // ------- REVAMP COMMAND ACCESS MANAGER ------- //
-        // if (this.guilds || this.users) {
-        //     if (this.commander.client.database) {
-        //         const data = await this.commander.client.database.getAccess(this.name);
-        //         if (data.guilds && this.guilds) this.guilds.push(...data.guilds);
-        //         if (data.users && this.users) this.users.push(...data.users);
-        //     }
-
-        //     if (this.users) this.users.push(this.commander.client.devId);
-        // }
 
         if (this.users) this.users.push(this.commander.client.devId);
 

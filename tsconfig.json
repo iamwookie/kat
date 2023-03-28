@@ -20,10 +20,9 @@
             "@src/*": ["src/*"],
             "@configs/*": ["src/configs/*"],
             "@structures/*": ["src/structures/*"],
-            "@commander/*": ["src/commander/*"],
             "@commands/*": ["src/commands/*"],
+            "@events/*": ["src/events/*"],
             "@api/*": ["src/api/*"],
-            "@lib/*": ["src/lib/*"],
             "@utils/*": ["src/utils/*"]
         }
     }

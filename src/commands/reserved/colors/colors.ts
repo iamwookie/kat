@@ -98,7 +98,5 @@ export class ColorCommand extends Command {
                     client.logger.error(err);
                 });
         });
-
-        return Promise.resolve();
     }
 }
