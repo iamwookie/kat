@@ -12,8 +12,6 @@ export class QueueCommand extends Command {
         this.description = {
             content: "View the server queue.",
         };
-
-        this.cooldown = 5; 
     }
 
     data() {

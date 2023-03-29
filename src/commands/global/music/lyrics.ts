@@ -46,6 +46,8 @@ export class LyricsCommand extends Command {
             query = subscription.active.title!;
         }
 
+        this.applyCooldown(author);
+
         try {
             const search = await genius.songs.search(query);
 

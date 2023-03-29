@@ -1,7 +1,8 @@
 // This is the command handler, CODENAME: Commander v7.0.0
 import { KATClient as Client} from "./Client.js";
 
-import readline, { Interface } from "readline";
+// ----- FOR LATER USE -----
+// import readline, { Interface } from "readline";
 import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";
 import { Command }from "./Command.js";
 import { Module } from "./Module.js";
@@ -150,7 +151,7 @@ export class Commander {
 
                 if (command.aliases) {
                     for (const alias of command.aliases) {
-                        let data = command.data().setName(alias);
+                        const data = command.data().setName(alias);
                         commands.push(data);
                     }
                 }
@@ -159,7 +160,7 @@ export class Commander {
             }
 
             const res: any = await this.rest.put(Routes.applicationCommands(process.env.BOT_APP_ID!), { body: commands });
-            this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s).`);
+            this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s)`);
         } catch (err) {
             this.client.logger.error(err);
             console.error(chalk.red("Commander (ERROR) >> Error Registering Global Slash Commands"));
@@ -178,7 +179,7 @@ export class Commander {
 
                 if (command.aliases) {
                     for (const alias of command.aliases) {
-                        let data = command.data().setName(alias);
+                        const data = command.data().setName(alias);
                         commands.push(data);
                     }
                 }
@@ -196,7 +197,7 @@ export class Commander {
             }
         }
 
-        this.client.logger.info("Commander >> Successfully Registered All Guild Commands.");
+        this.client.logger.info("Commander >> Successfully Registered All Guild Commands");
     }
 
     validate(interaction: ChatInputCommandInteraction | Message, command: any) {
@@ -215,8 +216,6 @@ export class Commander {
                 interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
-
-            command.applyCooldown(author);
         }
 
         return true;

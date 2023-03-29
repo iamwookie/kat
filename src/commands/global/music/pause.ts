@@ -28,6 +28,8 @@ export class PauseCommand extends Command {
 
         const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("I'm not playing anything!")] });
+        
+        this.applyCooldown(author);
 
         const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();

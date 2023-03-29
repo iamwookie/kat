@@ -6,6 +6,7 @@ export abstract class Command {
     public name: string;
     public group: string;
     public aliases?: string[];
+    public legacyAliases?: string[];
 
     public description?: {
         content?: string;
@@ -34,6 +35,12 @@ export abstract class Command {
     initialize() {
         if (this.aliases) {
             for (const alias of this.aliases) {
+                this.commander.aliases.set(alias, this.name);
+            }
+        }
+
+        if (this.legacyAliases) {
+            for (const alias of this.legacyAliases) {
                 this.commander.aliases.set(alias, this.name);
             }
         }
