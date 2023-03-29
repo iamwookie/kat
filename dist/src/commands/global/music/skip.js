@@ -21,7 +21,7 @@ export class SkipCommand extends Command {
         const author = this.getAuthor(int);
         const subscription = client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused)
-            return int.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("The queue is empty or does not exist!")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("The queue is empty or does not exist!")] });
         if (subscription.queue.length == 0)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("This is the last track in the queue!")] });
         this.applyCooldown(author);
