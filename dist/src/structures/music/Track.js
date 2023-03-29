@@ -1,26 +1,23 @@
+import { formatDuration } from "../../utils/helpers.js";
 class Track {
     data;
-    info;
-    interaction;
     requester;
+    textChannel;
     onStart;
     onFinish;
     onError;
     url;
     title;
-    description;
     duration;
     durationRaw;
     thumbnail;
-    type;
-    constructor(data, info, interaction, { ...options }) {
+    constructor(data, requester, textChannel, { ...options }) {
         this.data = data;
-        this.info = info;
-        this.interaction = interaction;
+        this.requester = requester;
+        this.textChannel = textChannel;
         this.data = data;
-        this.info = info;
-        this.interaction = interaction;
-        this.requester = interaction.user;
+        this.requester = requester;
+        this.textChannel = textChannel;
         this.onStart = options.onStart ? options.onStart : () => { };
         this.onFinish = options.onFinish ? options.onFinish : () => { };
         this.onError = options.onError ? options.onError : () => { };
@@ -28,18 +25,17 @@ class Track {
 }
 export class YouTubeTrack extends Track {
     data;
-    info;
-    interaction;
-    constructor(data, info, interaction, { ...options }) {
-        super(data, info, interaction, { ...options });
+    requester;
+    textChannel;
+    constructor(data, requester, textChannel, { ...options }) {
+        super(data, requester, textChannel, { ...options });
         this.data = data;
-        this.info = info;
-        this.interaction = interaction;
+        this.requester = requester;
+        this.textChannel = textChannel;
         this.url = this.data.info.uri;
         this.title = this.data.info.title;
-        this.description = this.info.video_details.description;
-        this.duration = this.info.video_details.durationRaw;
+        this.duration = formatDuration(this.data.info.length / 1000);
         this.durationRaw = this.data.info.length;
-        this.thumbnail = this.info.video_details.thumbnails ? this.info.video_details.thumbnails[0] : undefined;
+        this.thumbnail = `https://i.ytimg.com/vi/${this.data.info.identifier}/mqdefault.jpg`;
     }
 }

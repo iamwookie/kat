@@ -2,7 +2,7 @@ import { Event } from "../../../structures/index.js";
 import chalk from "chalk";
 export class PlayerException extends Event {
     constructor(client, commander) {
-        super(client, commander, "nodeDisconnect");
+        super(client, commander, "playerException");
     }
     async execute(subscription, reason) {
         this.client.logger.error(reason);

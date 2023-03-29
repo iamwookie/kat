@@ -14,8 +14,7 @@ export class MusicEmbed extends EmbedBuilder {
     setEnqueued(item) {
         if (!item)
             return this;
-        if (item.thumbnail)
-            super.setThumbnail(item.thumbnail.url);
+        super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: "Enqueued:",
             value: `\`${this.subscription.queue.length == 0 ? 1 : this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
@@ -24,8 +23,7 @@ export class MusicEmbed extends EmbedBuilder {
     setPlaying(item) {
         if (!item)
             return this;
-        if (item.thumbnail)
-            super.setThumbnail(item.thumbnail.url);
+        super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: "Now Playing:",
             value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.duration, item.durationRaw)}`,
@@ -34,8 +32,7 @@ export class MusicEmbed extends EmbedBuilder {
     setPaused(item) {
         if (!item)
             return this;
-        if (item.thumbnail)
-            super.setThumbnail(item.thumbnail.url);
+        super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: "Paused Track:",
             value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.player.position, item.durationRaw)}`,

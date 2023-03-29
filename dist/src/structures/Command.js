@@ -1,4 +1,4 @@
-import { Collection } from "discord.js";
+import { ChatInputCommandInteraction, Message, Collection } from "discord.js";
 export class Command {
     commander;
     name;
@@ -39,16 +39,39 @@ export class Command {
             this.commander.groups.set(this.group, new Collection());
         this.commander.groups.get(this.group)?.set(this.name, this);
     }
-    applyCooldown(guild, user) {
+    applyCooldown(user) {
         if (!this.cooldown)
             return;
         const now = Date.now();
         const cooldown = this.cooldown * 1000;
-        if (!this.cooldowns.has(guild?.id || "dm"))
-            this.cooldowns.set(guild?.id || "dm", new Collection());
-        const cooldowns = this.cooldowns.get(guild?.id || "dm");
-        if (!cooldowns?.has(user.id))
-            cooldowns?.set(user.id, now + cooldown);
-        setTimeout(() => cooldowns?.delete(user.id), cooldown);
+        if (!this.cooldowns.has(user.id))
+            this.cooldowns?.set(user.id, now + cooldown);
+        setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
+    }
+    getAuthor(interaction) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.user;
+        }
+        else if (interaction instanceof Message) {
+            return interaction.author;
+        }
+    }
+    getArgs(interaction) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.options.data.map((option) => typeof option.value == "string" ? option.value.split(/ +/) : option.value).flat();
+            ;
+        }
+        else if (interaction instanceof Message) {
+            return interaction.content.split(/ +/).slice(1);
+        }
+        return [];
+    }
+    reply(interaction, content) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content);
+        }
+        else if (interaction instanceof Message) {
+            return interaction.reply(content);
+        }
     }
 }

@@ -28,6 +28,7 @@ export class KATClient extends Client {
     ]);
     devId = Config.devId;
     prefix = Config.prefix;
+    legacyPrefix = Config.legacyPrefix;
     logger = new Logger(this);
     database = new Database(this);
     commander = new Commander(this);

@@ -44,21 +44,31 @@ export class TwitchCommand extends Command {
         });
     }
     async execute(client, int) {
-        const streamer = int.options.getString("streamer", true);
-        const channel = int.options.getChannel("channel", true);
-        const role = int.options.getRole("role");
-        const stream = await client.twitch.getStream(streamer);
+        const author = this.getAuthor(int);
+        const streamer = this.getArgs(int)[0];
+        if (!streamer)
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("You did not provide a streamer's username!")] });
+        const channelId = this.getArgs(int)[1];
+        if (!channelId)
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("You did not provide a channel ID to send the notification to!")] });
+        const channel = await int.guild?.channels.fetch(channelId);
+        if (channel && !channel.isTextBased())
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("The channel you provided is not a text channel!")] });
+        const roleId = this.getArgs(int)[2];
+        const role = roleId ? await int.guild?.roles.fetch(roleId) : null;
+        const stream = await client.twitch.getStream(streamer).catch(() => null);
         if (!stream)
-            return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("Streamer is invalid or not currently streaming!")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("Streamer is invalid or not currently streaming!")] });
+        // Watch this for errors in future
         const user = await stream.getUser();
         const image = stream.getThumbnailUrl(1280, 720);
         try {
-            await channel.send({ embeds: [new TwitchEmbed(user, stream, image)], content: role?.toString() ?? undefined });
-            return await int.editReply({ embeds: [new ActionEmbed("success").setUser(int.user).setDesc(`Sent a notification to ${channel}!`)] });
+            await channel?.send({ embeds: [new TwitchEmbed(user, stream, image)], content: role?.toString() ?? undefined });
+            return this.reply(int, { embeds: [new ActionEmbed("success").setUser(author).setDesc(`Sent a notification to ${channel}!`)] });
         }
         catch (err) {
             client.logger.error(err);
-            return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There was an error. Are you sure I have permissions to send messages in that channel?")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("There was an error. Are you sure I have permissions to send messages in that channel?")] });
         }
     }
 }

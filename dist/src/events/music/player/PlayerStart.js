@@ -1,7 +1,7 @@
 import { Event } from "../../../structures/index.js";
 export class PlayerStart extends Event {
     constructor(client, commander) {
-        super(client, commander, "nodeDisconnect");
+        super(client, commander, "playerStart");
     }
     async execute(subscription) {
         subscription.active?.onStart();

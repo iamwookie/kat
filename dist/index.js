@@ -23,7 +23,12 @@ import chalk from "chalk";
         ],
     });
     const client = new Client({
-        intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.MessageContent,
+        ],
         presence: {
             status: "online",
             activities: [

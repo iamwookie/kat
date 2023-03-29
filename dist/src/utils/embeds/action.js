@@ -19,6 +19,10 @@ export class ActionEmbed extends EmbedBuilder {
                 super.setColor('Red');
                 super.setDescription(`🚫 \u200b ${description}`);
                 break;
+            case 'warn':
+                super.setColor('Yellow');
+                super.setDescription(`⚠️ \u200b ${description}`);
+                break;
             default:
                 super.setDescription(`${description}`);
         }

@@ -18,11 +18,12 @@ export class PauseCommand extends Command {
             .setDMPermission(false);
     }
     async execute(client, int) {
+        const author = this.getAuthor(int);
         const subscription = client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused)
-            return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I'm not playing anything!")] });
-        const embed = new MusicEmbed(subscription).setUser(int.user).setPaused(subscription.active);
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("I'm not playing anything!")] });
+        const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();
-        return await int.editReply({ embeds: [embed] });
+        return this.reply(int, { embeds: [embed] });
     }
 }

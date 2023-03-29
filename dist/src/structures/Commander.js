@@ -1,5 +1,4 @@
-import readline from "readline";
-import { REST, Routes, Collection } from "discord.js";
+import { REST, Routes, ChatInputCommandInteraction, Collection } from "discord.js";
 import { ActionEmbed } from "../utils/embeds/index.js";
 import chalk from "chalk";
 // -----------------------------------
@@ -27,7 +26,8 @@ const reservedCommands = [
 // -----------------------------------
 export class Commander {
     client;
-    readline = readline.createInterface(process.stdin);
+    // ----- FOR LATER USE -----
+    // private readline: Interface = readline.createInterface(process.stdin);
     rest = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN);
     cli = new Collection();
     global = new Collection();
@@ -169,19 +169,19 @@ export class Commander {
         this.client.logger.info("Commander >> Successfully Registered All Guild Commands.");
     }
     validate(interaction, command) {
-        if (command.users && !command.users.includes(interaction.user.id)) {
-            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc("You are not allowed to use this command!")] });
+        const author = interaction instanceof ChatInputCommandInteraction ? interaction.user : interaction.author;
+        if (command.users && !command.users.includes(author.id)) {
+            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not allowed to use this command!")] });
             return false;
         }
         if (command.cooldown && command.cooldowns) {
-            const context = interaction.guild?.id || "dm";
-            if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
-                const cooldown = command.cooldowns.get(context).get(interaction.user.id);
+            if (command.cooldowns.has(author.id)) {
+                const cooldown = command.cooldowns.get(author.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
-            command.applyCooldown(interaction.guild, interaction.user);
+            command.applyCooldown(author);
         }
         return true;
     }

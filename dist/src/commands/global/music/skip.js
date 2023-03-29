@@ -18,14 +18,15 @@ export class SkipCommand extends Command {
             .setDMPermission(false);
     }
     async execute(client, int) {
+        const author = this.getAuthor(int);
         const subscription = client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused)
-            return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The queue is empty or does not exist!")] });
+            return int.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("The queue is empty or does not exist!")] });
         if (subscription.queue.length == 0)
-            return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("This is the last track in the queue!")] });
-        const embed = new MusicEmbed(subscription).setUser(int.user).setSkipped(subscription.active);
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("This is the last track in the queue!")] });
+        const embed = new MusicEmbed(subscription).setUser(author).setSkipped(subscription.active);
         subscription.stop();
-        return await int.editReply({ embeds: [embed] });
+        return this.reply(int, { embeds: [embed] });
     }
 }
 // START FULL OVERHAUL OF MUSIC NOW

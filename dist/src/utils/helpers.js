@@ -24,7 +24,7 @@ export function formatDuration(time) {
     const hours = Math.floor(time / 3600);
     const minutes = Math.floor(time / 60);
     const seconds = time - minutes * 60;
-    return `${hours > 0 ? hours + ":" : ""}${minutes > 0 ? minutes + ":" : ""}${seconds}`;
+    return `${hours > 0 ? hours.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${minutes > 0 ? minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
 }
 export function formatUser(user) {
     return {
