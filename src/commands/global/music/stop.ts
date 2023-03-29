@@ -25,10 +25,12 @@ export class StopCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
+        const author = this.getAuthor(int)!;
+
         const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
-        if (!subscription) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I'm not playing anything!")] });
+        if (!subscription) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("I'm not playing anything!")] });
 
         subscription.destroy();
-        return await int.editReply({ embeds: [new ActionEmbed("success").setUser(int.user).setDesc("Successfully disconnected. Cya! 👋")] });
+        return this.reply(int, { embeds: [new ActionEmbed("success").setUser(author).setDesc("Successfully disconnected. Cya! 👋")] });
     }
 }

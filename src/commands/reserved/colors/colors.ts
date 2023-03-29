@@ -33,10 +33,12 @@ export class ColorCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
-        if (!client.database) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The database is not online!")] });
+        const author = this.getAuthor(int)!;
+        
+        if (!client.database) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("The database is not online!")] });
 
         const colors = client.colors.get(int.guildId);
-        if (!colors || !colors.length) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There are no colors set for this guild!")] });
+        if (!colors || !colors.length) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("There are no colors set for this guild!")] });
 
         const menu = new StringSelectMenuBuilder().setCustomId("color").setPlaceholder("Select a color");
 
@@ -51,15 +53,15 @@ export class ColorCommand extends Command {
             menu.addOptions({ label: role.name, value: role.id });
         }
 
-        if (!menu.options.length) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("There are no colors set for this guild!")] });
+        if (!menu.options.length) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("There are no colors set for this guild!")] });
 
         menu.addOptions({ label: "None", value: "none" });
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
 
-        await int.editReply({ embeds: [new ActionEmbed().setTitle("Color Menu").setUser(int.user).setDesc("Select a color from the menu below.")], components: [row] });
+        this.reply(int, { embeds: [new ActionEmbed().setTitle("Color Menu").setUser(author).setDesc("Select a color from the menu below.")], components: [row] });
 
-        const filter = (i: any) => i.customId === "color" && i.user.id === int.user.id;
+        const filter = (i: any) => i.customId === "color" && i.user.id === author.id;
         const collector = int.channel?.createMessageComponentCollector({ filter, time: 60_000 });
 
         collector?.on("collect", async (i: StringSelectMenuInteraction): Promise<any> => {
@@ -70,33 +72,30 @@ export class ColorCommand extends Command {
             if (i.values[0] === "none") {
                 try {
                     await client.colors.clear(i.guildId!, i.member);
-                    return await i.editReply({ embeds: [new ActionEmbed("success").setUser(int.user).setDesc("Removed your color roles!")] });
+                    return await i.editReply({ embeds: [new ActionEmbed("success").setUser(author).setDesc("Removed your color roles!")] });
                 } catch (err) {
                     client.logger.error(err);
-                    return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I was unable to remove your color roles!")] });
+                    return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("I was unable to remove your color roles!")] });
                 }
             }
 
             const role = int.guild?.roles.cache.get(i.values[0]);
-            if (!role) return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The role was not found!")] });
+            if (!role) return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("The role was not found!")] });
 
-            if (i.member.roles.cache.has(role.id)) return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("You already have this role!")] });
+            if (i.member.roles.cache.has(role.id)) return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("You already have this role!")] });
 
             try {
                 await client.colors.clear(i.guildId!, i.member);
                 await i.member.roles.add(role);
-                return await i.editReply({ embeds: [new ActionEmbed().setColor(role.color).setUser(int.user).setDesc(`✅ \u200b You have been given \`${role.name}\`!`)] });
+                return await i.editReply({ embeds: [new ActionEmbed().setColor(role.color).setUser(author).setDesc(`✅ \u200b You have been given \`${role.name}\`!`)] });
             } catch (err) {
                 client.logger.error(err);
-                return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I was unable to add the role to you! Are you sure I have permissions?")] });
+                return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("I was unable to add the role to you! Are you sure I have permissions?")] });
             }
         });
 
         collector?.on("end", async (_, reason): Promise<any> => {
-            if (reason === "time")
-                return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("This menu has expired!")], components: [] }).catch((err) => {
-                    client.logger.error(err);
-                });
+            if (reason === "time") return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("This menu has expired!")], components: [] })?.catch(() => { });
         });
     }
 }

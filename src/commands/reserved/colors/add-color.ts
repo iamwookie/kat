@@ -41,14 +41,21 @@ export class AddColorCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
-        if (!client.database) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The database is not online!")] });
+        const author = this.getAuthor(int)!;
+
+        if (!client.database) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("The database is not online!")] });
         
-        const role = int.options.getRole("role", true);
+        const roleId = this.getArgs(int)[0];
+        if (!roleId) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("Please provide a role ID!")] });
+
+        const role = await int.guild?.roles.fetch(roleId as string);
+        if (!role) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("Invalid role ID!")] });
+
         const colors = client.colors.get(int.guildId);
-        if (colors && Object.values(colors).includes(role.id)) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("This role is already a color!")] });
+        if (colors && Object.values(colors).includes(role.id)) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("This role is already a color!")] });
 
         await client.colors.create(int.guildId!, role.id);
 
-        return await int.editReply({ embeds: [new ActionEmbed().setColor(role.color).setUser(int.user).setDesc(`✅ \u200b Added \`${role.name}\` as a color!`)] });
+        return this.reply(int, { embeds: [new ActionEmbed().setColor(role.color).setUser(author).setDesc(`✅ \u200b Added \`${role.name}\` as a color!`)] });
     }
 }

@@ -1,7 +1,7 @@
-import { KATClient as Client } from "../Client.js";
-import { ChatInputCommandInteraction, User } from "discord.js";
+import { TextBasedChannel, User } from "discord.js";
 import { Track as ShoukakuTrack } from "shoukaku";
-import { InfoData } from "play-dl";
+
+import { formatDuration } from "@src/utils/helpers.js";
 
 export type TrackMetadata = {
     onStart?: () => void;
@@ -10,30 +10,25 @@ export type TrackMetadata = {
 };
 
 abstract class Track {
-    public requester: User;
-
     public onStart: () => void;
     public onFinish: () => void;
     public onError: (err: any) => void;
 
     public url: string;
-    public title?: string;
-    public description?: string;
+    public title: string;
     public duration: string;
     public durationRaw: number;
-    public thumbnail?: any;
-    public type: "video" | "track" | "playlist" | "album" | "channel";
-
+    public thumbnail: string;
+    
     constructor(
         public data: ShoukakuTrack,
-        public info: InfoData,
-        public interaction: ChatInputCommandInteraction,
+        public requester: User,
+        public textChannel: TextBasedChannel | null,
         { ...options }: TrackMetadata
     ) {
         this.data = data;
-        this.info = info;
-        this.interaction = interaction;
-        this.requester = interaction.user;
+        this.requester = requester;
+        this.textChannel = textChannel;
 
         this.onStart = options.onStart ? options.onStart : () => {};
         this.onFinish = options.onFinish ? options.onFinish : () => {};
@@ -44,17 +39,16 @@ abstract class Track {
 export class YouTubeTrack extends Track {
     constructor(
         public data: ShoukakuTrack,
-        public info: InfoData,
-        public interaction: ChatInputCommandInteraction,
-        { ...options }: TrackMetadata,
+        public requester: User,
+        public textChannel: TextBasedChannel | null,
+        { ...options }: TrackMetadata
     ) {
-        super(data, info, interaction, { ...options });
-
+        super(data, requester, textChannel, { ...options });
+        
         this.url = this.data.info.uri;
         this.title = this.data.info.title;
-        this.description = this.info.video_details.description;
-        this.duration = this.info.video_details.durationRaw;
+        this.duration = formatDuration(this.data.info.length / 1000);
         this.durationRaw = this.data.info.length;
-        this.thumbnail = this.info.video_details.thumbnails ? this.info.video_details.thumbnails[0] : undefined;
+        this.thumbnail = `https://i.ytimg.com/vi/${this.data.info.identifier}/mqdefault.jpg`;
     }
 }

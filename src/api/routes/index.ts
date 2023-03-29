@@ -14,7 +14,7 @@ import packageJson from '../../../package.json' assert { type: "json" };
 
 const router = Router();
 
-export default function (client: Client): Router {
+export default function (client: Client) {
     router.get('/', (_: Request, res: Response) => res.send(`${client.user?.username} - v${packageJson.version}`));
 
     router.use('/stats', statsRoute(client));

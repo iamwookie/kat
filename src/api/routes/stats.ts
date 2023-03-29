@@ -5,7 +5,7 @@ import { fetchStats } from 'src/api/controllers/bot.js';
 
 const router = Router();
 
-export default function (client: Client): Router {
+export default function (client: Client) {
     // /stats
     router.get('/', fetchStats(client));
 

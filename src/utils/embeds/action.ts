@@ -2,7 +2,7 @@ import { EmbedBuilder, User } from 'discord.js';
 
 export class ActionEmbed extends EmbedBuilder {
     constructor(
-        public embedType?: "success" | "fail"
+        public embedType?: "success" | "fail" | "warn"
     ) {
         super();
 
@@ -22,6 +22,10 @@ export class ActionEmbed extends EmbedBuilder {
             case 'fail':
                 super.setColor('Red');
                 super.setDescription(`🚫 \u200b ${description}`);
+                break;
+            case 'warn':
+                super.setColor('Yellow');
+                super.setDescription(`⚠️ \u200b ${description}`);
                 break;
             default:
                 super.setDescription(`${description}`);

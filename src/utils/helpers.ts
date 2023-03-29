@@ -25,7 +25,9 @@ export function formatDuration(time: number) {
     const hours = Math.floor(time / 3600);
     const minutes = Math.floor(time / 60);
     const seconds = time - minutes * 60;
-    return `${hours > 0 ? hours + ":" : ""}${minutes > 0 ? minutes + ":" : ""}${seconds}`;
+    return `${hours > 0 ? hours.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${
+        minutes > 0 ? minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""
+    }${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
 }
 
 export function formatUser(user: User): {
@@ -59,7 +61,7 @@ export function getServiceIcon(item: YouTubeTrack) {
 export function createProgressBar(playbackDuration: number, totalDuration: number): string {
     playbackDuration = Math.round(playbackDuration / 1000);
     totalDuration = Math.round(totalDuration / 1000);
-    
+
     let progressBar = stringProgressBar.splitBar(totalDuration, playbackDuration, 26, "▬", emojis.music.slider)[0];
     if (playbackDuration == 0) progressBar = emojis.music.slider + progressBar.slice(1);
     return progressBar;

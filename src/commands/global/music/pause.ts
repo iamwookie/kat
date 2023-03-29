@@ -24,11 +24,13 @@ export class PauseCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
-        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
-        if (!subscription || !subscription.active || subscription.paused) return await int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("I'm not playing anything!")] });
+        const author = this.getAuthor(int)!;
 
-        const embed = new MusicEmbed(subscription).setUser(int.user).setPaused(subscription.active);
+        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("I'm not playing anything!")] });
+
+        const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();
-        return await int.editReply({ embeds: [embed] });
+        return this.reply(int, { embeds: [embed] });
     }
 }

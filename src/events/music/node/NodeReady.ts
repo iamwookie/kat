@@ -6,7 +6,6 @@ export class NodeReady extends Event {
     }
 
     async execute(name: string) {
-        console.log(this.client.shoukaku.nodes)
         this.client.logger.info(`Music >> Lavalink Node: ${name} has connected!`);
     }
 }

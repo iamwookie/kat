@@ -1,6 +1,6 @@
 import { KATClient } from "./Client.js";
 import { Commander } from "./Commander.js";
-import { User, Guild, ChatInputCommandInteraction, SlashCommandBuilder, Collection, Snowflake } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake, InteractionEditReplyOptions, MessagePayload, MessageReplyOptions } from "discord.js";
 
 export abstract class Command {
     public name: string;
@@ -20,10 +20,10 @@ export abstract class Command {
     public guilds?: Snowflake[];
     public users?: Snowflake[];
     
-    public cooldowns: Collection<Snowflake, Collection<Snowflake, number>> = new Collection();
+    public cooldowns: Collection<Snowflake, number> = new Collection();
 
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
-    abstract execute(client: KATClient, interaction: ChatInputCommandInteraction): Promise<any>;
+    abstract execute(client: KATClient, interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
     constructor(
         private commander: Commander
@@ -56,17 +56,40 @@ export abstract class Command {
         this.commander.groups.get(this.group)?.set(this.name, this);
     }
 
-    applyCooldown(guild: Guild, user: User): void {
+    applyCooldown(user: User): void {
         if (!this.cooldown) return;
 
         const now = Date.now();
-
         const cooldown = this.cooldown * 1000;
-        if (!this.cooldowns.has(guild?.id || "dm")) this.cooldowns.set(guild?.id || "dm", new Collection());
 
-        const cooldowns = this.cooldowns.get(guild?.id || "dm");
-        if (!cooldowns?.has(user.id)) cooldowns?.set(user.id, now + cooldown);
+        if (!this.cooldowns.has(user.id)) this.cooldowns?.set(user.id, now + cooldown);
 
-        setTimeout(() => cooldowns?.delete(user.id), cooldown);
+        setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
+    }
+
+    getAuthor(interaction: ChatInputCommandInteraction | Message) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.user;
+        } else if (interaction instanceof Message) {
+            return interaction.author;
+        }
+    }
+
+    getArgs(interaction: ChatInputCommandInteraction | Message) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.options.data.map((option) => typeof option.value == "string" ? option.value.split(/ +/) : option.value).flat();;
+        } else if (interaction instanceof Message) {
+            return interaction.content.split(/ +/).slice(1);
+        }
+
+        return [];
+    }
+
+    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageReplyOptions | InteractionEditReplyOptions) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content as string | MessagePayload | InteractionEditReplyOptions);
+        } else if (interaction instanceof Message) {
+            return interaction.reply(content as string | MessagePayload | MessageReplyOptions);
+        }
     }
 }

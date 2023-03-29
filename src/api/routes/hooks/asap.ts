@@ -5,7 +5,7 @@ import { sendUnbox, sendSuits, sendStaff } from '@api/hooks/asap.js';
 
 const router = Router();
 
-export default function (client: Client): Router {
+export default function (client: Client) {
     // /hooks/asap/unbox
     router.post('/unbox', sendUnbox(client));
 

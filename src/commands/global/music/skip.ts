@@ -24,13 +24,15 @@ export class SkipCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
-        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
-        if (!subscription || !subscription.active || subscription.paused) return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("The queue is empty or does not exist!")] });
-        if (subscription.queue.length == 0) return int.editReply({ embeds: [new ActionEmbed("fail").setUser(int.user).setDesc("This is the last track in the queue!")] });
+        const author = this.getAuthor(int)!;
 
-        const embed = new MusicEmbed(subscription).setUser(int.user).setSkipped(subscription.active);
+        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        if (!subscription || !subscription.active || subscription.paused) return int.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("The queue is empty or does not exist!")] });
+        if (subscription.queue.length == 0) return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("This is the last track in the queue!")] });
+
+        const embed = new MusicEmbed(subscription).setUser(author).setSkipped(subscription.active);
         subscription.stop();
-        return await int.editReply({ embeds: [embed] });
+        return this.reply(int, { embeds: [embed] });
     }
 }
 

@@ -2,7 +2,7 @@
 import { KATClient as Client} from "./Client.js";
 
 import readline, { Interface } from "readline";
-import { REST, Routes, CommandInteraction, Collection, Snowflake } from "discord.js";
+import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";
 import { Command }from "./Command.js";
 import { Module } from "./Module.js";
 import { ActionEmbed } from "@utils/embeds/index.js";
@@ -38,7 +38,8 @@ const reservedCommands = [
 ];
 // -----------------------------------
 export class Commander {
-    private readline: Interface = readline.createInterface(process.stdin);
+    // ----- FOR LATER USE -----
+    // private readline: Interface = readline.createInterface(process.stdin);
     private rest: REST = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN!);
 
     public cli: Collection<string, any> = new Collection();
@@ -198,24 +199,24 @@ export class Commander {
         this.client.logger.info("Commander >> Successfully Registered All Guild Commands.");
     }
 
-    validate(interaction: CommandInteraction, command: any) {
-        if (command.users && !command.users.includes(interaction.user.id)) {
-            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc("You are not allowed to use this command!")] });
+    validate(interaction: ChatInputCommandInteraction | Message, command: any) {
+        const author = interaction instanceof ChatInputCommandInteraction ? interaction.user : interaction.author;
+
+        if (command.users && !command.users.includes(author.id)) {
+            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not allowed to use this command!")] });
             return false;
         }
 
         if (command.cooldown && command.cooldowns) {
-            const context = interaction.guild?.id || "dm";
-
-            if (command.cooldowns.has(context) && command.cooldowns.get(context).has(interaction.user.id)) {
-                const cooldown = command.cooldowns.get(context).get(interaction.user.id);
+            if (command.cooldowns.has(author.id)) {
+                const cooldown = command.cooldowns.get(author.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
 
-                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(interaction.user).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
 
-            command.applyCooldown(interaction.guild, interaction.user);
+            command.applyCooldown(author);
         }
 
         return true;

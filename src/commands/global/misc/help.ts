@@ -24,18 +24,21 @@ export class HelpCommand extends Command {
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
+        const author = this.getAuthor(int)!;
+        
         const replyEmbed = new EmbedBuilder()
             .setColor('Random')
             .setTitle('**Help Menu**')
-            .setAuthor({ name: int.user.tag, iconURL: int.user.avatarURL() ?? undefined })
-            .setFooter({ text: 'Parameters with a \'?\' at the start are optional.' });
+            .setAuthor({ name: author.tag, iconURL: author.avatarURL() ?? undefined })
+            .setFooter({ text: 'Parameters with a \'?\' at the start are optional.' })
+            .setDescription(`As of right now, you may use commands with the \`${client.legacyPrefix}\` prefix in chat. This may be removed in the future!`)
 
         for (const [g, group] of client.commander.groups) {
             if (g == 'CLI') continue;
 
             let reply = '';
             for (const [_, command] of group) {
-                if (command.hidden || command.disabled || (command.guilds && (!int.guild || !command.guilds.includes(int.guild.id)) || (command.users && !command.users.includes(int.user.id)))) continue;
+                if (command.hidden || command.disabled || (command.guilds && (!int.guild || !command.guilds.includes(int.guild.id)) || (command.users && !command.users.includes(author.id)))) continue;
 
                 let aliases = "";
                 if (command.aliases) {
@@ -50,6 +53,6 @@ export class HelpCommand extends Command {
             if (reply) replyEmbed.addFields([{ name: `${g} Commands`, value: reply }]);
         }
 
-        return await int.editReply({ embeds: [replyEmbed] });
+        return this.reply(int, { embeds: [replyEmbed] });
     }
 }
