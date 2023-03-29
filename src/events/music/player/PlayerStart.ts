@@ -2,7 +2,7 @@ import { Event, KATClient as Client, Commander, Subscription as MusicSubscriptio
 
 export class PlayerStart extends Event {
     constructor(client: Client, commander: Commander) {
-        super(client, commander, "nodeDisconnect");
+        super(client, commander, "playerStart");
     }
 
     async execute(subscription: MusicSubscription) {

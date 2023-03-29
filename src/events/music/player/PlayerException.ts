@@ -5,7 +5,7 @@ import chalk from "chalk";
 
 export class PlayerException extends Event {
     constructor(client: Client, commander: Commander) {
-        super(client, commander, "nodeDisconnect");
+        super(client, commander, "playerException");
     }
 
     async execute(subscription: MusicSubscription, reason: TrackExceptionEvent) {

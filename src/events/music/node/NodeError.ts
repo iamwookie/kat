@@ -5,12 +5,12 @@ import chalk from "chalk";
 
 export class NodeError extends Event {
     constructor(client: Client, commander: Commander) {
-        super(client, commander, "nodeDisconnect");
+        super(client, commander, "nodeError");
     }
 
     async execute(name: string, error: Error) {
-        const eventId = this.client.logger.error(error);
-        console.error(chalk.red(`Music >> Lavalink Node: ${name} has had an error! Event ID: ${eventId}`));
+        if (!this.client.shoukaku.retries.get(name)) this.client.logger.error(error);
+        console.error(chalk.red(`Music >> Lavalink Node: ${name} has had an error!`));
 
         const subscriptions = this.client.subscriptions;
         for (const subscription of subscriptions.values()) {
