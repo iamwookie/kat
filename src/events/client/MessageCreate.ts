@@ -10,7 +10,11 @@ export class MessageCreate extends Event {
     }
 
     async execute(message: Message) {
+        if (message.author.bot) return;
+
         const prefix = this.client.legacyPrefix;
+        if (!message.content.startsWith(prefix)) return;
+
         const commandName = message.content.slice(prefix.length).trim().split(/ +/).shift()?.toLowerCase()!
 
         const command = this.commander.commands.get(commandName) || this.commander.commands.get(this.commander.aliases.get(commandName)!);
