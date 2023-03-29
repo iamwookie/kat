@@ -39,6 +39,7 @@ export class AddColorCommand extends Command {
         const roleId = this.getArgs(int)[0];
         if (!roleId)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("Please provide a role ID!")] });
+        this.applyCooldown(author);
         const role = await int.guild?.roles.fetch(roleId);
         if (!role)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("Invalid role ID!")] });

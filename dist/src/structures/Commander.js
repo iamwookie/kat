@@ -1,3 +1,5 @@
+// ----- FOR LATER USE -----
+// import readline, { Interface } from "readline";
 import { REST, Routes, ChatInputCommandInteraction, Collection } from "discord.js";
 import { ActionEmbed } from "../utils/embeds/index.js";
 import chalk from "chalk";
@@ -125,14 +127,14 @@ export class Commander {
                     continue;
                 if (command.aliases) {
                     for (const alias of command.aliases) {
-                        let data = command.data().setName(alias);
+                        const data = command.data().setName(alias);
                         commands.push(data);
                     }
                 }
                 commands.push(command.data().toJSON());
             }
             const res = await this.rest.put(Routes.applicationCommands(process.env.BOT_APP_ID), { body: commands });
-            this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s).`);
+            this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s)`);
         }
         catch (err) {
             this.client.logger.error(err);
@@ -150,7 +152,7 @@ export class Commander {
                     continue;
                 if (command.aliases) {
                     for (const alias of command.aliases) {
-                        let data = command.data().setName(alias);
+                        const data = command.data().setName(alias);
                         commands.push(data);
                     }
                 }
@@ -166,22 +168,21 @@ export class Commander {
                 console.error(err);
             }
         }
-        this.client.logger.info("Commander >> Successfully Registered All Guild Commands.");
+        this.client.logger.info("Commander >> Successfully Registered All Guild Commands");
     }
     validate(interaction, command) {
         const author = interaction instanceof ChatInputCommandInteraction ? interaction.user : interaction.author;
         if (command.users && !command.users.includes(author.id)) {
-            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not allowed to use this command!")] });
+            command.reply(interaction, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not allowed to use this command!")] });
             return false;
         }
         if (command.cooldown && command.cooldowns) {
             if (command.cooldowns.has(author.id)) {
                 const cooldown = command.cooldowns.get(author.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                command.reply(interaction, { embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
-            command.applyCooldown(author);
         }
         return true;
     }

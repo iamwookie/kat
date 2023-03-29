@@ -5,8 +5,8 @@ export class StopCommand extends Command {
     constructor(commander) {
         super(commander);
         this.name = "stop";
-        this.aliases = ["dc"];
         this.group = "Music";
+        this.aliases = ["dc"];
         this.description = {
             content: "Clear the queue and/or leave.",
         };

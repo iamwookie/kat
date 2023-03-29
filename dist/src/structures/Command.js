@@ -4,6 +4,7 @@ export class Command {
     name;
     group;
     aliases;
+    legacyAliases;
     description;
     hidden;
     disabled;
@@ -19,6 +20,11 @@ export class Command {
     initialize() {
         if (this.aliases) {
             for (const alias of this.aliases) {
+                this.commander.aliases.set(alias, this.name);
+            }
+        }
+        if (this.legacyAliases) {
+            for (const alias of this.legacyAliases) {
                 this.commander.aliases.set(alias, this.name);
             }
         }
@@ -71,7 +77,7 @@ export class Command {
             return interaction.editReply(content);
         }
         else if (interaction instanceof Message) {
-            return interaction.reply(content);
+            return interaction.channel.send(content);
         }
     }
 }

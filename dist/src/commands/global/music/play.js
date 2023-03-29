@@ -7,6 +7,7 @@ export class PlayCommand extends Command {
         super(commander);
         this.name = "play";
         this.group = "Music";
+        this.legacyAliases = ["p"];
         this.description = {
             content: "Search for a track and add it to the queue or resume the current track.",
             format: "<?title/url>",
@@ -32,6 +33,7 @@ export class PlayCommand extends Command {
             return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not in a voice channel!")] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("I can't play in that voice channel!")] });
+        this.applyCooldown(author);
         let subscription = client.subscriptions.get(int.guildId);
         if (!query && subscription && subscription.paused) {
             subscription.resume();

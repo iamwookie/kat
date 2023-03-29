@@ -28,6 +28,7 @@ export class ColorCommand extends Command {
         const author = this.getAuthor(int);
         if (!client.database)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("The database is not online!")] });
+        this.applyCooldown(author);
         const colors = client.colors.get(int.guildId);
         if (!colors || !colors.length)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("There are no colors set for this guild!")] });
@@ -53,26 +54,26 @@ export class ColorCommand extends Command {
             if (i.values[0] === "none") {
                 try {
                     await client.colors.clear(i.guildId, i.member);
-                    return await i.editReply({ embeds: [new ActionEmbed("success").setUser(author).setDesc("Removed your color roles!")] });
+                    return this.reply(int, { embeds: [new ActionEmbed("success").setUser(author).setDesc("Removed your color roles!")] });
                 }
                 catch (err) {
                     client.logger.error(err);
-                    return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("I was unable to remove your color roles!")] });
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("I was unable to remove your color roles!")] });
                 }
             }
             const role = int.guild?.roles.cache.get(i.values[0]);
             if (!role)
-                return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("The role was not found!")] });
+                return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("The role was not found!")] });
             if (i.member.roles.cache.has(role.id))
-                return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("You already have this role!")] });
+                return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("You already have this role!")] });
             try {
                 await client.colors.clear(i.guildId, i.member);
                 await i.member.roles.add(role);
-                return await i.editReply({ embeds: [new ActionEmbed().setColor(role.color).setUser(author).setDesc(`✅ \u200b You have been given \`${role.name}\`!`)] });
+                return this.reply(int, { embeds: [new ActionEmbed().setColor(role.color).setUser(author).setDesc(`✅ \u200b You have been given \`${role.name}\`!`)] });
             }
             catch (err) {
                 client.logger.error(err);
-                return await i.editReply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("I was unable to add the role to you! Are you sure I have permissions?")] });
+                return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("I was unable to add the role to you! Are you sure I have permissions?")] });
             }
         });
         collector?.on("end", async (_, reason) => {

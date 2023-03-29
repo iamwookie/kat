@@ -36,6 +36,7 @@ export class LyricsCommand extends Command {
                 return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDescription("I am not playing anything!")] });
             query = subscription.active.title;
         }
+        this.applyCooldown(author);
         try {
             const search = await genius.songs.search(query);
             let lyrics = search[0] ? await search[0].lyrics() : null;
