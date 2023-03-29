@@ -200,20 +200,20 @@ export class Commander {
         this.client.logger.info("Commander >> Successfully Registered All Guild Commands");
     }
 
-    validate(interaction: ChatInputCommandInteraction | Message, command: any) {
+    validate(interaction: ChatInputCommandInteraction | Message, command: Command) {
         const author = interaction instanceof ChatInputCommandInteraction ? interaction.user : interaction.author;
 
         if (command.users && !command.users.includes(author.id)) {
-            interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not allowed to use this command!")] });
+            command.reply(interaction, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not allowed to use this command!")] });
             return false;
         }
 
         if (command.cooldown && command.cooldowns) {
             if (command.cooldowns.has(author.id)) {
-                const cooldown = command.cooldowns.get(author.id);
+                const cooldown = command.cooldowns.get(author.id)!;
                 const secondsLeft = (cooldown - Date.now()) / 1000;
 
-                interaction.reply({ embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                command.reply(interaction, { embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
         }

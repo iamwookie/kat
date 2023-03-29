@@ -25,7 +25,7 @@ export class MessageCreate extends Event {
             console.error(chalk.red("Commander (ERROR) >> Error Running Chat Command"));
             console.error(err);
 
-            message.reply({ embeds: [new ErrorEmbed(eventId)] });
+            message.channel.send({ embeds: [new ErrorEmbed(eventId)] });
         }
     }
 }

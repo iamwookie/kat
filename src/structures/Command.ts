@@ -96,7 +96,7 @@ export abstract class Command {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.editReply(content as string | MessagePayload | InteractionEditReplyOptions);
         } else if (interaction instanceof Message) {
-            return interaction.reply(content as string | MessagePayload | MessageReplyOptions);
+            return interaction.channel.send(content as string | MessagePayload | MessageReplyOptions);
         }
     }
 }
