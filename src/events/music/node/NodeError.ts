@@ -9,7 +9,8 @@ export class NodeError extends Event {
     }
 
     async execute(name: string, error: Error) {
-        if (!this.client.shoukaku.retries.get(name)) this.client.logger.error(error);
+        const reconnects = this.client.shoukaku.retries.get(name);
+        if (!reconnects) this.client.logger.error(error);
         console.error(chalk.red(`Music >> Lavalink Node: ${name} has had an error!`));
 
         const subscriptions = this.client.subscriptions;

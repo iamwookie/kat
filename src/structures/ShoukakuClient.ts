@@ -27,7 +27,6 @@ export class ShoukakuClient extends Shoukaku {
             Config.nodes,
             {
                 moveOnDisconnect: false,
-                reconnectTries: 5,
                 restTimeout: 5_000,
             }
         );
