@@ -1,4 +1,5 @@
 import { EmbedBuilder } from "discord.js";
+import { YouTubePlaylist, SpotifyPlaylist } from "../../structures/index.js";
 import { getServiceIcon, createProgressBar } from "../helpers.js";
 export class MusicEmbed extends EmbedBuilder {
     subscription;
@@ -16,10 +17,18 @@ export class MusicEmbed extends EmbedBuilder {
             return this;
         if (item.thumbnail)
             super.setThumbnail(item.thumbnail);
-        return super.addFields({
-            name: "Enqueued:",
-            value: `\`${this.subscription.queue.length == 0 ? 1 : this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
-        });
+        if (item instanceof YouTubePlaylist || item instanceof SpotifyPlaylist) {
+            return super.addFields({
+                name: "Enqueued:",
+                value: `${getServiceIcon(item)} \`${item.tracks.length}\` tracks from [\`${item.title}\`](${item.url})`,
+            });
+        }
+        else {
+            return super.addFields({
+                name: "Enqueued:",
+                value: `\`${this.subscription.queue.length == 0 ? 1 : this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+            });
+        }
     }
     setPlaying(item) {
         if (!item)
@@ -52,7 +61,7 @@ export class MusicEmbed extends EmbedBuilder {
         let res = "";
         for (const [index, track] of queue.entries()) {
             if (res.length >= 840)
-                return this.addFields({ name: "Server Queue:", value: `${res}...` });
+                return super.addFields({ name: "Server Queue:", value: `${res}+ \`${queue.length - index}\` more...` });
             res += `\`${index + 1}.\` - ${getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${track.url})\n`;
         }
         return super.addFields({ name: "Server Queue:", value: `${res}` });

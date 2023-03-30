@@ -19,9 +19,6 @@ const globalCommands = [
     Commands.HelpCommand,
 ];
 const reservedCommands = [
-    // Color
-    Commands.ColorCommand,
-    Commands.AddColorCommand,
     // Twitch
     Commands.TwitchCommand,
 ];

@@ -1,6 +1,6 @@
 {
     "name": "cat-bot",
-    "version": "7.3.9",
+    "version": "7.3.10",
     "description": "",
     "main": "index.js",
     "type": "module",

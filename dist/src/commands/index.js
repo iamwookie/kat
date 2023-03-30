@@ -9,8 +9,5 @@ export { LyricsCommand } from "./global/music/lyrics.js";
 // Misc
 export { HelpCommand } from "./global/misc/help.js";
 // ----- RESERVED -----
-// Color
-export { AddColorCommand } from "./reserved/colors/add-color.js";
-export { ColorCommand } from "./reserved/colors/colors.js";
 // Twitch
 export { TwitchCommand } from "./reserved/twitch.js";

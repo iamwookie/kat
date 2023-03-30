@@ -1,4 +1,4 @@
-import { YouTubeTrack, SpotifyTrack } from "../structures/index.js";
+import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "../structures/index.js";
 import stringProgressBar from "string-progressbar";
 import emojis from "./emojis.json" assert { type: "json" };
 // API
@@ -41,10 +41,10 @@ export function formatDuration(timeInMs) {
     return `${hours > 0 ? hours.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${minutes > 0 ? minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
 }
 export function getServiceIcon(item) {
-    if (item instanceof YouTubeTrack) {
+    if (item instanceof YouTubeTrack || item instanceof YouTubePlaylist) {
         return emojis.music.youtube;
     }
-    else if (item instanceof SpotifyTrack) {
+    else if (item instanceof SpotifyTrack || item instanceof SpotifyPlaylist) {
         return emojis.music.spotify;
     }
     else {

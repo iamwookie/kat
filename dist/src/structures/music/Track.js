@@ -33,6 +33,22 @@ class Track {
         };
     }
 }
+class Playlist {
+    url;
+    tracks;
+    info;
+    title;
+    thumbnail;
+    constructor(url, tracks, info) {
+        this.url = url;
+        this.tracks = tracks;
+        this.info = info;
+        this.tracks = tracks;
+        this.info = info;
+        this.url = url;
+        this.title = this.info.name;
+    }
+}
 export class YouTubeTrack extends Track {
     client;
     data;
@@ -58,5 +74,28 @@ export class SpotifyTrack extends Track {
         this.data = data;
         this.requester = requester;
         this.textChannel = textChannel;
+    }
+}
+export class YouTubePlaylist extends Playlist {
+    url;
+    tracks;
+    info;
+    constructor(url, tracks, info) {
+        super(url, tracks, info);
+        this.url = url;
+        this.tracks = tracks;
+        this.info = info;
+        this.thumbnail = `https://i.ytimg.com/vi/${this.tracks[0].info.identifier}/mqdefault.jpg`;
+    }
+}
+export class SpotifyPlaylist extends Playlist {
+    url;
+    tracks;
+    info;
+    constructor(url, tracks, info) {
+        super(url, tracks, info);
+        this.url = url;
+        this.tracks = tracks;
+        this.info = info;
     }
 }

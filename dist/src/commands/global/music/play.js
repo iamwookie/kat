@@ -1,6 +1,6 @@
 import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder } from "discord.js";
-import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack } from "../../../structures/index.js";
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "../../../structures/index.js";
 import { ActionEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class PlayCommand extends Command {
     constructor(commander) {
@@ -51,9 +51,10 @@ export class PlayCommand extends Command {
                 return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No nodes are available to play music right now!")] });
             }
         }
-        let res;
+        let res = null;
+        let url = null;
         try {
-            const url = new URL(query);
+            url = new URL(query);
             res = await subscription.node.rest.resolve(url.href);
         }
         catch (err) {
@@ -73,6 +74,37 @@ export class PlayCommand extends Command {
                 const track = new YouTubeTrack(client, data, author, int.channel);
                 subscription.add(track);
                 this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                break;
+            }
+            case "PLAYLIST_LOADED": {
+                if (!url)
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
+                const tracks = res.tracks;
+                const info = res.playlistInfo;
+                switch (tracks[0].info.sourceName) {
+                    case "youtube": {
+                        const playlist = new YouTubePlaylist(url, tracks, info);
+                        for (const data of tracks) {
+                            const track = new YouTubeTrack(client, data, author, int.channel);
+                            subscription.add(track);
+                        }
+                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        break;
+                    }
+                    case "spotify": {
+                        const playlist = new SpotifyPlaylist(url, tracks, info);
+                        for (const data of tracks) {
+                            const track = new SpotifyTrack(client, data, author, int.channel);
+                            subscription.add(track);
+                        }
+                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        break;
+                    }
+                    default: {
+                        this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
+                        break;
+                    }
+                }
                 break;
             }
             case "TRACK_LOADED": {
