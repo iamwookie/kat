@@ -1,5 +1,5 @@
 import { Event, KATClient as Client, Commander } from "@structures/index.js";
-import { Events, Guild, PermissionFlagsBits, EmbedBuilder } from "discord.js";
+import { Events, Guild, PermissionFlagsBits, EmbedBuilder, ChannelType, TextBasedChannel } from "discord.js";
 
 export class GuildCreate extends Event {
     constructor(client: Client, commander: Commander) {
@@ -7,8 +7,8 @@ export class GuildCreate extends Event {
     }
 
     async execute(guild: Guild) {
-        const channel = guild.channels.cache.find((c) => c.isTextBased() && c.permissionsFor(guild.members.me!)?.has(PermissionFlagsBits.SendMessages));
-        if (!channel || !channel.isTextBased()) return;
+        const channel = guild.channels.cache.find((c) => c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me!)?.has(PermissionFlagsBits.SendMessages));
+        if (!channel) return;
 
         const embed = new EmbedBuilder()
             .setTitle("Thanks for adding me!")
@@ -16,14 +16,11 @@ export class GuildCreate extends Event {
             .setThumbnail(this.client.user?.avatarURL() ?? null)
             .setDescription(
                 `✨ KAT is a small multipurpose Discord bot that can play high quality music from YouTube and Spotify!
-                \n
                 \n🎵 Use \`/play\` or \`.play\` to play music!
-                \n
                 \n❓ Use \`/help\` or \`.help\` for the help menu!
-                \n
                 \nVisit the official website here: https://kat.bil.al`
             );
 
-        channel.send({ embeds: [embed] }).catch(() => { });
+        (channel as TextBasedChannel).send({ embeds: [embed] }).catch(() => { });
     }
 }
