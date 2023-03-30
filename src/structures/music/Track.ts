@@ -1,6 +1,6 @@
 import { KATClient as Client } from "../Client";
 import { TextBasedChannel, User } from "discord.js";
-import { Track as ShoukakuTrack } from "shoukaku";
+import { Track as ShoukakuTrack, LavalinkResponse } from "shoukaku";
 
 import { formatDuration } from "@src/utils/helpers.js";
 
@@ -40,6 +40,23 @@ abstract class Track {
     }
 }
 
+abstract class Playlist {
+    public title: string;
+    public thumbnail?: string;
+
+    constructor(
+        public url: URL,
+        public tracks: ShoukakuTrack[],
+        public info: LavalinkResponse["playlistInfo"],
+    ) {
+        this.tracks = tracks;
+        this.info = info;
+
+        this.url = url
+        this.title = this.info.name!;
+    }
+}
+
 export class YouTubeTrack extends Track {
     constructor(
         public client: Client,
@@ -61,5 +78,27 @@ export class SpotifyTrack extends Track {
         public textChannel: TextBasedChannel | null,
     ) {
         super(client, data, requester, textChannel);
+    }
+}
+
+export class YouTubePlaylist extends Playlist {
+    constructor(
+        public url: URL,
+        public tracks: ShoukakuTrack[],
+        public info: LavalinkResponse["playlistInfo"],
+    ) {
+        super(url, tracks, info);
+
+        this.thumbnail = `https://i.ytimg.com/vi/${this.tracks[0].info.identifier}/mqdefault.jpg`;
+    }
+}
+
+export class SpotifyPlaylist extends Playlist {
+    constructor(
+        public url: URL,
+        public tracks: ShoukakuTrack[],
+        public info: LavalinkResponse["playlistInfo"],
+    ) {
+        super(url, tracks, info);
     }
 }

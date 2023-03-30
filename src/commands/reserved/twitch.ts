@@ -1,6 +1,5 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
-
-import { SlashCommandBuilder, ChatInputCommandInteraction, ChannelType, GuildTextBasedChannel } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { ActionEmbed, TwitchEmbed } from "@src/utils/embeds/index.js";
 
 export class TwitchCommand extends Command {
@@ -32,23 +31,17 @@ export class TwitchCommand extends Command {
             .setDescription(this.description?.content!)
             .setDMPermission(false)
             .addStringOption((option) => {
-                option.setName("streamer")
-                .setDescription("The twitch channel name of the streamer to send a notification for.")
-                .setRequired(true)
+                option.setName("streamer").setDescription("The twitch channel name of the streamer to send a notification for.").setRequired(true);
                 return option;
             })
             .addChannelOption((option) => {
-                option.setName("channel")
-                .setDescription("The channel to send the notification to.")
-                .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
-                .setRequired(true)
+                option.setName("channel").setDescription("The channel to send the notification to.").addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement).setRequired(true);
                 return option;
             })
             .addRoleOption((option) => {
-                option.setName("role")
-                .setDescription("The role to mention in the notification.")
+                option.setName("role").setDescription("The role to mention in the notification.");
                 return option;
-            })
+            });
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
@@ -74,7 +67,9 @@ export class TwitchCommand extends Command {
         const image = stream.getThumbnailUrl(1280, 720);
 
         try {
-            await channel?.send({ embeds: [new TwitchEmbed(user, stream, image)], content: role?.toString() ?? undefined });
+            const buttons = new ActionRowBuilder<ButtonBuilder>();
+            buttons.addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("Watch Now!").setURL(`https://www.twitch.tv/${user.name}`));
+            await channel?.send({ embeds: [new TwitchEmbed(user, stream, image)], components: [buttons], content: role?.toString() ?? undefined });
             return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`Sent a notification to ${channel}!`)] });
         } catch (err) {
             client.logger.error(err);

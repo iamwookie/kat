@@ -1,5 +1,5 @@
 import { User } from "discord.js";
-import { YouTubeTrack, SpotifyTrack } from "@src/structures/index.js";
+import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@src/structures/index.js";
 import stringProgressBar from "string-progressbar";
 
 import emojis from "./emojis.json" assert { type: "json" };
@@ -56,10 +56,10 @@ export function formatDuration(timeInMs: number) {
     }${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
 }
 
-export function getServiceIcon(item: YouTubeTrack | SpotifyTrack) {
-    if (item instanceof YouTubeTrack) {
+export function getServiceIcon(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
+    if (item instanceof YouTubeTrack || item instanceof YouTubePlaylist) {
         return emojis.music.youtube;
-    } else if (item instanceof SpotifyTrack) {
+    } else if (item instanceof SpotifyTrack || item instanceof SpotifyPlaylist) {
         return emojis.music.spotify;
     } else {
         return "";
