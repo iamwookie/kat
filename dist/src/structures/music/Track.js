@@ -1,41 +1,62 @@
 import { formatDuration } from "../../utils/helpers.js";
 class Track {
+    client;
     data;
     requester;
     textChannel;
-    onStart;
-    onFinish;
-    onError;
     url;
     title;
     duration;
     durationRaw;
     thumbnail;
-    constructor(data, requester, textChannel, { ...options }) {
+    onStart;
+    onFinish;
+    onError;
+    constructor(client, data, requester, textChannel) {
+        this.client = client;
         this.data = data;
         this.requester = requester;
         this.textChannel = textChannel;
-        this.data = data;
-        this.requester = requester;
-        this.textChannel = textChannel;
-        this.onStart = options.onStart ? options.onStart : () => { };
-        this.onFinish = options.onFinish ? options.onFinish : () => { };
-        this.onError = options.onError ? options.onError : () => { };
-    }
-}
-export class YouTubeTrack extends Track {
-    data;
-    requester;
-    textChannel;
-    constructor(data, requester, textChannel, { ...options }) {
-        super(data, requester, textChannel, { ...options });
+        this.client = client;
         this.data = data;
         this.requester = requester;
         this.textChannel = textChannel;
         this.url = this.data.info.uri;
         this.title = this.data.info.title;
-        this.duration = formatDuration(this.data.info.length / 1000);
+        this.duration = formatDuration(this.data.info.length);
         this.durationRaw = this.data.info.length;
+        this.onStart = () => { };
+        this.onFinish = () => { };
+        this.onError = (err) => {
+            this.client.logger.error(err);
+            this.textChannel?.send(`An error occurred while playing **${this.title}**. Skipping...`);
+        };
+    }
+}
+export class YouTubeTrack extends Track {
+    client;
+    data;
+    requester;
+    textChannel;
+    constructor(client, data, requester, textChannel) {
+        super(client, data, requester, textChannel);
+        this.client = client;
+        this.data = data;
+        this.requester = requester;
+        this.textChannel = textChannel;
         this.thumbnail = `https://i.ytimg.com/vi/${this.data.info.identifier}/mqdefault.jpg`;
+    }
+}
+export class SpotifyTrack extends Track {
+    client;
+    data;
+    requester;
+    textChannel;
+    constructor(client, data, requester, textChannel) {
+        super(client, data, requester, textChannel);
+        this.client = client;
+        this.data = data;
+        this.requester = requester;
+        this.textChannel = textChannel;
     }
 }

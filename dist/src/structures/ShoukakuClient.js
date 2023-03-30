@@ -8,7 +8,6 @@ export class ShoukakuClient extends Shoukaku {
     constructor(client) {
         super(new Connectors.DiscordJS(client), Config.nodes, {
             moveOnDisconnect: false,
-            reconnectTries: 5,
             restTimeout: 5000,
         });
         this.client = client;

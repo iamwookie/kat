@@ -22,7 +22,6 @@ export class HelpCommand extends Command {
         const replyEmbed = new EmbedBuilder()
             .setColor('Random')
             .setTitle('**Help Menu**')
-            .setAuthor({ name: author.tag, iconURL: author.avatarURL() ?? undefined })
             .setFooter({ text: 'Parameters with a \'?\' at the start are optional.' })
             .setDescription(`As of right now, you may use commands with the \`${client.legacyPrefix}\` prefix in chat. This may be removed in the future!`);
         for (const [g, group] of client.commander.groups) {

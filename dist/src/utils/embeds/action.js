@@ -6,9 +6,6 @@ export class ActionEmbed extends EmbedBuilder {
         this.embedType = embedType;
         this.embedType = embedType;
     }
-    setUser(user) {
-        return super.setAuthor({ name: user.tag, iconURL: user.avatarURL() ?? undefined });
-    }
     setDesc(description) {
         switch (this.embedType) {
             case 'success':

@@ -1,6 +1,7 @@
-import { YouTubeTrack } from "../structures/index.js";
+import { YouTubeTrack, SpotifyTrack } from "../structures/index.js";
 import stringProgressBar from "string-progressbar";
 import emojis from "./emojis.json" assert { type: "json" };
+// API
 export function formatTime(time) {
     if (!time)
         return "No Data";
@@ -20,12 +21,6 @@ export function formatBytes(bytes) {
     let i = Math.floor(Math.log(bytes) / Math.log(1024));
     return Math.round(bytes / Math.pow(1024, i)) + " " + sizes[i];
 }
-export function formatDuration(time) {
-    const hours = Math.floor(time / 3600);
-    const minutes = Math.floor(time / 60);
-    const seconds = time - minutes * 60;
-    return `${hours > 0 ? hours.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${minutes > 0 ? minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
-}
 export function formatUser(user) {
     return {
         id: user.id,
@@ -37,9 +32,20 @@ export function formatUser(user) {
         accentHex: user.hexAccentColor ?? undefined,
     };
 }
+// Music
+export function formatDuration(timeInMs) {
+    const time = Math.floor(timeInMs / 1000);
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor(time / 60);
+    const seconds = time - minutes * 60;
+    return `${hours > 0 ? hours.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${minutes > 0 ? minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
+}
 export function getServiceIcon(item) {
     if (item instanceof YouTubeTrack) {
         return emojis.music.youtube;
+    }
+    else if (item instanceof SpotifyTrack) {
+        return emojis.music.spotify;
     }
     else {
         return "";

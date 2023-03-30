@@ -1,7 +1,7 @@
 import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder } from "discord.js";
-import { Subscription as MusicSubscription, YouTubeTrack } from "../../../structures/index.js";
-import { ActionEmbed, ErrorEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack } from "../../../structures/index.js";
+import { ActionEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class PlayCommand extends Command {
     constructor(commander) {
         super(commander);
@@ -30,42 +30,75 @@ export class PlayCommand extends Command {
         const query = this.getArgs(int).join(" ");
         const voiceChannel = int.member.voice.channel;
         if (!voiceChannel)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not in a voice channel!")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in a voice channel!")] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("I can't play in that voice channel!")] });
-        this.applyCooldown(author);
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I can't play in that voice channel!")] });
         let subscription = client.subscriptions.get(int.guildId);
         if (!query && subscription && subscription.paused) {
+            this.applyCooldown(author);
             subscription.resume();
             return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
         }
         if (!query)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("What should I play?")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("What should I play?")] });
+        this.applyCooldown(author);
         if (!subscription) {
             try {
                 subscription = await MusicSubscription.create(client, int.guild, voiceChannel, int.channel);
             }
             catch (err) {
-                const eventId = client.logger.error(err);
-                return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
+                client.logger.error(err);
+                return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No nodes are available to play music right now!")] });
             }
         }
-        const res = await subscription.node.rest.resolve('ytsearch:' + query);
+        let res;
+        try {
+            const url = new URL(query);
+            res = await subscription.node.rest.resolve(url.href);
+        }
+        catch (err) {
+            res = await subscription.node.rest.resolve("ytsearch:" + query);
+        }
         switch (res?.loadType) {
             case "LOAD_FAILED": {
-                await this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Failed to load track! \n\`${res.exception?.message}\``)] });
+                this.reply(int, { embeds: [new ActionEmbed("fail").setDesc(`Failed to load track! \n\`${res.exception?.message}\``)] });
                 break;
             }
             case "NO_MATCHES": {
-                await this.reply(int, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("Could not find your search result!")] });
+                this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
                 break;
             }
             case "SEARCH_RESULT": {
-                const track = new YouTubeTrack(res.tracks[0], author, int.channel, {
-                    onError: () => int.channel?.send({ embeds: [new ActionEmbed('fail').setUser(author).setDesc("An error occured while playing the track. Skipping!")] }),
-                });
+                const data = res.tracks[0];
+                const track = new YouTubeTrack(client, data, author, int.channel);
                 subscription.add(track);
-                await this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                break;
+            }
+            case "TRACK_LOADED": {
+                const data = res.tracks[0];
+                switch (data.info.sourceName) {
+                    case "youtube": {
+                        const track = new YouTubeTrack(client, data, author, int.channel);
+                        subscription.add(track);
+                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                        break;
+                    }
+                    case "spotify": {
+                        const track = new SpotifyTrack(client, data, author, int.channel);
+                        subscription.add(track);
+                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                        break;
+                    }
+                    default: {
+                        this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
                 break;
             }
         }
