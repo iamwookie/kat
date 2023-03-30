@@ -1,5 +1,5 @@
 import { Event, KATClient as Client, Commander } from "@structures/index.js";
-import { Events, BaseInteraction, ChatInputCommandInteraction } from "discord.js";
+import { Events, BaseInteraction } from "discord.js";
 import { ErrorEmbed } from "@src/utils/embeds/index.js";
 
 import chalk from "chalk";
