@@ -1,4 +1,4 @@
-export { YouTubeTrack } from "./music/Track.js";
+export { YouTubeTrack, SpotifyTrack } from "./music/Track.js";
 export { Subscription } from "./music/Subscription.js";
 
 export { ColorClient } from "./ColorClient.js";

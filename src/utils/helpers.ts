@@ -1,7 +1,10 @@
 import { User } from "discord.js";
-import { YouTubeTrack } from "@src/structures/index.js";
+import { YouTubeTrack, SpotifyTrack } from "@src/structures/index.js";
 import stringProgressBar from "string-progressbar";
+
 import emojis from "./emojis.json" assert { type: "json" };
+
+// API
 
 export function formatTime(time?: number): string {
     if (!time) return "No Data";
@@ -19,15 +22,6 @@ export function formatBytes(bytes?: number): string {
     if (bytes == 0) return "0 Byte";
     let i = Math.floor(Math.log(bytes) / Math.log(1024));
     return Math.round(bytes / Math.pow(1024, i)) + " " + sizes[i];
-}
-
-export function formatDuration(time: number) {
-    const hours = Math.floor(time / 3600);
-    const minutes = Math.floor(time / 60);
-    const seconds = time - minutes * 60;
-    return `${hours > 0 ? hours.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${
-        minutes > 0 ? minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""
-    }${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
 }
 
 export function formatUser(user: User): {
@@ -50,13 +44,27 @@ export function formatUser(user: User): {
     };
 }
 
-export function getServiceIcon(item: YouTubeTrack) {
+// Music
+
+export function formatDuration(timeInMs: number) {
+    const time = Math.floor(timeInMs / 1000);
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor(time / 60);
+    const seconds = time - minutes * 60;
+    return `${hours > 0 ? hours.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${
+        minutes > 0 ? minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""
+    }${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
+}
+
+export function getServiceIcon(item: YouTubeTrack | SpotifyTrack) {
     if (item instanceof YouTubeTrack) {
         return emojis.music.youtube;
+    } else if (item instanceof SpotifyTrack) {
+        return emojis.music.spotify;
     } else {
         return "";
     }
-}
+} 
 
 export function createProgressBar(playbackDuration: number, totalDuration: number): string {
     playbackDuration = Math.round(playbackDuration / 1000);

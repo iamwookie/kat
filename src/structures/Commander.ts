@@ -204,7 +204,7 @@ export class Commander {
         const author = interaction instanceof ChatInputCommandInteraction ? interaction.user : interaction.author;
 
         if (command.users && !command.users.includes(author.id)) {
-            command.reply(interaction, { embeds: [new ActionEmbed("fail").setUser(author).setDesc("You are not allowed to use this command!")] });
+            command.reply(interaction, { embeds: [new ActionEmbed("fail").setDesc("You are not allowed to use this command!")] });
             return false;
         }
 
@@ -213,7 +213,7 @@ export class Commander {
                 const cooldown = command.cooldowns.get(author.id)!;
                 const secondsLeft = (cooldown - Date.now()) / 1000;
 
-                command.reply(interaction, { embeds: [new ActionEmbed("fail").setUser(author).setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                command.reply(interaction, { embeds: [new ActionEmbed("fail").setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
         }

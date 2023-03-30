@@ -3,9 +3,6 @@ import { YouTubeTrack } from "./Track.js";
 import { Guild, VoiceBasedChannel, Events, TextBasedChannel } from "discord.js";
 import { Shoukaku, Player, Node } from "shoukaku";
 
-import chalk from "chalk";
-import { ActionEmbed } from "@src/utils/embeds/action.js";
-
 export class Subscription {
     public shoukaku: Shoukaku
     public queue: YouTubeTrack[] = [];

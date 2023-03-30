@@ -1,6 +1,5 @@
-import { EmbedBuilder, Client, Guild, User, ChatInputCommandInteraction } from "discord.js";
-
-import { Subscription as MusicSubscription, YouTubeTrack } from "@src/structures/index.js";
+import { EmbedBuilder, User } from "discord.js";
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack } from "@src/structures/index.js";
 import { getServiceIcon, createProgressBar } from "../helpers.js";
 
 export class MusicEmbed extends EmbedBuilder {
@@ -13,46 +12,52 @@ export class MusicEmbed extends EmbedBuilder {
     }
 
     setUser(user: User) {
-        return super.setAuthor({ name: `Requested By: ${user.tag}`, iconURL: user.avatarURL() ?? undefined });
+        return super.setFooter({ text: `${user.tag} \u200b • \u200b 🎵 ${this.subscription.node.name}`, iconURL: user.avatarURL() ?? undefined });
     }
 
-    setEnqueued(item: YouTubeTrack | null) {
+    setEnqueued(item: YouTubeTrack | SpotifyTrack | null) {
         if (!item) return this;
 
-        super.setThumbnail(item.thumbnail);
-        return super.addFields({
-            name: "Enqueued:",
-            value: `\`${this.subscription.queue.length == 0 ? 1 : this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
-        });
+        if (item.thumbnail) super.setThumbnail(item.thumbnail);
+        return super.addFields(
+            {
+                name: "Enqueued:",
+                value: `\`${this.subscription.queue.length == 0 ? 1 : this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+            }
+        );
     }
 
-    setPlaying(item: YouTubeTrack | null) {
+    setPlaying(item: YouTubeTrack | SpotifyTrack | null) {
         if (!item) return this;
 
-        super.setThumbnail(item.thumbnail);
-        return super.addFields({
-            name: "Now Playing:",
-            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.duration, item.durationRaw)}`,
-        });
+        if (item.thumbnail) super.setThumbnail(item.thumbnail);
+        return super.addFields(
+            {
+                name: "Now Playing:",
+                value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.duration, item.durationRaw)}`,
+            }
+        );
     }
 
-    setPaused(item: YouTubeTrack | null) {
+    setPaused(item: YouTubeTrack | SpotifyTrack | null) {
         if (!item) return this;
 
-        super.setThumbnail(item.thumbnail);
-        return super.addFields({
-            name: "Paused Track:",
-            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.player.position, item.durationRaw)}`,
-        });
+        if (item.thumbnail) super.setThumbnail(item.thumbnail);
+        return super.addFields(
+            {
+                name: "Paused Track:",
+                value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.player.position, item.durationRaw)}`,
+            }
+        );
     }
 
-    setSkipped(item: YouTubeTrack | null) {
-        if(!item) return this;
+    setSkipped(item: YouTubeTrack | SpotifyTrack | null) {
+        if (!item) return this;
 
         return super.addFields({ name: "Skipped:", value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})` });
     }
 
-    setQueue(queue: YouTubeTrack[]) {
+    setQueue(queue: (YouTubeTrack | SpotifyTrack)[]) {
         if (!queue.length) return this;
 
         let res = "";
