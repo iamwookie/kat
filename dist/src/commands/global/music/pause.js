@@ -23,7 +23,7 @@ export class PauseCommand extends Command {
         if (!subscription || !subscription.active || subscription.paused)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I'm not playing anything!")] });
         this.applyCooldown(author);
-        const embed = new MusicEmbed(subscription).setPaused(subscription.active);
+        const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();
         return this.reply(int, { embeds: [embed] });
     }

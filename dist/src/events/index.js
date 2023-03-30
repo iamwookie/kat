@@ -1,4 +1,5 @@
 // ----- CLIENT -----
+export { GuildCreate } from "./client/GuildCreate.js";
 export { VoiceStateUpdate } from "./client/VoiceStateUpdate.js";
 export { MessageCreate } from "./client/MessageCreate.js";
 export { InteractionCreate } from "./client/InteractionCreate.js";
