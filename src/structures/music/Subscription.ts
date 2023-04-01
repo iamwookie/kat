@@ -67,7 +67,7 @@ export class Subscription {
 
     process() {
         const track = this.queue.shift();
-        if (!track) return this.destroy();
+        if (!track) return;
 
         this.active = track;
         this.player.playTrack({ track: track.data.track });
