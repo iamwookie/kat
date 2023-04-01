@@ -45,7 +45,6 @@ export class Subscription {
         const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
         client.subscriptions.set(guild.id, subscription);
         client.emit("subscriptionCreate", subscription);
-        client.logger.info(`Music >> Subscription Created for ${guild.name} (${guild.id}). Node: ${node.name}`);
         return subscription;
     }
     destroy() {
