@@ -1,4 +1,4 @@
-import Config from "../configs/bot.json" assert { type: "json" };
+import Config from "../../config.js";
 import { Client, Events, Collection, PermissionsBitField } from "discord.js";
 import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
@@ -26,9 +26,10 @@ export class KATClient extends Client {
         PermissionsBitField.Flags.Speak,
         PermissionsBitField.Flags.UseVAD,
     ]);
-    devId = Config.devId;
-    prefix = Config.prefix;
-    legacyPrefix = Config.legacyPrefix;
+    config = Config;
+    devId = Config.bot.devId;
+    prefix = Config.bot.prefix;
+    legacyPrefix = Config.bot.legacyPrefix;
     logger = new Logger(this);
     database = new Database(this);
     commander = new Commander(this);
@@ -42,12 +43,6 @@ export class KATClient extends Client {
         this.on(Events.Error, (err) => { this.logger.error(err); });
         if (process.env.NODE_ENV != "production")
             this.on(Events.Debug, msg => { this.logger.debug(msg); });
-        this.on(Events.ClientReady, async (client) => {
-            await this.colors.initialize();
-            console.log(chalk.greenBright.bold.underline(`>>> Colors Initialized`));
-            console.log(chalk.magenta.bold.underline(`\n>>> App Online, Client: ${client.user.tag} (${client.user.id}) [Guilds: ${client.guilds.cache.size}]`));
-            console.log(chalk.magenta.bold.underline(`>>> App Loaded In: ${Date.now() - this.startTime}ms`));
-        });
     }
     async initialize() {
         this.server = await Server(this);

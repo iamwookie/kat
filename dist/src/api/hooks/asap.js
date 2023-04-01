@@ -1,6 +1,4 @@
 import { EmbedBuilder } from "discord.js";
-import Config from "../../configs/server.json" assert { type: "json" };
-const { asap } = Config.hooks;
 import chalk from "chalk";
 export function sendUnbox(client) {
     return async (req, res) => {
@@ -21,7 +19,7 @@ export function sendUnbox(client) {
                 { name: "Item", value: `\`${itemName}\``, inline: true },
                 { name: "Crate", value: `\`${crateName}\``, inline: true },
             ]);
-            for (const c of asap.unbox) {
+            for (const c of client.config.server.hooks.asap.unbox) {
                 const channel = await client.channels.fetch(c);
                 if (!channel || !channel.isTextBased())
                     return res.status(500).send("Internal Server Error");
@@ -56,7 +54,7 @@ export function sendSuits(client) {
                 { name: "Suit Lost", value: `\`${itemName}\``, inline: true },
                 { name: "Killer", value: `\`${killerName}\``, inline: true },
             ]);
-            for (const c of asap.suits) {
+            for (const c of client.config.server.hooks.asap.suits) {
                 const channel = await client.channels.fetch(c);
                 if (!channel || !channel.isTextBased())
                     return res.status(500).send("Internal Server Error");
@@ -96,7 +94,7 @@ export function sendStaff(client) {
                     { name: "Ban Reason", value: `\`${banReason}\`` },
                 ]);
             }
-            for (const c of asap.staff) {
+            for (const c of client.config.server.hooks.asap.staff) {
                 const channel = await client.channels.fetch(c);
                 if (!channel || !channel.isTextBased())
                     return res.status(500).send("Internal Server Error");

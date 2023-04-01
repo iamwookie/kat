@@ -44,8 +44,7 @@ export class Subscription {
         });
         const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
         client.subscriptions.set(guild.id, subscription);
-        setTimeout(() => { if (!subscription.active && !subscription.queue.length)
-            subscription.destroy(); }, 10000);
+        client.emit("subscriptionCreate", subscription);
         client.logger.info(`Music >> Subscription Created for ${guild.name} (${guild.id}). Node: ${node.name}`);
         return subscription;
     }
@@ -54,6 +53,7 @@ export class Subscription {
         this.active = null;
         this.player.connection.disconnect();
         this.client.subscriptions.delete(this.guild.id);
+        this.client.emit("subscriptionDestroy", this);
         this.client.logger.warn(`Music >> Subscription Destroyed for ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`);
     }
     process() {

@@ -1,12 +1,11 @@
 import { Shoukaku, Connectors } from "shoukaku";
-import Config from "../configs/lavalink.json" assert { type: "json" };
-import chalk from "chalk";
 import { Collection } from 'discord.js';
+import chalk from "chalk";
 export class ShoukakuClient extends Shoukaku {
     client;
     retries = new Collection();
     constructor(client) {
-        super(new Connectors.DiscordJS(client), Config.nodes, {
+        super(new Connectors.DiscordJS(client), client.config.lavalink.nodes, {
             moveOnDisconnect: false,
             restTimeout: 5000,
         });

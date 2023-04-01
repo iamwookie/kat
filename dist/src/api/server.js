@@ -4,10 +4,7 @@ import helmet from "helmet";
 import bodyParser from "body-parser";
 import chalk from "chalk";
 // ------------------------------------
-import Config from "../configs/server.json" assert { type: "json" };
-// ------------------------------------
 import routes from "./routes/index.js";
-// ------------------------------------
 const app = express();
 export default function (client) {
     return new Promise((resolve, reject) => {
@@ -24,8 +21,9 @@ export default function (client) {
             res.status(500).send('Internal Server Error');
             return reject(err);
         });
-        app.listen(Config.port, async () => {
-            console.log(chalk.greenBright.bold.underline(`>>> Server Initialized On Port: ${Config.port}`));
+        const port = client.config.server.port;
+        app.listen(port, async () => {
+            console.log(chalk.greenBright.bold.underline(`>>> Server Initialized On Port: ${port}`));
             return resolve(app);
         });
     });
