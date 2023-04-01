@@ -7,7 +7,7 @@ export class ShoukakuClient extends Shoukaku {
     constructor(client) {
         super(new Connectors.DiscordJS(client), client.config.lavalink.nodes, {
             moveOnDisconnect: false,
-            restTimeout: 5000,
+            restTimeout: 5_000,
         });
         this.client = client;
         this.client = client;

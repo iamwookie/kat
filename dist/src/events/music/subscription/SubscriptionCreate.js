@@ -11,6 +11,6 @@ export class SubscriptionCreate extends Event {
                     subscription.destroy();
                 console.warn(chalk.yellowBright(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id}).`));
             }
-        }, 15000);
+        }, 15_000);
     }
 }

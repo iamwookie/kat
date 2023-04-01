@@ -12,8 +12,8 @@ export class PlayerEnd extends Event {
             {
                 if (!subscription.active || !subscription.queue.length)
                     subscription.destroy();
-                console.warn(chalk.yellowBright(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id}).`));
+                console.warn(chalk.yellow(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id}).`));
             }
-        }, 15000);
+        }, 15_000);
     }
 }
