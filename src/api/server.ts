@@ -1,5 +1,4 @@
-import { KATClient } from "@structures/index.js";
-
+import { KATClient as Client } from "@structures/index.js";
 import express, { Express, NextFunction, Request, Response } from "express";
 import Sentry from "@sentry/node";
 import helmet from "helmet";
@@ -7,14 +6,11 @@ import bodyParser from "body-parser";
 
 import chalk from "chalk";
 // ------------------------------------
-import Config from "@configs/server.json" assert { type: "json" };
-// ------------------------------------
 import routes from "./routes/index.js";
-// ------------------------------------
 
 const app = express();
 
-export default function (client: KATClient): Promise<Express> {
+export default function (client: Client): Promise<Express> {
     return new Promise((resolve, reject) => {
         if (app.get('env') == 'production') app.set('trust proxy', 1);
 
@@ -33,8 +29,9 @@ export default function (client: KATClient): Promise<Express> {
             return reject(err);
         });
 
-        app.listen(Config.port, async () => {
-            console.log(chalk.greenBright.bold.underline(`>>> Server Initialized On Port: ${Config.port}`));
+        const port = client.config.server.port;
+        app.listen(port, async () => {
+            console.log(chalk.greenBright.bold.underline(`>>> Server Initialized On Port: ${port}`));
             return resolve(app);
         });
     });

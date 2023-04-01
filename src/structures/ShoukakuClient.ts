@@ -1,10 +1,8 @@
 import { KATClient as Client } from './Client.js';
 import { Shoukaku, Connectors } from "shoukaku";
-
-import Config from "@configs/lavalink.json" assert { type: "json" };
+import { Collection } from 'discord.js';
 
 import chalk from "chalk";
-import { Collection } from 'discord.js';
 
 declare module "shoukaku" {
     interface LavalinkResponse {
@@ -24,7 +22,7 @@ export class ShoukakuClient extends Shoukaku {
     ) {
         super(
             new Connectors.DiscordJS(client),
-            Config.nodes,
+            client.config.lavalink.nodes,
             {
                 moveOnDisconnect: false,
                 restTimeout: 5_000,

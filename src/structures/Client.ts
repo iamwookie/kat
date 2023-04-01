@@ -1,4 +1,4 @@
-import Config from "../configs/bot.json" assert { type: "json" };
+import Config from "@config";
 
 import { Client, ClientOptions, Events, Collection, PermissionsBitField } from "discord.js";
 import { Express } from "express";
@@ -32,9 +32,11 @@ export class KATClient extends Client {
         PermissionsBitField.Flags.UseVAD,
     ]);
 
-    public devId: string = Config.devId;
-    public prefix: string = Config.prefix;
-    public legacyPrefix: string = Config.legacyPrefix;
+    public config = Config;
+
+    public devId = Config.bot.devId;
+    public prefix = Config.bot.prefix;
+    public legacyPrefix = Config.bot.legacyPrefix;
 
     public logger: Logger = new Logger(this);
     public database?: Database = new Database(this);

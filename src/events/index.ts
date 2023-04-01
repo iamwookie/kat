@@ -18,3 +18,6 @@ export { NodeError } from "./music/node/NodeError.js";
 export { PlayerEnd } from "./music/player/PlayerEnd.js";
 export { PlayerStart } from "./music/player/PlayerStart.js";
 export { PlayerException } from "./music/player/PlayerException.js";
+
+// Subscription
+export { SubscriptionCreate } from "./music/subscription/SubscriptionCreate.js";

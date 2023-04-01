@@ -3,9 +3,6 @@ import { TextChannel, ColorResolvable } from "discord.js";
 import { Request, Response } from "express";
 import { EmbedBuilder } from "discord.js";
 
-import Config from "@configs/server.json" assert { type: "json" };
-const { asap } = Config.hooks;
-
 import chalk from "chalk";
 
 type UnboxData = {
@@ -15,6 +12,27 @@ type UnboxData = {
     itemIcon: string;
     itemColor: string;
     crateName: string;
+};
+
+type SuitData = {
+    name: string;
+    steamId: string;
+    itemName: string;
+    itemIcon: string;
+    itemColor: string;
+    killerName: string;
+};
+
+type StaffData = {
+    ban: "banned" | "unbanned";
+    banLength: string;
+    banReason: string;
+    adminUser: string;
+    adminSid: string;
+    banUser: string;
+    banUserSid: string;
+    banUserProfile: string;
+    banUserAvatar: string;
 };
 
 export function sendUnbox(client: Client) {
@@ -37,7 +55,7 @@ export function sendUnbox(client: Client) {
                     { name: "Crate", value: `\`${crateName}\``, inline: true },
                 ]);
 
-            for (const c of asap.unbox) {
+            for (const c of client.config.server.hooks.asap.unbox) {
                 const channel = await client.channels.fetch(c);
                 if (!channel || !channel.isTextBased()) return res.status(500).send("Internal Server Error");
                 await (channel as TextChannel).send({ embeds: [embed] });
@@ -53,15 +71,6 @@ export function sendUnbox(client: Client) {
         }
     };
 }
-
-type SuitData = {
-    name: string;
-    steamId: string;
-    itemName: string;
-    itemIcon: string;
-    itemColor: string;
-    killerName: string;
-};
 
 export function sendSuits(client: Client) {
     return async (req: Request, res: Response) => {
@@ -83,7 +92,7 @@ export function sendSuits(client: Client) {
                     { name: "Killer", value: `\`${killerName}\``, inline: true },
                 ]);
 
-            for (const c of asap.suits) {
+            for (const c of client.config.server.hooks.asap.suits) {
                 const channel = await client.channels.fetch(c);
                 if (!channel || !channel.isTextBased()) return res.status(500).send("Internal Server Error");
                 await (channel as TextChannel).send({ embeds: [embed] });
@@ -99,18 +108,6 @@ export function sendSuits(client: Client) {
         }
     };
 }
-
-type StaffData = {
-    ban: "banned" | "unbanned";
-    banLength: string;
-    banReason: string;
-    adminUser: string;
-    adminSid: string;
-    banUser: string;
-    banUserSid: string;
-    banUserProfile: string;
-    banUserAvatar: string;
-};
 
 export function sendStaff(client: Client) {
     return async (req: Request, res: Response) => {
@@ -138,7 +135,7 @@ export function sendStaff(client: Client) {
                 ]);
             }
 
-            for (const c of asap.staff) {
+            for (const c of client.config.server.hooks.asap.staff) {
                 const channel = await client.channels.fetch(c);
                 if (!channel || !channel.isTextBased()) return res.status(500).send("Internal Server Error");
                 await (channel as TextChannel).send({

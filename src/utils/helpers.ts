@@ -1,8 +1,9 @@
-import { User } from "discord.js";
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@src/structures/index.js";
+import { User } from "discord.js";
 import stringProgressBar from "string-progressbar";
 
-import emojis from "./emojis.json" assert { type: "json" };
+import Config from "@config";
+const musicEmotes = Config.bot.emotes.music;
 
 // API
 
@@ -58,9 +59,9 @@ export function formatDuration(timeInMs: number) {
 
 export function getServiceIcon(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
     if (item instanceof YouTubeTrack || item instanceof YouTubePlaylist) {
-        return emojis.music.youtube;
+        return musicEmotes.youtube;
     } else if (item instanceof SpotifyTrack || item instanceof SpotifyPlaylist) {
-        return emojis.music.spotify;
+        return musicEmotes.spotify;
     } else {
         return "";
     }
@@ -70,7 +71,7 @@ export function createProgressBar(playbackDuration: number, totalDuration: numbe
     playbackDuration = Math.round(playbackDuration / 1000);
     totalDuration = Math.round(totalDuration / 1000);
 
-    let progressBar = stringProgressBar.splitBar(totalDuration, playbackDuration, 26, "▬", emojis.music.slider)[0];
-    if (playbackDuration == 0) progressBar = emojis.music.slider + progressBar.slice(1);
+    let progressBar = stringProgressBar.splitBar(totalDuration, playbackDuration, 26, "▬", musicEmotes.slider)[0];
+    if (playbackDuration == 0) progressBar = musicEmotes.slider + progressBar.slice(1);
     return progressBar;
 }
