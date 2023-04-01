@@ -1,4 +1,5 @@
 import { Event } from "../../../structures/index.js";
+import chalk from "chalk";
 export class PlayerEnd extends Event {
     constructor(client, commander) {
         super(client, commander, "playerEnd");
@@ -7,7 +8,12 @@ export class PlayerEnd extends Event {
         subscription.active?.onFinish();
         subscription.active = null;
         subscription.process();
-        setTimeout(() => { if (!subscription.active || !subscription.queue.length)
-            subscription.destroy(); }, 15000);
+        setTimeout(() => {
+            {
+                if (!subscription.active || !subscription.queue.length)
+                    subscription.destroy();
+                console.warn(chalk.yellowBright(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id}).`));
+            }
+        }, 15000);
     }
 }
