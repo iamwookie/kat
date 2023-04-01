@@ -1,6 +1,6 @@
 import { KATClient as Client } from "../Client.js";
 import { YouTubeTrack } from "./Track.js";
-import { Guild, VoiceBasedChannel, Events, TextBasedChannel } from "discord.js";
+import { Guild, VoiceBasedChannel, TextBasedChannel } from "discord.js";
 import { Shoukaku, Player, Node } from "shoukaku";
 
 export class Subscription {
@@ -50,8 +50,6 @@ export class Subscription {
         const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
         client.subscriptions.set(guild.id, subscription);
         client.emit("subscriptionCreate", subscription);
-
-        client.logger.info(`Music >> Subscription Created for ${guild.name} (${guild.id}). Node: ${node.name}`);
 
         return subscription;
     }
