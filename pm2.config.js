@@ -2,10 +2,10 @@ module.exports = {
     apps: [
         {
             name: "kat",
-            script: "dist/index.js",
+            script: "kat/dist/index.js",
             instances: 1,
             autorestart: true,
-            watch: "dist",
+            watch: "kat/dist",
             env: {
                 NODE_ENV: "production",
 
