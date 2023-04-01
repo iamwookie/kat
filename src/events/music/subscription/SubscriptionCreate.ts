@@ -1,4 +1,5 @@
 import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from "@structures/index.js";
+
 import chalk from "chalk";
 
 export class SubscriptionCreate extends Event {
