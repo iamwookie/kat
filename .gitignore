@@ -9,5 +9,5 @@ node_modules/
 .env
 
 # Extras
-data/
 .data/
+.archive/

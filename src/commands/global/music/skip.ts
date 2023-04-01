@@ -1,0 +1,42 @@
+import { KATClient as Client, Commander, Command } from "@structures/index.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import { Subscription as MusicSubscription } from "@src/structures/music/Subscription.js";
+import { ActionEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
+
+export class SkipCommand extends Command {
+    constructor(commander: Commander) {
+        super(commander);
+
+        this.name = "skip";
+        this.group = "Music";
+        this.description = {
+            content: "Skip the track.",
+        };
+
+        this.cooldown = 5;
+    }
+
+    data() {
+        return new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription(this.description?.content!)
+            .setDMPermission(false);
+    }
+
+    async execute(client: Client, int: ChatInputCommandInteraction) {
+        const author = this.getAuthor(int)!;
+
+        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The queue is empty or does not exist!")] });
+        if (subscription.queue.length == 0) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("This is the last track in the queue!")] });
+
+        this.applyCooldown(author);
+
+        const next = subscription.queue[0];
+        const embed = new MusicEmbed(subscription).setUser(author).setPlaying(next).setSkipped(subscription.active);
+        subscription.stop();
+        return this.reply(int, { embeds: [embed] });
+    }
+}
+
+// START FULL OVERHAUL OF MUSIC NOW
