@@ -48,73 +48,73 @@ export class Commander {
         this.intiliazeEvents();
     }
     initializeCLICommands() {
-        if (cliCommands.length) {
-            for (const CLICommand of cliCommands) {
-                try {
-                    const command = new CLICommand(this);
-                    command.initialize();
-                    this.cli.set(command.name, command);
-                }
-                catch (err) {
-                    this.client.logger.error(err);
-                    console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI Command"));
-                    console.error(err);
-                }
+        if (!cliCommands.length)
+            return;
+        for (const CLICommand of cliCommands) {
+            try {
+                const command = new CLICommand(this);
+                command.initialize();
+                this.cli.set(command.name, command);
+            }
+            catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI Command"));
+                console.error(err);
             }
         }
     }
     initializeGlobalCommands() {
-        if (globalCommands.length) {
-            for (const GlobalCommand of globalCommands) {
-                try {
-                    const command = new GlobalCommand(this);
-                    command.initialize();
-                    this.commands.set(command.name, command);
-                }
-                catch (err) {
-                    this.client.logger.error(err);
-                    console.error(chalk.red("Commander (ERROR) >> Error Initializing Global Command"));
-                    console.error(err);
-                }
+        if (!globalCommands.length)
+            return;
+        for (const GlobalCommand of globalCommands) {
+            try {
+                const command = new GlobalCommand(this);
+                command.initialize();
+                this.commands.set(command.name, command);
             }
-            this.client.logger.info(`Commander >> Successfully Initialized ${globalCommands.length} Global Commands`);
+            catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Initializing Global Command"));
+                console.error(err);
+            }
         }
+        this.client.logger.info(`Commander >> Successfully Initialized ${globalCommands.length} Global Command(s)`);
     }
     initializeReservedCommands() {
-        if (reservedCommands.length) {
-            for (const GuildCommand of reservedCommands) {
-                try {
-                    const command = new GuildCommand(this);
-                    if (!command.guilds)
-                        this.client.logger.warn(`Commander >> Guild Not Set For Guild Command: ${command.name}`);
-                    command.initialize();
-                    this.commands.set(command.name, command);
-                }
-                catch (err) {
-                    this.client.logger.error(err);
-                    console.error(chalk.red("Commander (ERROR) >> Error Initializing Guild Command"));
-                    console.error(err);
-                }
+        if (!reservedCommands.length)
+            return;
+        for (const GuildCommand of reservedCommands) {
+            try {
+                const command = new GuildCommand(this);
+                if (!command.guilds)
+                    this.client.logger.warn(`Commander >> Guild Not Set For Guild Command: ${command.name}`);
+                command.initialize();
+                this.commands.set(command.name, command);
             }
-            this.client.logger.info(`Commander >> Successfully Initialized ${reservedCommands.length} Reserved Commands`);
+            catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Initializing Guild Command"));
+                console.error(err);
+            }
         }
+        this.client.logger.info(`Commander >> Successfully Initialized ${reservedCommands.length} Reserved Command(s)`);
     }
     intiliazeEvents() {
         const events = Object.values(Events);
-        if (events.length) {
-            for (const GlobalEvent of events) {
-                try {
-                    const event = new GlobalEvent(this.client, this);
-                    this.client.on(event.name, event.execute.bind(event));
-                }
-                catch (err) {
-                    this.client.logger.error(err);
-                    console.error(chalk.red("Commander (ERROR) >> Error Registering Event"));
-                    console.error(err);
-                }
+        if (!events.length)
+            return;
+        for (const Event of events) {
+            try {
+                const event = new Event(this.client, this);
+                this.client.on(event.name, event.execute.bind(event));
             }
-            this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Events`);
+            catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Initializing Event"));
+                console.error(err);
+            }
         }
+        this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
     async registerGlobalCommands() {
         try {

@@ -1,13 +1,13 @@
-import { Router } from 'express';
-import { sendUnbox, sendSuits, sendStaff } from '../../hooks/asap.js';
-const router = Router();
-export default function (client) {
-    // /hooks/asap/unbox
-    router.post('/unbox', sendUnbox(client));
-    // /hooks/asap/suit
-    router.post('/suits', sendSuits(client));
-    // /hooks/asap/staff
-    router.post('/staff', sendStaff(client));
-    return router;
+import { Route } from "../../structures/Route.js";
+import { sendUnbox, sendSuits, sendStaff } from "../../hooks/asap.js";
+export class AsapHook extends Route {
+    constructor(client) {
+        super(client, "/hooks/asap");
+    }
+    register() {
+        this.router.post("/unbox", sendUnbox(this.client));
+        this.router.post("/suits", sendSuits(this.client));
+        this.router.post("/staff", sendStaff(this.client));
+        return this.router;
+    }
 }
-;
