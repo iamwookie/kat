@@ -29,7 +29,7 @@ export default {
         nodes: [
             {
                 name: "uk:london-1",
-                url: "145.239.205.161:2333",
+                url: "localhost:2333",
                 auth: "yoruistrash",
             },
         ],
