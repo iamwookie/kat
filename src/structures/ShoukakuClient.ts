@@ -24,8 +24,9 @@ export class ShoukakuClient extends Shoukaku {
             new Connectors.DiscordJS(client),
             client.config.lavalink.nodes,
             {
-                moveOnDisconnect: false,
+                reconnectTries: 10,
                 restTimeout: 5_000,
+                moveOnDisconnect: false,
             }
         );
 
