@@ -42,8 +42,6 @@ export class PlayCommand extends Command {
         let subscription: MusicSubscription = client.subscriptions.get(int.guildId);
 
         if (!query && subscription && subscription.paused) {
-            this.applyCooldown(author);
-            
             subscription.resume();
             return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
         }
