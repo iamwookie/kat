@@ -36,7 +36,7 @@ import chalk from "chalk";
             status: "online",
             activities: [
                 {
-                    name: "/help",
+                    name: "/help | .help",
                     type: ActivityType.Listening,
                 },
             ],

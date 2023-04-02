@@ -7,10 +7,13 @@ export class SubscriptionCreate extends Event {
 
     async execute(subscription: MusicSubscription) {
         this.client.logger.info(`Music >> Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`);
+
         setTimeout(() => {
             {
-                if (!subscription.active || !subscription.queue.length) subscription.destroy();
-                this.client.logger.warn(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id}).`);
+                if (!subscription.active && !subscription.queue.length) {
+                    subscription.destroy();
+                    this.client.logger.warn(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id})`);
+                }
             }
         }, 15_000);
     }
