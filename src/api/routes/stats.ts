@@ -1,13 +1,16 @@
 import { KATClient as Client } from "@structures/index.js";
-import { Router } from 'express';
+import { Route } from "@api/structures/Route.js";
 
-import { fetchStats } from 'src/api/controllers/bot.js';
+import { fetchStats } from "src/api/controllers/bot.js";
 
-const router = Router();
+export class StatsRoute extends Route {
+    constructor(client: Client) {
+        super(client, "/stats");
+    }
 
-export default function (client: Client) {
-    // /stats
-    router.get('/', fetchStats(client));
+    register() {
+        this.router.get("/", fetchStats(this.client));
 
-    return router;
+        return this.router;
+    }
 }

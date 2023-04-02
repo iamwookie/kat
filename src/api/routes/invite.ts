@@ -1,13 +1,16 @@
 import { KATClient as Client } from "@structures/index.js";
-import { Router } from 'express';
+import { Route } from "@api/structures/Route.js";
 
-import { fetchInvite } from '@api/controllers/bot.js';
+import { fetchInvite } from "@api/controllers/bot.js";
 
-const router = Router();
+export class InviteRoute extends Route {
+    constructor(client: Client) {
+        super(client, "/invite");
+    }
 
-export default function (client: Client) {
-    // /invite/:?admin=(true|false)
-    router.get('/', fetchInvite(client));
+    register() {
+        this.router.get("/", fetchInvite(this.client));
 
-    return router;
-};
+        return this.router;
+    }
+}

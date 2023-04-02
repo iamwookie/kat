@@ -1,18 +1,34 @@
 import { KATClient as Client } from "@structures/index.js";
-import { Router, Request, Response } from 'express';
+import { Route } from "@api/structures/Route.js";
 
-import { withAuth } from '@api/middlewares/auth.js';
-
+import chalk from "chalk";
 // ------------------------------------
-import asapHook from './asap.js';
+import { AsapHook } from "./asap.js";
+const hooks = [AsapHook];
 // ------------------------------------
 
-const router = Router();
+// Move into server structure at some point
+export class HookRoute extends Route {
+    constructor(client: Client) {
+        super(client, "/hooks");
+    }
 
-export default function (client: Client) {
-    router.get("/", (_: Request, res: Response) => res.send(`${client.user?.username} - vDEV`));
+    register() {
+        if (!hooks.length) return this.router;
 
-    router.use("/asap", withAuth(client), asapHook(client));
+        for (const Hook of hooks) {
+            try {
+                const hook = new Hook(this.client);
+                this.router.use(hook.path, hook.register());
+            } catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Server (ERROR) >> Error Registering Hook: " + Hook.name));
+                console.error(err);
+            }
+        }
 
-    return router;
-};
+        this.client.logger.info(`Server >> Successfully Registered ${hooks.length} Hook(s)`);
+
+        return this.router;
+    }
+}
