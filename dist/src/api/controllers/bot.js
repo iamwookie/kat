@@ -1,10 +1,10 @@
-import { formatTime, formatBytes } from "../../utils/helpers.js";
+import { formatDuration, formatBytes } from "../../utils/helpers.js";
 import chalk from "chalk";
 export function fetchStats(client) {
     return async (req, res) => {
         try {
             const data = {
-                uptime: formatTime(client.uptime ?? undefined),
+                uptime: formatDuration(client.uptime ?? 0),
                 ram_usage: formatBytes(process.memoryUsage().heapUsed),
                 ws_ping: client.ws.ping,
                 guilds: client.guilds.cache.size,
