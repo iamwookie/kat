@@ -1,29 +1,13 @@
 import { KATClient as Client } from "@structures/index.js";
-import { TextChannel, ColorResolvable } from "discord.js";
+import { Route } from "@api/structures/Route.js";
 import { Request, Response } from "express";
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, ColorResolvable } from "discord.js";
+
+import { withAuth } from "@api/middlewares/auth.js";
 
 import chalk from "chalk";
 
-type UnboxData = {
-    name: string;
-    steamId: string;
-    itemName: string;
-    itemIcon: string;
-    itemColor: string;
-    crateName: string;
-};
-
-type SuitData = {
-    name: string;
-    steamId: string;
-    itemName: string;
-    itemIcon: string;
-    itemColor: string;
-    killerName: string;
-};
-
-type StaffData = {
+interface StaffData {
     ban: "banned" | "unbanned";
     banLength: string;
     banReason: string;
@@ -35,82 +19,35 @@ type StaffData = {
     banUserAvatar: string;
 };
 
-export function sendUnbox(client: Client) {
-    return async (req: Request, res: Response) => {
-        try {
-            const body: UnboxData = req.body;
-            if (!body) return res.status(400).send("Bad Request");
+interface UnboxData {
+    name: string;
+    steamId: string;
+    itemName: string;
+    itemIcon: string;
+    itemColor: ColorResolvable;
+    crateName: string;
+};
 
-            const { name, steamId, itemName, itemIcon, itemColor, crateName } = body;
-            if (!name || !steamId || !itemName || !itemIcon || !itemColor || !crateName) return res.status(400).send("Bad Request");
+interface SuitData extends UnboxData {
+    killerName: string;
+};
 
-            const embed = new EmbedBuilder()
-                .setTitle("ASAP Unbox")
-                .setDescription(`**${name}** has received **${itemName}** from **${crateName}** 🎁!`)
-                .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
-                .setColor(itemColor as ColorResolvable)
-                .addFields([
-                    { name: "Player", value: `[${name}](https://steamcommunity.com/profiles/${steamId})`, inline: true },
-                    { name: "Item", value: `\`${itemName}\``, inline: true },
-                    { name: "Crate", value: `\`${crateName}\``, inline: true },
-                ]);
+export class AsapHook extends Route {
+    public config = this.client.config.server.hooks.asap;
 
-            for (const c of client.config.server.hooks.asap.unbox) {
-                const channel = await client.channels.fetch(c);
-                if (!channel || !channel.isTextBased()) return res.status(500).send("Internal Server Error");
-                await (channel as TextChannel).send({ embeds: [embed] });
-            }
+    constructor(client: Client) {
+        super(client, "/asap");
+    }
 
-            return res.status(200).send("OK");
-        } catch (err) {
-            client.logger.request(req, "error", err);
-            console.error(chalk.red("ASAP Controller (ERROR) >> Error Creating Unbox Log"));
-            console.error(err);
-
-            return res.status(500).send("Internal Server Error");
-        }
-    };
-}
-
-export function sendSuits(client: Client) {
-    return async (req: Request, res: Response) => {
-        try {
-            const body: SuitData = req.body;
-            if (!body) return res.status(400).send("Bad Request");
-
-            const { name, steamId, itemName, itemIcon, itemColor, killerName } = body;
-            if (!name || !steamId || !itemName || !itemIcon || !itemColor || !killerName) return res.status(400).send("Bad Request");
-
-            const embed = new EmbedBuilder()
-                .setTitle("ASAP Suit Rips")
-                .setDescription(`**${name}** has lost **${itemName}** to **${killerName}** 💀!`)
-                .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
-                .setColor(itemColor as ColorResolvable)
-                .addFields([
-                    { name: "Player", value: `[${name}](https://steamcommunity.com/profiles/${steamId})`, inline: true },
-                    { name: "Suit Lost", value: `\`${itemName}\``, inline: true },
-                    { name: "Killer", value: `\`${killerName}\``, inline: true },
-                ]);
-
-            for (const c of client.config.server.hooks.asap.suits) {
-                const channel = await client.channels.fetch(c);
-                if (!channel || !channel.isTextBased()) return res.status(500).send("Internal Server Error");
-                await (channel as TextChannel).send({ embeds: [embed] });
-            }
-
-            return res.status(200).send("OK");
-        } catch (err) {
-            client.logger.request(req, "error", err);
-            console.error(chalk.red("ASAP Controller (ERROR) >> Error Creating Suit Rip Log"));
-            console.error(err);
-
-            return res.status(500).send("Internal Server Error");
-        }
-    };
-}
-
-export function sendStaff(client: Client) {
-    return async (req: Request, res: Response) => {
+    register() {
+        this.router.post("/staff", withAuth(this.client), this.sendStaff);
+        this.router.post("/unbox", withAuth(this.client), this.sendUnbox);
+        this.router.post("/suits", withAuth(this.client), this.sendSuits);
+        
+        return this.router;
+    }
+    
+    private sendStaff = async (req: Request, res: Response) => {
         try {
             const body: StaffData = req.body;
             if (!body) return res.status(400).send("Bad Request");
@@ -135,10 +72,10 @@ export function sendStaff(client: Client) {
                 ]);
             }
 
-            for (const c of client.config.server.hooks.asap.staff) {
-                const channel = await client.channels.fetch(c);
+            for (const c of this.config.staff) {
+                const channel = await this.client.channels.fetch(c);
                 if (!channel || !channel.isTextBased()) return res.status(500).send("Internal Server Error");
-                await (channel as TextChannel).send({
+                await channel.send({
                     content: `\`${adminUser} (${adminSid})\` has ${ban} \`${banUser} (${banUserSid})\`!`,
                     embeds: [embed],
                 });
@@ -146,11 +83,81 @@ export function sendStaff(client: Client) {
 
             return res.status(200).send("OK");
         } catch (err) {
-            client.logger.request(req, "error", err);
+            this.client.logger.request(req, "error", err);
             console.error(chalk.red("ASAP Controller (ERROR) >> Error Creating Staff Log"));
             console.error(err);
 
             return res.status(500).send("Internal Server Error");
         }
-    };
+    }
+
+    private sendUnbox = async (req: Request, res: Response) => {
+        try {
+            const body: UnboxData = req.body;
+            if (!body) return res.status(400).send("Bad Request");
+
+            const { name, steamId, itemName, itemIcon, itemColor, crateName } = body;
+            if (!name || !steamId || !itemName || !itemIcon || !itemColor || !crateName) return res.status(400).send("Bad Request");
+
+            const embed = new EmbedBuilder()
+                .setTitle("ASAP Unbox")
+                .setDescription(`**${name}** has received **${itemName}** from **${crateName}** 🎁!`)
+                .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
+                .setColor(itemColor)
+                .addFields([
+                    { name: "Player", value: `[${name}](https://steamcommunity.com/profiles/${steamId})`, inline: true },
+                    { name: "Item", value: `\`${itemName}\``, inline: true },
+                    { name: "Crate", value: `\`${crateName}\``, inline: true },
+                ]);
+
+            for (const c of this.config.unbox) {
+                const channel = await this.client.channels.fetch(c);
+                if (!channel || !channel.isTextBased()) return res.status(500).send("Internal Server Error");
+                await channel.send({ embeds: [embed] });
+            }
+
+            return res.status(200).send("OK");
+        } catch (err) {
+            this.client.logger.request(req, "error", err);
+            console.error(chalk.red("ASAP Controller (ERROR) >> Error Creating Unbox Log"));
+            console.error(err);
+
+            return res.status(500).send("Internal Server Error");
+        }
+    }
+
+    private sendSuits = async (req: Request, res: Response) => {
+        try {
+            const body: SuitData = req.body;
+            if (!body) return res.status(400).send("Bad Request");
+
+            const { name, steamId, itemName, itemIcon, itemColor, killerName } = body;
+            if (!name || !steamId || !itemName || !itemIcon || !itemColor || !killerName) return res.status(400).send("Bad Request");
+
+            const embed = new EmbedBuilder()
+                .setTitle("ASAP Suit Rips")
+                .setDescription(`**${name}** has lost **${itemName}** to **${killerName}** 💀!`)
+                .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
+                .setColor(itemColor as ColorResolvable)
+                .addFields([
+                    { name: "Player", value: `[${name}](https://steamcommunity.com/profiles/${steamId})`, inline: true },
+                    { name: "Suit Lost", value: `\`${itemName}\``, inline: true },
+                    { name: "Killer", value: `\`${killerName}\``, inline: true },
+                ]);
+
+            for (const c of this.config.suits) {
+                const channel = await this.client.channels.fetch(c);
+                if (!channel || !channel.isTextBased()) return res.status(500).send("Internal Server Error");
+                await channel.send({ embeds: [embed] });
+            }
+
+            return res.status(200).send("OK");
+        } catch (err) {
+            this.client.logger.request(req, "error", err);
+            console.error(chalk.red("ASAP Controller (ERROR) >> Error Creating Suit Rip Log"));
+            console.error(err);
+
+            return res.status(500).send("Internal Server Error");
+        }
+    }
 }
