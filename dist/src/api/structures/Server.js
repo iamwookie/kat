@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import chalk from "chalk";
 // ------------------------------------
 import * as Routes from "../routes/index.js";
+import * as Hooks from "../hooks/index.js";
 // ------------------------------------
 export class Server {
     client;
@@ -24,6 +25,7 @@ export class Server {
             this.app.use(helmet());
             this.app.use(bodyParser.urlencoded({ extended: true }));
             this.app.use(express.json());
+            this.registerHooks();
             this.registerRoutes();
             this.app.use(Sentry.Handlers.errorHandler());
             this.app.use((err, req, res, _) => {
@@ -49,5 +51,22 @@ export class Server {
             }
         }
         this.client.logger.info(`Server >> Successfully Registered ${routes.length} Route(s)`);
+    }
+    registerHooks() {
+        const hooks = Object.values(Hooks);
+        if (!hooks.length)
+            return;
+        for (const Hook of hooks) {
+            try {
+                const hook = new Hook(this.client);
+                this.app.use("/hooks" + hook.path, hook.register());
+            }
+            catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Server (ERROR) >> Error Registering Hook: " + Hook.name));
+                console.error(err);
+            }
+        }
+        this.client.logger.info(`Server >> Successfully Registered ${hooks.length} Hook(s)`);
     }
 }
