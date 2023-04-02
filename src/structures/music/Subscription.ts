@@ -73,7 +73,7 @@ export class Subscription {
 
     add(track: YouTubeTrack) {
         this.queue.push(track);
-        if (!this.active) return this.process();
+        if (!this.active) this.process();
     }
 
     stop() {
@@ -92,7 +92,7 @@ export class Subscription {
     }
 
     // Getters
-
+    
     get duration() {
         return this.player.position;
     }
