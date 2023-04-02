@@ -2,7 +2,7 @@ export default {
     bot: {
         devId: "244662779745665026",
         prefix: "/",
-        legacyPrefix: "!",
+        legacyPrefix: ".",
         emotes: {
             music: {
                 youtube: "<:youtube:1067881972774477844>",
