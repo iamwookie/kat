@@ -8,7 +8,7 @@ import { Commander } from "./Commander.js";
 import { ShoukakuClient } from "./ShoukakuClient.js";
 import { ColorClient } from "./ColorClient.js";
 import { TwitchClient } from "./TwitchClient.js";
-import Server from "@api/server.js";
+import { Server } from "@src/api/structures/Server.js";
 
 import chalk from "chalk";
 
@@ -44,7 +44,7 @@ export class KATClient extends Client {
     public shoukaku: ShoukakuClient = new ShoukakuClient(this);
     public colors: ColorClient = new ColorClient(this);
     public twitch: TwitchClient = new TwitchClient(this);
-    public server: Express;
+    public server: Server = new Server(this);
 
     public subscriptions: Collection<any, any> = new Collection();
 
@@ -57,8 +57,6 @@ export class KATClient extends Client {
     }
 
     async initialize(): Promise<void> {
-        this.server = await Server(this);
-
         await this.database?.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));
 

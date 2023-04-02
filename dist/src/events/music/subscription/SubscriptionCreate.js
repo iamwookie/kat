@@ -5,6 +5,7 @@ export class SubscriptionCreate extends Event {
         super(client, commander, "subscriptionCreate");
     }
     async execute(subscription) {
+        this.client.logger.info(`Music >> Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`);
         setTimeout(() => {
             {
                 if (!subscription.active || !subscription.queue.length)

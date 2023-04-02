@@ -1,6 +1,6 @@
 import { KATClient as Client } from "@structures/index.js";
 import { Request, Response } from "express";
-import { formatTime, formatBytes } from "@src/utils/helpers.js";
+import { formatDuration, formatBytes } from "@src/utils/helpers.js";
 
 import chalk from "chalk";
 
@@ -8,7 +8,7 @@ export function fetchStats(client: Client) {
     return async (req: Request, res: Response) => {
         try {
             const data = {
-                uptime: formatTime(client.uptime ?? undefined),
+                uptime: formatDuration(client.uptime ?? 0),
                 ram_usage: formatBytes(process.memoryUsage().heapUsed),
                 ws_ping: client.ws.ping,
                 guilds: client.guilds.cache.size,
