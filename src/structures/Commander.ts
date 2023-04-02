@@ -97,7 +97,7 @@ export class Commander {
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${globalCommands.length} Global Commands`);
+        this.client.logger.info(`Commander >> Successfully Initialized ${globalCommands.length} Global Command(s)`);
     }
 
     initializeReservedCommands() {
@@ -117,7 +117,7 @@ export class Commander {
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${reservedCommands.length} Reserved Commands`);
+        this.client.logger.info(`Commander >> Successfully Initialized ${reservedCommands.length} Reserved Command(s)`);
     }
 
     intiliazeEvents() {
@@ -135,7 +135,7 @@ export class Commander {
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Events`);
+        this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
 
     async registerGlobalCommands() {
