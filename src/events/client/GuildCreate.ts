@@ -1,5 +1,5 @@
 import { Event, KATClient as Client, Commander } from "@structures/index.js";
-import { Events, Guild, PermissionFlagsBits, EmbedBuilder, ChannelType, TextBasedChannel } from "discord.js";
+import { Events, Guild, PermissionFlagsBits, EmbedBuilder, ChannelType } from "discord.js";
 
 export class GuildCreate extends Event {
     constructor(client: Client, commander: Commander) {
@@ -22,7 +22,7 @@ export class GuildCreate extends Event {
                 \n❓ Use \`/help\` or \`.help\` for the help menu!
                 \nVisit the official website here: https://kat.bil.al`
             );
-            
+
         channel.send({ embeds: [embed] }).catch(() => {});
     }
 }
