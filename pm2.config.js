@@ -14,9 +14,7 @@ module.exports = {
                 KAT_API_KEY: process.env.CAT_API_KEY,
 
                 SENTRY_DSN: process.env.SENTRY_DSN,
-                SENTRY_ENVIRONMENT: process.env.SENTRY_ENVIRONMENT,
-                SENTRY_RELEASE: process.env.SENTRY_RELEASE,
-
+                
                 REDIS_URL: process.env.REDIS_URL,
 
                 TWITCH_CLIENT_ID: process.env.TWITCH_CLIENT_ID,
