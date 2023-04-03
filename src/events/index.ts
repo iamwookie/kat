@@ -20,4 +20,5 @@ export { PlayerStart } from "./music/player/PlayerStart.js";
 export { PlayerException } from "./music/player/PlayerException.js";
 
 // Subscription
+export { SubscriptionDestroy } from "./music/subscription/SubscriptionDestroy.js";
 export { SubscriptionCreate } from "./music/subscription/SubscriptionCreate.js";
