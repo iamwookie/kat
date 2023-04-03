@@ -59,9 +59,6 @@ export class KATClient extends Client {
         await this.database?.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));
 
-        await this.colors.initialize();
-        console.log(chalk.greenBright.bold.underline(`>>> Colors Initialized`));
-
         await this.commander.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
     }
