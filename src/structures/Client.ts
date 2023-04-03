@@ -1,7 +1,6 @@
 import Config from "@config";
 
 import { Client, ClientOptions, Events, Collection, PermissionsBitField } from "discord.js";
-import { Express } from "express";
 import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
 import { Commander } from "./Commander.js";
@@ -59,6 +58,9 @@ export class KATClient extends Client {
     async initialize(): Promise<void> {
         await this.database?.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));
+
+        await this.colors.initialize();
+        console.log(chalk.greenBright.bold.underline(`>>> Colors Initialized`));
 
         await this.commander.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));

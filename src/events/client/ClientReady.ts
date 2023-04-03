@@ -9,9 +9,6 @@ export class ClientReady extends Event {
     }
 
     async execute(client: Client) {
-        await this.client.colors.initialize();
-        console.log(chalk.greenBright.bold.underline(`>>> Colors Initialized`));
-
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
 
