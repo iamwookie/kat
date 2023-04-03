@@ -1,3 +1,4 @@
+import { NodeError, PlayerError } from '../../utils/errors.js';
 export class Subscription {
     client;
     guild;
@@ -8,6 +9,7 @@ export class Subscription {
     shoukaku;
     queue = [];
     active = null;
+    destroyed = false;
     constructor(client, guild, voiceChannel, textChannel, player, node) {
         this.client = client;
         this.guild = guild;
@@ -33,27 +35,41 @@ export class Subscription {
         // });
     }
     static async create(client, guild, voiceChannel, textChannel) {
-        const node = client.shoukaku.getNode();
-        if (!node)
-            throw new Error("No available nodes!");
-        const player = await node.joinChannel({
-            guildId: guild.id,
-            channelId: voiceChannel.id,
-            shardId: 0,
-            deaf: true,
-        });
-        const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
-        client.subscriptions.set(guild.id, subscription);
-        client.emit("subscriptionCreate", subscription);
-        return subscription;
+        try {
+            const node = client.shoukaku.getNode();
+            if (!node)
+                throw new NodeError("Node doesn't exist.");
+            try {
+                const player = await node.joinChannel({
+                    guildId: guild.id,
+                    channelId: voiceChannel.id,
+                    shardId: 0,
+                    deaf: true,
+                });
+                const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
+                client.subscriptions.set(guild.id, subscription);
+                client.emit("subscriptionCreate", subscription);
+                return subscription;
+            }
+            catch (err) {
+                client.logger.error(err);
+                throw new PlayerError(err.message);
+            }
+        }
+        catch (err) {
+            client.logger.error(err);
+            throw new NodeError(err.message);
+        }
     }
     destroy() {
+        if (this.destroyed)
+            return;
         this.queue = [];
         this.active = null;
         this.player.connection.disconnect();
         this.client.subscriptions.delete(this.guild.id);
+        this.destroyed = true;
         this.client.emit("subscriptionDestroy", this);
-        this.client.logger.warn(`Music >> Subscription Destroyed for ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`);
     }
     process() {
         const track = this.queue.shift();
@@ -65,7 +81,7 @@ export class Subscription {
     add(track) {
         this.queue.push(track);
         if (!this.active)
-            return this.process();
+            this.process();
     }
     stop() {
         this.active = null;

@@ -5,8 +5,9 @@ export class GuildCreate extends Event {
         super(client, commander, Events.GuildCreate);
     }
     async execute(guild) {
+        this.client.logger.info(`DISCORD >> Joined guild ${guild.name} (${guild.id}) with ${guild.memberCount} members!`);
         const channel = guild.channels.cache.find((c) => c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me)?.has(PermissionFlagsBits.SendMessages));
-        if (!channel)
+        if (!channel || !channel.isTextBased())
             return;
         const embed = new EmbedBuilder()
             .setTitle("Thanks for adding me!")

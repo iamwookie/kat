@@ -1,7 +1,8 @@
 import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder } from "discord.js";
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "../../../structures/index.js";
-import { ActionEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
+import { NodeError, PlayerError } from "../../../utils/errors.js";
+import { ActionEmbed, ErrorEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class PlayCommand extends Command {
     constructor(commander) {
         super(commander);
@@ -20,8 +21,7 @@ export class PlayCommand extends Command {
             .setDescription(this.description?.content)
             .setDMPermission(false)
             .addStringOption((option) => {
-            option.setName("query")
-                .setDescription("The name or URL of the track.");
+            option.setName("query").setDescription("The name or URL of the track.");
             return option;
         });
     }
@@ -35,20 +35,27 @@ export class PlayCommand extends Command {
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I can't play in that voice channel!")] });
         let subscription = client.subscriptions.get(int.guildId);
         if (!query && subscription && subscription.paused) {
-            this.applyCooldown(author);
             subscription.resume();
             return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
         }
         if (!query)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("What should I play?")] });
-        this.applyCooldown(author);
+        //this.applyCooldown(author);
         if (!subscription) {
             try {
                 subscription = await MusicSubscription.create(client, int.guild, voiceChannel, int.channel);
             }
             catch (err) {
-                client.logger.error(err);
-                return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No nodes are available to play music right now!")] });
+                if (err instanceof NodeError) {
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No available music nodes. Please try again!")] });
+                }
+                else if (err instanceof PlayerError) {
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Error establishing a voice channel connection. Try again in a few minutes!")] });
+                }
+                else {
+                    const eventId = client.logger.error(err);
+                    return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
+                }
             }
         }
         let res = null;
