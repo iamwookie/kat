@@ -7,8 +7,10 @@ export class GuildCreate extends Event {
     }
 
     async execute(guild: Guild) {
+        this.client.logger.info(`DISCORD >> Joined guild ${guild.name} (${guild.id}) with ${guild.memberCount} members!`);
+
         const channel = guild.channels.cache.find((c) => c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me!)?.has(PermissionFlagsBits.SendMessages));
-        if (!channel) return;
+        if (!channel || !channel.isTextBased()) return;
 
         const embed = new EmbedBuilder()
             .setTitle("Thanks for adding me!")
@@ -20,7 +22,7 @@ export class GuildCreate extends Event {
                 \n❓ Use \`/help\` or \`.help\` for the help menu!
                 \nVisit the official website here: https://kat.bil.al`
             );
-
-        (channel as TextBasedChannel).send({ embeds: [embed] }).catch(() => { });
+            
+        channel.send({ embeds: [embed] }).catch(() => {});
     }
 }

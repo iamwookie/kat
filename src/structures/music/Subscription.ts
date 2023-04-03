@@ -7,6 +7,7 @@ export class Subscription {
     public shoukaku: Shoukaku
     public queue: YouTubeTrack[] = [];
     public active: YouTubeTrack | null = null;
+    public destroyed: boolean = false;
 
     constructor(
         public client: Client,
@@ -55,12 +56,13 @@ export class Subscription {
     }
 
     destroy() {
+        if (this.destroyed) return;
         this.queue = [];
         this.active = null;
         this.player.connection.disconnect();
         this.client.subscriptions.delete(this.guild.id);
+        this.destroyed = true;
         this.client.emit("subscriptionDestroy", this);
-        this.client.logger.warn(`Music >> Subscription Destroyed for ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`)
     }
 
     process() {
