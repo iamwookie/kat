@@ -2,9 +2,10 @@ import { KATClient as Client } from "../Client.js";
 import { YouTubeTrack } from "./Track.js";
 import { Guild, VoiceBasedChannel, TextBasedChannel } from "discord.js";
 import { Shoukaku, Player, Node } from "shoukaku";
+import { NodeError, PlayerError } from '@src/utils/errors.js';
 
 export class Subscription {
-    public shoukaku: Shoukaku
+    public shoukaku: Shoukaku;
     public queue: YouTubeTrack[] = [];
     public active: YouTubeTrack | null = null;
     public destroyed: boolean = false;
@@ -15,7 +16,7 @@ export class Subscription {
         public voiceChannel: VoiceBasedChannel,
         public textChannel: TextBasedChannel | null,
         public player: Player,
-        public node: Node,
+        public node: Node
     ) {
         this.client = client;
         this.shoukaku = client.shoukaku;
@@ -38,21 +39,31 @@ export class Subscription {
     }
 
     static async create(client: Client, guild: Guild, voiceChannel: VoiceBasedChannel, textChannel: TextBasedChannel | null) {
-        const node = client.shoukaku.getNode();
-        if (!node) throw new Error("No available nodes!");
+        try {
+            const node = client.shoukaku.getNode();
+            if (!node) throw new NodeError("Node doesn't exist.");
 
-        const player = await node.joinChannel({
-            guildId: guild.id,
-            channelId: voiceChannel.id,
-            shardId: 0,
-            deaf: true,
-        });
+            try {
+                const player: Player = await node.joinChannel({
+                    guildId: guild.id,
+                    channelId: voiceChannel.id,
+                    shardId: 0,
+                    deaf: true,
+                });
+                
+                const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
+                client.subscriptions.set(guild.id, subscription);
+                client.emit("subscriptionCreate", subscription);
 
-        const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
-        client.subscriptions.set(guild.id, subscription);
-        client.emit("subscriptionCreate", subscription);
-
-        return subscription;
+                return subscription;
+            } catch (err) {
+                client.logger.error(err);
+                throw new PlayerError((err as Error).message);
+            }
+        } catch (err) {
+            client.logger.error(err);
+            throw new NodeError((err as Error).message);
+        }
     }
 
     destroy() {
@@ -94,7 +105,7 @@ export class Subscription {
     }
 
     // Getters
-    
+
     get duration() {
         return this.player.position;
     }

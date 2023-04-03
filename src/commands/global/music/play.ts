@@ -2,7 +2,8 @@ import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, GuildMember, VoiceBasedChannel, VoiceChannel } from "discord.js";
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@structures/index.js";
 import { LavalinkResponse } from "shoukaku";
-import { ActionEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
+import { NodeError, PlayerError } from "@src/utils/errors.js";
+import { ActionEmbed, ErrorEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
 
 export class PlayCommand extends Command {
     constructor(commander: Commander) {
@@ -21,18 +22,17 @@ export class PlayCommand extends Command {
 
     data() {
         return new SlashCommandBuilder()
-        .setName(this.name)
-        .setDescription(this.description?.content!)
-        .setDMPermission(false)
-        .addStringOption((option) => {
-            option.setName("query")
-            .setDescription("The name or URL of the track.");
-            return option;
-        });
+            .setName(this.name)
+            .setDescription(this.description?.content!)
+            .setDMPermission(false)
+            .addStringOption((option) => {
+                option.setName("query").setDescription("The name or URL of the track.");
+                return option;
+            });
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction | Message) {
-        const author = this.getAuthor(int)!
+        const author = this.getAuthor(int)!;
         const query = this.getArgs(int).join(" ");
 
         const voiceChannel: VoiceBasedChannel | null = (int.member as GuildMember).voice.channel;
@@ -48,14 +48,20 @@ export class PlayCommand extends Command {
 
         if (!query) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("What should I play?")] });
 
-        this.applyCooldown(author);
+        //this.applyCooldown(author);
 
         if (!subscription) {
             try {
                 subscription = await MusicSubscription.create(client, int.guild!, voiceChannel, int.channel);
             } catch (err) {
-                client.logger.error(err)
-                return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No nodes are available to play music right now!")] });
+                if (err instanceof NodeError) {
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No available music nodes. Please try again!")] });
+                } else if (err instanceof PlayerError) {
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Error establishing a voice channel connection. Try again in a few minutes!")] });
+                } else {
+                    const eventId = client.logger.error(err);
+                    return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
+                }
             }
         }
 
@@ -100,7 +106,7 @@ export class PlayCommand extends Command {
                             const track = new YouTubeTrack(client, data, author, int.channel);
                             subscription.add(track);
                         }
-                        
+
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
                         break;
                     }
