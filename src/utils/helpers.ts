@@ -1,6 +1,5 @@
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@src/structures/index.js";
 import { User } from "discord.js";
-import stringProgressBar from "string-progressbar";
 
 import Config from "@config";
 const musicEmotes = Config.bot.emotes.music;

@@ -55,11 +55,11 @@ export class TwitchCommand extends Command {
         
         const channel = int.guild?.channels.cache.get(channelId as string);
         if (channel && !channel.isTextBased()) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The channel you provided is not a text channel!")] });
-
-        this.applyCooldown(author);
         
         const roleId = this.getArgs(int)[2];
         const role = roleId ? int.guild?.roles.cache.get(roleId as string) : null;
+
+        this.applyCooldown(author);
 
         const stream = await client.twitch.getStream(streamer as string).catch(() => null);
         if (!stream) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Streamer is invalid or not currently streaming!")] });
