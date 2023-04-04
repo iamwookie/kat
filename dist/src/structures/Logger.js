@@ -12,9 +12,9 @@ export class Logger {
     }
     async notify(eventId) {
         try {
-            const dev = await this.client.users.fetch(this.client.devId);
+            const dev = this.client.users.cache.get(this.client.devId);
             const embed = new ErrorEmbed(eventId);
-            await dev.send({ embeds: [embed] });
+            await dev?.send({ embeds: [embed] });
         }
         catch (err) {
             console.error(chalk.red("Logger (ERROR): Error Warning Dev!"));

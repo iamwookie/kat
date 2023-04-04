@@ -40,7 +40,7 @@ export class AsapHook extends Route {
                 ]);
             }
             for (const c of this.config.staff) {
-                const channel = await this.client.channels.fetch(c);
+                const channel = this.client.channels.cache.get(c);
                 if (!channel || !channel.isTextBased())
                     return res.status(500).send("Internal Server Error");
                 await channel.send({
@@ -76,7 +76,7 @@ export class AsapHook extends Route {
                 { name: "Crate", value: `\`${crateName}\``, inline: true },
             ]);
             for (const c of this.config.unbox) {
-                const channel = await this.client.channels.fetch(c);
+                const channel = this.client.channels.cache.get(c);
                 if (!channel || !channel.isTextBased())
                     return res.status(500).send("Internal Server Error");
                 await channel.send({ embeds: [embed] });
@@ -109,7 +109,7 @@ export class AsapHook extends Route {
                 { name: "Killer", value: `\`${killerName}\``, inline: true },
             ]);
             for (const c of this.config.suits) {
-                const channel = await this.client.channels.fetch(c);
+                const channel = await this.client.channels.cache.get(c);
                 if (!channel || !channel.isTextBased())
                     return res.status(500).send("Internal Server Error");
                 await channel.send({ embeds: [embed] });

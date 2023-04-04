@@ -1,5 +1,4 @@
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "../structures/index.js";
-import stringProgressBar from "string-progressbar";
 import Config from "../../config.js";
 const musicEmotes = Config.bot.emotes.music;
 export function formatDuration(timeInMs) {
@@ -39,12 +38,4 @@ export function getServiceIcon(item) {
     else {
         return "";
     }
-}
-export function createProgressBar(playbackDuration, totalDuration) {
-    playbackDuration = Math.round(playbackDuration / 1000);
-    totalDuration = Math.round(totalDuration / 1000);
-    let progressBar = stringProgressBar.splitBar(totalDuration, playbackDuration, 26, "▬", musicEmotes.slider)[0];
-    if (playbackDuration == 0)
-        progressBar = musicEmotes.slider + progressBar.slice(1);
-    return progressBar;
 }
