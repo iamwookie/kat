@@ -1,6 +1,6 @@
 import { EmbedBuilder, User } from "discord.js";
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@src/structures/index.js";
-import { getServiceIcon, createProgressBar } from "../helpers.js";
+import { getServiceIcon } from "../helpers.js";
 
 export class MusicEmbed extends EmbedBuilder {
     constructor(private subscription: MusicSubscription) {
@@ -43,7 +43,7 @@ export class MusicEmbed extends EmbedBuilder {
         return super.addFields(
             {
                 name: "Now Playing:",
-                value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.duration, item.durationRaw)}`,
+                value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
             }
         );
     }
@@ -55,7 +55,7 @@ export class MusicEmbed extends EmbedBuilder {
         return super.addFields(
             {
                 name: "Paused Track:",
-                value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})\n${createProgressBar(this.subscription.player.position, item.durationRaw)}`,
+                value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
             }
         );
     }

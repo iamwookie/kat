@@ -51,13 +51,4 @@ export function getServiceIcon(item: YouTubeTrack | SpotifyTrack | YouTubePlayli
     } else {
         return "";
     }
-} 
-
-export function createProgressBar(playbackDuration: number, totalDuration: number): string {
-    playbackDuration = Math.round(playbackDuration / 1000);
-    totalDuration = Math.round(totalDuration / 1000);
-
-    let progressBar = stringProgressBar.splitBar(totalDuration, playbackDuration, 26, "▬", musicEmotes.slider)[0];
-    if (playbackDuration == 0) progressBar = musicEmotes.slider + progressBar.slice(1);
-    return progressBar;
 }
