@@ -11,12 +11,10 @@ export class ColorClient {
     }
 
     async initialize() {
-        const guilds = await this.client.guilds.fetch();
-
-        for (const [_, guild] of guilds) {
+        for (const [_, guild] of  this.client.guilds.cache) {
             const data = await this.client.database?.get(guild.id, "colors");
             if (!data) continue;
-
+            
             this.guilds.set(guild.id, data);
         }
     }
