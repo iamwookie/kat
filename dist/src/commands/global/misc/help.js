@@ -42,6 +42,6 @@ export class HelpCommand extends Command {
             if (reply)
                 replyEmbed.addFields([{ name: `${g} Commands`, value: reply }]);
         }
-        return this.reply(int, { embeds: [replyEmbed] });
+        this.reply(int, { embeds: [replyEmbed] });
     }
 }
