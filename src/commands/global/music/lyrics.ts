@@ -45,23 +45,23 @@ export class LyricsCommand extends Command {
 
         this.applyCooldown(author);
 
+        const noResults = new ErrorEmbed("fail").setDescription("Couldn't find your search results!");
+
         try {
             const search = await genius.songs.search(query);
 
             let lyrics = search[0] ? await search[0].lyrics() : null;
-            if (!lyrics) return this.reply(int, { embeds: [new ActionEmbed("fail").setDescription("Couldn't find your search results!")] });
+            if (!lyrics) return this.reply(int, { embeds: [noResults] });
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + "\n...";
 
             const success = new EmbedBuilder();
             success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`);
 
-            return this.reply(int, { embeds: [success] });
+            this.reply(int, { embeds: [success] });
         } catch (err) {
-            const eventId = client.logger.error(err);
-            console.error(chalk.red("Music Commands (ERROR) >> lyrics: Error Getting Track Lyrics"));
-            console.error(err);
-
-            return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
+            client.logger.error(err);
+            
+            this.reply(int, { embeds: [noResults] });
         }
     }
 }
