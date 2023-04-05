@@ -46,13 +46,14 @@ abstract class Playlist {
 
     constructor(
         public url: URL,
-        public tracks: ShoukakuTrack[],
         public info: LavalinkResponse["playlistInfo"],
+        public tracks: ShoukakuTrack[],
+        public requester: User,
+        public textChannel: TextBasedChannel | null,
     ) {
-        this.tracks = tracks;
+        this.url = url;
         this.info = info;
-
-        this.url = url
+        this.tracks = tracks;
         this.title = this.info.name!;
     }
 }
@@ -84,10 +85,12 @@ export class SpotifyTrack extends Track {
 export class YouTubePlaylist extends Playlist {
     constructor(
         public url: URL,
-        public tracks: ShoukakuTrack[],
         public info: LavalinkResponse["playlistInfo"],
+        public tracks: ShoukakuTrack[],
+        public requester: User,
+        public textChannel: TextBasedChannel | null,
     ) {
-        super(url, tracks, info);
+        super(url, info, tracks, requester, textChannel);
 
         this.thumbnail = `https://i.ytimg.com/vi/${this.tracks[0].info.identifier}/mqdefault.jpg`;
     }
@@ -96,9 +99,11 @@ export class YouTubePlaylist extends Playlist {
 export class SpotifyPlaylist extends Playlist {
     constructor(
         public url: URL,
-        public tracks: ShoukakuTrack[],
         public info: LavalinkResponse["playlistInfo"],
+        public tracks: ShoukakuTrack[],
+        public requester: User,
+        public textChannel: TextBasedChannel | null,
     ) {
-        super(url, tracks, info);
+        super(url, info, tracks, requester, textChannel);
     }
 }

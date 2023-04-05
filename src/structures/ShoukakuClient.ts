@@ -15,8 +15,6 @@ declare module "shoukaku" {
 }
 
 export class ShoukakuClient extends Shoukaku {
-    public retries: Collection<string, number> = new Collection();
-
     constructor(
         public client: Client
     ) {

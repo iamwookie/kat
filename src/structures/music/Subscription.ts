@@ -1,13 +1,13 @@
 import { KATClient as Client } from "../Client.js";
-import { YouTubeTrack } from "./Track.js";
+import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from "./Track.js";
 import { Guild, VoiceBasedChannel, TextBasedChannel } from "discord.js";
 import { Shoukaku, Player, Node } from "shoukaku";
 import { NodeError, PlayerError } from '@src/utils/errors.js';
 
 export class Subscription {
     public shoukaku: Shoukaku;
-    public queue: YouTubeTrack[] = [];
-    public active: YouTubeTrack | null = null;
+    public queue: (YouTubeTrack | SpotifyTrack)[] = [];
+    public active: YouTubeTrack | SpotifyTrack | null = null;
     public destroyed: boolean = false;
 
     constructor(
@@ -84,8 +84,21 @@ export class Subscription {
         this.player.playTrack({ track: track.data.track });
     }
 
-    add(track: YouTubeTrack) {
-        this.queue.push(track);
+    add(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
+        if (item instanceof YouTubePlaylist) {
+            for (const data of item.tracks) {
+                const track = new YouTubeTrack(this.client, data, item.requester, item.textChannel);
+                this.queue.push(track);
+            }
+        } else if (item instanceof SpotifyPlaylist) {
+            for (const data of item.tracks) {
+                const track = new SpotifyTrack(this.client, data, item.requester, item.textChannel);
+                this.queue.push(track);
+            }
+        } else {
+            this.queue.push(item);
+        }
+
         if (!this.active) this.process();
     }
 
