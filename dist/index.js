@@ -40,6 +40,6 @@ import chalk from "chalk";
         },
     });
     await client.initialize();
-    await client.login(process.env.BOT_TOKEN);
+    await client.login(process.env.BOT_TOKEN).catch(err => { client.logger.error(err); });
     return client;
 })();

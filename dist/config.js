@@ -2,7 +2,7 @@ export default {
     bot: {
         devId: "244662779745665026",
         prefix: "/",
-        legacyPrefix: "!",
+        legacyPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
         emotes: {
             music: {
                 youtube: "<:youtube:1067881972774477844>",
