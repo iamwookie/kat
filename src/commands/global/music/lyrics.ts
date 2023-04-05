@@ -4,7 +4,7 @@ import { Subscription as MusicSubscription } from "@structures/index.js";
 import { ActionEmbed } from "@utils/embeds/index.js";
 
 import GeniusLyrics from "genius-lyrics";
-const genius = new GeniusLyrics.Client(process.env.GENIUS_API_KEY);
+const genius = new GeniusLyrics.Client();
 
 export class LyricsCommand extends Command {
     constructor(commander: Commander) {
@@ -53,7 +53,7 @@ export class LyricsCommand extends Command {
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + "\n...";
 
             const success = new EmbedBuilder();
-            success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`);
+            success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`);
 
             this.reply(int, { embeds: [success] });
         } catch (err) {
