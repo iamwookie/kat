@@ -1,5 +1,5 @@
 import { EmbedBuilder, User } from "discord.js";
-import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@src/structures/index.js";
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@structures/index.js";
 import { getServiceIcon } from "../helpers.js";
 
 export class MusicEmbed extends EmbedBuilder {

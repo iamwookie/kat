@@ -1,7 +1,7 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
-import { Subscription as MusicSubscription } from "@src/structures/music/Subscription.js";
-import { ActionEmbed } from "@src/utils/embeds/index.js";
+import { Subscription as MusicSubscription } from "@structures/music/Subscription.js";
+import { ActionEmbed } from "@utils/embeds/index.js";
 
 export class StopCommand extends Command {
     constructor(commander: Commander) {

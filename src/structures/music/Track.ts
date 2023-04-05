@@ -2,7 +2,7 @@ import { KATClient as Client } from "../Client";
 import { TextBasedChannel, User } from "discord.js";
 import { Track as ShoukakuTrack, LavalinkResponse } from "shoukaku";
 
-import { formatDuration } from "@src/utils/helpers.js";
+import { formatDuration } from "@utils/helpers.js";
 
 abstract class Track {
     public url: string;

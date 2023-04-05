@@ -2,7 +2,7 @@ import { KATClient as Client } from "../Client.js";
 import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from "./Track.js";
 import { Guild, VoiceBasedChannel, TextBasedChannel } from "discord.js";
 import { Shoukaku, Player, Node } from "shoukaku";
-import { NodeError, PlayerError } from '@src/utils/errors.js';
+import { NodeError, PlayerError } from '@utils/errors.js';
 
 export class Subscription {
     public shoukaku: Shoukaku;

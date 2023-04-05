@@ -1,6 +1,6 @@
 import { KATClient as Client } from "@structures/index.js";
 import { Request, Response } from "express";
-import { formatDuration, formatBytes } from "@src/utils/helpers.js";
+import { formatDuration, formatBytes } from "@utils/helpers.js";
 
 import chalk from "chalk";
 

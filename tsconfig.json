@@ -18,7 +18,6 @@
         "baseUrl": "." /* Base directory to resolve non-relative module names. */,
         "paths": {
             "@config": ["config.ts"],
-            "@src/*": ["src/*"],
             "@structures/*": ["src/structures/*"],
             "@commands/*": ["src/commands/*"],
             "@events/*": ["src/events/*"],

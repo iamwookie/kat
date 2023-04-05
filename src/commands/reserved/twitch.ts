@@ -1,6 +1,6 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { ActionEmbed, TwitchEmbed } from "@src/utils/embeds/index.js";
+import { ActionEmbed, TwitchEmbed } from "@utils/embeds/index.js";
 
 export class TwitchCommand extends Command {
     constructor(commander: Commander) {

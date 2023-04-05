@@ -1,4 +1,4 @@
-import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@src/structures/index.js";
+import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@structures/index.js";
 import { User } from "discord.js";
 
 import Config from "@config";

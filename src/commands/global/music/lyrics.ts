@@ -1,7 +1,7 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
-import { ActionEmbed } from "@src/utils/embeds/index.js";
+import { ActionEmbed } from "@utils/embeds/index.js";
 
 import GeniusLyrics from "genius-lyrics";
 const genius = new GeniusLyrics.Client(process.env.GENIUS_API_KEY);
@@ -39,11 +39,11 @@ export class LyricsCommand extends Command {
 
         const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
         if (!query && subscription && subscription.active) query = subscription.active.title;
-        if (!query) return this.reply(int, { embeds: [new ActionEmbed("fail").setDescription("I am not playing anything!")] });
+        if (!query) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I am not playing anything!")] });
 
         this.applyCooldown(author);
 
-        const noResults = new ActionEmbed("fail").setDescription("Couldn't find your search results!");
+        const noResults = new ActionEmbed("fail").setDesc("Couldn't find your search results!");
 
         try {
             const search = await genius.songs.search(query);
