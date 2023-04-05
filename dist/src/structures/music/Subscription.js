@@ -1,3 +1,4 @@
+import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from "./Track.js";
 import { NodeError, PlayerError } from '../../utils/errors.js';
 export class Subscription {
     client;
@@ -78,8 +79,22 @@ export class Subscription {
         this.active = track;
         this.player.playTrack({ track: track.data.track });
     }
-    add(track) {
-        this.queue.push(track);
+    add(item) {
+        if (item instanceof YouTubePlaylist) {
+            for (const data of item.tracks) {
+                const track = new YouTubeTrack(this.client, data, item.requester, item.textChannel);
+                this.queue.push(track);
+            }
+        }
+        else if (item instanceof SpotifyPlaylist) {
+            for (const data of item.tracks) {
+                const track = new SpotifyTrack(this.client, data, item.requester, item.textChannel);
+                this.queue.push(track);
+            }
+        }
+        else {
+            this.queue.push(item);
+        }
         if (!this.active)
             this.process();
     }

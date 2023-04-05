@@ -35,17 +35,21 @@ class Track {
 }
 class Playlist {
     url;
-    tracks;
     info;
+    tracks;
+    requester;
+    textChannel;
     title;
     thumbnail;
-    constructor(url, tracks, info) {
+    constructor(url, info, tracks, requester, textChannel) {
         this.url = url;
-        this.tracks = tracks;
         this.info = info;
         this.tracks = tracks;
-        this.info = info;
+        this.requester = requester;
+        this.textChannel = textChannel;
         this.url = url;
+        this.info = info;
+        this.tracks = tracks;
         this.title = this.info.name;
     }
 }
@@ -78,24 +82,32 @@ export class SpotifyTrack extends Track {
 }
 export class YouTubePlaylist extends Playlist {
     url;
-    tracks;
     info;
-    constructor(url, tracks, info) {
-        super(url, tracks, info);
+    tracks;
+    requester;
+    textChannel;
+    constructor(url, info, tracks, requester, textChannel) {
+        super(url, info, tracks, requester, textChannel);
         this.url = url;
-        this.tracks = tracks;
         this.info = info;
+        this.tracks = tracks;
+        this.requester = requester;
+        this.textChannel = textChannel;
         this.thumbnail = `https://i.ytimg.com/vi/${this.tracks[0].info.identifier}/mqdefault.jpg`;
     }
 }
 export class SpotifyPlaylist extends Playlist {
     url;
-    tracks;
     info;
-    constructor(url, tracks, info) {
-        super(url, tracks, info);
+    tracks;
+    requester;
+    textChannel;
+    constructor(url, info, tracks, requester, textChannel) {
+        super(url, info, tracks, requester, textChannel);
         this.url = url;
-        this.tracks = tracks;
         this.info = info;
+        this.tracks = tracks;
+        this.requester = requester;
+        this.textChannel = textChannel;
     }
 }

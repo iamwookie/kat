@@ -27,11 +27,11 @@ export class Database {
                     },
                 },
             });
-            this.redis.on("connect", () => this.client.logger.info("Redis >> KATClient Connected"));
-            this.redis.on("end", () => this.client.logger.info("Redis >> KATClient Disconnected"));
+            this.redis.on("connect", () => this.client.logger.info("Redis >> Connected"));
+            this.redis.on("end", () => this.client.logger.info("Redis >> Disconnected"));
             this.redis.on("error", (err) => {
                 this.client.logger.error(err);
-                console.error(chalk.red("Redis >> KATClient Error"));
+                console.error(chalk.red("Redis >> Error"));
                 console.error(err);
             });
             await this.redis.connect();

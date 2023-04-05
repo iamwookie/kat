@@ -29,13 +29,12 @@ export class LyricsCommand extends Command {
     }
     async execute(client, int) {
         const author = this.getAuthor(int);
-        let query = int.options.getString("query");
+        let query = this.getArgs(int).join(" ");
         const subscription = client.subscriptions.get(int.guildId);
-        if (!query) {
-            if (!subscription || !subscription.active)
-                return this.reply(int, { embeds: [new ActionEmbed("fail").setDescription("I am not playing anything!")] });
+        if (!query && subscription && subscription.active)
             query = subscription.active.title;
-        }
+        if (!query)
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setDescription("I am not playing anything!")] });
         this.applyCooldown(author);
         try {
             const search = await genius.songs.search(query);
@@ -45,9 +44,7 @@ export class LyricsCommand extends Command {
             if (lyrics.length > 4000)
                 lyrics = lyrics.substring(0, 4000) + "\n...";
             const success = new EmbedBuilder();
-            search[0]
-                ? success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`)
-                : success.setDescription(lyrics);
+            success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`);
             return this.reply(int, { embeds: [success] });
         }
         catch (err) {

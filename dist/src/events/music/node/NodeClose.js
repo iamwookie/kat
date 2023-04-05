@@ -4,6 +4,6 @@ export class NodeClose extends Event {
         super(client, commander, "nodeClose");
     }
     async execute(name, code) {
-        this.client.logger.warn(`Music >> Lavalink Node: ${name} has closed with code ${code}!`);
+        this.client.logger.warn(`Music >> Node: ${name} has closed with code ${code}!`);
     }
 }

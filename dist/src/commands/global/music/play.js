@@ -40,7 +40,7 @@ export class PlayCommand extends Command {
         }
         if (!query)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("What should I play?")] });
-        //this.applyCooldown(author);
+        this.applyCooldown(author);
         if (!subscription) {
             try {
                 subscription = await MusicSubscription.create(client, int.guild, voiceChannel, int.channel);
@@ -86,24 +86,18 @@ export class PlayCommand extends Command {
             case "PLAYLIST_LOADED": {
                 if (!url)
                     return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
-                const tracks = res.tracks;
                 const info = res.playlistInfo;
+                const tracks = res.tracks;
                 switch (tracks[0].info.sourceName) {
                     case "youtube": {
-                        const playlist = new YouTubePlaylist(url, tracks, info);
-                        for (const data of tracks) {
-                            const track = new YouTubeTrack(client, data, author, int.channel);
-                            subscription.add(track);
-                        }
+                        const playlist = new YouTubePlaylist(url, info, tracks, author, int.channel);
+                        subscription.add(playlist);
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
                         break;
                     }
                     case "spotify": {
-                        const playlist = new SpotifyPlaylist(url, tracks, info);
-                        for (const data of tracks) {
-                            const track = new SpotifyTrack(client, data, author, int.channel);
-                            subscription.add(track);
-                        }
+                        const playlist = new SpotifyPlaylist(url, info, tracks, author, int.channel);
+                        subscription.add(playlist);
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
                         break;
                     }

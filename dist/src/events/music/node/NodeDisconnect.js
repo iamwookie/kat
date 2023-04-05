@@ -5,6 +5,6 @@ export class NodeDisconnect extends Event {
         super(client, commander, "nodeDisconnect");
     }
     async execute(name) {
-        console.error(chalk.red(`Music >> Lavalink Node: ${name} has disconnected!`));
+        console.error(chalk.red(`Music >> Node: ${name} has disconnected!`));
     }
 }
