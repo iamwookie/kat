@@ -1,12 +1,10 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
-import { ActionEmbed, ErrorEmbed } from "@src/utils/embeds/index.js";
+import { ActionEmbed } from "@src/utils/embeds/index.js";
 
 import GeniusLyrics from "genius-lyrics";
 const genius = new GeniusLyrics.Client(process.env.GENIUS_API_KEY);
-
-import chalk from "chalk";
 
 export class LyricsCommand extends Command {
     constructor(commander: Commander) {
@@ -45,7 +43,7 @@ export class LyricsCommand extends Command {
 
         this.applyCooldown(author);
 
-        const noResults = new ErrorEmbed("fail").setDescription("Couldn't find your search results!");
+        const noResults = new ActionEmbed("fail").setDescription("Couldn't find your search results!");
 
         try {
             const search = await genius.songs.search(query);
