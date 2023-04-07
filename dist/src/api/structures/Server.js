@@ -2,11 +2,16 @@ import express from "express";
 import Sentry from "@sentry/node";
 import helmet from "helmet";
 import bodyParser from "body-parser";
+import morgan from "morgan";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 import chalk from "chalk";
 // ------------------------------------
 import * as Routes from "../routes/index.js";
 import * as Hooks from "../hooks/index.js";
 // ------------------------------------
+const __dirname = dirname(fileURLToPath(import.meta.url));
 export class Server {
     client;
     port;
@@ -25,11 +30,13 @@ export class Server {
             this.app.use(helmet());
             this.app.use(bodyParser.urlencoded({ extended: true }));
             this.app.use(express.json());
+            const accessLogStream = fs.createWriteStream(path.join(__dirname, "../../../logs/access.log"), { flags: "a+" });
+            this.app.use(morgan("combined", { stream: accessLogStream }));
             this.registerHooks();
             this.registerRoutes();
             this.app.use(Sentry.Handlers.errorHandler());
-            this.app.use((err, req, res, _) => {
-                this.client.logger.request(req, "error", err);
+            this.app.use((err, _, res, _0) => {
+                this.client.logger.error(err);
                 res.status(500).send("Internal Server Error");
             });
             this.app.listen(this.port, () => resolve());

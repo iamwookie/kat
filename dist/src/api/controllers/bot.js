@@ -13,7 +13,7 @@ export function fetchStats(client) {
             return res.json(data);
         }
         catch (err) {
-            client.logger.request(req, "error", err);
+            client.logger.error(err);
             console.error("Stats Controller (ERROR) >> Error Getting Stats");
             console.error(err);
             return res.status(500).send("Internal Server Error");
@@ -30,7 +30,7 @@ export function fetchInvite(client) {
             return res.redirect(url.toString());
         }
         catch (err) {
-            client.logger.request(req, "error", err);
+            client.logger.error(err);
             console.error(chalk.red("Invite Controller (ERROR) >> Error Getting Invite"));
             console.error(err);
             return res.status(500).send("Internal Server Error");
