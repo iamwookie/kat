@@ -40,9 +40,9 @@ export class AsapHook extends Route {
     }
 
     register() {
-        this.router.post("/staff", withAuth(this.client), this.sendStaff);
-        this.router.post("/unbox", withAuth(this.client), this.sendUnbox);
-        this.router.post("/suits", withAuth(this.client), this.sendSuits);
+        this.router.post("/staff", withAuth, this.sendStaff);
+        this.router.post("/unbox", withAuth, this.sendUnbox);
+        this.router.post("/suits", withAuth, this.sendSuits);
         
         return this.router;
     }
@@ -83,7 +83,7 @@ export class AsapHook extends Route {
 
             return res.status(200).send("OK");
         } catch (err) {
-            this.client.logger.request(req, "error", err);
+            this.client.logger.error(err);
             console.error(chalk.red("ASAP Controller (ERROR) >> Error Creating Staff Log"));
             console.error(err);
 
@@ -118,7 +118,7 @@ export class AsapHook extends Route {
 
             return res.status(200).send("OK");
         } catch (err) {
-            this.client.logger.request(req, "error", err);
+            this.client.logger.error(err);
             console.error(chalk.red("ASAP Controller (ERROR) >> Error Creating Unbox Log"));
             console.error(err);
 
@@ -153,7 +153,7 @@ export class AsapHook extends Route {
 
             return res.status(200).send("OK");
         } catch (err) {
-            this.client.logger.request(req, "error", err);
+            this.client.logger.error(err);
             console.error(chalk.red("ASAP Controller (ERROR) >> Error Creating Suit Rip Log"));
             console.error(err);
 

@@ -3,6 +3,7 @@
         "module": "esnext" /* Specify what module code is generated. */,
         "moduleResolution": "node" /* Specify how TypeScript looks up a file from a given module specifier. */,
         "target": "esnext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+        "types": ["node"] /* Type declaration files to be included in compilation. */,
 
         "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
         "resolveJsonModule": true /* Include modules imported with '.json' extension. */,
@@ -26,5 +27,5 @@
         }
     },
 
-    "include": ["config.ts", "index.ts", "package.json", "src/**/*"]
+    "include": ["index.ts", "package.json", "src/**/*"],
 }

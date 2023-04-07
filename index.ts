@@ -2,6 +2,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 // ------------------------------------
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import fs from "fs";
+// ------------------------------------
 import { KATClient as Client } from "./src/structures/index.js";
 import { GatewayIntentBits, ActivityType } from "discord.js";
 // ------------------------------------
@@ -11,8 +15,12 @@ import { RewriteFrames } from "@sentry/integrations";
 // ------------------------------------
 import chalk from "chalk";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 (async () => {
     console.log(chalk.magenta.bold.underline(`\n>>> App Loading...\n`));
+
+    if (!fs.existsSync(path.join(__dirname, "./logs"))) fs.mkdirSync(path.join(__dirname, "./logs"))
 
     Sentry.init({
         dsn: process.env.SENTRY_DSN,
