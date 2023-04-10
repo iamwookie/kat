@@ -1,4 +1,4 @@
-import { Client, User } from "discord.js";
+import { Client } from "discord.js";
 import { Request, Response } from "express";
 import { formatUser } from "@utils/helpers.js";
 
