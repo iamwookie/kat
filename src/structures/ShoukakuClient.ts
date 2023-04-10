@@ -15,8 +15,6 @@ declare module "shoukaku" {
 }
 
 export class ShoukakuClient extends Shoukaku {
-    public retries: Collection<string, number> = new Collection();
-
     constructor(
         public client: Client
     ) {
@@ -24,8 +22,9 @@ export class ShoukakuClient extends Shoukaku {
             new Connectors.DiscordJS(client),
             client.config.lavalink.nodes,
             {
-                moveOnDisconnect: false,
+                reconnectTries: 10,
                 restTimeout: 5_000,
+                moveOnDisconnect: false,
             }
         );
 

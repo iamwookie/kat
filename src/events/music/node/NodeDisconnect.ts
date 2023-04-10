@@ -8,6 +8,6 @@ export class NodeDisconnect extends Event {
     }
 
     async execute(name: string) {
-        console.error(chalk.red(`Music >> Lavalink Node: ${name} has disconnected!`));
+        console.error(chalk.red(`Music >> Node: ${name} has disconnected!`));
     }
 }

@@ -1,6 +1,6 @@
 import { KATClient as Client } from "@structures/index.js";
 import { Request, Response } from "express";
-import { formatDuration, formatBytes } from "@src/utils/helpers.js";
+import { formatDuration, formatBytes } from "@utils/helpers.js";
 
 import chalk from "chalk";
 
@@ -17,7 +17,7 @@ export function fetchStats(client: Client) {
 
             return res.json(data);
         } catch (err) {
-            client.logger.request(req, "error", err);
+            client.logger.error(err);
             console.error("Stats Controller (ERROR) >> Error Getting Stats");
             console.error(err);
 
@@ -36,7 +36,7 @@ export function fetchInvite(client: Client) {
 
             return res.redirect(url.toString());
         } catch (err) {
-            client.logger.request(req, "error", err);
+            client.logger.error(err);
             console.error(chalk.red("Invite Controller (ERROR) >> Error Getting Invite"));
             console.error(err);
 

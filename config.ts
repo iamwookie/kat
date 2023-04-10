@@ -2,8 +2,8 @@ export default {
     bot: {
         devId: "244662779745665026",
         prefix: "/",
-        legacyPrefix: ".",
-
+        legacyPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
+        
         emotes: {
             music: {
                 youtube: "<:youtube:1067881972774477844>",
@@ -33,7 +33,7 @@ export default {
         nodes: [
             {
                 name: "uk:london-1",
-                url: "145.239.205.161:2333",
+                url: "localhost:2333",
                 auth: "yoruistrash",
             },
         ],

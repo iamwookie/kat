@@ -1,9 +1,12 @@
-# Logs
-logs
-*.log
-
 # Dependency directories
 node_modules/
+
+# Build files
+dist/
+
+# Logs
+logs/
+*.log
 
 # Dotenv environment variables file
 .env

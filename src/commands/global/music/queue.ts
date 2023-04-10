@@ -1,7 +1,7 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
-import { ActionEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
+import { ActionEmbed, MusicEmbed } from "@utils/embeds/index.js";
 
 export class QueueCommand extends Command {
     constructor(commander: Commander) {

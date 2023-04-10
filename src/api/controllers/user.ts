@@ -1,6 +1,6 @@
-import { Client, User } from "discord.js";
+import { Client } from "discord.js";
 import { Request, Response } from "express";
-import { formatUser } from "@src/utils/helpers.js";
+import { formatUser } from "@utils/helpers.js";
 
 import chalk from "chalk";
 
@@ -26,5 +26,3 @@ export function fetchUser(client: Client) {
 }
 
 // Extras
-
-

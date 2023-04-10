@@ -1,12 +1,10 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
-import { ActionEmbed, ErrorEmbed } from "@src/utils/embeds/index.js";
+import { ActionEmbed } from "@utils/embeds/index.js";
 
 import GeniusLyrics from "genius-lyrics";
-const genius = new GeniusLyrics.Client(process.env.GENIUS_API_KEY);
-
-import chalk from "chalk";
+const genius = new GeniusLyrics.Client();
 
 export class LyricsCommand extends Command {
     constructor(commander: Commander) {
@@ -29,44 +27,39 @@ export class LyricsCommand extends Command {
             .setDMPermission(false)
             .addStringOption((option) => {
                 option.setName("query")
-                .setDescription("The name or URL of the track to search for.")
-                .setRequired(false);
+                    .setDescription("The name or URL of the track to search for.")
+                    .setRequired(false);
                 return option;
             });
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction) {
         const author = this.getAuthor(int)!;
-        
-        let query = int.options.getString("query");
-        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        let query = this.getArgs(int).join(" ");
 
-        if (!query) {
-            if (!subscription || !subscription.active) return this.reply(int, { embeds: [new ActionEmbed("fail").setDescription("I am not playing anything!")] });
-            query = subscription.active.title!;
-        }
+        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        if (!query && subscription && subscription.active) query = subscription.active.title;
+        if (!query) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I am not playing anything!")] });
 
         this.applyCooldown(author);
+
+        const noResults = new ActionEmbed("fail").setDesc("Couldn't find your search results!");
 
         try {
             const search = await genius.songs.search(query);
 
             let lyrics = search[0] ? await search[0].lyrics() : null;
-            if (!lyrics) return this.reply(int, { embeds: [new ActionEmbed("fail").setDescription("Couldn't find your search results!")] });
+            if (!lyrics) return this.reply(int, { embeds: [noResults] });
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + "\n...";
 
-            const success = new EmbedBuilder()
-            search[0]
-                ? success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`)
-                : success.setDescription(lyrics);
+            const success = new EmbedBuilder();
+            success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`);
 
-            return this.reply(int, { embeds: [success] });
+            this.reply(int, { embeds: [success] });
         } catch (err) {
-            const eventId = client.logger.error(err);
-            console.error(chalk.red("Music Commands (ERROR) >> lyrics: Error Getting Track Lyrics"));
-            console.error(err);
-
-            return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
+            client.logger.error(err);
+            
+            this.reply(int, { embeds: [noResults] });
         }
     }
 }

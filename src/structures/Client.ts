@@ -1,14 +1,13 @@
 import Config from "@config";
 
 import { Client, ClientOptions, Events, Collection, PermissionsBitField } from "discord.js";
-import { Express } from "express";
 import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";
 import { Commander } from "./Commander.js";
 import { ShoukakuClient } from "./ShoukakuClient.js";
 import { ColorClient } from "./ColorClient.js";
 import { TwitchClient } from "./TwitchClient.js";
-import { Server } from "@src/api/structures/Server.js";
+import { Server } from "@api/structures/Server.js";
 
 import chalk from "chalk";
 

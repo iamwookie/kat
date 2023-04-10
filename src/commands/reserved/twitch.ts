@@ -1,6 +1,6 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { ActionEmbed, TwitchEmbed } from "@src/utils/embeds/index.js";
+import { ActionEmbed, TwitchEmbed } from "@utils/embeds/index.js";
 
 export class TwitchCommand extends Command {
     constructor(commander: Commander) {
@@ -52,12 +52,14 @@ export class TwitchCommand extends Command {
 
         const channelId = this.getArgs(int)[1];
         if (!channelId) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You did not provide a channel ID to send the notification to!")] });
-
-        const channel = await int.guild?.channels.fetch(channelId as string);
+        
+        const channel = int.guild?.channels.cache.get(channelId as string);
         if (channel && !channel.isTextBased()) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The channel you provided is not a text channel!")] });
-
+        
         const roleId = this.getArgs(int)[2];
-        const role = roleId ? await int.guild?.roles.fetch(roleId as string) : null;
+        const role = roleId ? int.guild?.roles.cache.get(roleId as string) : null;
+
+        this.applyCooldown(author);
 
         const stream = await client.twitch.getStream(streamer as string).catch(() => null);
         if (!stream) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Streamer is invalid or not currently streaming!")] });

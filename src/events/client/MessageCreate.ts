@@ -1,6 +1,6 @@
 import { Event, KATClient as Client, Commander } from "@structures/index.js";
 import { Events, Message } from "discord.js";
-import { ErrorEmbed } from "@src/utils/embeds/index.js";
+import { ErrorEmbed } from "@utils/embeds/index.js";
 
 import chalk from "chalk";
 

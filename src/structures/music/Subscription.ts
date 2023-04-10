@@ -1,12 +1,14 @@
 import { KATClient as Client } from "../Client.js";
-import { YouTubeTrack } from "./Track.js";
+import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from "./Track.js";
 import { Guild, VoiceBasedChannel, TextBasedChannel } from "discord.js";
 import { Shoukaku, Player, Node } from "shoukaku";
+import { NodeError, PlayerError } from '@utils/errors.js';
 
 export class Subscription {
-    public shoukaku: Shoukaku
-    public queue: YouTubeTrack[] = [];
-    public active: YouTubeTrack | null = null;
+    public shoukaku: Shoukaku;
+    public queue: (YouTubeTrack | SpotifyTrack)[] = [];
+    public active: YouTubeTrack | SpotifyTrack | null = null;
+    public destroyed: boolean = false;
 
     constructor(
         public client: Client,
@@ -14,7 +16,7 @@ export class Subscription {
         public voiceChannel: VoiceBasedChannel,
         public textChannel: TextBasedChannel | null,
         public player: Player,
-        public node: Node,
+        public node: Node
     ) {
         this.client = client;
         this.shoukaku = client.shoukaku;
@@ -37,30 +39,41 @@ export class Subscription {
     }
 
     static async create(client: Client, guild: Guild, voiceChannel: VoiceBasedChannel, textChannel: TextBasedChannel | null) {
-        const node = client.shoukaku.getNode();
-        if (!node) throw new Error("No available nodes!");
+        try {
+            const node = client.shoukaku.getNode();
+            if (!node) throw new NodeError("Node doesn't exist.");
 
-        const player = await node.joinChannel({
-            guildId: guild.id,
-            channelId: voiceChannel.id,
-            shardId: 0,
-            deaf: true,
-        });
+            try {
+                const player: Player = await node.joinChannel({
+                    guildId: guild.id,
+                    channelId: voiceChannel.id,
+                    shardId: 0,
+                    deaf: true,
+                });
+                
+                const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
+                client.subscriptions.set(guild.id, subscription);
+                client.emit("subscriptionCreate", subscription);
 
-        const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
-        client.subscriptions.set(guild.id, subscription);
-        client.emit("subscriptionCreate", subscription);
-
-        return subscription;
+                return subscription;
+            } catch (err) {
+                client.logger.error(err);
+                throw new PlayerError((err as Error).message);
+            }
+        } catch (err) {
+            client.logger.error(err);
+            throw new NodeError((err as Error).message);
+        }
     }
 
     destroy() {
+        if (this.destroyed) return;
         this.queue = [];
         this.active = null;
         this.player.connection.disconnect();
         this.client.subscriptions.delete(this.guild.id);
+        this.destroyed = true;
         this.client.emit("subscriptionDestroy", this);
-        this.client.logger.warn(`Music >> Subscription Destroyed for ${this.guild.name} (${this.guild.id}). Node: ${this.node.name}`)
     }
 
     process() {
@@ -71,9 +84,22 @@ export class Subscription {
         this.player.playTrack({ track: track.data.track });
     }
 
-    add(track: YouTubeTrack) {
-        this.queue.push(track);
-        if (!this.active) return this.process();
+    add(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
+        if (item instanceof YouTubePlaylist) {
+            for (const data of item.tracks) {
+                const track = new YouTubeTrack(this.client, data, item.requester, item.textChannel);
+                this.queue.push(track);
+            }
+        } else if (item instanceof SpotifyPlaylist) {
+            for (const data of item.tracks) {
+                const track = new SpotifyTrack(this.client, data, item.requester, item.textChannel);
+                this.queue.push(track);
+            }
+        } else {
+            this.queue.push(item);
+        }
+
+        if (!this.active) this.process();
     }
 
     stop() {

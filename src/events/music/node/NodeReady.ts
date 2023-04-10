@@ -6,6 +6,6 @@ export class NodeReady extends Event {
     }
 
     async execute(name: string) {
-        this.client.logger.info(`Music >> Lavalink Node: ${name} has connected!`);
+        this.client.logger.info(`Music >> Node: ${name} has connected!`);
     }
 }

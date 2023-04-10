@@ -2,7 +2,8 @@ import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, GuildMember, VoiceBasedChannel, VoiceChannel } from "discord.js";
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@structures/index.js";
 import { LavalinkResponse } from "shoukaku";
-import { ActionEmbed, MusicEmbed } from "@src/utils/embeds/index.js";
+import { NodeError, PlayerError } from "@utils/errors.js";
+import { ActionEmbed, ErrorEmbed, MusicEmbed } from "@utils/embeds/index.js";
 
 export class PlayCommand extends Command {
     constructor(commander: Commander) {
@@ -21,18 +22,17 @@ export class PlayCommand extends Command {
 
     data() {
         return new SlashCommandBuilder()
-        .setName(this.name)
-        .setDescription(this.description?.content!)
-        .setDMPermission(false)
-        .addStringOption((option) => {
-            option.setName("query")
-            .setDescription("The name or URL of the track.");
-            return option;
-        });
+            .setName(this.name)
+            .setDescription(this.description?.content!)
+            .setDMPermission(false)
+            .addStringOption((option) => {
+                option.setName("query").setDescription("The name or URL of the track.");
+                return option;
+            });
     }
 
     async execute(client: Client, int: ChatInputCommandInteraction | Message) {
-        const author = this.getAuthor(int)!
+        const author = this.getAuthor(int)!;
         const query = this.getArgs(int).join(" ");
 
         const voiceChannel: VoiceBasedChannel | null = (int.member as GuildMember).voice.channel;
@@ -42,8 +42,6 @@ export class PlayCommand extends Command {
         let subscription: MusicSubscription = client.subscriptions.get(int.guildId);
 
         if (!query && subscription && subscription.paused) {
-            this.applyCooldown(author);
-            
             subscription.resume();
             return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
         }
@@ -56,8 +54,14 @@ export class PlayCommand extends Command {
             try {
                 subscription = await MusicSubscription.create(client, int.guild!, voiceChannel, int.channel);
             } catch (err) {
-                client.logger.error(err)
-                return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No nodes are available to play music right now!")] });
+                if (err instanceof NodeError) {
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No available music nodes. Please try again!")] });
+                } else if (err instanceof PlayerError) {
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Error establishing a voice channel connection. Try again in a few minutes!")] });
+                } else {
+                    const eventId = client.logger.error(err);
+                    return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
+                }
             }
         }
 
@@ -91,28 +95,20 @@ export class PlayCommand extends Command {
             case "PLAYLIST_LOADED": {
                 if (!url) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
 
-                const tracks = res.tracks;
                 const info = res.playlistInfo;
+                const tracks = res.tracks;
 
                 switch (tracks[0].info.sourceName) {
                     case "youtube": {
-                        const playlist = new YouTubePlaylist(url, tracks, info);
+                        const playlist = new YouTubePlaylist(url, info, tracks, author, int.channel);
+                        subscription.add(playlist);
 
-                        for (const data of tracks) {
-                            const track = new YouTubeTrack(client, data, author, int.channel);
-                            subscription.add(track);
-                        }
-                        
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
                         break;
                     }
                     case "spotify": {
-                        const playlist = new SpotifyPlaylist(url, tracks, info);
-
-                        for (const data of tracks) {
-                            const track = new SpotifyTrack(client, data, author, int.channel);
-                            subscription.add(track);
-                        }
+                        const playlist = new SpotifyPlaylist(url, info, tracks, author, int.channel);
+                        subscription.add(playlist);
 
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
                         break;
