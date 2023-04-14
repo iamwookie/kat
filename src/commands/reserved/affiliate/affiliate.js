@@ -1,7 +1,7 @@
 import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits } from "discord.js";
 import { ActionEmbed } from "../../../utils/embeds/action.js";
-export class AddAffiliateCommand extends Command {
+export class AffiliateCommand extends Command {
     constructor(client, commander) {
         super(client, commander);
         this.name = "affiliate";
@@ -17,6 +17,7 @@ export class AddAffiliateCommand extends Command {
             .setName("affiliate")
             .setDescription(this.description?.content)
             .setDMPermission(false)
+            .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
             .addSubcommand((subcommand) => subcommand
             .setName("create")
             .setDescription("Create an affiliate link.")
