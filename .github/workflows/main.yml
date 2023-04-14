@@ -1,33 +1,33 @@
 name: Build
 
 on:
-  push:
-    branches:
-    - staging
+    push:
+        branches:
+            - staging
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: npm install
+            - name: Install dependencies
+              run: npm install
 
-      - name: Build app
-        run: npm run build
+            - name: Build app
+              run: npm run build
 
-      - name: Copy PM2 config file
-        run: cp pm2.config.js dist/
+            - name: Copy Prsima files
+              run: cp -r prisma dist/
 
-      - name: Copy Prsima files
-        run: cp -r prisma dist/
+            - name: Copy PM2 config file
+              run: cp pm2.config.js dist/
 
-      - name: Deploy to build branch
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          personal_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: dist
+            - name: Deploy to build branch
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                  personal_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./dist
+                  publish_branch: dist
