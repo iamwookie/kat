@@ -31,7 +31,7 @@ export class KATClient extends Client {
     legacyPrefix = Config.bot.legacyPrefix;
     logger = new Logger(this);
     // Prisma causes an issue with circular references. Try fixing this later
-    prisma = new PrismaClient();
+    prisma = new PrismaClient({ log: ["query", "info", "warn", "error"] });
     commander = new Commander(this);
     shoukaku = new ShoukakuClient(this);
     twitch = new TwitchClient(this);
