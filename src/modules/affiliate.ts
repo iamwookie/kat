@@ -13,12 +13,12 @@ export class AffiliateModule extends Module {
 
         this.name = "Affiliate";
         this.guilds = [
-            // "1094860861505544314",
+            "1094860861505544314",
             "1023866029069320242",
         ];
 
         // In future, this will be handled by the db
-        // this.channels.set("1023866029069320242", ["1096530697876930560"]);
+        this.channels.set("1023866029069320242", ["1096530697876930560"]);
         this.channels.set("1094860861505544314", ["1094861185310011412"]);
     }
 
