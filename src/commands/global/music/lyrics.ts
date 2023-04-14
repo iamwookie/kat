@@ -7,8 +7,8 @@ import GeniusLyrics from "genius-lyrics";
 const genius = new GeniusLyrics.Client();
 
 export class LyricsCommand extends Command {
-    constructor(commander: Commander) {
-        super(commander);
+    constructor(client: Client, commander: Commander) {
+        super(client, commander);
 
         this.name = "lyrics";
         this.group = "Music";
@@ -25,19 +25,19 @@ export class LyricsCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content!)
             .setDMPermission(false)
-            .addStringOption((option) => {
-                option.setName("query")
+            .addStringOption(option =>
+                option
+                    .setName("query")
                     .setDescription("The name or URL of the track to search for.")
-                    .setRequired(false);
-                return option;
-            });
+                    .setRequired(false)
+            );
     }
 
-    async execute(client: Client, int: ChatInputCommandInteraction) {
+    async execute(int: ChatInputCommandInteraction) {
         const author = this.getAuthor(int)!;
         let query = this.getArgs(int).join(" ");
 
-        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        const subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
         if (!query && subscription && subscription.active) query = subscription.active.title;
         if (!query) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I am not playing anything!")] });
 
@@ -57,7 +57,7 @@ export class LyricsCommand extends Command {
 
             this.reply(int, { embeds: [success] });
         } catch (err) {
-            client.logger.error(err);
+            this.client.logger.error(err);
             
             this.reply(int, { embeds: [noResults] });
         }

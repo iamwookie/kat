@@ -1,17 +1,16 @@
-import { Event, KATClient, Commander } from "@structures/index.js";
-import { Events, Client } from "discord.js";
+import { Event, KATClient as Client, Commander } from "@structures/index.js";
+import { Events, Client as DiscordClient } from "discord.js";
 
 import chalk from "chalk";
 
 export class ClientReady extends Event {
-    constructor(client: KATClient, commander: Commander) {
+    constructor(client: Client, commander: Commander) {
         super(client, commander, Events.ClientReady);
     }
 
-    async execute(client: Client) {
-        await this.client.colors.initialize();
-        console.log(chalk.greenBright.bold.underline(`>>> Colors Initialized`));
-
+    async execute(client: DiscordClient) {
+        this.commander.modules.forEach(module => module.onReady(client));
+        
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
 

@@ -11,11 +11,7 @@ export class Database {
     public guilds: Collection<Snowflake, { [key: string]: any }> = new Collection();
     public access: Collection<string, { [key: string]: any }> = new Collection();
 
-    constructor(
-        private readonly client: KATClient
-    ) {
-        this.client = client;
-    }
+    constructor(private readonly client: KATClient) {}
 
     async initialize() {
         await this.connect();
@@ -28,22 +24,15 @@ export class Database {
                 url: process.env.REDIS_URL,
                 socket: {
                     reconnectStrategy: (retries) => {
-                        if (retries > 3)
-                            return new Error(
-                                chalk.red("Redis >> Failed To Connect")
-                            );
+                        if (retries > 3) return new Error(chalk.red("Redis >> Failed To Connect"));
                         return Math.min(retries * 100, 3000);
                     },
                 },
             });
-            
-            this.redis.on("connect", () =>
-                this.client.logger.info("Redis >> Connected")
-            );
 
-            this.redis.on("end", () =>
-                this.client.logger.info("Redis >> Disconnected")
-            );
+            this.redis.on("connect", () => this.client.logger.info("Redis >> Connected"));
+
+            this.redis.on("end", () => this.client.logger.info("Redis >> Disconnected"));
 
             this.redis.on("error", (err) => {
                 this.client.logger.error(err);
@@ -54,7 +43,6 @@ export class Database {
             await this.redis.connect();
         } catch (err) {
             this.client.logger.error(err);
-            this.client.database = undefined;
             console.error(chalk.red("CommanderDatabase (ERROR) >> Error Connecting"));
             console.error(err);
         }
@@ -77,7 +65,6 @@ export class Database {
             return true;
         } catch (err) {
             this.client.logger.error(err);
-            this.client.database = undefined;
             console.error(chalk.red("CommanderDatabase (ERROR) >> Error Loading Data"));
             console.error(err);
         }
@@ -97,11 +84,7 @@ export class Database {
             const data: { [key: string]: any } = this.guilds.get(guild) || {};
             data[key] = value;
 
-            await this.redis.hSet(
-                this.withPrefix("guilds"),
-                guild,
-                JSON.stringify(data)
-            );
+            await this.redis.hSet(this.withPrefix("guilds"), guild, JSON.stringify(data));
 
             await this.load();
             console.log(chalk.greenBright("CommanderDatabase >> Value Set"));
@@ -124,11 +107,7 @@ export class Database {
             delete data[key];
 
             if (Object.keys(data).length) {
-                await this.redis.hSet(
-                    this.withPrefix("guilds"),
-                    guild,
-                    JSON.stringify(data)
-                );
+                await this.redis.hSet(this.withPrefix("guilds"), guild, JSON.stringify(data));
             } else {
                 await this.redis.hDel(this.withPrefix("guilds"), guild);
             }
@@ -164,11 +143,7 @@ export class Database {
             if (!data.guilds?.length && !data.users?.length) {
                 await this.redis.hDel(this.withPrefix("access"), command);
             } else {
-                await this.redis.hSet(
-                    this.withPrefix("access"),
-                    command,
-                    JSON.stringify(data)
-                );
+                await this.redis.hSet(this.withPrefix("access"), command, JSON.stringify(data));
             }
 
             await this.load();

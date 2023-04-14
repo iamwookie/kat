@@ -4,8 +4,8 @@ import { Subscription as MusicSubscription } from "@structures/index.js";
 import { ActionEmbed, MusicEmbed } from "@utils/embeds/index.js";
 
 export class PauseCommand extends Command {
-    constructor(commander: Commander) {
-        super(commander);
+    constructor(client: Client, commander: Commander) {
+        super(client, commander);
 
         this.name = "pause";
         this.group = "Music";
@@ -23,10 +23,10 @@ export class PauseCommand extends Command {
             .setDMPermission(false);
     }
 
-    async execute(client: Client, int: ChatInputCommandInteraction) {
+    async execute(int: ChatInputCommandInteraction) {
         const author = this.getAuthor(int)!;
 
-        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        const subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I'm not playing anything!")] });
         
         this.applyCooldown(author);
