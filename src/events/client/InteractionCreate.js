@@ -1,4 +1,4 @@
-import { Event } from "../../structures/index.js";
+import { Event, Module } from "../../structures/index.js";
 import { Events } from "discord.js";
 import { ErrorEmbed } from "../../utils/embeds/index.js";
 import chalk from "chalk";
@@ -12,11 +12,14 @@ export class InteractionCreate extends Event {
         const command = this.commander.commands.get(interaction.commandName) || this.commander.commands.get(this.commander.aliases.get(interaction.commandName));
         if (!command || command.disabled)
             return;
+        // In future modules will always be required
+        if (command.module && command.module instanceof Module && !command.module.guilds?.includes(interaction.guild?.id))
+            return;
         if (!this.commander.validate(interaction, command))
             return;
         await interaction.deferReply({ ephemeral: command.ephemeral });
         try {
-            await command.execute(this.client, interaction);
+            await command.execute(interaction);
         }
         catch (err) {
             const eventId = this.client.logger.error(err);

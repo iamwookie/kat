@@ -6,7 +6,12 @@ export class Event {
         this.client = client;
         this.commander = commander;
         this.name = name;
-        this.client = client;
+    }
+}
+export class ProcessEvent {
+    commander;
+    name;
+    constructor(commander, name) {
         this.commander = commander;
         this.name = name;
     }

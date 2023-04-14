@@ -5,7 +5,6 @@ export class Logger {
     client;
     constructor(client) {
         this.client = client;
-        this.client = client;
         console.log(chalk.greenBright.bold.underline(">>> Logger Initialized!"));
     }
     async notify(eventId) {

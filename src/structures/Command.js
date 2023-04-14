@@ -1,8 +1,10 @@
 import { ChatInputCommandInteraction, Message, Collection } from "discord.js";
 export class Command {
+    client;
     commander;
     name;
     group;
+    module;
     aliases;
     legacyAliases;
     description;
@@ -13,37 +15,9 @@ export class Command {
     guilds;
     users;
     cooldowns = new Collection();
-    constructor(commander) {
+    constructor(client, commander) {
+        this.client = client;
         this.commander = commander;
-        this.commander = commander;
-    }
-    initialize() {
-        if (this.aliases) {
-            for (const alias of this.aliases) {
-                this.commander.aliases.set(alias, this.name);
-            }
-        }
-        if (this.legacyAliases) {
-            for (const alias of this.legacyAliases) {
-                this.commander.aliases.set(alias, this.name);
-            }
-        }
-        if (this.users)
-            this.users.push(this.commander.client.devId);
-        if (this.guilds) {
-            for (const guildId of this.guilds) {
-                const guild = this.commander.guilds.get(guildId) || {};
-                guild.commands = guild.commands || new Collection();
-                guild.commands.set(this.name, this);
-                this.commander.guilds.set(guildId, guild);
-            }
-        }
-        else {
-            this.commander.global.set(this.name, this);
-        }
-        if (!this.commander.groups.has(this.group))
-            this.commander.groups.set(this.group, new Collection());
-        this.commander.groups.get(this.group)?.set(this.name, this);
     }
     applyCooldown(user) {
         if (!this.cooldown)
@@ -64,7 +38,7 @@ export class Command {
     }
     getArgs(interaction) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => typeof option.value == "string" ? option.value.split(/ +/) : option.value).flat();
+            return interaction.options.data.map((option) => typeof option.value == "string" ? option.value.split(/ +/) : option.options).flat();
             ;
         }
         else if (interaction instanceof Message) {

@@ -2,8 +2,8 @@ import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder } from "discord.js";
 import { ActionEmbed } from "../../../utils/embeds/index.js";
 export class StopCommand extends Command {
-    constructor(commander) {
-        super(commander);
+    constructor(client, commander) {
+        super(client, commander);
         this.name = "stop";
         this.group = "Music";
         this.aliases = ["dc"];
@@ -18,8 +18,8 @@ export class StopCommand extends Command {
             .setDescription(this.description?.content)
             .setDMPermission(false);
     }
-    async execute(client, int) {
-        const subscription = client.subscriptions.get(int.guildId);
+    async execute(int) {
+        const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I'm not playing anything!")] });
         subscription.destroy();

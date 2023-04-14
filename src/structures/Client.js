@@ -1,10 +1,9 @@
-import Config from "../../config.js";
+import * as Config from "../../config.js";
 import { Client, Events, Collection, PermissionsBitField } from "discord.js";
 import { Logger } from "./Logger.js";
-import { Database } from "./Database.js";
+import { PrismaClient } from "@prisma/client";
 import { Commander } from "./Commander.js";
 import { ShoukakuClient } from "./ShoukakuClient.js";
-import { ColorClient } from "./ColorClient.js";
 import { TwitchClient } from "./TwitchClient.js";
 import { Server } from "../api/structures/Server.js";
 import chalk from "chalk";
@@ -31,10 +30,10 @@ export class KATClient extends Client {
     prefix = Config.bot.prefix;
     legacyPrefix = Config.bot.legacyPrefix;
     logger = new Logger(this);
-    database = new Database(this);
+    // Prisma causes an issue with circular references. Try fixing this later
+    prisma = new PrismaClient();
     commander = new Commander(this);
     shoukaku = new ShoukakuClient(this);
-    colors = new ColorClient(this);
     twitch = new TwitchClient(this);
     server = new Server(this);
     subscriptions = new Collection();
@@ -45,8 +44,15 @@ export class KATClient extends Client {
             this.on(Events.Debug, msg => { this.logger.debug(msg); });
     }
     async initialize() {
-        await this.database?.initialize();
-        console.log(chalk.greenBright.bold.underline(">>> Database Initialized"));
+        try {
+            await this.prisma.$connect();
+            console.log(chalk.greenBright.bold.underline(">>> Prisma Initialized"));
+        }
+        catch (err) {
+            this.logger.error(err);
+            console.error(chalk.red("Prisma (ERROR) >> Error Connecting"));
+            console.error(err);
+        }
         await this.commander.initialize();
         console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
     }

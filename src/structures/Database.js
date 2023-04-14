@@ -9,7 +9,6 @@ export class Database {
     access = new Collection();
     constructor(client) {
         this.client = client;
-        this.client = client;
     }
     async initialize() {
         await this.connect();
@@ -38,7 +37,6 @@ export class Database {
         }
         catch (err) {
             this.client.logger.error(err);
-            this.client.database = undefined;
             console.error(chalk.red("CommanderDatabase (ERROR) >> Error Connecting"));
             console.error(err);
         }
@@ -57,7 +55,6 @@ export class Database {
         }
         catch (err) {
             this.client.logger.error(err);
-            this.client.database = undefined;
             console.error(chalk.red("CommanderDatabase (ERROR) >> Error Loading Data"));
             console.error(err);
         }

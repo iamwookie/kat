@@ -17,10 +17,6 @@ class Track {
         this.data = data;
         this.requester = requester;
         this.textChannel = textChannel;
-        this.client = client;
-        this.data = data;
-        this.requester = requester;
-        this.textChannel = textChannel;
         this.url = this.data.info.uri;
         this.title = this.data.info.title;
         this.duration = formatDuration(this.data.info.length);
@@ -31,26 +27,6 @@ class Track {
             this.client.logger.error(err);
             this.textChannel?.send(`An error occurred while playing **${this.title}**. Skipping...`);
         };
-    }
-}
-class Playlist {
-    url;
-    info;
-    tracks;
-    requester;
-    textChannel;
-    title;
-    thumbnail;
-    constructor(url, info, tracks, requester, textChannel) {
-        this.url = url;
-        this.info = info;
-        this.tracks = tracks;
-        this.requester = requester;
-        this.textChannel = textChannel;
-        this.url = url;
-        this.info = info;
-        this.tracks = tracks;
-        this.title = this.info.name;
     }
 }
 export class YouTubeTrack extends Track {
@@ -78,6 +54,23 @@ export class SpotifyTrack extends Track {
         this.data = data;
         this.requester = requester;
         this.textChannel = textChannel;
+    }
+}
+class Playlist {
+    url;
+    info;
+    tracks;
+    requester;
+    textChannel;
+    title;
+    thumbnail;
+    constructor(url, info, tracks, requester, textChannel) {
+        this.url = url;
+        this.info = info;
+        this.tracks = tracks;
+        this.requester = requester;
+        this.textChannel = textChannel;
+        this.title = this.info.name;
     }
 }
 export class YouTubePlaylist extends Playlist {

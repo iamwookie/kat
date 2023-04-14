@@ -4,8 +4,8 @@ import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubeP
 import { NodeError, PlayerError } from "../../../utils/errors.js";
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class PlayCommand extends Command {
-    constructor(commander) {
-        super(commander);
+    constructor(client, commander) {
+        super(client, commander);
         this.name = "play";
         this.group = "Music";
         this.legacyAliases = ["p"];
@@ -20,20 +20,21 @@ export class PlayCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content)
             .setDMPermission(false)
-            .addStringOption((option) => {
-            option.setName("query").setDescription("The name or URL of the track.");
-            return option;
-        });
+            .addStringOption(option => option
+            .setName("query")
+            .setDescription("The name or URL of the track."));
     }
-    async execute(client, int) {
+    async execute(int) {
         const author = this.getAuthor(int);
         const query = this.getArgs(int).join(" ");
         const voiceChannel = int.member.voice.channel;
         if (!voiceChannel)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in a voice channel!")] });
+        if (!voiceChannel.members.has(this.client.user?.id))
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in my voice channel!")] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I can't play in that voice channel!")] });
-        let subscription = client.subscriptions.get(int.guildId);
+        let subscription = this.client.subscriptions.get(int.guildId);
         if (!query && subscription && subscription.paused) {
             subscription.resume();
             return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
@@ -43,7 +44,7 @@ export class PlayCommand extends Command {
         this.applyCooldown(author);
         if (!subscription) {
             try {
-                subscription = await MusicSubscription.create(client, int.guild, voiceChannel, int.channel);
+                subscription = await MusicSubscription.create(this.client, int.guild, voiceChannel, int.channel);
             }
             catch (err) {
                 if (err instanceof NodeError) {
@@ -53,7 +54,7 @@ export class PlayCommand extends Command {
                     return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Error establishing a voice channel connection. Try again in a few minutes!")] });
                 }
                 else {
-                    const eventId = client.logger.error(err);
+                    const eventId = this.client.logger.error(err);
                     return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
                 }
             }
@@ -78,7 +79,7 @@ export class PlayCommand extends Command {
             }
             case "SEARCH_RESULT": {
                 const data = res.tracks[0];
-                const track = new YouTubeTrack(client, data, author, int.channel);
+                const track = new YouTubeTrack(this.client, data, author, int.channel);
                 subscription.add(track);
                 this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                 break;
@@ -112,13 +113,13 @@ export class PlayCommand extends Command {
                 const data = res.tracks[0];
                 switch (data.info.sourceName) {
                     case "youtube": {
-                        const track = new YouTubeTrack(client, data, author, int.channel);
+                        const track = new YouTubeTrack(this.client, data, author, int.channel);
                         subscription.add(track);
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                         break;
                     }
                     case "spotify": {
-                        const track = new SpotifyTrack(client, data, author, int.channel);
+                        const track = new SpotifyTrack(this.client, data, author, int.channel);
                         subscription.add(track);
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                         break;

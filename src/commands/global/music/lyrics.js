@@ -4,8 +4,8 @@ import { ActionEmbed } from "../../../utils/embeds/index.js";
 import GeniusLyrics from "genius-lyrics";
 const genius = new GeniusLyrics.Client();
 export class LyricsCommand extends Command {
-    constructor(commander) {
-        super(commander);
+    constructor(client, commander) {
+        super(client, commander);
         this.name = "lyrics";
         this.group = "Music";
         this.description = {
@@ -19,17 +19,15 @@ export class LyricsCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content)
             .setDMPermission(false)
-            .addStringOption((option) => {
-            option.setName("query")
-                .setDescription("The name or URL of the track to search for.")
-                .setRequired(false);
-            return option;
-        });
+            .addStringOption(option => option
+            .setName("query")
+            .setDescription("The name or URL of the track to search for.")
+            .setRequired(false));
     }
-    async execute(client, int) {
+    async execute(int) {
         const author = this.getAuthor(int);
         let query = this.getArgs(int).join(" ");
-        const subscription = client.subscriptions.get(int.guildId);
+        const subscription = this.client.subscriptions.get(int.guildId);
         if (!query && subscription && subscription.active)
             query = subscription.active.title;
         if (!query)
@@ -48,7 +46,7 @@ export class LyricsCommand extends Command {
             this.reply(int, { embeds: [success] });
         }
         catch (err) {
-            client.logger.error(err);
+            this.client.logger.error(err);
             this.reply(int, { embeds: [noResults] });
         }
     }

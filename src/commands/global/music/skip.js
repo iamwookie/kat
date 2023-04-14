@@ -2,8 +2,8 @@ import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder } from "discord.js";
 import { ActionEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class SkipCommand extends Command {
-    constructor(commander) {
-        super(commander);
+    constructor(client, commander) {
+        super(client, commander);
         this.name = "skip";
         this.group = "Music";
         this.description = {
@@ -17,9 +17,9 @@ export class SkipCommand extends Command {
             .setDescription(this.description?.content)
             .setDMPermission(false);
     }
-    async execute(client, int) {
+    async execute(int) {
         const author = this.getAuthor(int);
-        const subscription = client.subscriptions.get(int.guildId);
+        const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The queue is empty or does not exist!")] });
         if (subscription.queue.length == 0)

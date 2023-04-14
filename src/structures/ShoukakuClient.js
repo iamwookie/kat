@@ -9,7 +9,6 @@ export class ShoukakuClient extends Shoukaku {
             moveOnDisconnect: false,
         });
         this.client = client;
-        this.client = client;
         this.on("error", (name, error) => this.client.emit("nodeError", name, error));
         this.on("ready", (name) => this.client.emit("nodeReady", name));
         this.on("reconnecting", (name, info, tries) => this.client.emit("nodeReconnecting", name, info, tries));

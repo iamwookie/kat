@@ -8,6 +8,6 @@ export { QueueCommand } from "./global/music/queue.js";
 export { LyricsCommand } from "./global/music/lyrics.js";
 // Misc
 export { HelpCommand } from "./global/misc/help.js";
-// ----- RESERVED -----
-// Twitch
-export { TwitchCommand } from "./reserved/twitch.js";
+// ----- MODULES -----
+// Affiliate
+export { AddAffiliateCommand } from "./modules/affiliate/affiliate.js";
