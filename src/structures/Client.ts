@@ -37,7 +37,7 @@ export class KATClient extends Client {
 
     public logger: Logger = new Logger(this);
     // Prisma causes an issue with circular references. Try fixing this later
-    public prisma: PrismaClient = new PrismaClient({ log: ["query", "info", "warn", "error"] });
+    public prisma: PrismaClient = new PrismaClient({ log: ["warn", "error"] });
     public commander: Commander = new Commander(this);
     public shoukaku: ShoukakuClient = new ShoukakuClient(this);
     public twitch: TwitchClient = new TwitchClient(this);
