@@ -1,9 +1,9 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message, Embed, EmbedBuilder, Permissions, PermissionFlagsBits } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message, EmbedBuilder, PermissionFlagsBits } from "discord.js";
 import { AffiliateModule } from "@modules/affiliate.js";
 import { ActionEmbed } from "@utils/embeds/action.js";
 
-export class AddAffiliateCommand extends Command {
+export class AffiliateCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander);
 
@@ -22,6 +22,7 @@ export class AddAffiliateCommand extends Command {
             .setName("affiliate")
             .setDescription(this.description?.content!)
             .setDMPermission(false)
+            .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
             .addSubcommand((subcommand) =>
                 subcommand
                     .setName("create")

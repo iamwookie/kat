@@ -12,7 +12,6 @@ export class GuildCreate extends Event {
         });
 
         const channel = guild.channels.cache.find((c) => c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me!)?.has(PermissionFlagsBits.SendMessages));
-
         if (channel && channel.isTextBased()) {
             const embed = new EmbedBuilder()
                 .setColor("White")

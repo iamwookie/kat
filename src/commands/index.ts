@@ -11,7 +11,7 @@ export { LyricsCommand } from "./global/music/lyrics.js";
 // Misc
 export { HelpCommand } from "./global/misc/help.js";
 
-// ----- MODULES -----
+// ----- RESERVED -----
 
 // Affiliate
-export { AddAffiliateCommand } from "./modules/affiliate/affiliate.js";
+export { AffiliateCommand } from "./reserved/affiliate/affiliate.js";
