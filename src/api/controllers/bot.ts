@@ -1,6 +1,6 @@
 import { KATClient as Client } from "@structures/index.js";
 import { Request, Response } from "express";
-import { formatBytes } from "@utils/helpers.js";
+import { formatDuration, formatBytes } from "@utils/helpers.js";
 
 import chalk from "chalk";
 
@@ -8,7 +8,7 @@ export function fetchStats(client: Client) {
     return async (req: Request, res: Response) => {
         try {
             const data = {
-                uptime: client.uptime ?? 0,
+                uptime: formatDuration(client.uptime ?? 0),
                 ram_usage: formatBytes(process.memoryUsage().heapUsed),
                 ws_ping: client.ws.ping,
                 guilds: client.guilds.cache.size,
@@ -30,7 +30,7 @@ export function fetchInvite(client: Client) {
     return async (req: Request, res: Response) => {
         try {
             const url = new URL("https://discord.com/api/oauth2/authorize");
-            url.searchParams.append("client_id", process.env.DISCORD_APP_ID!);
+            url.searchParams.append("client_id", process.env.BOT_APP_ID!);
             url.searchParams.append("permissions", req.query.admin ? "8" : client.permissions?.bitfield.toString());
             url.searchParams.append("scope", "bot applications.commands");
 

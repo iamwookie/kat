@@ -1,4 +1,5 @@
-import * as Config from "@config";
+import Config from "@config";
+
 import { Client, ClientOptions, Events, Collection, PermissionsBitField } from "discord.js";
 import { Logger } from "./Logger.js";
 import { Database } from "./Database.js";

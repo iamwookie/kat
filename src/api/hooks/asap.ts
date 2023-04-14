@@ -56,10 +56,10 @@ export class AsapHook extends Route {
             if (!adminUser || !adminSid || !banUser || !banUserSid || !banUserProfile || !banUserAvatar) return res.status(400).send("Bad Request");
 
             const embed = new EmbedBuilder()
-                .setColor(ban == "banned" ? "#ff0000" : "#00ff00")
                 .setTitle("ASAP Admin")
                 .setDescription(`**${banUser}** has been ${ban}!`)
                 .setThumbnail(banUserAvatar)
+                .setColor(ban == "banned" ? "#ff0000" : "#00ff00")
                 .addFields([
                     { name: "Player", value: `[${banUser} (${banUserSid})](${banUserProfile})` },
                     { name: "Admin", value: `${adminUser} (${adminSid})` },
@@ -100,10 +100,10 @@ export class AsapHook extends Route {
             if (!name || !steamId || !itemName || !itemIcon || !itemColor || !crateName) return res.status(400).send("Bad Request");
 
             const embed = new EmbedBuilder()
-                .setColor(itemColor)
                 .setTitle("ASAP Unbox")
                 .setDescription(`**${name}** has received **${itemName}** from **${crateName}** 🎁!`)
                 .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
+                .setColor(itemColor)
                 .addFields([
                     { name: "Player", value: `[${name}](https://steamcommunity.com/profiles/${steamId})`, inline: true },
                     { name: "Item", value: `\`${itemName}\``, inline: true },
@@ -135,10 +135,10 @@ export class AsapHook extends Route {
             if (!name || !steamId || !itemName || !itemIcon || !itemColor || !killerName) return res.status(400).send("Bad Request");
 
             const embed = new EmbedBuilder()
-                .setColor(itemColor as ColorResolvable)
                 .setTitle("ASAP Suit Rips")
                 .setDescription(`**${name}** has lost **${itemName}** to **${killerName}** 💀!`)
                 .setThumbnail(`https://i.imgur.com/${itemIcon}.png`)
+                .setColor(itemColor as ColorResolvable)
                 .addFields([
                     { name: "Player", value: `[${name}](https://steamcommunity.com/profiles/${steamId})`, inline: true },
                     { name: "Suit Lost", value: `\`${itemName}\``, inline: true },

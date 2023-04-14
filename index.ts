@@ -6,14 +6,13 @@ import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from "fs";
 // ------------------------------------
+import { KATClient as Client } from "./src/structures/index.js";
+import { GatewayIntentBits, ActivityType } from "discord.js";
+// ------------------------------------
 import Sentry from "@sentry/node";
 import "@sentry/tracing";
 import { RewriteFrames } from "@sentry/integrations";
 // ------------------------------------
-import { KATClient as Client } from "@structures/index.js";
-import { GatewayIntentBits, ActivityType } from "discord.js";
-import { bot as config } from "@config";
-
 import chalk from "chalk";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -37,7 +36,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     const client = new Client({
         intents: [
             GatewayIntentBits.Guilds,
-            GatewayIntentBits.GuildMembers,
             GatewayIntentBits.GuildVoiceStates,
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.MessageContent,
@@ -46,7 +44,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             status: "online",
             activities: [
                 {
-                    name: `${config.prefix}help | ${config.legacyPrefix}help`,
+                    name: "/help | .help",
                     type: ActivityType.Listening,
                 },
             ],
@@ -54,7 +52,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     });
 
     await client.initialize();
-    await client.login(process.env.DISCORD_TOKEN).catch(err => { client.logger.error(err) });
+    await client.login(process.env.BOT_TOKEN).catch(err => { client.logger.error(err) });
 
     return client;
 })();

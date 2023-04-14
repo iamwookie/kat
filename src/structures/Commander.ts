@@ -38,7 +38,7 @@ const reservedCommands = [
 export class Commander {
     // ----- FOR LATER USE -----
     // private readline: Interface = readline.createInterface(process.stdin);
-    private rest: REST = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
+    private rest: REST = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN!);
 
     public cli: Collection<string, any> = new Collection();
     public global: Collection<string, any> = new Collection();
@@ -155,7 +155,7 @@ export class Commander {
                 commands.push(command.data().toJSON());
             }
 
-            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), { body: commands });
+            const res: any = await this.rest.put(Routes.applicationCommands(process.env.BOT_APP_ID!), { body: commands });
             this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s)`);
         } catch (err) {
             this.client.logger.error(err);
@@ -184,7 +184,7 @@ export class Commander {
             }
 
             try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, k), { body: commands });
+                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.BOT_APP_ID!, k), { body: commands });
                 this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`);
             } catch (err) {
                 this.client.logger.error(err);
