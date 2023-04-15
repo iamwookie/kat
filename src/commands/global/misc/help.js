@@ -21,9 +21,9 @@ export class HelpCommand extends Command {
         const replyEmbed = new EmbedBuilder()
             .setTitle("**Help Menu**")
             .setFooter({ text: "Parameters with a '?' at the start are optional." })
-            .setDescription(`As of right now, you may use commands with the \`${this.client.legacyPrefix}\` prefix in chat. This may be removed in the future!`);
-        for (const [g, group] of this.client.commander.groups) {
-            if (g == "CLI")
+            .setDescription(`As of right now, you may use some commands with the \`${this.client.legacyPrefix}\` prefix in chat. This may be removed in the future!`);
+        for (const [name, group] of this.client.commander.groups) {
+            if (name == "CLI")
                 continue;
             let reply = "";
             for (const command of group.values()) {
@@ -41,7 +41,7 @@ export class HelpCommand extends Command {
                 reply += `\`\`${this.client.prefix}${command.name}${aliases}${command.description?.format ? ` ${command.description?.format.replace("[prefix]", this.client.prefix).replace("[aliases]", aliases)}` : ""}\`\` → ${command.description?.content}\n`;
             }
             if (reply)
-                replyEmbed.addFields([{ name: `${g} Commands`, value: reply }]);
+                replyEmbed.addFields([{ name: `${name} Commands`, value: reply }]);
         }
         this.reply(int, { embeds: [replyEmbed] });
     }

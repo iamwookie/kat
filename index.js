@@ -16,7 +16,7 @@ import { bot as config } from "./config.js";
 import chalk from "chalk";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 (async () => {
-    console.log(chalk.magenta.bold.underline(`\n>>> App Loading...\n`));
+    console.log(chalk.magenta.bold.underline(`\n!! >>> App Loading...\n`));
     if (!fs.existsSync(path.join(__dirname, "./logs")))
         fs.mkdirSync(path.join(__dirname, "./logs"));
     Sentry.init({
