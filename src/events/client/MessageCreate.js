@@ -14,7 +14,7 @@ export class MessageCreate extends Event {
             return;
         const commandName = message.content.slice(prefix.length).trim().split(/ +/).shift()?.toLowerCase();
         const command = this.commander.commands.get(commandName) || this.commander.commands.get(this.commander.aliases.get(commandName));
-        if (!command || command.disabled)
+        if (!command || !command.legacy || command.disabled)
             return;
         // In future modules will always be required
         if (command.module && command.module instanceof Module && !command.module.guilds?.includes(message.guild?.id))

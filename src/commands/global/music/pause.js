@@ -6,6 +6,7 @@ export class PauseCommand extends Command {
         super(client, commander);
         this.name = "pause";
         this.group = "Music";
+        this.legacy = true;
         this.description = {
             content: "Pause the track. Use \`/play\` to unpause.",
         };

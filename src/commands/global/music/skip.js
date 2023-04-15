@@ -6,16 +6,14 @@ export class SkipCommand extends Command {
         super(client, commander);
         this.name = "skip";
         this.group = "Music";
+        this.legacy = true;
         this.description = {
             content: "Skip the track.",
         };
         this.cooldown = 5;
     }
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content).setDMPermission(false);
     }
     async execute(int) {
         const author = this.getAuthor(int);

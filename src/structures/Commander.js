@@ -10,6 +10,16 @@ import * as Commands from "../commands/index.js";
 import * as Events from "../events/index.js";
 import * as Modules from "../modules/index.js";
 // -----------------------------------
+const commands = [
+    Commands.PlayCommand,
+    Commands.StopCommand,
+    Commands.PauseCommand,
+    Commands.SkipCommand,
+    Commands.QueueCommand,
+    Commands.LyricsCommand,
+    Commands.HelpCommand,
+    Commands.AffiliateCommand,
+];
 export class Commander {
     client;
     // ----- FOR LATER USE -----
@@ -52,7 +62,6 @@ export class Commander {
         this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} CLI Command(s)`);
     }
     initializeCommands() {
-        const commands = Object.values(Commands);
         if (!commands.length)
             return;
         for (const Command of commands) {
@@ -81,7 +90,7 @@ export class Commander {
                 console.error(err);
             }
         }
-        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} Global Command(s)`);
+        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} Command(s)`);
     }
     intiliazeEvents() {
         const events = Object.values(Events);

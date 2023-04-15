@@ -8,6 +8,7 @@ export class LyricsCommand extends Command {
         super(client, commander);
         this.name = "lyrics";
         this.group = "Music";
+        this.legacy = true;
         this.description = {
             content: "View the current tracks lyrics or search for one.",
             format: "<?title/url>",
@@ -19,10 +20,7 @@ export class LyricsCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content)
             .setDMPermission(false)
-            .addStringOption(option => option
-            .setName("query")
-            .setDescription("The name or URL of the track to search for.")
-            .setRequired(false));
+            .addStringOption((option) => option.setName("query").setDescription("The name or URL of the track to search for.").setRequired(false));
     }
     async execute(int) {
         const author = this.getAuthor(int);

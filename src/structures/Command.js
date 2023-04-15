@@ -6,6 +6,7 @@ export class Command {
     group;
     module;
     aliases;
+    legacy;
     legacyAliases;
     description;
     hidden;
