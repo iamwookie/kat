@@ -18,13 +18,7 @@ export class Subscription {
         public player: Player,
         public node: Node
     ) {
-        this.client = client;
         this.shoukaku = client.shoukaku;
-        this.guild = guild;
-        this.voiceChannel = voiceChannel;
-        this.textChannel = textChannel;
-        this.player = player;
-        this.node = node;
 
         this.player.on("exception", (reason) => this.client.emit("playerException", this, reason));
         this.player.on("start", (data) => this.client.emit("playerStart", this, data));

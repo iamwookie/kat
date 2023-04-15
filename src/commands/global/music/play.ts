@@ -37,14 +37,16 @@ export class PlayCommand extends Command {
 
         const voiceChannel: VoiceBasedChannel | null = (int.member as GuildMember).voice.channel;
         if (!voiceChannel) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in a voice channel!")] });
-        if (!voiceChannel.members.has(this.client.user?.id!)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in my voice channel!")] });
         if (!voiceChannel.joinable || !(voiceChannel as VoiceChannel).speakable) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I can't play in that voice channel!")] });
 
         let subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
 
-        if (!query && subscription && subscription.paused) {
-            subscription.resume();
-            return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
+        if (subscription) {
+            if (!subscription.voiceChannel.members.has(author.id)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in my voice channel!")] });
+            if (!query && subscription.paused) {
+                subscription.resume();
+                return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
+            }
         }
 
         if (!query) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("What should I play?")] });
