@@ -17,6 +17,17 @@ import * as Events from "@events/index.js";
 import * as Modules from "@modules/index.js";
 // -----------------------------------
 
+const commands = [
+    Commands.PlayCommand,
+    Commands.StopCommand,
+    Commands.PauseCommand,
+    Commands.SkipCommand,
+    Commands.QueueCommand,
+    Commands.LyricsCommand,
+    Commands.HelpCommand,
+    Commands.AffiliateCommand,
+];
+
 export class Commander {
     // ----- FOR LATER USE -----
     // private readline: Interface = readline.createInterface(process.stdin);
@@ -64,27 +75,26 @@ export class Commander {
     }
 
     initializeCommands() {
-        const commands = Object.values(Commands);
         if (!commands.length) return;
 
         for (const Command of commands) {
             try {
                 const command = new Command(this.client, this);
-                
+
                 if (command.aliases) {
                     for (const alias of command.aliases) {
                         this.aliases.set(alias, command.name);
                     }
                 }
-        
+
                 if (command.legacyAliases) {
                     for (const alias of command.legacyAliases) {
                         this.aliases.set(alias, command.name);
                     }
                 }
-        
+
                 if (command.users) command.users.push(this.client.devId);
-        
+
                 if (!this.groups.has(command.group)) this.groups.set(command.group, new Collection());
                 this.groups.get(command.group)?.set(command.name, command);
 
@@ -96,7 +106,7 @@ export class Commander {
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} Global Command(s)`);
+        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} Command(s)`);
     }
 
     intiliazeEvents() {
@@ -129,7 +139,7 @@ export class Commander {
 
         for (const Module of modules) {
             try {
-                const module= new Module(this.client, this);
+                const module = new Module(this.client, this);
                 this.modules.set(module.name, module);
             } catch (err) {
                 this.client.logger.error(err);
@@ -140,7 +150,7 @@ export class Commander {
 
         for (const command of this.commands.values()) {
             // In future, modules will always be required
-            if (command.module && typeof command.module == "string") command.module = this.modules.get(command.module)
+            if (command.module && typeof command.module == "string") command.module = this.modules.get(command.module);
 
             if (command.module instanceof Module && command.module.guilds) {
                 for (const guild of command.module.guilds) {
@@ -200,7 +210,7 @@ export class Commander {
 
                 body.push(command.data().toJSON());
             }
-            
+
             try {
                 const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guild), { body: body });
                 this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guild}`);

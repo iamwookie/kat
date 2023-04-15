@@ -10,6 +10,9 @@ export class StopCommand extends Command {
         this.name = "stop";
         this.group = "Music";
         this.aliases = ["dc"];
+
+        this.legacy = true;
+
         this.description = {
             content: "Clear the queue and/or leave.",
         };
@@ -18,10 +21,7 @@ export class StopCommand extends Command {
     }
 
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
     }
 
     async execute(int: ChatInputCommandInteraction) {

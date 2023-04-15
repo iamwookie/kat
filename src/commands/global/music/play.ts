@@ -11,9 +11,12 @@ export class PlayCommand extends Command {
 
         this.name = "play";
         this.group = "Music";
+
+        this.legacy = true;
         this.legacyAliases = ["p"];
+
         this.description = {
-            content: "Search for a track and add it to the queue or resume the current track.",
+            content: "Add a track to the queue, or resume the current one.",
             format: "<?title/url>",
         };
 
@@ -25,11 +28,7 @@ export class PlayCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content!)
             .setDMPermission(false)
-            .addStringOption(option =>
-                option
-                    .setName("query")
-                    .setDescription("The name or URL of the track.")
-            );
+            .addStringOption((option) => option.setName("query").setDescription("The name or URL of the track."));
     }
 
     async execute(int: ChatInputCommandInteraction | Message) {

@@ -8,6 +8,8 @@ export abstract class Command {
     public group: string;
     public module?: string | Module;
     public aliases?: string[];
+
+    public legacy?: boolean;
     public legacyAliases?: string[];
 
     public description?: {

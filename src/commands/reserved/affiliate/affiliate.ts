@@ -8,10 +8,12 @@ export class AffiliateCommand extends Command {
         super(client, commander);
 
         this.name = "affiliate";
-        this.group = "Music";
+        this.group = "Misc";
         this.module = "Affiliate";
+
         this.description = {
-            content: "Interaction with the affiliate system.",
+            content: "Create an affiliate link for a user.",
+            format: "create <user>"
         };
 
         this.cooldown = 5;
@@ -31,32 +33,28 @@ export class AffiliateCommand extends Command {
             ) as SlashCommandBuilder;
     }
 
-    async execute(int: ChatInputCommandInteraction<"cached"> | Message) {
+    async execute(int: ChatInputCommandInteraction<"cached">) {
         if (!int.member?.permissions.has(PermissionFlagsBits.Administrator)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You do not have permission to use this command!")] });
 
         const module = this.module as AffiliateModule;
-        const command = int instanceof ChatInputCommandInteraction ? int.options.getSubcommand() : this.getArgs(int).shift();
-
-        // Might be better ways to do this
-        const args = this.getArgs(int) as any;
+        const command = int.options.getSubcommand();
 
         if (command === "create") {
-            const userId = typeof args[1] === "string" ? args[1] : args[0].user?.id;
-            const user = this.client.users.cache.get(userId);
-            if (!user || !int.guild?.members.cache.has(userId) || user.bot) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("That user you provided is invalid!")] });
+            const user = int.options.getUser("user", true);
+            if (!user || user.bot) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The user you provided is invalid!")] });
 
-            const affiliate = await module.createAffiliate(int.guild, user);
+            const members = await int.guild?.members.fetch();
+            if (!members?.has(user.id)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The user you provided is not in this server!")] });
+
+            const affiliate = await module.createAffiliate(int.guild!, user);
             if (!affiliate) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("An error occured while creating the affiliate link!")] });
 
             const embed = new EmbedBuilder()
                 .setColor("Green")
                 .setTitle("Affiliate System")
                 .setDescription(`Successfully created an affiliate link for \`${user.tag}\`!`)
-                .addFields(
-                    { name: "Link", value: `\`${affiliate.link}\``, inline: true },
-                    { name: "Inviter", value: `<@${affiliate.userId}>`, inline: true }
-                )
-            
+                .addFields({ name: "Link", value: `\`${affiliate.link}\``, inline: true }, { name: "Inviter", value: `<@${affiliate.userId}>`, inline: true });
+
             this.reply(int, { embeds: [embed] });
         } else {
             this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You did not provide a valid sub command!")] });

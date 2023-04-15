@@ -60,6 +60,9 @@ export class AffiliateModule extends Module {
             });
             if (!res) return;
 
+            // @ts-ignore
+            res = "123"
+
             const affiliate = await this.client.prisma.affiliate.update({
                 where: {
                     link: invite.url,
@@ -97,43 +100,33 @@ export class AffiliateModule extends Module {
 
         for (const channelId of channels) {
             const channel = member.guild.channels.cache.get(channelId);
-            // Could add proper handling later
             if (channel && channel.isTextBased()) channel.send({ embeds: [embed] }).catch(() => {});
         }
     }
 
     async createAffiliate(guild: Guild, user: User) {
-        try {
-            const res = await this.client.prisma.affiliate.findFirst({
-                where: {
-                    userId: user.id,
-                },
-            });
-            if (res) return res;
+        const res = await this.client.prisma.affiliate.findFirst({
+            where: {
+                userId: user.id,
+            },
+        });
+        if (res) return res;
 
-            const channel = guild?.channels.cache.find((channel) => channel.isTextBased());
-            if (!channel) return null;
+        // Watch this, could be risky as channel may be undefined
+        const channel = guild?.channels.cache.find((channel) => channel.isTextBased());
+        const invite = await guild?.invites.create(channel?.id!, { maxAge: 0, maxUses: 0, unique: true });
+        
+        const affiliate = await this.client.prisma.affiliate.create({
+            data: {
+                link: invite.url,
+                guildId: guild.id,
+                userId: user.id,
+                total: 0,
+            },
+        });
 
-            const invite = await guild?.invites.create(channel?.id, { maxAge: 0, maxUses: 0, unique: true });
-            
-            const affiliate = await this.client.prisma.affiliate.create({
-                data: {
-                    link: invite.url,
-                    guildId: guild.id,
-                    userId: user.id,
-                    total: 0,
-                },
-            });
+        this.client.logger.info(`Module (${this.name}) >> Created Affiliate Invite Link: ` + affiliate.link + " | Guild: " + affiliate.guildId + " | User: " + affiliate.userId);
 
-            this.client.logger.info(`Module (${this.name}) >> Created Affiliate Invite Link: ` + affiliate.link + " | Guild: " + affiliate.guildId + " | User: " + affiliate.userId);
-
-            return affiliate;
-        } catch (err) {
-            this.client.logger.error(err);
-            console.error(`Module (${this.name}) (ERROR) >> Error Creating Invite`);
-            console.error(err);
-
-            return null;
-        }
+        return affiliate;
     }
 }

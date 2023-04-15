@@ -9,6 +9,9 @@ export class SkipCommand extends Command {
 
         this.name = "skip";
         this.group = "Music";
+
+        this.legacy = true;
+
         this.description = {
             content: "Skip the track.",
         };
@@ -17,10 +20,7 @@ export class SkipCommand extends Command {
     }
 
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
     }
 
     async execute(int: ChatInputCommandInteraction) {
