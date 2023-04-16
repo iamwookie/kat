@@ -5,7 +5,7 @@ module.exports = {
             script: "kat/index.js",
             instances: 1,
             autorestart: true,
-            watch: "kat",
+            watch: ["kat/src", "kat/index.js", "kat/config.js", "kat/package.json"],
             env: {
                 NODE_ENV: "production",
             }
