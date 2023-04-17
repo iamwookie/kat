@@ -2,7 +2,6 @@
 // import readline, { Interface } from "readline";
 import { REST, Routes, ChatInputCommandInteraction, Collection } from "discord.js";
 import { Module } from "./Module.js";
-import { ProcessEvent } from "./Event.js";
 import { ActionEmbed } from "../utils/embeds/index.js";
 import chalk from "chalk";
 // -----------------------------------
@@ -99,15 +98,8 @@ export class Commander {
             return;
         for (const Event of events) {
             try {
-                // Change this in the future please
-                if (Event.prototype instanceof ProcessEvent) {
-                    const event = new Event(this.client, this);
-                    process.on(event.name, event.execute.bind(event));
-                }
-                else {
-                    const event = new Event(this.client, this);
-                    this.client.on(event.name, event.execute.bind(event));
-                }
+                const event = new Event(this.client, this);
+                this.client.on(event.name, event.execute.bind(event));
             }
             catch (err) {
                 this.client.logger.error(err);

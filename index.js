@@ -47,7 +47,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             ],
         },
     });
+    process.on("unhandledRejection", (err) => {
+        client.logger.uncaught(err);
+    });
+    process.on("uncaughtException", (err) => {
+        client.logger.uncaught(err);
+    });
     await client.initialize();
     await client.login(process.env.DISCORD_TOKEN).catch(err => { client.logger.error(err); });
-    return client;
 })();

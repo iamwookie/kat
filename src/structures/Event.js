@@ -8,11 +8,3 @@ export class Event {
         this.name = name;
     }
 }
-export class ProcessEvent {
-    commander;
-    name;
-    constructor(commander, name) {
-        this.commander = commander;
-        this.name = name;
-    }
-}
