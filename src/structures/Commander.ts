@@ -19,10 +19,10 @@ import * as Modules from "@modules/index.js";
 
 const commands = [
     Commands.PlayCommand,
+    Commands.LoopCommand,
     Commands.StopCommand,
     Commands.PauseCommand,
     Commands.SkipCommand,
-    Commands.LoopCommand,
     Commands.QueueCommand,
     Commands.LyricsCommand,
     Commands.HelpCommand,
