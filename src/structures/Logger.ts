@@ -26,12 +26,23 @@ export class Logger {
     fatal(err: any): void {
         const eventId = Sentry.captureException(err);
 
-        console.error(chalk.red(`Logger (FATAL) (${eventId}): A Fatal Error Has Occured!`));
+        console.error(chalk.redBright(`Logger (FATAL) (${eventId}): A Fatal Error Has Occured!`));
         console.error(err);
 
-        if (this.client.readyTimestamp) this.notify(eventId);
+        if (this.client.isReady()) this.notify(eventId);
 
         process.exit();
+    }
+
+    uncaught(err: any): string {
+        const eventId = Sentry.captureException(err);
+
+        console.error(chalk.redBright(`Logger (UNCAUGHT) (${eventId}): An Uncaught Error Has Occured!`));
+        console.error(err);
+
+        if (this.client.isReady()) this.notify(eventId);
+
+        return eventId;
     }
 
     error(err: any): string {
@@ -40,13 +51,13 @@ export class Logger {
         console.error(chalk.red(`Logger (ERROR) (${eventId}): An Error Has Occured!`));
         console.error(err);
 
-        if (this.client.readyTimestamp) this.notify(eventId);
+        if (this.client.isReady()) this.notify(eventId);
 
         return eventId;
     }
 
     warn(msg: string): void {
-        console.warn(chalk.yellow("Logger (WARN): " + msg));
+        console.log(chalk.yellow("Logger (WARN): " + msg));
     }
 
     info(msg: string): void {

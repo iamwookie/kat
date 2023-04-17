@@ -10,12 +10,3 @@ export abstract class Event {
         public name: string
     ) {}
 }
-
-export abstract class ProcessEvent {
-    abstract execute(...args: any[]): Promise<any>;
-
-    constructor(
-        public commander: Commander,
-        public name: string
-    ) {}
-}

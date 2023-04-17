@@ -6,7 +6,6 @@ import { KATClient as Client } from "./Client.js";
 import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";
 import { Command } from "./Command.js";
 import { Module } from "./Module.js";
-import { ProcessEvent } from "./Event.js";
 import { ActionEmbed } from "@utils/embeds/index.js";
 
 import chalk from "chalk";
@@ -116,14 +115,8 @@ export class Commander {
 
         for (const Event of events) {
             try {
-                // Change this in the future please
-                if (Event.prototype instanceof ProcessEvent) {
-                    const event = new Event(this.client, this);
-                    process.on(event.name, event.execute.bind(event));
-                } else {
-                    const event = new Event(this.client, this);
-                    this.client.on(event.name, event.execute.bind(event));
-                }
+                const event = new Event(this.client, this);
+                this.client.on(event.name, event.execute.bind(event));
             } catch (err) {
                 this.client.logger.error(err);
                 console.error(chalk.red("Commander (ERROR) >> Error Initializing Event"));
@@ -198,7 +191,7 @@ export class Commander {
     async registerReservedCommands() {
         for (const [guildId, commands] of this.reserved) {
             if (!this.client.guilds.cache.has(guildId)) continue;
-            
+
             let body = [];
 
             for (const command of commands.values()) {
