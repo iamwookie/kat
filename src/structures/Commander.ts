@@ -22,6 +22,7 @@ const commands = [
     Commands.StopCommand,
     Commands.PauseCommand,
     Commands.SkipCommand,
+    Commands.LoopCommand,
     Commands.QueueCommand,
     Commands.LyricsCommand,
     Commands.HelpCommand,
