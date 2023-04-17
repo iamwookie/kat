@@ -174,7 +174,9 @@ export class Commander {
         }
     }
     async registerReservedCommands() {
-        for (const [guild, commands] of this.reserved) {
+        for (const [guildId, commands] of this.reserved) {
+            if (!this.client.guilds.cache.has(guildId))
+                continue;
             let body = [];
             for (const command of commands.values()) {
                 if (!command.data || command.disabled || command.hidden)
@@ -188,12 +190,12 @@ export class Commander {
                 body.push(command.data().toJSON());
             }
             try {
-                const res = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guild), { body: body });
-                this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guild}`);
+                const res = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), { body: body });
+                this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
             }
             catch (err) {
                 this.client.logger.error(err);
-                console.error(chalk.red(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${guild}`));
+                console.error(chalk.red(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${guildId}`));
                 console.error(err);
             }
         }
