@@ -10,6 +10,7 @@ export class Subscription {
     shoukaku;
     queue = [];
     active = null;
+    looped = false;
     destroyed = false;
     constructor(client, guild, voiceChannel, textChannel, player, node) {
         this.client = client;
@@ -67,7 +68,7 @@ export class Subscription {
         this.client.emit("subscriptionDestroy", this);
     }
     process() {
-        const track = this.queue.shift();
+        const track = this.looped ? this.active : this.queue.shift();
         if (!track)
             return;
         this.active = track;
@@ -93,6 +94,7 @@ export class Subscription {
             this.process();
     }
     stop() {
+        this.looped = false;
         this.active = null;
         return this.player.stopTrack();
     }
@@ -105,6 +107,9 @@ export class Subscription {
         if (!this.active)
             return;
         return this.player.setPaused(false);
+    }
+    loop() {
+        return this.looped = !this.looped;
     }
     // Getters
     get duration() {

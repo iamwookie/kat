@@ -5,7 +5,8 @@ export class PlayerEnd extends Event {
     }
     async execute(subscription) {
         subscription.active?.onFinish();
-        subscription.active = null;
+        if (!subscription.looped)
+            subscription.active = null;
         subscription.process();
         setTimeout(() => {
             {

@@ -8,6 +8,7 @@ export class PlayerException extends Event {
         this.client.logger.error(reason);
         console.error(chalk.red(`Music >> Exception in ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`));
         subscription.active?.onError(reason);
+        subscription.looped = false;
         subscription.active = null;
         subscription.process();
     }
