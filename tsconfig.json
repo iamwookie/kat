@@ -21,6 +21,7 @@
             "@config": ["config.ts"],
             "@structures/*": ["src/structures/*"],
             "@commands/*": ["src/commands/*"],
+            "@modules/*": ["src/modules/*"],
             "@events/*": ["src/events/*"],
             "@api/*": ["src/api/*"],
             "@utils/*": ["src/utils/*"]

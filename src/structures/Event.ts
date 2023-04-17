@@ -8,9 +8,14 @@ export abstract class Event {
         public client: Client,
         public commander: Commander,
         public name: string
-    ) {
-        this.client = client;
-        this.commander = commander;
-        this.name = name;
-    }
+    ) {}
+}
+
+export abstract class ProcessEvent {
+    abstract execute(...args: any[]): Promise<any>;
+
+    constructor(
+        public commander: Commander,
+        public name: string
+    ) {}
 }

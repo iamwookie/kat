@@ -1,11 +1,15 @@
-import { KATClient } from "./Client.js";
+import { KATClient as Client } from "./Client.js";
 import { Commander } from "./Commander.js";
+import { Module } from "./Module.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake, InteractionEditReplyOptions, MessagePayload, MessageReplyOptions } from "discord.js";
 
 export abstract class Command {
     public name: string;
     public group: string;
+    public module?: string | Module;
     public aliases?: string[];
+
+    public legacy?: boolean;
     public legacyAliases?: string[];
 
     public description?: {
@@ -24,44 +28,12 @@ export abstract class Command {
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
-    abstract execute(client: KATClient, interaction: ChatInputCommandInteraction | Message): Promise<any>;
+    abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
     constructor(
-        private commander: Commander
-    ) {
-        this.commander = commander;
-    }
-
-    initialize() {
-        if (this.aliases) {
-            for (const alias of this.aliases) {
-                this.commander.aliases.set(alias, this.name);
-            }
-        }
-
-        if (this.legacyAliases) {
-            for (const alias of this.legacyAliases) {
-                this.commander.aliases.set(alias, this.name);
-            }
-        }
-
-        if (this.users) this.users.push(this.commander.client.devId);
-
-        if (this.guilds) {
-            for (const guildId of this.guilds) {
-                const guild = this.commander.guilds.get(guildId) || {};
-                guild.commands = guild.commands || new Collection();
-
-                guild.commands.set(this.name, this);
-                this.commander.guilds.set(guildId, guild);
-            }
-        } else {
-            this.commander.global.set(this.name, this);
-        }
-
-        if (!this.commander.groups.has(this.group)) this.commander.groups.set(this.group, new Collection());
-        this.commander.groups.get(this.group)?.set(this.name, this);
-    }
+        public client: Client,
+        public commander: Commander
+    ) {}
 
     applyCooldown(user: User): void {
         if (!this.cooldown) return;
@@ -84,7 +56,7 @@ export abstract class Command {
 
     getArgs(interaction: ChatInputCommandInteraction | Message) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => typeof option.value == "string" ? option.value.split(/ +/) : option.value).flat();;
+            return interaction.options.data.map((option) => typeof option.value == "string" ? option.value.split(/ +/) : option.options).flat();;
         } else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);
         }

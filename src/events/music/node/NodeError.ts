@@ -8,7 +8,7 @@ export class NodeError extends Event {
         super(client, commander, "nodeError");
 
         this.client.once(this.name, (_, err) => { this.client.logger.error(err) });
-        this.client.logger.info("Events >> Registered Sub Event For: " + this.name);
+        this.client.logger.info("Events (NodeError) >> Registered Sub Event");
     }
 
     async execute(name: string, error: Error) {

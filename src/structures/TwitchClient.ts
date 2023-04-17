@@ -9,11 +9,7 @@ export class TwitchClient {
     private authProvider = new ClientCredentialsAuthProvider(this.clientId, this.clientSecret);
     private apiClient = new ApiClient({ authProvider: this.authProvider });
 
-    constructor(
-        public client: Client
-    ) {
-        this.client = client;
-    }
+    constructor(public client: Client) {}
 
     async getStream(name: string) {
         const stream = await this.apiClient.streams.getStreamByUserName(name);

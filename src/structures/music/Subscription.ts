@@ -8,8 +8,9 @@ export class Subscription {
     public shoukaku: Shoukaku;
     public queue: (YouTubeTrack | SpotifyTrack)[] = [];
     public active: YouTubeTrack | SpotifyTrack | null = null;
+    public looped: boolean = false;
     public destroyed: boolean = false;
-
+    
     constructor(
         public client: Client,
         public guild: Guild,
@@ -18,13 +19,7 @@ export class Subscription {
         public player: Player,
         public node: Node
     ) {
-        this.client = client;
         this.shoukaku = client.shoukaku;
-        this.guild = guild;
-        this.voiceChannel = voiceChannel;
-        this.textChannel = textChannel;
-        this.player = player;
-        this.node = node;
 
         this.player.on("exception", (reason) => this.client.emit("playerException", this, reason));
         this.player.on("start", (data) => this.client.emit("playerStart", this, data));
@@ -77,7 +72,7 @@ export class Subscription {
     }
 
     process() {
-        const track = this.queue.shift();
+        const track = this.looped ? this.active : this.queue.shift();
         if (!track) return;
 
         this.active = track;
@@ -103,6 +98,7 @@ export class Subscription {
     }
 
     stop() {
+        this.looped = false;
         this.active = null;
         return this.player.stopTrack();
     }
@@ -115,6 +111,10 @@ export class Subscription {
     resume() {
         if (!this.active) return;
         return this.player.setPaused(false);
+    }
+
+    loop() {
+        return this.looped = !this.looped;
     }
 
     // Getters

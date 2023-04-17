@@ -1,11 +1,12 @@
 // This is the command handler, CODENAME: Commander v7.0.0
-import { KATClient as Client} from "./Client.js";
+import { KATClient as Client } from "./Client.js";
 
 // ----- FOR LATER USE -----
 // import readline, { Interface } from "readline";
 import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";
-import { Command }from "./Command.js";
+import { Command } from "./Command.js";
 import { Module } from "./Module.js";
+import { ProcessEvent } from "./Event.js";
 import { ActionEmbed } from "@utils/embeds/index.js";
 
 import chalk from "chalk";
@@ -13,50 +14,40 @@ import chalk from "chalk";
 // -----------------------------------
 import * as Commands from "@commands/index.js";
 import * as Events from "@events/index.js";
+import * as Modules from "@modules/index.js";
+// -----------------------------------
 
-const cliCommands: any = [];
-
-const globalCommands = [
-    // Music
+const commands = [
     Commands.PlayCommand,
+    Commands.LoopCommand,
     Commands.StopCommand,
     Commands.PauseCommand,
     Commands.SkipCommand,
     Commands.QueueCommand,
     Commands.LyricsCommand,
-
-    // Misc
     Commands.HelpCommand,
-]
-
-const reservedCommands = [
-    // Twitch
-    Commands.TwitchCommand,
+    Commands.AffiliateCommand,
 ];
-// -----------------------------------
 
 export class Commander {
     // ----- FOR LATER USE -----
     // private readline: Interface = readline.createInterface(process.stdin);
-    private rest: REST = new REST({ version: "10" }).setToken(process.env.BOT_TOKEN!);
+    private rest: REST = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
-    public cli: Collection<string, any> = new Collection();
-    public global: Collection<string, any> = new Collection();
-    public guilds: Collection<Snowflake, any> = new Collection();
-
+    public cli: Collection<string, Command> = new Collection();
     public groups: Collection<string, Collection<string, Command>> = new Collection();
     public commands: Collection<string, Command> = new Collection();
+    public global: Collection<string, Command> = new Collection();
+    public reserved: Collection<Snowflake, Collection<string, Command>> = new Collection();
     public modules: Collection<string, Module> = new Collection();
     public aliases: Collection<string, string> = new Collection();
 
-    constructor(public readonly client: Client) {
-        this.client = client;
-    }
+    constructor(public readonly client: Client) {}
 
     async initialize() {
         this.initializeCLICommands();
-        this.initializeGlobalCommands();
-        this.initializeReservedCommands();
+        this.initializeCommands();
+        this.initializeModules();
 
         await this.registerGlobalCommands();
         await this.registerReservedCommands();
@@ -65,11 +56,12 @@ export class Commander {
     }
 
     initializeCLICommands() {
-        if (!cliCommands.length) return;
+        const commands: any = [];
+        if (!commands.length) return;
 
-        for (const CLICommand of cliCommands) {
+        for (const Command of commands) {
             try {
-                const command = new CLICommand(this);
+                const command = new Command(this);
                 command.initialize();
 
                 this.cli.set(command.name, command);
@@ -79,15 +71,33 @@ export class Commander {
                 console.error(err);
             }
         }
+
+        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} CLI Command(s)`);
     }
 
-    initializeGlobalCommands() {
-        if (!globalCommands.length) return;
+    initializeCommands() {
+        if (!commands.length) return;
 
-        for (const GlobalCommand of globalCommands) {
+        for (const Command of commands) {
             try {
-                const command = new GlobalCommand(this);
-                command.initialize();
+                const command = new Command(this.client, this);
+
+                if (command.aliases) {
+                    for (const alias of command.aliases) {
+                        this.aliases.set(alias, command.name);
+                    }
+                }
+
+                if (command.legacyAliases) {
+                    for (const alias of command.legacyAliases) {
+                        this.aliases.set(alias, command.name);
+                    }
+                }
+
+                if (command.users) command.users.push(this.client.devId);
+
+                if (!this.groups.has(command.group)) this.groups.set(command.group, new Collection());
+                this.groups.get(command.group)?.set(command.name, command);
 
                 this.commands.set(command.name, command);
             } catch (err) {
@@ -97,37 +107,23 @@ export class Commander {
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${globalCommands.length} Global Command(s)`);
-    }
-
-    initializeReservedCommands() {
-        if (!reservedCommands.length) return;
-
-        for (const GuildCommand of reservedCommands) {
-            try {
-                const command = new GuildCommand(this);
-                if (!command.guilds) this.client.logger.warn(`Commander >> Guild Not Set For Guild Command: ${command.name}`);
-                command.initialize();
-
-                this.commands.set(command.name, command);
-            } catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Guild Command"));
-                console.error(err);
-            }
-        }
-
-        this.client.logger.info(`Commander >> Successfully Initialized ${reservedCommands.length} Reserved Command(s)`);
+        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} Command(s)`);
     }
 
     intiliazeEvents() {
-        const events = Object.values(Events)
+        const events = Object.values(Events);
         if (!events.length) return;
 
         for (const Event of events) {
             try {
-                const event = new Event(this.client, this);
-                this.client.on(event.name, event.execute.bind(event));
+                // Change this in the future please
+                if (Event.prototype instanceof ProcessEvent) {
+                    const event = new Event(this.client, this);
+                    process.on(event.name, event.execute.bind(event));
+                } else {
+                    const event = new Event(this.client, this);
+                    this.client.on(event.name, event.execute.bind(event));
+                }
             } catch (err) {
                 this.client.logger.error(err);
                 console.error(chalk.red("Commander (ERROR) >> Error Initializing Event"));
@@ -138,24 +134,59 @@ export class Commander {
         this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
 
+    async initializeModules() {
+        const modules = Object.values(Modules);
+        if (!modules.length) return;
+
+        for (const Module of modules) {
+            try {
+                const module = new Module(this.client, this);
+                this.modules.set(module.name, module);
+            } catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Initializing Guild Command"));
+                console.error(err);
+            }
+        }
+
+        for (const command of this.commands.values()) {
+            // In future, modules will always be required
+            if (command.module && typeof command.module == "string") command.module = this.modules.get(command.module);
+
+            if (command.module instanceof Module && command.module.guilds) {
+                for (const guild of command.module.guilds) {
+                    const commands = this.reserved.get(guild) || new Collection();
+                    commands.set(command.name, command);
+                    this.reserved.set(guild, commands);
+                }
+            } else {
+                this.global.set(command.name, command);
+            }
+
+            this.commands.set(command.name, command);
+        }
+
+        this.client.logger.info(`Commander >> Successfully Initialized ${modules.length} Module(s)`);
+    }
+
     async registerGlobalCommands() {
         try {
-            let commands = [];
+            let body = [];
 
-            for (const [_, command] of this.global) {
+            for (const command of this.global.values()) {
                 if (!command.data || command.disabled || command.hidden) continue;
 
                 if (command.aliases) {
                     for (const alias of command.aliases) {
                         const data = command.data().setName(alias);
-                        commands.push(data);
+                        body.push(data);
                     }
                 }
 
-                commands.push(command.data().toJSON());
+                body.push(command.data().toJSON());
             }
 
-            const res: any = await this.rest.put(Routes.applicationCommands(process.env.BOT_APP_ID!), { body: commands });
+            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), { body: body });
             this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s)`);
         } catch (err) {
             this.client.logger.error(err);
@@ -165,30 +196,28 @@ export class Commander {
     }
 
     async registerReservedCommands() {
-        for (const [k, g] of this.guilds) {
-            let commands = [];
+        for (const [guild, commands] of this.reserved) {
+            let body = [];
 
-            if (!g.commands) continue;
-
-            for (const [_, command] of g.commands) {
+            for (const command of commands.values()) {
                 if (!command.data || command.disabled || command.hidden) continue;
 
                 if (command.aliases) {
                     for (const alias of command.aliases) {
                         const data = command.data().setName(alias);
-                        commands.push(data);
+                        body.push(data);
                     }
                 }
 
-                commands.push(command.data().toJSON());
+                body.push(command.data().toJSON());
             }
 
             try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.BOT_APP_ID!, k), { body: commands });
-                this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${k}`);
+                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guild), { body: body });
+                this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guild}`);
             } catch (err) {
                 this.client.logger.error(err);
-                console.error(chalk.red(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${k}`));
+                console.error(chalk.red(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${guild}`));
                 console.error(err);
             }
         }
@@ -216,45 +245,4 @@ export class Commander {
 
         return true;
     }
-
-    // async initializeModules() {
-    //     if (globalFolders.length) {
-    //         for (const folder of globalFolders) {
-    //             const globalFiles = fs.readdirSync(`${globalPath}/${folder}`).filter((file) => file.endsWith(".js"));
-
-    //             for (const file of globalFiles) {
-    //                 // delete require.cache[require.resolve(`${globalPath}/${folder}/${file}`)];
-
-    //                 const object = await import(`${globalPath}/${folder}/${file}`);
-    //                 const module = new Module(this, object);
-
-    //                 await module.initialize(this.client);
-
-    //                 this.modules.set(module.name, module);
-    //             }
-    //         }
-    //     }
-
-    //     if (guildFolders.length) {
-    //         for (const folder of guildFolders) {
-    //             const guildSubFolders = fs.readdirSync(`${guildPath}/${folder}`);
-
-    //             for (const subFolder of guildSubFolders) {
-    //                 const guildFiles = fs.readdirSync(`${guildPath}/${folder}/${subFolder}`).filter((file) => file.endsWith(".js"));
-
-    //                 for (const file of guildFiles) {
-    //                     // delete require.cache[require.resolve(`${guildPath}/${folder}/${subFolder}/${file}`)];
-
-    //                     const object = await import(`${guildPath}/${folder}/${subFolder}/${file}`);
-    //                     const module = new Module(this, object);
-    //                     if (!module.guilds || !module.guilds.includes(folder)) this.client.logger.warn(`Commander >> Guild Not Set For Guild Module: ${module.name}`);
-
-    //                     module.initialize(this.client);
-
-    //                     this.modules.set(module.name, module);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 }

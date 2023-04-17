@@ -4,11 +4,14 @@ import { Subscription as MusicSubscription } from "@structures/music/Subscriptio
 import { ActionEmbed, MusicEmbed } from "@utils/embeds/index.js";
 
 export class SkipCommand extends Command {
-    constructor(commander: Commander) {
-        super(commander);
+    constructor(client: Client, commander: Commander) {
+        super(client, commander);
 
         this.name = "skip";
         this.group = "Music";
+
+        this.legacy = true;
+
         this.description = {
             content: "Skip the track.",
         };
@@ -17,16 +20,13 @@ export class SkipCommand extends Command {
     }
 
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
     }
 
-    async execute(client: Client, int: ChatInputCommandInteraction) {
+    async execute(int: ChatInputCommandInteraction) {
         const author = this.getAuthor(int)!;
 
-        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+        const subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The queue is empty or does not exist!")] });
         if (subscription.queue.length == 0) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("This is the last track in the queue!")] });
 

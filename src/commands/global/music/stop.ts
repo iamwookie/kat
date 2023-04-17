@@ -4,12 +4,15 @@ import { Subscription as MusicSubscription } from "@structures/music/Subscriptio
 import { ActionEmbed } from "@utils/embeds/index.js";
 
 export class StopCommand extends Command {
-    constructor(commander: Commander) {
-        super(commander);
+    constructor(client: Client, commander: Commander) {
+        super(client, commander);
 
         this.name = "stop";
         this.group = "Music";
         this.aliases = ["dc"];
+
+        this.legacy = true;
+
         this.description = {
             content: "Clear the queue and/or leave.",
         };
@@ -18,14 +21,11 @@ export class StopCommand extends Command {
     }
 
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
     }
 
-    async execute(client: Client, int: ChatInputCommandInteraction) {
-        const subscription: MusicSubscription = client.subscriptions.get(int.guildId);
+    async execute(int: ChatInputCommandInteraction) {
+        const subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
         if (!subscription) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I'm not playing anything!")] });
 
         subscription.destroy();

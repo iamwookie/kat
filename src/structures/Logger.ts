@@ -1,4 +1,4 @@
-import { KATClient } from "./index.js";
+import { KATClient as Client } from "./Client.js";
 import Sentry from "@sentry/node";
 import { ErrorEmbed } from "@utils/embeds/index.js";
 
@@ -6,9 +6,8 @@ import chalk from "chalk";
 
 export class Logger {
     constructor(
-        private client: KATClient
+        private client: Client
     ) {
-        this.client = client;
         console.log(chalk.greenBright.bold.underline(">>> Logger Initialized!"));
     }
 

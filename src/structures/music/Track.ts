@@ -21,11 +21,6 @@ abstract class Track {
         public requester: User,
         public textChannel: TextBasedChannel | null,
     ) {
-        this.client = client;
-        this.data = data;
-        this.requester = requester;
-        this.textChannel = textChannel;
-
         this.url = this.data.info.uri;
         this.title = this.data.info.title;
         this.duration = formatDuration(this.data.info.length);
@@ -40,24 +35,6 @@ abstract class Track {
     }
 }
 
-abstract class Playlist {
-    public title: string;
-    public thumbnail?: string;
-
-    constructor(
-        public url: URL,
-        public info: LavalinkResponse["playlistInfo"],
-        public tracks: ShoukakuTrack[],
-        public requester: User,
-        public textChannel: TextBasedChannel | null,
-    ) {
-        this.url = url;
-        this.info = info;
-        this.tracks = tracks;
-        this.title = this.info.name!;
-    }
-}
-
 export class YouTubeTrack extends Track {
     constructor(
         public client: Client,
@@ -66,7 +43,6 @@ export class YouTubeTrack extends Track {
         public textChannel: TextBasedChannel | null,
     ) {
         super(client, data, requester, textChannel);
-
         this.thumbnail = `https://i.ytimg.com/vi/${this.data.info.identifier}/mqdefault.jpg`;
     }
 }
@@ -82,6 +58,21 @@ export class SpotifyTrack extends Track {
     }
 }
 
+abstract class Playlist {
+    public title: string;
+    public thumbnail?: string;
+
+    constructor(
+        public url: URL,
+        public info: LavalinkResponse["playlistInfo"],
+        public tracks: ShoukakuTrack[],
+        public requester: User,
+        public textChannel: TextBasedChannel | null,
+    ) {
+        this.title = this.info.name!;
+    }
+}
+
 export class YouTubePlaylist extends Playlist {
     constructor(
         public url: URL,
@@ -91,7 +82,6 @@ export class YouTubePlaylist extends Playlist {
         public textChannel: TextBasedChannel | null,
     ) {
         super(url, info, tracks, requester, textChannel);
-
         this.thumbnail = `https://i.ytimg.com/vi/${this.tracks[0].info.identifier}/mqdefault.jpg`;
     }
 }
