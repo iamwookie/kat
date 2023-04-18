@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Guild {
+    id        Int      @id @default(autoincrement())
+    guildId   String   @unique
+    prefix    String   @default(".")
+    createdAt DateTime @default(now())
+}
+
 model Affiliate {
   id        Int      @id @default(autoincrement())
   guildId   String

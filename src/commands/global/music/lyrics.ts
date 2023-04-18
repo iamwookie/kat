@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
 import { ActionEmbed } from "@utils/embeds/index.js";
 
@@ -28,10 +28,10 @@ export class LyricsCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content!)
             .setDMPermission(false)
-            .addStringOption((option) => option.setName("query").setDescription("The name or URL of the track to search for.").setRequired(false));
+            .addStringOption((option) => option.setName("query").setDescription("The name or URL of the track to search for."));
     }
 
-    async execute(int: ChatInputCommandInteraction) {
+    async execute(int: ChatInputCommandInteraction | Message) {
         const author = this.getAuthor(int)!;
         let query = this.getArgs(int).join(" ");
 

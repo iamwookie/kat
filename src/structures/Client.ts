@@ -6,6 +6,7 @@ import { Commander } from "./Commander.js";
 import { ShoukakuClient } from "./ShoukakuClient.js";
 import { TwitchClient } from "./TwitchClient.js";
 import { Server } from "@api/structures/Server.js";
+import { Cache } from "./Cache.js";
 
 import chalk from "chalk";
 
@@ -42,6 +43,7 @@ export class KATClient extends Client {
     public shoukaku: ShoukakuClient = new ShoukakuClient(this);
     public twitch: TwitchClient = new TwitchClient(this);
     public server: Server = new Server(this);
+    public cache: Cache = new Cache(this);
 
     public subscriptions: Collection<any, any> = new Collection();
 

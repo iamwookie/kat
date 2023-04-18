@@ -8,7 +8,7 @@ export class AffiliateCommand extends Command {
         super(client, commander);
 
         this.name = "affiliate";
-        this.group = "Misc";
+        this.group = "Affiliate";
         this.module = "Affiliate";
 
         this.description = {
@@ -33,9 +33,7 @@ export class AffiliateCommand extends Command {
             ) as SlashCommandBuilder;
     }
 
-    async execute(int: ChatInputCommandInteraction<"cached">) {
-        if (!int.member?.permissions.has(PermissionFlagsBits.Administrator)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You do not have permission to use this command!")] });
-
+    async execute(int: ChatInputCommandInteraction) {
         const module = this.module as AffiliateModule;
         const command = int.options.getSubcommand();
 

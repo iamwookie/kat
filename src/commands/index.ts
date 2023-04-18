@@ -12,6 +12,7 @@ export { PlayCommand } from "./global/music/play.js";
 
 // Misc
 export { HelpCommand } from "./global/misc/help.js";
+export { PrefixCommand } from "./global/misc/prefix.js";
 
 // ----- RESERVED -----
 

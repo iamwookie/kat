@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from "discord.js";
 import { Subscription as MusicSubscription } from "@structures/index.js";
 import { ActionEmbed, MusicEmbed } from "@utils/embeds/index.js";
 
@@ -25,7 +25,7 @@ export class PauseCommand extends Command {
             .setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction) {
+    async execute(int: ChatInputCommandInteraction | Message) {
         const author = this.getAuthor(int)!;
 
         const subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);

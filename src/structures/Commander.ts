@@ -24,6 +24,7 @@ const commands = [
     Commands.SkipCommand,
     Commands.QueueCommand,
     Commands.LyricsCommand,
+    Commands.PrefixCommand,
     Commands.HelpCommand,
     Commands.AffiliateCommand,
 ];
