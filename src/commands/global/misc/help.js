@@ -18,7 +18,7 @@ export class HelpCommand extends Command {
     async execute(int) {
         const author = this.getAuthor(int);
         const res = await this.client.cache.getConfig(int.guild?.id);
-        const prefix = res?.prefix || this.client.prefix;
+        const prefix = res?.prefix || this.client.legacyPrefix;
         const replyEmbed = new EmbedBuilder()
             .setTitle("**Help Menu**")
             .setFooter({ text: "Parameters with a '?' at the start are optional." })
