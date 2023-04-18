@@ -6,6 +6,7 @@ import { Commander } from "./Commander.js";
 import { ShoukakuClient } from "./ShoukakuClient.js";
 import { TwitchClient } from "./TwitchClient.js";
 import { Server } from "../api/structures/Server.js";
+import { Cache } from "./Cache.js";
 import chalk from "chalk";
 export class KATClient extends Client {
     startTime = Date.now();
@@ -36,6 +37,7 @@ export class KATClient extends Client {
     shoukaku = new ShoukakuClient(this);
     twitch = new TwitchClient(this);
     server = new Server(this);
+    cache = new Cache(this);
     subscriptions = new Collection();
     constructor(options) {
         super(options);

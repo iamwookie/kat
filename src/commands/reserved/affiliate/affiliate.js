@@ -5,7 +5,7 @@ export class AffiliateCommand extends Command {
     constructor(client, commander) {
         super(client, commander);
         this.name = "affiliate";
-        this.group = "Misc";
+        this.group = "Affiliate";
         this.module = "Affiliate";
         this.description = {
             content: "Create an affiliate link for a user.",
@@ -25,8 +25,6 @@ export class AffiliateCommand extends Command {
             .addUserOption((option) => option.setName("user").setDescription("The user to create an affiliate link for.").setRequired(true)));
     }
     async execute(int) {
-        if (!int.member?.permissions.has(PermissionFlagsBits.Administrator))
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You do not have permission to use this command!")] });
         const module = this.module;
         const command = int.options.getSubcommand();
         if (command === "create") {

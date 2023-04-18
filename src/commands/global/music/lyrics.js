@@ -20,7 +20,7 @@ export class LyricsCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content)
             .setDMPermission(false)
-            .addStringOption((option) => option.setName("query").setDescription("The name or URL of the track to search for.").setRequired(false));
+            .addStringOption((option) => option.setName("query").setDescription("The name or URL of the track to search for."));
     }
     async execute(int) {
         const author = this.getAuthor(int);

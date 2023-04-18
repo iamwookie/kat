@@ -1,6 +1,5 @@
 import { Command, Module } from "../../../structures/index.js";
-import { EmbedBuilder } from "discord.js";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 export class HelpCommand extends Command {
     constructor(client, commander) {
         super(client, commander);
@@ -18,10 +17,12 @@ export class HelpCommand extends Command {
     }
     async execute(int) {
         const author = this.getAuthor(int);
+        const res = await this.client.cache.getConfig(int.guild?.id);
+        const prefix = res?.prefix || this.client.prefix;
         const replyEmbed = new EmbedBuilder()
             .setTitle("**Help Menu**")
             .setFooter({ text: "Parameters with a '?' at the start are optional." })
-            .setDescription(`As of right now, you may use some commands with the \`${this.client.legacyPrefix}\` prefix in chat. This may be removed in the future!`);
+            .setDescription(`As of right now, you may use some commands with the \`${prefix}\` prefix in chat. This may be removed in the future!`);
         for (const [name, group] of this.client.commander.groups) {
             if (name == "CLI")
                 continue;
