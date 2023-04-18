@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, Message, PermissionFlagsBits } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { ActionEmbed } from "@utils/embeds/action.js";
 
 export class PrefixCommand extends Command {
@@ -32,32 +32,25 @@ export class PrefixCommand extends Command {
         const args = this.getArgs(int)[0] as string;
         if (!args) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You did not provide a valid prefix!")] });
 
-        const errorEmbed = new ActionEmbed("fail").setDesc("An error occured while setting the prefix!")
+        const res = await this.client.prisma.guild.upsert({
+            where: {
+                guildId: int.guild!.id,
+            },
+            update: {
+                prefix: args,
+            },
+            create: {
+                guildId: int.guild!.id,
+                prefix: args,
+            },
+        });
 
-        try {
-            const res = await this.client.prisma.guild.upsert({
-                where: {
-                    guildId: int.guild!.id,
-                },
-                update: {
-                    prefix: args,
-                },
-                create: {
-                    guildId: int.guild!.id,
-                    prefix: args,
-                },
-            });
+        this.client.cache.update(res.guildId, res);
 
-            this.client.cache.update(res.guildId, res);
-
-            if (res) {
-                return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`Successfully set the prefix to \`${res.prefix}\`!`)] });
-            } else {
-                return this.reply(int, { embeds: [errorEmbed] });
-            }
-        } catch (err) {
-            this.client.logger.error(err);
-            return this.reply(int, { embeds: [errorEmbed] });
+        if (res) {
+            return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`Successfully set the prefix to \`${res.prefix}\`!`)] });
+        } else {
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("An error occured while setting the prefix!")] });
         }
     }
 }

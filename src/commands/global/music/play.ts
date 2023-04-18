@@ -39,7 +39,7 @@ export class PlayCommand extends Command {
         if (!voiceChannel) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in a voice channel!")] });
         if (!voiceChannel.joinable || !(voiceChannel as VoiceChannel).speakable) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I can't play in that voice channel!")] });
 
-        let subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
+        let subscription = this.client.subscriptions.get(int.guildId!);
 
         if (subscription) {
             if (!subscription.voiceChannel.members.has(author.id)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in my voice channel!")] });

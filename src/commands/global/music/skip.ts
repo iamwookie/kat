@@ -1,6 +1,5 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from "discord.js";
-import { Subscription as MusicSubscription } from "@structures/music/Subscription.js";
 import { ActionEmbed, MusicEmbed } from "@utils/embeds/index.js";
 
 export class SkipCommand extends Command {
@@ -26,7 +25,7 @@ export class SkipCommand extends Command {
     async execute(int: ChatInputCommandInteraction | Message) {
         const author = this.getAuthor(int)!;
 
-        const subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
+        const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The queue is empty or does not exist!")] });
         if (subscription.queue.length == 0) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("This is the last track in the queue!")] });
 

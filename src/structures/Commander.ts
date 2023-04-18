@@ -23,6 +23,7 @@ const commands = [
     Commands.PauseCommand,
     Commands.SkipCommand,
     Commands.QueueCommand,
+    Commands.VolumeCommand,
     Commands.LyricsCommand,
     Commands.PrefixCommand,
     Commands.HelpCommand,

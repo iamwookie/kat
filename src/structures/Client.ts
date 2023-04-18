@@ -1,5 +1,5 @@
 import * as Config from "@config";
-import { Client, ClientOptions, Events, Collection, PermissionsBitField } from "discord.js";
+import { Client, ClientOptions, Events, Collection, PermissionsBitField, Snowflake } from "discord.js";
 import { Logger } from "./Logger.js";
 import { PrismaClient } from "@prisma/client";
 import { Commander } from "./Commander.js";
@@ -7,6 +7,7 @@ import { ShoukakuClient } from "./ShoukakuClient.js";
 import { TwitchClient } from "./TwitchClient.js";
 import { Server } from "@api/structures/Server.js";
 import { Cache } from "./Cache.js";
+import { Subscription as MusicSubscription } from "./music/Subscription.js";
 
 import chalk from "chalk";
 
@@ -45,7 +46,7 @@ export class KATClient extends Client {
     public server: Server = new Server(this);
     public cache: Cache = new Cache(this);
 
-    public subscriptions: Collection<any, any> = new Collection();
+    public subscriptions: Collection<Snowflake, MusicSubscription> = new Collection();
 
     constructor(options: ClientOptions) {
         super(options);
