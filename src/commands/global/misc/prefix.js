@@ -26,31 +26,24 @@ export class PrefixCommand extends Command {
         const args = this.getArgs(int)[0];
         if (!args)
             return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You did not provide a valid prefix!")] });
-        const errorEmbed = new ActionEmbed("fail").setDesc("An error occured while setting the prefix!");
-        try {
-            const res = await this.client.prisma.guild.upsert({
-                where: {
-                    guildId: int.guild.id,
-                },
-                update: {
-                    prefix: args,
-                },
-                create: {
-                    guildId: int.guild.id,
-                    prefix: args,
-                },
-            });
-            this.client.cache.update(res.guildId, res);
-            if (res) {
-                return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`Successfully set the prefix to \`${res.prefix}\`!`)] });
-            }
-            else {
-                return this.reply(int, { embeds: [errorEmbed] });
-            }
+        const res = await this.client.prisma.guild.upsert({
+            where: {
+                guildId: int.guild.id,
+            },
+            update: {
+                prefix: args,
+            },
+            create: {
+                guildId: int.guild.id,
+                prefix: args,
+            },
+        });
+        this.client.cache.update(res.guildId, res);
+        if (res) {
+            return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`Successfully set the prefix to \`${res.prefix}\`!`)] });
         }
-        catch (err) {
-            this.client.logger.error(err);
-            return this.reply(int, { embeds: [errorEmbed] });
+        else {
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("An error occured while setting the prefix!")] });
         }
     }
 }

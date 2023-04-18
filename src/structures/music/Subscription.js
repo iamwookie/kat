@@ -11,6 +11,7 @@ export class Subscription {
     queue = [];
     active = null;
     looped = false;
+    volume = 100;
     destroyed = false;
     constructor(client, guild, voiceChannel, textChannel, player, node) {
         this.client = client;
@@ -45,6 +46,16 @@ export class Subscription {
                 const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
                 client.subscriptions.set(guild.id, subscription);
                 client.emit("subscriptionCreate", subscription);
+                const res = await client.prisma.music.findUnique({
+                    where: {
+                        guildId: guild.id
+                    },
+                    select: {
+                        volume: true
+                    }
+                });
+                if (res?.volume)
+                    subscription.volume = res.volume;
                 return subscription;
             }
             catch (err) {
@@ -72,6 +83,7 @@ export class Subscription {
         if (!track)
             return;
         this.active = track;
+        this.player.setVolume(this.volume / 100);
         this.player.playTrack({ track: track.data.track });
     }
     add(item) {
