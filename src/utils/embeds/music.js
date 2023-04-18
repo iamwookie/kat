@@ -6,6 +6,7 @@ export class MusicEmbed extends EmbedBuilder {
     constructor(subscription) {
         super();
         this.subscription = subscription;
+        super.setDescription("```⚠️ Track links have been removed temporarily due to a bug with Discord.```");
         super.setFooter({ text: `🎵 ${this.subscription.node.name}` });
     }
     setUser(user) {
@@ -19,13 +20,13 @@ export class MusicEmbed extends EmbedBuilder {
         if (item instanceof YouTubePlaylist || item instanceof SpotifyPlaylist) {
             return super.addFields({
                 name: "Enqueued:",
-                value: `${getServiceIcon(item)} \`${item.tracks.length}\` tracks from [\`${item.title}\`](${item.url})`,
+                value: `${getServiceIcon(item)} \`${item.tracks.length}\` tracks from \`${item.title}\``,
             });
         }
         else {
             return super.addFields({
                 name: "Enqueued:",
-                value: `\`${this.subscription.queue.length == 0 ? 1 : this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+                value: `\`${this.subscription.queue.length == 0 ? 1 : this.subscription.queue.length}.\` - ${getServiceIcon(item)} \`${item.title} [${item.duration}]\``,
             });
         }
     }
@@ -36,7 +37,7 @@ export class MusicEmbed extends EmbedBuilder {
             super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: "Now Playing:",
-            value: `${this.subscription.looped ? "🔁 - " : ""}${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+            value: `${this.subscription.looped ? "🔁 - " : ""}${getServiceIcon(item)} \`${item.title} [${item.duration}]\``,
         });
     }
     setPaused(item) {
@@ -46,20 +47,20 @@ export class MusicEmbed extends EmbedBuilder {
             super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: "Paused Track:",
-            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+            value: `${getServiceIcon(item)} \`${item.title} [${item.duration}]\``,
         });
     }
     setSkipped(item) {
         if (!item)
             return this;
-        return super.addFields({ name: "Skipped:", value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})` });
+        return super.addFields({ name: "Skipped:", value: `${getServiceIcon(item)} \`${item.title} [${item.duration}]\`` });
     }
     setLooped(item) {
         if (!item)
             return this;
         return super
             .setColor(this.subscription.looped ? "Green" : "Red")
-            .addFields({ name: `Track ${this.subscription.looped ? "Looped" : "Un-looped"}:`, value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})` });
+            .addFields({ name: `Track ${this.subscription.looped ? "Looped" : "Un-looped"}:`, value: `${getServiceIcon(item)} \`${item.title} [${item.duration}]\`` });
     }
     setQueue(queue) {
         if (!queue.length)
