@@ -1,5 +1,16 @@
 import { KATClient as Client, Commander, Command, Module } from "@structures/index.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
+import {
+    SlashCommandBuilder,
+    ChatInputCommandInteraction,
+    EmbedBuilder,
+    Message,
+    ActionRowBuilder,
+    StringSelectMenuBuilder,
+    StringSelectMenuOptionBuilder,
+    CommandInteraction,
+    Interaction,
+    StringSelectMenuInteraction,
+} from "discord.js";
 
 export class HelpCommand extends Command {
     constructor(client: Client, commander: Commander) {
@@ -25,19 +36,14 @@ export class HelpCommand extends Command {
     async execute(int: ChatInputCommandInteraction | Message) {
         const author = this.getAuthor(int)!;
 
-        const res = await this.client.cache.guilds.get(int.guild?.id!);
-        const prefix = res?.prefix || this.client.legacyPrefix;
+        const embed = new EmbedBuilder().setTitle("**Help Menu**").setDescription(`Select an option from the dropdown menu below.`);
+        const menu = new StringSelectMenuBuilder().setCustomId("help_menu").setPlaceholder("Select an option");
 
-        const replyEmbed = new EmbedBuilder()
-            .setTitle("**Help Menu**")
-            .setFooter({ text: "Parameters with a '?' at the start are optional." })
-            .setDescription(`As of right now, you may use some commands with the \`${prefix}\` prefix in chat. This may be removed in the future!`);
+        // In future, won't have to do this as groups will be replaced with modules
+        for (const [group, commands] of this.client.commander.groups) {
+            if (group == "CLI") continue;
 
-        for (const [name, group] of this.client.commander.groups) {
-            if (name == "CLI") continue;
-
-            let reply = "";
-            for (const command of group.values()) {
+            for (const command of commands.values()) {
                 if (
                     command.hidden ||
                     command.disabled ||
@@ -46,6 +52,25 @@ export class HelpCommand extends Command {
                 )
                     continue;
 
+                if (!menu.options.find((o) => o.data.value == group)) menu.addOptions(new StringSelectMenuOptionBuilder().setLabel(group + " Commands").setValue(group));
+            }
+        }
+
+        const reply = await this.reply(int, { embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)] })!;
+
+        const filter = (i: Interaction) => i.isStringSelectMenu() && i.customId == "help_menu" && i.message.id == reply.id && i.user.id == author.id;
+        const collector = int.channel?.createMessageComponentCollector({ filter, time: 60_000, max: 1 });
+
+        collector?.on("collect", async (i: StringSelectMenuInteraction) => {
+            const group = i.values[0];
+            const commands = this.client.commander.groups.get(group)!;
+
+            const res = await this.client.cache.guilds.get(i.guild?.id!);
+            const prefix = res?.prefix || this.client.legacyPrefix;
+
+            let content = "";
+            for (const command of commands.values()) {
+                // Use command.aliases(prefix) function for this next time
                 let aliases = "";
                 if (command.aliases) {
                     for (const alias of command.aliases) {
@@ -53,14 +78,23 @@ export class HelpCommand extends Command {
                     }
                 }
 
-                reply += `\`\`${this.client.prefix}${command.name}${aliases}${
+                content += `\`\`${this.client.prefix}${command.name}${aliases}${
                     command.description?.format ? ` ${command.description?.format.replace("[prefix]", this.client.prefix).replace("[aliases]", aliases)}` : ""
                 }\`\` → ${command.description?.content}\n`;
             }
 
-            if (reply) replyEmbed.addFields([{ name: `${name} Commands`, value: reply }]);
-        }
+            embed.setFooter({ text: "Parameters with a '?' at the start are optional." });
+            embed.setDescription(`As of right now, you may use some commands with the \`${prefix}\` prefix in chat. This may be removed in the future!`);
+            embed.addFields({ name: group + " Commands", value: content });
 
-        this.reply(int, { embeds: [replyEmbed] });
+            reply.edit({ embeds: [embed], components: [] });
+        });
+
+        collector?.on("end", (collected, reason) => {
+            if (!collected.size && reason == "time") {
+                menu.setDisabled(true);
+                reply.edit({ embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)] });
+            }
+        });
     }
 }
