@@ -14,8 +14,8 @@ export class VolumeCommand extends Command {
         this.legacyAliases = ["v"];
 
         this.description = {
-            content: "Set the music volume for the server.",
-            format: "<number>(0-100)",
+            content: "View or set the music volume for the server.",
+            format: "<?number>(0-100)",
         };
 
         this.cooldown = 5;
@@ -26,11 +26,17 @@ export class VolumeCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content!)
             .setDMPermission(false)
-            .addStringOption((option) => option.setName("number").setDescription("The volume to set. (0-100)").setRequired(true));
+            .addStringOption((option) => option.setName("number").setDescription("The volume to set. (0-100)"));
     }
 
     async execute(int: ChatInputCommandInteraction | Message) {
         const args = this.getArgs(int)[0] as string;
+
+        if (!args) {
+            const res = await this.client.cache.music.get(int.guildId!);
+            return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`The current volume is \`${res?.volume ?? 100}\`!`)] });
+        }
+
         const volume = parseInt(args);
 
         if (isNaN(volume)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Invalid volume provided!")] });
@@ -49,7 +55,7 @@ export class VolumeCommand extends Command {
                         create: {
                             volume: volume,
                         },
-                    }
+                    },
                 },
             },
             create: {
@@ -62,9 +68,11 @@ export class VolumeCommand extends Command {
             },
             select: {
                 music: true,
-            }
+            },
         });
         if (!res?.music) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("An error occured while setting the volume!")] });
+
+        this.client.cache.music.update(int.guildId!, res.music);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (subscription) {
