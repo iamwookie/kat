@@ -42,9 +42,14 @@ export class VolumeCommand extends Command {
             },
             update: {
                 music: {
-                    update: {
-                        volume: volume,
-                    },
+                    upsert: {
+                        update: {
+                            volume: volume,
+                        },
+                        create: {
+                            volume: volume,
+                        },
+                    }
                 },
             },
             create: {
@@ -57,7 +62,7 @@ export class VolumeCommand extends Command {
             },
             select: {
                 music: true,
-            },
+            }
         });
         if (!res?.music) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("An error occured while setting the volume!")] });
 
