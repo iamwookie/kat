@@ -20,6 +20,11 @@ export class Command {
         this.client = client;
         this.commander = commander;
     }
+    async usage(interaction) {
+        const config = await this.client.cache.guilds.get(interaction.guild?.id);
+        const prefix = config?.prefix ?? this.client.legacyPrefix;
+        return `${prefix}${this.name} ${this.description?.format}`;
+    }
     applyCooldown(user) {
         if (!this.cooldown)
             return;
@@ -39,8 +44,7 @@ export class Command {
     }
     getArgs(interaction) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => typeof option.value == "string" ? option.value.split(/ +/) : option.options).flat();
-            ;
+            return interaction.options.data.map((option) => (typeof option.value == "string" ? option.value.split(/ +/) : option.options)).flat();
         }
         else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);

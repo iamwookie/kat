@@ -1,5 +1,5 @@
 import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from "./Track.js";
-import { NodeError, PlayerError } from '../../utils/errors.js';
+import { NodeError, PlayerError } from "../../utils/errors.js";
 export class Subscription {
     client;
     guild;
@@ -46,14 +46,7 @@ export class Subscription {
                 const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
                 client.subscriptions.set(guild.id, subscription);
                 client.emit("subscriptionCreate", subscription);
-                const res = await client.prisma.music.findUnique({
-                    where: {
-                        guildId: guild.id
-                    },
-                    select: {
-                        volume: true
-                    }
-                });
+                const res = await client.cache.music.get(guild.id);
                 if (res?.volume)
                     subscription.volume = res.volume;
                 return subscription;
@@ -121,7 +114,7 @@ export class Subscription {
         return this.player.setPaused(false);
     }
     loop() {
-        return this.looped = !this.looped;
+        return (this.looped = !this.looped);
     }
     // Getters
     get duration() {
