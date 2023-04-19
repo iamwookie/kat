@@ -12,8 +12,8 @@ export class MessageCreate extends Event {
     async execute(message: Message) {
         if (message.author.bot) return;
 
-        const res = await this.client.cache.getConfig(message.guild?.id!);
-        const prefix = res?.prefix || this.client.legacyPrefix;
+        const config = await this.client.cache.guilds.get(message.guild?.id!);
+        const prefix = config?.prefix || this.client.legacyPrefix;
         if (!message.content.startsWith(prefix)) return;
 
         const commandName = message.content.slice(prefix.length).trim().split(/ +/).shift()?.toLowerCase()!;

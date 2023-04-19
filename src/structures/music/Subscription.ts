@@ -2,7 +2,7 @@ import { KATClient as Client } from "../Client.js";
 import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from "./Track.js";
 import { Guild, VoiceBasedChannel, TextBasedChannel } from "discord.js";
 import { Shoukaku, Player, Node } from "shoukaku";
-import { NodeError, PlayerError } from '@utils/errors.js';
+import { NodeError, PlayerError } from "@utils/errors.js";
 
 export class Subscription {
     public shoukaku: Shoukaku;
@@ -11,15 +11,8 @@ export class Subscription {
     public looped: boolean = false;
     public volume: number = 100;
     public destroyed: boolean = false;
-    
-    constructor(
-        public client: Client,
-        public guild: Guild,
-        public voiceChannel: VoiceBasedChannel,
-        public textChannel: TextBasedChannel | null,
-        public player: Player,
-        public node: Node
-    ) {
+
+    constructor(public client: Client, public guild: Guild, public voiceChannel: VoiceBasedChannel, public textChannel: TextBasedChannel | null, public player: Player, public node: Node) {
         this.shoukaku = client.shoukaku;
 
         this.player.on("exception", (reason) => this.client.emit("playerException", this, reason));
@@ -51,14 +44,7 @@ export class Subscription {
                 client.subscriptions.set(guild.id, subscription);
                 client.emit("subscriptionCreate", subscription);
 
-                const res = await client.prisma.music.findUnique({
-                    where: {
-                        guildId: guild.id
-                    },
-                    select: {
-                        volume: true
-                    }
-                });
+                const res = await client.cache.music.get(guild.id);
                 if (res?.volume) subscription.volume = res.volume;
 
                 return subscription;
@@ -126,7 +112,7 @@ export class Subscription {
     }
 
     loop() {
-        return this.looped = !this.looped;
+        return (this.looped = !this.looped);
     }
 
     // Getters

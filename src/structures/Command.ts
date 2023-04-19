@@ -24,16 +24,19 @@ export abstract class Command {
 
     public guilds?: Snowflake[];
     public users?: Snowflake[];
-    
+
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
     abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
-    constructor(
-        public client: Client,
-        public commander: Commander
-    ) {}
+    constructor(public client: Client, public commander: Commander) {}
+
+    async usage(interaction: ChatInputCommandInteraction | Message) {
+        const config = await this.client.cache.guilds.get(interaction.guild?.id!);
+        const prefix = config?.prefix ?? this.client.legacyPrefix;
+        return `${prefix}${this.name} ${this.description?.format}`;
+    }
 
     applyCooldown(user: User): void {
         if (!this.cooldown) return;
@@ -56,7 +59,7 @@ export abstract class Command {
 
     getArgs(interaction: ChatInputCommandInteraction | Message) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => typeof option.value == "string" ? option.value.split(/ +/) : option.options).flat();;
+            return interaction.options.data.map((option) => (typeof option.value == "string" ? option.value.split(/ +/) : option.options)).flat();
         } else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);
         }

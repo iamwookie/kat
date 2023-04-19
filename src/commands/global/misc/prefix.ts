@@ -45,7 +45,7 @@ export class PrefixCommand extends Command {
             },
         });
 
-        this.client.cache.update(res.guildId, res);
+        this.client.cache.guilds.update(res.guildId, res);
 
         if (res) {
             return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`Successfully set the prefix to \`${res.prefix}\`!`)] });
