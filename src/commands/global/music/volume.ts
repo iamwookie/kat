@@ -14,8 +14,8 @@ export class VolumeCommand extends Command {
         this.legacyAliases = ["v"];
 
         this.description = {
-            content: "Set the music volume for the server. (0-100)",
-            format: "<number>",
+            content: "Set the music volume for the server.",
+            format: "<number>(0-100)",
         };
 
         this.cooldown = 5;
