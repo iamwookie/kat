@@ -7,6 +7,21 @@ export class SubscriptionCreate extends Event {
 
     async execute(subscription: MusicSubscription) {
         this.client.logger.info(`Music >> Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`);
+ 
+        await this.client.prisma.subscription.upsert({
+            where: {
+                guildId: subscription.guild.id,
+            },
+            update: {
+                voiceId: subscription.voiceChannel.id,
+                textId: subscription.textChannel?.id,
+            },
+            create: {
+                guildId: subscription.guild.id,
+                voiceId: subscription.voiceChannel.id,
+                textId: subscription.textChannel?.id,
+            },
+        });
 
         setTimeout(() => {
             {
