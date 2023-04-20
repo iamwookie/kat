@@ -1,13 +1,14 @@
 export const bot = {
     devId: "244662779745665026",
     prefix: "/",
+    cliPrefix: ":",
     legacyPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
-    emotes: {
-        music: {
-            youtube: "<:youtube:1067881972774477844>",
-            spotify: "<:spotify:1067881968697614476>",
-            slider: "⚪",
-        },
+};
+export const emotes = {
+    music: {
+        youtube: "<:youtube:1067881972774477844>",
+        spotify: "<:spotify:1067881968697614476>",
+        slider: "⚪",
     },
 };
 export const server = {

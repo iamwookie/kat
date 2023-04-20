@@ -1,6 +1,6 @@
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "../structures/index.js";
-import { bot as config } from "../../config.js";
-const musicEmotes = config.emotes.music;
+import { emotes } from "../../config.js";
+const musicEmotes = emotes.music;
 export function formatDuration(timeInMs) {
     const time = Math.floor(timeInMs / 1000);
     const hours = Math.floor(time / 3600);

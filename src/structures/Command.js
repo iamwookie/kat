@@ -89,13 +89,3 @@ export class Command {
         return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? " " + this.description.format : ""}`;
     }
 }
-export class CLICommand {
-    client;
-    commander;
-    name;
-    constructor(client, commander, name) {
-        this.client = client;
-        this.commander = commander;
-        this.name = name;
-    }
-}

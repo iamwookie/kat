@@ -6,22 +6,22 @@ export class ActionEmbed extends EmbedBuilder {
         this.embedType = embedType;
         this.embedType = embedType;
     }
-    setDesc(description) {
+    setText(content) {
         switch (this.embedType) {
             case 'success':
                 super.setColor('Green');
-                super.setDescription(`✅ \u200b ${description}`);
+                super.setDescription(`✅ \u200b ${content}`);
                 break;
             case 'fail':
                 super.setColor('Red');
-                super.setDescription(`🚫 \u200b ${description}`);
+                super.setDescription(`🚫 \u200b ${content}`);
                 break;
             case 'warn':
                 super.setColor('Yellow');
-                super.setDescription(`⚠️ \u200b ${description}`);
+                super.setDescription(`⚠️ \u200b ${content}`);
                 break;
             default:
-                super.setDescription(`${description}`);
+                super.setDescription(content);
         }
         return this;
     }

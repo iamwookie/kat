@@ -20,9 +20,9 @@ export class SkipCommand extends Command {
         const author = this.getAuthor(int);
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The queue is empty or does not exist!")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setText("The queue is empty or does not exist!")] });
         if (subscription.queue.length == 0)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("This is the last track in the queue!")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setText("This is the last track in the queue!")] });
         this.applyCooldown(author);
         const next = subscription.queue[0];
         const embed = new MusicEmbed(subscription).setUser(author).setPlaying(next).setSkipped(subscription.active);

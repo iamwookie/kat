@@ -1,5 +1,5 @@
 // ----- FOR LATER USE -----
-import pm2 from "pm2";
+import readline from "readline";
 import { REST, Routes, ChatInputCommandInteraction, Collection } from "discord.js";
 import { Module } from "./Module.js";
 import { ActionEmbed } from "../utils/embeds/index.js";
@@ -27,6 +27,7 @@ const cliCommands = [
 ];
 export class Commander {
     client;
+    readline = readline.createInterface(process.stdin);
     rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
     cli = new Collection();
     groups = new Collection();
@@ -37,35 +38,22 @@ export class Commander {
     aliases = new Collection();
     constructor(client) {
         this.client = client;
-        try {
-            pm2.launchBus((err, bus) => {
-                if (err)
-                    throw err;
-                bus.on("process:message", (packet) => {
-                    const content = packet.data;
-                    if (!content)
-                        return;
-                    const commandName = content.split(" ")[0];
-                    const command = this.cli.get(commandName);
-                    if (!command)
-                        return;
-                    try {
-                        command.execute(content);
-                    }
-                    catch (err) {
-                        this.client.logger.error(err);
-                        console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
-                        console.error(err);
-                    }
-                });
-                this.client.logger.info("Commander >> Successfully Initialized CLI");
-            });
-        }
-        catch (err) {
-            this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI"));
-            console.error(err);
-        }
+        this.readline.on("line", (content) => {
+            if (!content.startsWith(this.client.cliPrefix))
+                return;
+            const commandName = content.split(" ")[0].slice(this.client.cliPrefix.length);
+            const command = this.cli.get(commandName);
+            if (!command)
+                return;
+            try {
+                command.execute(content);
+            }
+            catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
+                console.error(err);
+            }
+        });
     }
     async initialize() {
         this.initializeCLICommands();
@@ -226,14 +214,14 @@ export class Commander {
     validate(interaction, command) {
         const author = interaction instanceof ChatInputCommandInteraction ? interaction.user : interaction.author;
         if (command.users && !command.users.includes(author.id)) {
-            command.reply(interaction, { embeds: [new ActionEmbed("fail").setDesc("You are not allowed to use this command!")] });
+            command.reply(interaction, { embeds: [new ActionEmbed("fail").setText("You are not allowed to use this command!")] });
             return false;
         }
         if (command.cooldown && command.cooldowns) {
             if (command.cooldowns.has(author.id)) {
                 const cooldown = command.cooldowns.get(author.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-                command.reply(interaction, { embeds: [new ActionEmbed("fail").setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                command.reply(interaction, { embeds: [new ActionEmbed("fail").setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
         }

@@ -20,8 +20,8 @@ export class StopCommand extends Command {
     async execute(int) {
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I'm not playing anything!")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setText("I'm not playing anything!")] });
         subscription.destroy();
-        return this.reply(int, { embeds: [new ActionEmbed("success").setDesc("Successfully disconnected. Cya! 👋")] });
+        return this.reply(int, { embeds: [new ActionEmbed("success").setText("Successfully disconnected. Cya! 👋")] });
     }
 }
