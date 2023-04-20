@@ -44,7 +44,9 @@ export class Command {
         else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);
         }
-        return [];
+        else {
+            return [];
+        }
     }
     reply(interaction, content) {
         if (interaction instanceof ChatInputCommandInteraction) {
@@ -52,6 +54,20 @@ export class Command {
         }
         else if (interaction instanceof Message) {
             return interaction.channel.send(content);
+        }
+        else {
+            return Promise.reject("Invalid interaction.");
+        }
+    }
+    edit(interaction, editable, content) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content);
+        }
+        else if (interaction instanceof Message) {
+            return editable.edit(content);
+        }
+        else {
+            return Promise.reject("Invalid interaction.");
         }
     }
     get usage() {

@@ -1,5 +1,5 @@
 import { Command, Module } from "../../../structures/index.js";
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, CommandInteraction, } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, } from "discord.js";
 export class HelpCommand extends Command {
     constructor(client, commander) {
         super(client, commander);
@@ -49,13 +49,12 @@ export class HelpCommand extends Command {
                     .map((c) => `\`${c.usage}\` → ${c.description?.content}`)
                     .join("\n"),
             });
-            int instanceof CommandInteraction ? int.editReply({ embeds: [embed], components: [] }) : reply.edit({ embeds: [embed], components: [] });
+            this.edit(int, reply, { embeds: [embed], components: [] });
         });
         collector?.on("end", (collected, reason) => {
             if (!collected.size && reason == "time") {
                 menu.setDisabled(true);
-                const row = new ActionRowBuilder().addComponents(menu);
-                int instanceof CommandInteraction ? int.editReply({ embeds: [embed], components: [row] }) : reply.edit({ embeds: [embed], components: [row] });
+                this.edit(int, reply, { embeds: [embed], components: [new ActionRowBuilder().addComponents(menu)] });
             }
         });
     }
