@@ -57,7 +57,6 @@ export class HelpCommand extends Command {
         }
 
         const reply = await this.reply(int, { embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)] });
-
         const filter = (i: Interaction) => i.isStringSelectMenu() && i.customId == "help_menu" && i.message.id == reply.id && i.user.id == author.id;
         const collector = int.channel?.createMessageComponentCollector({ filter, time: 60_000, max: 1 });
 
