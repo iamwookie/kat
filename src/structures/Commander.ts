@@ -2,9 +2,8 @@
 import { KATClient as Client } from "./Client.js";
 
 // ----- FOR LATER USE -----
-import readline from "readline";
 import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";
-import { Command, CLICommand } from "./Command.js";
+import { Command } from "./Command.js";
 import { Module } from "./Module.js";
 import { ActionEmbed } from "@utils/embeds/index.js";
 
@@ -30,15 +29,9 @@ const commands = [
     Commands.AffiliateCommand,
 ];
 
-const cliCommands = [
-    Commands.WarnCommand
-];
-
 export class Commander {
-    private readline = readline.createInterface(process.stdin);
     private rest: REST = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
-    public cli: Collection<string, CLICommand> = new Collection();
     public groups: Collection<string, Collection<string, Command>> = new Collection();
     public commands: Collection<string, Command> = new Collection();
     public global: Collection<string, Command> = new Collection();
@@ -46,26 +39,9 @@ export class Commander {
     public modules: Collection<string, Module> = new Collection();
     public aliases: Collection<string, string> = new Collection();
 
-    constructor(public readonly client: Client) {
-        this.readline.on("line", (content) => {
-            if (!content.startsWith(this.client.cliPrefix)) return;
-
-            const commandName = content.split(" ")[0].slice(this.client.cliPrefix.length);
-            const command = this.cli.get(commandName);
-            if (!command) return;
-
-            try {
-                command.execute(content);
-            } catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
-                console.error(err);
-            }
-        });
-    }
+    constructor(public readonly client: Client) {}
 
     async initialize() {
-        this.initializeCLICommands();
         this.initializeCommands();
         this.initializeModules();
 
@@ -73,23 +49,6 @@ export class Commander {
         await this.registerReservedCommands();
 
         this.intiliazeEvents();
-    }
-
-    initializeCLICommands() {
-        if (!cliCommands.length) return;
-
-        for (const CLICommand of cliCommands) {
-            try {
-                const command = new CLICommand(this.client, this);
-                this.cli.set(command.name, command);
-            } catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI Command"));
-                console.error(err);
-            }
-        }
-
-        this.client.logger.info(`Commander >> Successfully Initialized ${cliCommands.length} CLI Command(s)`);
     }
 
     initializeCommands() {

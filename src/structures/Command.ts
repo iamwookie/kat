@@ -14,13 +14,6 @@ import {
     MessageCreateOptions,
 } from "discord.js";
 
-export interface CLICommand {
-    client: Client;
-    commander: Commander;
-    name: string;
-    execute(content: string): Promise<any>;
-}
-
 interface CommandOptions {
     name: string;
     group: string;
