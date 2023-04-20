@@ -29,6 +29,6 @@ export class LoopCommand extends Command {
         if (!subscription || !subscription.active) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I'm not playing anything!")] });
 
         subscription.loop();
-        return this.reply(int, { embeds: [new MusicEmbed(subscription).setLooped(subscription.active)] });
+        this.reply(int, { embeds: [new MusicEmbed(subscription).setLooped(subscription.active)] });
     }
 }

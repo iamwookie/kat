@@ -34,6 +34,6 @@ export class PauseCommand extends Command {
 
         const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();
-        return this.reply(int, { embeds: [embed] });
+        this.reply(int, { embeds: [embed] });
     }
 }

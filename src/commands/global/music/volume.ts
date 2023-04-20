@@ -34,11 +34,10 @@ export class VolumeCommand extends Command {
 
         if (!args) {
             const res = await this.client.cache.music.get(int.guildId!);
-            return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`The current volume is \`${res?.volume ?? 100}\`!`)] });
+            return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`The current volume is \`${res?.volume ?? 100}%\`!`)] });
         }
 
         const volume = parseInt(args);
-
         if (isNaN(volume)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Invalid volume provided!")] });
         if (volume < 0 || volume > 100) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Volume must be between `0` and `100`!")] });
 
@@ -83,7 +82,7 @@ export class VolumeCommand extends Command {
         return this.reply(int, {
             embeds: [
                 new ActionEmbed("success").setDesc(
-                    `Set the music volume to \`${res.music.volume}\`!${subscription ? "\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```" : ""}`
+                    `Set the music volume to \`${res.music.volume}%\`!${subscription ? "\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```" : ""}`
                 ),
             ],
         });

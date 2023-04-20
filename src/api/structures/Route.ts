@@ -10,8 +10,6 @@ export abstract class Route {
         public client: Client,
         public path: string,
     ) {
-        this.client = client;
-        this.path = path;
         this.router = Router();
     }
 }

@@ -34,8 +34,6 @@ export class SkipCommand extends Command {
         const next = subscription.queue[0];
         const embed = new MusicEmbed(subscription).setUser(author).setPlaying(next).setSkipped(subscription.active);
         subscription.stop();
-        return this.reply(int, { embeds: [embed] });
+        this.reply(int, { embeds: [embed] });
     }
 }
-
-// START FULL OVERHAUL OF MUSIC NOW
