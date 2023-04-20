@@ -5,5 +5,10 @@ export class SubscriptionDestroy extends Event {
     }
     async execute(subscription) {
         this.client.logger.warn(`Music >> Subscription Destroyed for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`);
+        await this.client.prisma.subscription.deleteMany({
+            where: {
+                guildId: subscription.guild.id,
+            },
+        });
     }
 }

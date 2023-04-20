@@ -23,6 +23,15 @@ model Music {
     guild     Guild    @relation(fields: [guildId], references: [guildId])
 }
 
+// Add queue later
+model Subscription {
+    id        Int      @id @default(autoincrement())
+    guildId   String   @unique
+    voiceId   String
+    textId    String?
+    createdAt DateTime @default(now())
+}
+
 model Affiliate {
     id        Int      @id @default(autoincrement())
     guildId   String
