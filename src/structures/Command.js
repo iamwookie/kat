@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Message, Collection } from "discord.js";
+import { ChatInputCommandInteraction, Message, Collection, } from "discord.js";
 export class Command {
     client;
     commander;
@@ -87,5 +87,15 @@ export class Command {
     get usage() {
         const aliases = this.aliases ? ", " + this.aliases.map((alias) => this.client.prefix + alias).join(", ") : "";
         return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? " " + this.description.format : ""}`;
+    }
+}
+export class CLICommand {
+    client;
+    commander;
+    name;
+    constructor(client, commander, name) {
+        this.client = client;
+        this.commander = commander;
+        this.name = name;
     }
 }

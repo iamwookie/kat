@@ -22,8 +22,6 @@ export class HelpCommand extends Command {
         const menu = new StringSelectMenuBuilder().setCustomId("help_menu").setPlaceholder("Select a category");
         // In future, won't have to do this as groups will be replaced with modules
         for (const [group, commands] of this.client.commander.groups) {
-            if (group == "CLI")
-                continue;
             for (const command of commands.values()) {
                 if (command.hidden ||
                     command.disabled ||

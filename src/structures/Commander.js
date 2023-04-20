@@ -1,5 +1,5 @@
 // ----- FOR LATER USE -----
-// import readline, { Interface } from "readline";
+import pm2 from "pm2";
 import { REST, Routes, ChatInputCommandInteraction, Collection } from "discord.js";
 import { Module } from "./Module.js";
 import { ActionEmbed } from "../utils/embeds/index.js";
@@ -22,10 +22,11 @@ const commands = [
     Commands.HelpCommand,
     Commands.AffiliateCommand,
 ];
+const cliCommands = [
+    Commands.WarnCommand
+];
 export class Commander {
     client;
-    // ----- FOR LATER USE -----
-    // private readline: Interface = readline.createInterface(process.stdin);
     rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
     cli = new Collection();
     groups = new Collection();
@@ -36,6 +37,35 @@ export class Commander {
     aliases = new Collection();
     constructor(client) {
         this.client = client;
+        try {
+            pm2.launchBus((err, bus) => {
+                if (err)
+                    throw err;
+                bus.on("process:message", (packet) => {
+                    const content = packet.data;
+                    if (!content)
+                        return;
+                    const commandName = content.split(" ")[0];
+                    const command = this.cli.get(commandName);
+                    if (!command)
+                        return;
+                    try {
+                        command.execute(content);
+                    }
+                    catch (err) {
+                        this.client.logger.error(err);
+                        console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
+                        console.error(err);
+                    }
+                });
+                this.client.logger.info("Commander >> Successfully Initialized CLI");
+            });
+        }
+        catch (err) {
+            this.client.logger.error(err);
+            console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI"));
+            console.error(err);
+        }
     }
     async initialize() {
         this.initializeCLICommands();
@@ -46,13 +76,11 @@ export class Commander {
         this.intiliazeEvents();
     }
     initializeCLICommands() {
-        const commands = [];
-        if (!commands.length)
+        if (!cliCommands.length)
             return;
-        for (const Command of commands) {
+        for (const CLICommand of cliCommands) {
             try {
-                const command = new Command(this);
-                command.initialize();
+                const command = new CLICommand(this.client, this);
                 this.cli.set(command.name, command);
             }
             catch (err) {
@@ -61,7 +89,7 @@ export class Commander {
                 console.error(err);
             }
         }
-        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} CLI Command(s)`);
+        this.client.logger.info(`Commander >> Successfully Initialized ${cliCommands.length} CLI Command(s)`);
     }
     initializeCommands() {
         if (!commands.length)
