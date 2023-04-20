@@ -7,7 +7,7 @@ export class ClientReady extends Event {
         super(client, commander, Events.ClientReady);
     }
     async execute(client) {
-        this.commander.modules.forEach(module => module.onReady(client));
+        this.commander.modules.forEach((module) => module.onReady(client));
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
         // Move to a method in the future
@@ -29,6 +29,8 @@ export class ClientReady extends Event {
                 }
             }
             this.client.logger.info(`Music >> Warnings Sent`);
+            await this.client.prisma.subscription.deleteMany();
+            this.client.logger.info(`Music >> Subscriptions Cleared`);
         }
         // ----------------------------
         console.log(chalk.magenta.bold.underline(`\n---- >>> App Online, Client: ${client.user?.tag} (${client.user?.id}) [Guilds: ${client.guilds.cache.size}]`));
