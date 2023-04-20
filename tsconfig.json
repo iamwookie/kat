@@ -28,5 +28,5 @@
         }
     },
 
-    "include": ["index.ts", "package.json", "src/**/*"],
+    "include": ["index.ts", "src/**/*"],
 }
