@@ -57,7 +57,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         client.logger.uncaught(err);
     });
 
-    process.on("beforeExit", async () => {
+    process.on("beforeReload", async () => {
         if (!client.subscriptions.size) return;
 
         console.log("-> Warning Subscriptions...");
