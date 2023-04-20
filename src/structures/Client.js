@@ -7,6 +7,7 @@ import { ShoukakuClient } from "./ShoukakuClient.js";
 import { TwitchClient } from "./TwitchClient.js";
 import { Server } from "../api/structures/Server.js";
 import { Cache } from "./Cache.js";
+import { ActionEmbed } from "../utils/embeds/action.js";
 import chalk from "chalk";
 export class KATClient extends Client {
     startTime = Date.now();
@@ -45,6 +46,26 @@ export class KATClient extends Client {
         this.on(Events.Error, (err) => { this.logger.error(err); });
         if (process.env.NODE_ENV != "production")
             this.on(Events.Debug, msg => { this.logger.debug(msg); });
+        process.on("beforeReload", async () => {
+            if (!this.subscriptions.size)
+                return;
+            console.log("-> Warning Subscriptions...");
+            for (const subscription of this.subscriptions.values()) {
+                if (!subscription.active)
+                    continue;
+                const channel = subscription.textChannel;
+                if (!channel)
+                    continue;
+                try {
+                    await channel.send({ embeds: [new ActionEmbed("warn").setText("The bot is restarting, replay your track after a few seconds!")] });
+                    console.log(`-> Warned ${subscription.guild.name} (${subscription.guild.id})`);
+                }
+                catch (err) {
+                    console.error(`-> Failed To Warn ${subscription.guild.name} (${subscription.guild.id}): ${err instanceof Error ? err.message : err}`);
+                }
+            }
+            console.log("-> Warned All Subscriptions");
+        });
     }
     async initialize() {
         try {

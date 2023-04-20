@@ -2,8 +2,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 // ------------------------------------
-import path, { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 import fs from "fs";
 // ------------------------------------
 import Sentry from "@sentry/node";
@@ -30,13 +30,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         ],
     });
     const client = new Client({
-        intents: [
-            GatewayIntentBits.Guilds,
-            GatewayIntentBits.GuildMembers,
-            GatewayIntentBits.GuildVoiceStates,
-            GatewayIntentBits.GuildMessages,
-            GatewayIntentBits.MessageContent,
-        ],
+        intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
         presence: {
             status: "online",
             activities: [
@@ -54,5 +48,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         client.logger.uncaught(err);
     });
     await client.initialize();
-    await client.login(process.env.DISCORD_TOKEN).catch(err => { client.logger.error(err); });
+    await client.login(process.env.DISCORD_TOKEN).catch((err) => {
+        client.logger.error(err);
+    });
 })();

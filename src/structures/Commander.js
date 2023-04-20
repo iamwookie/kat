@@ -1,5 +1,4 @@
 // ----- FOR LATER USE -----
-import readline from "readline";
 import { REST, Routes, ChatInputCommandInteraction, Collection } from "discord.js";
 import { Module } from "./Module.js";
 import { ActionEmbed } from "../utils/embeds/index.js";
@@ -22,14 +21,9 @@ const commands = [
     Commands.HelpCommand,
     Commands.AffiliateCommand,
 ];
-const cliCommands = [
-    Commands.WarnCommand
-];
 export class Commander {
     client;
-    readline = readline.createInterface(process.stdin);
     rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
-    cli = new Collection();
     groups = new Collection();
     commands = new Collection();
     global = new Collection();
@@ -38,46 +32,13 @@ export class Commander {
     aliases = new Collection();
     constructor(client) {
         this.client = client;
-        this.readline.on("line", (content) => {
-            if (!content.startsWith(this.client.cliPrefix))
-                return;
-            const commandName = content.split(" ")[0].slice(this.client.cliPrefix.length);
-            const command = this.cli.get(commandName);
-            if (!command)
-                return;
-            try {
-                command.execute(content);
-            }
-            catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
-                console.error(err);
-            }
-        });
     }
     async initialize() {
-        this.initializeCLICommands();
         this.initializeCommands();
         this.initializeModules();
         await this.registerGlobalCommands();
         await this.registerReservedCommands();
         this.intiliazeEvents();
-    }
-    initializeCLICommands() {
-        if (!cliCommands.length)
-            return;
-        for (const CLICommand of cliCommands) {
-            try {
-                const command = new CLICommand(this.client, this);
-                this.cli.set(command.name, command);
-            }
-            catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI Command"));
-                console.error(err);
-            }
-        }
-        this.client.logger.info(`Commander >> Successfully Initialized ${cliCommands.length} CLI Command(s)`);
     }
     initializeCommands() {
         if (!commands.length)
