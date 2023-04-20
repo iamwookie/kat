@@ -14,6 +14,13 @@ import {
     MessageCreateOptions,
 } from "discord.js";
 
+export interface CLICommand {
+    client: Client;
+    commander: Commander;
+    name: string;
+    execute(content: string): Promise<any>;
+}
+
 interface CommandOptions {
     name: string;
     group: string;
@@ -136,10 +143,4 @@ export abstract class Command implements CommandOptions {
         const aliases = this.aliases ? ", " + this.aliases.map((alias) => this.client.prefix + alias).join(", ") : "";
         return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? " " + this.description.format : ""}`;
     }
-}
-
-export abstract class CLICommand {
-    abstract execute(content: string): Promise<any>;
-
-    constructor(public client: Client, public commander: Commander, public name: string) {}
 }

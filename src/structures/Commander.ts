@@ -2,7 +2,7 @@
 import { KATClient as Client } from "./Client.js";
 
 // ----- FOR LATER USE -----
-import pm2 from "pm2";
+import readline from "readline";
 import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";
 import { Command, CLICommand } from "./Command.js";
 import { Module } from "./Module.js";
@@ -35,6 +35,7 @@ const cliCommands = [
 ];
 
 export class Commander {
+    private readline = readline.createInterface(process.stdin);
     private rest: REST = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
     public cli: Collection<string, CLICommand> = new Collection();
@@ -46,34 +47,21 @@ export class Commander {
     public aliases: Collection<string, string> = new Collection();
 
     constructor(public readonly client: Client) {
-        try {
-            pm2.launchBus((err, bus) => {
-                if (err) throw err;
+        this.readline.on("line", (content) => {
+            if (!content.startsWith(this.client.cliPrefix)) return;
 
-                bus.on("process:message", (packet: any) => {
-                    const content: string = packet.data;
-                    if (!content) return;
+            const commandName = content.split(" ")[0].slice(this.client.cliPrefix.length);
+            const command = this.cli.get(commandName);
+            if (!command) return;
 
-                    const commandName = content.split(" ")[0];
-                    const command = this.cli.get(commandName);
-                    if (!command) return;
-
-                    try {
-                        command.execute(content);
-                    } catch (err) {
-                        this.client.logger.error(err);
-                        console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
-                        console.error(err);
-                    }
-                });
-
-                this.client.logger.info("Commander >> Successfully Initialized CLI");
-            });
-        } catch (err) {
-            this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI"));
-            console.error(err);
-        }
+            try {
+                command.execute(content);
+            } catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
+                console.error(err);
+            }
+        });
     }
 
     async initialize() {
@@ -254,7 +242,7 @@ export class Commander {
         const author = interaction instanceof ChatInputCommandInteraction ? interaction.user : interaction.author;
 
         if (command.users && !command.users.includes(author.id)) {
-            command.reply(interaction, { embeds: [new ActionEmbed("fail").setDesc("You are not allowed to use this command!")] });
+            command.reply(interaction, { embeds: [new ActionEmbed("fail").setText("You are not allowed to use this command!")] });
             return false;
         }
 
@@ -263,7 +251,7 @@ export class Commander {
                 const cooldown = command.cooldowns.get(author.id)!;
                 const secondsLeft = (cooldown - Date.now()) / 1000;
 
-                command.reply(interaction, { embeds: [new ActionEmbed("fail").setDesc(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                command.reply(interaction, { embeds: [new ActionEmbed("fail").setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
                 return false;
             }
         }

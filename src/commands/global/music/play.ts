@@ -33,20 +33,20 @@ export class PlayCommand extends Command {
         const query = this.getArgs(int).join(" ");
 
         const voiceChannel: VoiceBasedChannel | null = (int.member as GuildMember).voice.channel;
-        if (!voiceChannel) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in a voice channel!")] });
-        if (!voiceChannel.joinable || !(voiceChannel as VoiceChannel).speakable) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I can't play in that voice channel!")] });
+        if (!voiceChannel) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("You are not in a voice channel!")] });
+        if (!voiceChannel.joinable || !(voiceChannel as VoiceChannel).speakable) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("I can't play in that voice channel!")] });
 
         let subscription = this.client.subscriptions.get(int.guildId!);
 
         if (subscription) {
-            if (!subscription.voiceChannel.members.has(author.id)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You are not in my voice channel!")] });
+            if (!subscription.voiceChannel.members.has(author.id)) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("You are not in my voice channel!")] });
             if (!query && subscription.paused) {
                 subscription.resume();
                 return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
             }
         }
 
-        if (!query) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("What should I play?")] });
+        if (!query) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("What should I play?")] });
 
         this.applyCooldown(author);
 
@@ -55,9 +55,9 @@ export class PlayCommand extends Command {
                 subscription = await MusicSubscription.create(this.client, int.guild!, voiceChannel, int.channel);
             } catch (err) {
                 if (err instanceof NodeError) {
-                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("No available music nodes. Please try again!")] });
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setText("No available music nodes. Please try again!")] });
                 } else if (err instanceof PlayerError) {
-                    return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Error establishing a voice channel connection. Try again in a few minutes!")] });
+                    return this.reply(int, { embeds: [new ActionEmbed("fail").setText("Error establishing a voice channel connection. Try again in a few minutes!")] });
                 } else {
                     const eventId = this.client.logger.error(err);
                     return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
@@ -77,11 +77,11 @@ export class PlayCommand extends Command {
 
         switch (res?.loadType) {
             case "LOAD_FAILED": {
-                this.reply(int, { embeds: [new ActionEmbed("fail").setDesc(`Failed to load track! \n\`${res.exception?.message}\``)] });
+                this.reply(int, { embeds: [new ActionEmbed("fail").setText(`Failed to load track! \n\`${res.exception?.message}\``)] });
                 break;
             }
             case "NO_MATCHES": {
-                this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
+                this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
                 break;
             }
             case "SEARCH_RESULT": {
@@ -93,7 +93,7 @@ export class PlayCommand extends Command {
                 break;
             }
             case "PLAYLIST_LOADED": {
-                if (!url) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
+                if (!url) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
 
                 const info = res.playlistInfo;
                 const tracks = res.tracks;
@@ -114,7 +114,7 @@ export class PlayCommand extends Command {
                         break;
                     }
                     default: {
-                        this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
+                        this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
                         break;
                     }
                 }
@@ -140,7 +140,7 @@ export class PlayCommand extends Command {
                         break;
                     }
                     default: {
-                        this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
+                        this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
                         break;
                     }
                 }
@@ -148,7 +148,7 @@ export class PlayCommand extends Command {
                 break;
             }
             default: {
-                this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("Could not find your search result!")] });
+                this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
                 break;
             }
         }

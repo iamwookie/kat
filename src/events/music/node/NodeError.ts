@@ -18,7 +18,7 @@ export class NodeError extends Event {
         const subscriptions = this.client.subscriptions;
         for (const subscription of subscriptions.values()) {
             if (subscription.node.name == name) subscription.destroy();
-            subscription.textChannel?.send({ embeds: [new ActionEmbed("fail").setDesc("The voice node has disconnected. Try playing another track!")] }).catch(() => {});
+            subscription.textChannel?.send({ embeds: [new ActionEmbed("fail").setText("The voice node has disconnected. Try playing another track!")] }).catch(() => {});
         }
     }
 }

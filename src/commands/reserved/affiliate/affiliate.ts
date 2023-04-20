@@ -37,13 +37,13 @@ export class AffiliateCommand extends Command {
 
         if (command === "create") {
             const user = int.options.getUser("user", true);
-            if (!user || user.bot) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The user you provided is invalid!")] });
+            if (!user || user.bot) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("The user you provided is invalid!")] });
 
             const members = await int.guild?.members.fetch();
-            if (!members?.has(user.id)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The user you provided is not in this server!")] });
+            if (!members?.has(user.id)) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("The user you provided is not in this server!")] });
 
             const affiliate = await module.createAffiliate(int.guild!, user);
-            if (!affiliate) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("An error occured while creating the affiliate link!")] });
+            if (!affiliate) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("An error occured while creating the affiliate link!")] });
 
             const embed = new EmbedBuilder()
                 .setColor("Green")
@@ -53,7 +53,7 @@ export class AffiliateCommand extends Command {
 
             this.reply(int, { embeds: [embed] });
         } else {
-            this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("You did not provide a valid sub command!")] });
+            this.reply(int, { embeds: [new ActionEmbed("fail").setText("You did not provide a valid sub command!")] });
         }
     }
 }

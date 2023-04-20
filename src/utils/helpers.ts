@@ -1,8 +1,8 @@
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "@structures/index.js";
 import { User } from "discord.js";
 
-import { bot as config } from "@config";
-const musicEmotes = config.emotes.music;
+import { emotes } from "@config";
+const musicEmotes = emotes.music;
 
 export function formatDuration(timeInMs: number) {
     const time = Math.floor(timeInMs / 1000);

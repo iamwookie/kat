@@ -24,7 +24,7 @@ export class LoopCommand extends Command {
 
     async execute(int: ChatInputCommandInteraction | Message) {
         const subscription = this.client.subscriptions.get(int.guildId!);
-        if (!subscription || !subscription.active) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I'm not playing anything!")] });
+        if (!subscription || !subscription.active) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("I'm not playing anything!")] });
 
         subscription.loop();
         this.reply(int, { embeds: [new MusicEmbed(subscription).setLooped(subscription.active)] });

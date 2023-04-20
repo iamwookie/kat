@@ -23,7 +23,7 @@ export class QueueCommand extends Command {
         const author = this.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
-        if (!subscription || (!subscription.active && !subscription.queue.length)) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The queue is empty or does not exist!")] });
+        if (!subscription || (!subscription.active && !subscription.queue.length)) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("The queue is empty or does not exist!")] });
 
         return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue)] });
     }
