@@ -56,7 +56,7 @@ export class HelpCommand extends Command {
             }
         }
 
-        const reply = await this.reply(int, { embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)] })!;
+        const reply = await this.reply(int, { embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)] });
 
         const filter = (i: Interaction) => i.isStringSelectMenu() && i.customId == "help_menu" && i.message.id == reply.id && i.user.id == author.id;
         const collector = int.channel?.createMessageComponentCollector({ filter, time: 60_000, max: 1 });
@@ -77,14 +77,13 @@ export class HelpCommand extends Command {
                     .join("\n"),
             });
 
-            int instanceof CommandInteraction ? int.editReply({ embeds: [embed], components: [] }) : reply.edit({ embeds: [embed], components: [] });
+            this.edit(int, reply, { embeds: [embed], components: [] })
         });
 
         collector?.on("end", (collected, reason) => {
             if (!collected.size && reason == "time") {
                 menu.setDisabled(true);
-                const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
-                int instanceof CommandInteraction ? int.editReply({ embeds: [embed], components: [row] }) : reply.edit({ embeds: [embed], components: [row] });
+                this.edit(int, reply, { embeds: [embed], components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)] });
             }
         });
     }

@@ -1,7 +1,7 @@
 import { KATClient as Client } from "./Client.js";
 import { Commander } from "./Commander.js";
 import { Module } from "./Module.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake, InteractionEditReplyOptions, MessagePayload, MessageReplyOptions } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake, InteractionEditReplyOptions, MessagePayload, MessageReplyOptions, MessageEditOptions, MessageCreateOptions } from "discord.js";
 
 export abstract class Command {
     public name: string;
@@ -56,16 +56,28 @@ export abstract class Command {
             return interaction.options.data.map((option) => (typeof option.value == "string" ? option.value.split(/ +/) : option.options)).flat();
         } else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);
+        } else {
+            return [];
         }
-
-        return [];
     }
 
-    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageReplyOptions | InteractionEditReplyOptions) {
+    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content as string | MessagePayload | InteractionEditReplyOptions);
+            return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
         } else if (interaction instanceof Message) {
-            return interaction.channel.send(content as string | MessagePayload | MessageReplyOptions);
+            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject("Invalid interaction.");
+        }
+    }
+
+    edit(interaction: ChatInputCommandInteraction | Message, editable: Message, content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
+        } else if (interaction instanceof Message) {
+            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject("Invalid interaction.");
         }
     }
 
