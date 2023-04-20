@@ -16,6 +16,7 @@ import { bot as config } from "@config";
 
 import chalk from "chalk";
 
+import pm2 from "pm2";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 (async () => {

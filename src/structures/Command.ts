@@ -1,7 +1,18 @@
 import { KATClient as Client } from "./Client.js";
 import { Commander } from "./Commander.js";
 import { Module } from "./Module.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake, InteractionEditReplyOptions, MessagePayload, MessageReplyOptions, MessageEditOptions, MessageCreateOptions } from "discord.js";
+import {
+    SlashCommandBuilder,
+    ChatInputCommandInteraction,
+    User,
+    Message,
+    Collection,
+    Snowflake,
+    InteractionEditReplyOptions,
+    MessagePayload,
+    MessageEditOptions,
+    MessageCreateOptions,
+} from "discord.js";
 
 interface CommandOptions {
     name: string;
@@ -49,7 +60,7 @@ export abstract class Command implements CommandOptions {
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
-    abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
+    abstract execute(interaction: string | ChatInputCommandInteraction | Message): Promise<any>;
 
     constructor(public client: Client, public commander: Commander, options: CommandOptions) {
         this.name = options.name;
@@ -125,4 +136,10 @@ export abstract class Command implements CommandOptions {
         const aliases = this.aliases ? ", " + this.aliases.map((alias) => this.client.prefix + alias).join(", ") : "";
         return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? " " + this.description.format : ""}`;
     }
+}
+
+export abstract class CLICommand {
+    abstract execute(content: string): Promise<any>;
+
+    constructor(public client: Client, public commander: Commander, public name: string) {}
 }

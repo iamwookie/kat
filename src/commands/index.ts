@@ -1,3 +1,8 @@
+// ----- RESERVED -----
+
+// Affiliate
+export { AffiliateCommand } from "./reserved/affiliate/affiliate.js";
+
 // ----- GLOBAL -----
 
 // Music
@@ -15,7 +20,5 @@ export { PlayCommand } from "./global/music/play.js";
 export { HelpCommand } from "./global/misc/help.js";
 export { PrefixCommand } from "./global/misc/prefix.js";
 
-// ----- RESERVED -----
-
-// Affiliate
-export { AffiliateCommand } from "./reserved/affiliate/affiliate.js";
+// ----- CLI -----
+export { WarnCommand } from "./cli/warn.js";

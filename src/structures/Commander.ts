@@ -2,9 +2,9 @@
 import { KATClient as Client } from "./Client.js";
 
 // ----- FOR LATER USE -----
-// import readline, { Interface } from "readline";
+import pm2 from "pm2";
 import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";
-import { Command } from "./Command.js";
+import { Command, CLICommand } from "./Command.js";
 import { Module } from "./Module.js";
 import { ActionEmbed } from "@utils/embeds/index.js";
 
@@ -30,12 +30,14 @@ const commands = [
     Commands.AffiliateCommand,
 ];
 
+const cliCommands = [
+    Commands.WarnCommand
+];
+
 export class Commander {
-    // ----- FOR LATER USE -----
-    // private readline: Interface = readline.createInterface(process.stdin);
     private rest: REST = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
-    public cli: Collection<string, Command> = new Collection();
+    public cli: Collection<string, CLICommand> = new Collection();
     public groups: Collection<string, Collection<string, Command>> = new Collection();
     public commands: Collection<string, Command> = new Collection();
     public global: Collection<string, Command> = new Collection();
@@ -43,7 +45,36 @@ export class Commander {
     public modules: Collection<string, Module> = new Collection();
     public aliases: Collection<string, string> = new Collection();
 
-    constructor(public readonly client: Client) {}
+    constructor(public readonly client: Client) {
+        try {
+            pm2.launchBus((err, bus) => {
+                if (err) throw err;
+
+                bus.on("process:message", (packet: any) => {
+                    const content: string = packet.data;
+                    if (!content) return;
+
+                    const commandName = content.split(" ")[0];
+                    const command = this.cli.get(commandName);
+                    if (!command) return;
+
+                    try {
+                        command.execute(content);
+                    } catch (err) {
+                        this.client.logger.error(err);
+                        console.error(chalk.red("Commander (ERROR) >> Error Running CLI Command"));
+                        console.error(err);
+                    }
+                });
+
+                this.client.logger.info("Commander >> Successfully Initialized CLI");
+            });
+        } catch (err) {
+            this.client.logger.error(err);
+            console.error(chalk.red("Commander (ERROR) >> Error Initializing CLI"));
+            console.error(err);
+        }
+    }
 
     async initialize() {
         this.initializeCLICommands();
@@ -57,14 +88,11 @@ export class Commander {
     }
 
     initializeCLICommands() {
-        const commands: any = [];
-        if (!commands.length) return;
+        if (!cliCommands.length) return;
 
-        for (const Command of commands) {
+        for (const CLICommand of cliCommands) {
             try {
-                const command = new Command(this);
-                command.initialize();
-
+                const command = new CLICommand(this.client, this);
                 this.cli.set(command.name, command);
             } catch (err) {
                 this.client.logger.error(err);
@@ -73,7 +101,7 @@ export class Commander {
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} CLI Command(s)`);
+        this.client.logger.info(`Commander >> Successfully Initialized ${cliCommands.length} CLI Command(s)`);
     }
 
     initializeCommands() {
