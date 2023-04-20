@@ -14,8 +14,6 @@ import { KATClient as Client } from "@structures/index.js";
 import { GatewayIntentBits, ActivityType } from "discord.js";
 import { bot as config } from "@config";
 
-import { ActionEmbed } from "@utils/embeds/action.js";
-
 import chalk from "chalk";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -55,28 +53,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
     process.on("uncaughtException", (err) => {
         client.logger.uncaught(err);
-    });
-
-    process.on("beforeReload", async () => {
-        if (!client.subscriptions.size) return;
-
-        console.log("-> Warning Subscriptions...");
-
-        for (const subscription of client.subscriptions.values()) {
-            if (!subscription.active) continue;
-
-            const channel = subscription.textChannel;
-            if (!channel) continue;
-
-            try {
-                await channel.send({ embeds: [new ActionEmbed("warn").setText("The bot is restarting, replay your track after a few seconds!")] });
-                console.log(`-> Warned ${subscription.guild.name} (${subscription.guild.id})`);
-            } catch (err) {
-                console.error(`-> Failed To Warn ${subscription.guild.name} (${subscription.guild.id}): ${err instanceof Error ? err.message : err}`);
-            }
-        }
-
-        console.log("-> Warned All Subscriptions");
     });
 
     await client.initialize();
