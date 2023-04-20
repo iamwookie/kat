@@ -3,14 +3,15 @@ import { SlashCommandBuilder } from "discord.js";
 import { ActionEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class SkipCommand extends Command {
     constructor(client, commander) {
-        super(client, commander);
-        this.name = "skip";
-        this.group = "Music";
-        this.legacy = true;
-        this.description = {
-            content: "Skip the track.",
-        };
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "skip",
+            group: "Music",
+            legacy: true,
+            description: {
+                content: "Skip the track.",
+            },
+            cooldown: 5,
+        });
     }
     data() {
         return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content).setDMPermission(false);
@@ -26,7 +27,6 @@ export class SkipCommand extends Command {
         const next = subscription.queue[0];
         const embed = new MusicEmbed(subscription).setUser(author).setPlaying(next).setSkipped(subscription.active);
         subscription.stop();
-        return this.reply(int, { embeds: [embed] });
+        this.reply(int, { embeds: [embed] });
     }
 }
-// START FULL OVERHAUL OF MUSIC NOW

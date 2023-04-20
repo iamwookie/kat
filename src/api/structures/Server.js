@@ -18,7 +18,6 @@ export class Server {
     app;
     constructor(client) {
         this.client = client;
-        this.client = client;
         this.port = client.config.server.port;
         this.app = express();
     }

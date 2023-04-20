@@ -5,15 +5,16 @@ import GeniusLyrics from "genius-lyrics";
 const genius = new GeniusLyrics.Client();
 export class LyricsCommand extends Command {
     constructor(client, commander) {
-        super(client, commander);
-        this.name = "lyrics";
-        this.group = "Music";
-        this.legacy = true;
-        this.description = {
-            content: "View the current tracks lyrics or search for one.",
-            format: "<?title/url>",
-        };
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "lyrics",
+            aliases: ["ly"],
+            group: "Music",
+            legacy: true,
+            description: {
+                content: "View the current tracks lyrics or search for one.",
+                format: "<?title/url>",
+            },
+        });
     }
     data() {
         return new SlashCommandBuilder()

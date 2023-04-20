@@ -5,16 +5,17 @@ import { NodeError, PlayerError } from "../../../utils/errors.js";
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class PlayCommand extends Command {
     constructor(client, commander) {
-        super(client, commander);
-        this.name = "play";
-        this.group = "Music";
-        this.legacy = true;
-        this.legacyAliases = ["p"];
-        this.description = {
-            content: "Add a track to the queue, or resume the current one.",
-            format: "<?title/url>",
-        };
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "play",
+            group: "Music",
+            legacy: true,
+            legacyAliases: ["p"],
+            description: {
+                content: "Add a track to the queue, or resume the current one.",
+                format: "<?title/url>",
+            },
+            cooldown: 5,
+        });
     }
     data() {
         return new SlashCommandBuilder()

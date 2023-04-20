@@ -4,16 +4,17 @@ import { ActionEmbed } from "../../../utils/embeds/index.js";
 // Add ability to see current volume next
 export class VolumeCommand extends Command {
     constructor(client, commander) {
-        super(client, commander);
-        this.name = "volume";
-        this.group = "Music";
-        this.legacy = true;
-        this.legacyAliases = ["v"];
-        this.description = {
-            content: "View or set the music volume for the server.",
-            format: "<?number>(0-100)",
-        };
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "volume",
+            group: "Music",
+            legacy: true,
+            legacyAliases: ["v"],
+            description: {
+                content: "View or set the music volume for the server.",
+                format: "<?number>(0-100)",
+            },
+            cooldown: 5,
+        });
     }
     data() {
         return new SlashCommandBuilder()
@@ -26,7 +27,7 @@ export class VolumeCommand extends Command {
         const args = this.getArgs(int)[0];
         if (!args) {
             const res = await this.client.cache.music.get(int.guildId);
-            return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`The current volume is \`${res?.volume ?? 100}\`!`)] });
+            return this.reply(int, { embeds: [new ActionEmbed("success").setDesc(`The current volume is \`${res?.volume ?? 100}%\`!`)] });
         }
         const volume = parseInt(args);
         if (isNaN(volume))
@@ -71,7 +72,7 @@ export class VolumeCommand extends Command {
         }
         return this.reply(int, {
             embeds: [
-                new ActionEmbed("success").setDesc(`Set the music volume to \`${res.music.volume}\`!${subscription ? "\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```" : ""}`),
+                new ActionEmbed("success").setDesc(`Set the music volume to \`${res.music.volume}%\`!${subscription ? "\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```" : ""}`),
             ],
         });
     }

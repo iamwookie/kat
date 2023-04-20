@@ -3,9 +3,11 @@ export class Module {
     commander;
     name;
     guilds;
-    constructor(client, commander) {
+    constructor(client, commander, options) {
         this.client = client;
         this.commander = commander;
+        this.name = options.name;
+        this.guilds = options.guilds;
     }
     onReady(client) { }
     onInviteCreate(invite) { }

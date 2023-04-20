@@ -13,12 +13,23 @@ export class Command {
     disabled;
     cooldown;
     ephemeral;
-    guilds;
     users;
     cooldowns = new Collection();
-    constructor(client, commander) {
+    constructor(client, commander, options) {
         this.client = client;
         this.commander = commander;
+        this.name = options.name;
+        this.group = options.group;
+        this.module = options.module;
+        this.aliases = options.aliases;
+        this.legacy = options.legacy;
+        this.legacyAliases = options.legacyAliases;
+        this.description = options.description;
+        this.hidden = options.hidden;
+        this.disabled = options.disabled;
+        this.cooldown = options.cooldown;
+        this.ephemeral = options.ephemeral;
+        this.users = options.users;
     }
     applyCooldown(user) {
         if (!this.cooldown)
@@ -35,6 +46,9 @@ export class Command {
         }
         else if (interaction instanceof Message) {
             return interaction.author;
+        }
+        else {
+            throw new Error("Invalid interaction.");
         }
     }
     getArgs(interaction) {

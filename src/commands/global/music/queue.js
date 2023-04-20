@@ -3,14 +3,15 @@ import { SlashCommandBuilder } from "discord.js";
 import { ActionEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
 export class QueueCommand extends Command {
     constructor(client, commander) {
-        super(client, commander);
-        this.name = "queue";
-        this.group = "Music";
-        this.legacy = true;
-        this.legacyAliases = ["q"];
-        this.description = {
-            content: "View the server queue.",
-        };
+        super(client, commander, {
+            name: "queue",
+            group: "Music",
+            legacy: true,
+            legacyAliases: ["q"],
+            description: {
+                content: "View the server queue.",
+            },
+        });
     }
     data() {
         return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content).setDMPermission(false);

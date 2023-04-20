@@ -6,8 +6,6 @@ export class Route {
     constructor(client, path) {
         this.client = client;
         this.path = path;
-        this.client = client;
-        this.path = path;
         this.router = Router();
     }
 }

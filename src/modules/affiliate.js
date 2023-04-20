@@ -1,22 +1,21 @@
 import { Module } from "../structures/index.js";
 import { Collection, EmbedBuilder } from "discord.js";
 export class AffiliateModule extends Module {
-    name;
-    guilds;
     invites = new Collection();
     channels = new Collection();
     constructor(client, commander) {
-        super(client, commander);
-        this.name = "Affiliate";
-        this.guilds = [
-            "1094860861505544314",
-            "1023866029069320242",
-        ];
+        super(client, commander, {
+            name: "Affiliate",
+            guilds: [
+                "1094860861505544314",
+                "1023866029069320242",
+            ],
+        });
         // In future, this will be handled by the db
         this.channels.set("1023866029069320242", ["1096530697876930560"]);
         this.channels.set("1094860861505544314", ["1094861185310011412"]);
     }
-    async onReady(client) {
+    async onReady() {
         // make this async
         const guilds = this.client.guilds.cache.filter((guild) => this.guilds?.includes(guild.id));
         if (!guilds.size)
