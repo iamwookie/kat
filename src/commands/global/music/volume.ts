@@ -5,20 +5,17 @@ import { ActionEmbed } from "@utils/embeds/index.js";
 // Add ability to see current volume next
 export class VolumeCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "volume";
-        this.group = "Music";
-
-        this.legacy = true;
-        this.legacyAliases = ["v"];
-
-        this.description = {
-            content: "View or set the music volume for the server.",
-            format: "<?number>(0-100)",
-        };
-
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "volume",
+            group: "Music",
+            legacy: true,
+            legacyAliases: ["v"],
+            description: {
+                content: "View or set the music volume for the server.",
+                format: "<?number>(0-100)",
+            },
+            cooldown: 5,
+        });
     }
 
     data() {

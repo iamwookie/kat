@@ -4,18 +4,15 @@ import { ActionEmbed, MusicEmbed } from "@utils/embeds/index.js";
 
 export class SkipCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "skip";
-        this.group = "Music";
-
-        this.legacy = true;
-
-        this.description = {
-            content: "Skip the track.",
-        };
-
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "skip",
+            group: "Music",
+            legacy: true,
+            description: {
+                content: "Skip the track.",
+            },
+            cooldown: 5,
+        });
     }
 
     data() {
@@ -23,7 +20,7 @@ export class SkipCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction | Message) {
-        const author = this.getAuthor(int)!;
+        const author = this.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The queue is empty or does not exist!")] });

@@ -7,19 +7,16 @@ const genius = new GeniusLyrics.Client();
 
 export class LyricsCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "lyrics";
-        this.group = "Music";
-
-        this.legacy = true;
-
-        this.description = {
-            content: "View the current tracks lyrics or search for one.",
-            format: "<?title/url>",
-        };
-
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "lyrics",
+            aliases: ["ly"],
+            group: "Music",
+            legacy: true,
+            description: {
+                content: "View the current tracks lyrics or search for one.",
+                format: "<?title/url>",
+            },
+        });
     }
 
     data() {
@@ -31,7 +28,7 @@ export class LyricsCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction | Message) {
-        const author = this.getAuthor(int)!;
+        const author = this.getAuthor(int);
         let query = this.getArgs(int).join(" ");
 
         const subscription = this.client.subscriptions.get(int.guildId!);

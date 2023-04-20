@@ -7,26 +7,22 @@ import {
     ActionRowBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
-    CommandInteraction,
     Interaction,
     StringSelectMenuInteraction,
 } from "discord.js";
 
 export class HelpCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "help";
-        this.group = "Misc";
-        this.aliases = ["info"];
-
-        this.legacy = true;
-
-        this.description = {
-            content: "Stop it, get some help.",
-        };
-
-        this.ephemeral = true;
+        super(client, commander, {
+            name: "help",
+            group: "Misc",
+            aliases: ["info"],
+            legacy: true,
+            description: {
+                content: "Stop it, get some help.",
+            },
+            ephemeral: true,
+        });
     }
 
     data() {
@@ -34,10 +30,9 @@ export class HelpCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction | Message) {
-        const author = this.getAuthor(int)!;
-
+        const author = this.getAuthor(int);
         const embed = new EmbedBuilder().setTitle("**Help Menu**").setDescription(`Select an option from the dropdown menu below.`);
-        const menu = new StringSelectMenuBuilder().setCustomId("help_menu").setPlaceholder("Select an option");
+        const menu = new StringSelectMenuBuilder().setCustomId("help_menu").setPlaceholder("Select a category");
 
         // In future, won't have to do this as groups will be replaced with modules
         for (const [group, commands] of this.client.commander.groups) {
@@ -76,7 +71,7 @@ export class HelpCommand extends Command {
                     .join("\n"),
             });
 
-            this.edit(int, reply, { embeds: [embed], components: [] })
+            this.edit(int, reply, { embeds: [embed], components: [] });
         });
 
         collector?.on("end", (collected, reason) => {

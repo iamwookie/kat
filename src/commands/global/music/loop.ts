@@ -4,17 +4,15 @@ import { MusicEmbed, ActionEmbed } from "@utils/embeds/index.js";
 
 export class LoopCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "loop";
-        this.aliases = ["repeat"];
-        this.group = "Music";
-
-        this.legacy = true;
-
-        this.description = {
-            content: "Loop the currently playing track.",
-        };
+        super(client, commander, {
+            name: "loop",
+            aliases: ["repeat"],
+            group: "Music",
+            legacy: true,
+            description: {
+                content: "Loop the currently playing track.",
+            },
+        });
     }
 
     data() {

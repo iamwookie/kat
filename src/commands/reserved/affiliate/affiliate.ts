@@ -5,18 +5,16 @@ import { ActionEmbed } from "@utils/embeds/action.js";
 
 export class AffiliateCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "affiliate";
-        this.group = "Affiliate";
-        this.module = "Affiliate";
-
-        this.description = {
-            content: "Create an affiliate link for a user.",
-            format: "create <user>"
-        };
-
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "affiliate",
+            group: "Affiliate",
+            module: "Affiliate",
+            description: {
+                content: "Create an affiliate link for a user.",
+                format: "create <user>",
+            },
+            cooldown: 5,
+        });
     }
 
     data() {

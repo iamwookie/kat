@@ -3,7 +3,29 @@ import { Commander } from "./Commander.js";
 import { Module } from "./Module.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake, InteractionEditReplyOptions, MessagePayload, MessageReplyOptions, MessageEditOptions, MessageCreateOptions } from "discord.js";
 
-export abstract class Command {
+interface CommandOptions {
+    name: string;
+    group: string;
+    module?: string | Module;
+    aliases?: string[];
+
+    legacy?: boolean;
+    legacyAliases?: string[];
+
+    description?: {
+        content?: string;
+        format?: string;
+    };
+
+    hidden?: boolean;
+    disabled?: boolean;
+    cooldown?: number;
+    ephemeral?: boolean;
+
+    users?: Snowflake[];
+}
+
+export abstract class Command implements CommandOptions {
     public name: string;
     public group: string;
     public module?: string | Module;
@@ -22,7 +44,6 @@ export abstract class Command {
     public cooldown?: number;
     public ephemeral?: boolean;
 
-    public guilds?: Snowflake[];
     public users?: Snowflake[];
 
     public cooldowns: Collection<Snowflake, number> = new Collection();
@@ -30,7 +51,24 @@ export abstract class Command {
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
     abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
-    constructor(public client: Client, public commander: Commander) {}
+    constructor(public client: Client, public commander: Commander, options: CommandOptions) {
+        this.name = options.name;
+        this.group = options.group;
+        this.module = options.module;
+        this.aliases = options.aliases;
+
+        this.legacy = options.legacy;
+        this.legacyAliases = options.legacyAliases;
+
+        this.description = options.description;
+
+        this.hidden = options.hidden;
+        this.disabled = options.disabled;
+        this.cooldown = options.cooldown;
+        this.ephemeral = options.ephemeral;
+
+        this.users = options.users;
+    }
 
     applyCooldown(user: User): void {
         if (!this.cooldown) return;
@@ -48,6 +86,8 @@ export abstract class Command {
             return interaction.user;
         } else if (interaction instanceof Message) {
             return interaction.author;
+        } else {
+            throw new Error("Invalid interaction.");
         }
     }
 

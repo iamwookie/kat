@@ -4,19 +4,16 @@ import { ActionEmbed } from "@utils/embeds/index.js";
 
 export class StopCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "stop";
-        this.group = "Music";
-        this.aliases = ["dc"];
-
-        this.legacy = true;
-
-        this.description = {
-            content: "Clear the queue and/or leave.",
-        };
-
-        this.cooldown = 5;
+        super(client, commander, {
+            name: "stop",
+            group: "Music",
+            aliases: ["dc"],
+            legacy: true,
+            description: {
+                content: "Clear the queue and/or leave.",
+            },
+            cooldown: 5,
+        });
     }
 
     data() {

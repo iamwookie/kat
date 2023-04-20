@@ -4,17 +4,15 @@ import { ActionEmbed } from "@utils/embeds/action.js";
 
 export class PrefixCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "prefix";
-        this.group = "Misc";
-
-        this.legacy = true;
-
-        this.description = {
-            content: "Set the chat prefix for your guild.",
-            format: "<prefix>",
-        };
+        super(client, commander, {
+            name: "prefix",
+            group: "Misc",
+            legacy: true,
+            description: {
+                content: "Set the chat prefix for your guild.",
+                format: "<prefix>",
+            },
+        });
     }
 
     data() {
