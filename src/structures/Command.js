@@ -20,11 +20,6 @@ export class Command {
         this.client = client;
         this.commander = commander;
     }
-    async usage(interaction) {
-        const config = await this.client.cache.guilds.get(interaction.guild?.id);
-        const prefix = config?.prefix ?? this.client.legacyPrefix;
-        return `${prefix}${this.name} ${this.description?.format}`;
-    }
     applyCooldown(user) {
         if (!this.cooldown)
             return;
@@ -58,5 +53,9 @@ export class Command {
         else if (interaction instanceof Message) {
             return interaction.channel.send(content);
         }
+    }
+    get usage() {
+        const aliases = this.aliases ? ", " + this.aliases.map((alias) => this.client.prefix + alias).join(", ") : "";
+        return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? " " + this.description.format : ""}`;
     }
 }

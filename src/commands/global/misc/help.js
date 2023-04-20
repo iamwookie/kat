@@ -1,5 +1,5 @@
 import { Command, Module } from "../../../structures/index.js";
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, CommandInteraction, } from "discord.js";
 export class HelpCommand extends Command {
     constructor(client, commander) {
         super(client, commander);
@@ -41,26 +41,21 @@ export class HelpCommand extends Command {
             const commands = this.client.commander.groups.get(group);
             const res = await this.client.cache.guilds.get(i.guild?.id);
             const prefix = res?.prefix || this.client.legacyPrefix;
-            let content = "";
-            for (const command of commands.values()) {
-                // Use command.aliases(prefix) function for this next time
-                let aliases = "";
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        aliases += `, ${this.client.prefix}${alias}`;
-                    }
-                }
-                content += `\`\`${this.client.prefix}${command.name}${aliases}${command.description?.format ? ` ${command.description?.format.replace("[prefix]", this.client.prefix).replace("[aliases]", aliases)}` : ""}\`\` → ${command.description?.content}\n`;
-            }
             embed.setFooter({ text: "Parameters with a '?' at the start are optional." });
             embed.setDescription(`As of right now, you may use some commands with the \`${prefix}\` prefix in chat. This may be removed in the future!`);
-            embed.addFields({ name: group + " Commands", value: content });
-            reply.edit({ embeds: [embed], components: [] });
+            embed.addFields({
+                name: group + " Commands",
+                value: Array.from(commands.values())
+                    .map((c) => `\`${c.usage}\` → ${c.description?.content}`)
+                    .join("\n"),
+            });
+            int instanceof CommandInteraction ? int.editReply({ embeds: [embed], components: [] }) : reply.edit({ embeds: [embed], components: [] });
         });
         collector?.on("end", (collected, reason) => {
             if (!collected.size && reason == "time") {
                 menu.setDisabled(true);
-                reply.edit({ embeds: [embed], components: [new ActionRowBuilder().addComponents(menu)] });
+                const row = new ActionRowBuilder().addComponents(menu);
+                int instanceof CommandInteraction ? int.editReply({ embeds: [embed], components: [row] }) : reply.edit({ embeds: [embed], components: [row] });
             }
         });
     }
