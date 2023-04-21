@@ -33,15 +33,16 @@ export const server = {
 };
 
 export const music = {
-    inactiveDuration: 30_000 // The time in milliseconds before the bot leaves the voice channel
-}
+    inactiveDuration: 30_000, // The time in milliseconds before the bot leaves the voice channel
+};
 
 export const lavalink = {
     nodes: [
         {
             name: "uk:london-1",
-            url: "145.239.205.161:2333",
+            url: "lavalink.bil.al",
             auth: "yoruistrash",
+            secure: true,
         },
     ],
 };
