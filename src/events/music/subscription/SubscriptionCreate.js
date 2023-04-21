@@ -26,6 +26,6 @@ export class SubscriptionCreate extends Event {
                     this.client.logger.warn(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id})`);
                 }
             }
-        }, 15_000);
+        }, this.client.config.music.inactiveDuration);
     }
 }
