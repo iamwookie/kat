@@ -2,10 +2,9 @@ import * as Config from "../../config.js";
 import { Client, Events, Collection, PermissionsBitField } from "discord.js";
 import { Logger } from "./Logger.js";
 import { PrismaClient } from "@prisma/client";
-import { Commander } from "./Commander.js";
-import { ShoukakuClient } from "./ShoukakuClient.js";
-import { TwitchClient } from "./TwitchClient.js";
-import { Server } from "../api/structures/Server.js";
+import { Commander } from "./commander/Commander.js";
+import { ShoukakuClient } from "./music/ShoukakuClient.js";
+import { Server } from "./api/Server.js";
 import { Cache } from "./Cache.js";
 import chalk from "chalk";
 export class KATClient extends Client {
@@ -36,7 +35,6 @@ export class KATClient extends Client {
     prisma = new PrismaClient({ log: ["warn", "error"] });
     commander = new Commander(this);
     shoukaku = new ShoukakuClient(this);
-    twitch = new TwitchClient(this);
     server = new Server(this);
     cache = new Cache(this);
     subscriptions = new Collection();

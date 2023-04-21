@@ -1,10 +1,10 @@
 export { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "./music/Track.js";
 export { Subscription } from "./music/Subscription.js";
-export { ShoukakuClient } from "./ShoukakuClient.js";
-export { Module } from "./Module.js";
+export { ShoukakuClient } from "./music/ShoukakuClient.js";
+export { Module } from "./commander/Module.js";
 export { Event } from "./Event.js";
-export { Command } from "./Command.js";
-export { Commander } from "./Commander.js";
+export { Command } from "./commander/Command.js";
+export { Commander } from "./commander/Commander.js";
 export { Database } from "./Database.js";
 export { Logger } from "./Logger.js";
 export { KATClient } from "./Client.js";

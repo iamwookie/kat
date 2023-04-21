@@ -1,4 +1,4 @@
-import { Route } from "../structures/Route.js";
+import { Route } from "../../structures/api/Route.js";
 import { withLimiter } from "../middlewares/limiter.js";
 import { fetchUser } from "../controllers/user.js";
 export class UsersRoute extends Route {

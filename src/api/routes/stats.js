@@ -1,4 +1,4 @@
-import { Route } from "../structures/Route.js";
+import { Route } from "../../structures/api/Route.js";
 import { fetchStats } from "../../../src/api/controllers/bot.js";
 export class StatsRoute extends Route {
     constructor(client) {

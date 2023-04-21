@@ -1,4 +1,4 @@
-import { Route } from "../structures/Route.js";
+import { Route } from "../../structures/api/Route.js";
 import { EmbedBuilder } from "discord.js";
 import { withAuth } from "../middlewares/auth.js";
 import chalk from "chalk";

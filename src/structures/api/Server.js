@@ -8,8 +8,8 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import chalk from "chalk";
 // ------------------------------------
-import * as Routes from "../routes/index.js";
-import * as Hooks from "../hooks/index.js";
+import * as Routes from "../../api/routes/index.js";
+import * as Hooks from "../../api/hooks/index.js";
 // ------------------------------------
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export class Server {

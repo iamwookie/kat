@@ -9,7 +9,6 @@ export const emotes = {
     music: {
         youtube: "<:youtube:1067881972774477844>",
         spotify: "<:spotify:1067881968697614476>",
-        slider: "⚪",
     },
 };
 export const server = {

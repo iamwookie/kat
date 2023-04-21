@@ -1,4 +1,4 @@
-import { Route } from "../structures/Route.js";
+import { Route } from "../../structures/api/Route.js";
 export class IndexRoute extends Route {
     constructor(client) {
         super(client, "/");

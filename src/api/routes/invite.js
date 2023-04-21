@@ -1,4 +1,4 @@
-import { Route } from "../structures/Route.js";
+import { Route } from "../../structures/api/Route.js";
 import { fetchInvite } from "../controllers/bot.js";
 export class InviteRoute extends Route {
     constructor(client) {

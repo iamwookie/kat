@@ -1,12 +1,12 @@
 // ----- FOR LATER USE -----
 import { REST, Routes, ChatInputCommandInteraction, Collection } from "discord.js";
 import { Module } from "./Module.js";
-import { ActionEmbed } from "../utils/embeds/index.js";
+import { ActionEmbed } from "../../utils/embeds/index.js";
 import chalk from "chalk";
 // -----------------------------------
-import * as Commands from "../commands/index.js";
-import * as Events from "../events/index.js";
-import * as Modules from "../modules/index.js";
+import * as Commands from "../../commands/index.js";
+import * as Events from "../../events/index.js";
+import * as Modules from "../../modules/index.js";
 // -----------------------------------
 const commands = [
     Commands.PlayCommand,
