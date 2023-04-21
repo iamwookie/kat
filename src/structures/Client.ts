@@ -2,10 +2,9 @@ import * as Config from "@config";
 import { Client, ClientOptions, Events, Collection, PermissionsBitField, Snowflake } from "discord.js";
 import { Logger } from "./Logger.js";
 import { PrismaClient } from "@prisma/client";
-import { Commander } from "./Commander.js";
-import { ShoukakuClient } from "./ShoukakuClient.js";
-import { TwitchClient } from "./TwitchClient.js";
-import { Server } from "@api/structures/Server.js";
+import { Commander } from "./commander/Commander.js";
+import { ShoukakuClient } from "./music/ShoukakuClient.js";
+import { Server } from "@structures/api/Server.js";
 import { Cache } from "./Cache.js";
 import { Subscription as MusicSubscription } from "./music/Subscription.js";
 
@@ -43,7 +42,6 @@ export class KATClient extends Client {
     public prisma: PrismaClient = new PrismaClient({ log: ["warn", "error"] });
     public commander: Commander = new Commander(this);
     public shoukaku: ShoukakuClient = new ShoukakuClient(this);
-    public twitch: TwitchClient = new TwitchClient(this);
     public server: Server = new Server(this);
     public cache: Cache = new Cache(this);
 

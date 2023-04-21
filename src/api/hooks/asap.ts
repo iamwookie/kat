@@ -1,5 +1,5 @@
 import { KATClient as Client } from "@structures/index.js";
-import { Route } from "@api/structures/Route.js";
+import { Route } from "@structures/api/Route.js";
 import { Request, Response } from "express";
 import { EmbedBuilder, ColorResolvable } from "discord.js";
 

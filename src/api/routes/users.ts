@@ -1,5 +1,5 @@
 import { KATClient as Client } from "@structures/index.js";
-import { Route } from "@api/structures/Route.js";
+import { Route } from "@structures/api/Route.js";
 
 import { withLimiter } from "@api/middlewares/limiter.js";
 import { fetchUser } from "@api/controllers/user.js";

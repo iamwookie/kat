@@ -1,4 +1,4 @@
-import { KATClient as Client } from "./Client.js";
+import { KATClient as Client } from "../Client.js";
 import { Commander } from "./Commander.js";
 import { Module } from "./Module.js";
 import {

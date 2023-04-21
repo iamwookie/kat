@@ -1,4 +1,4 @@
-import { KATClient as Client } from './Client.js';
+import { KATClient as Client } from '../Client.js';
 import { Shoukaku, Connectors } from "shoukaku";
 import { Collection } from 'discord.js';
 

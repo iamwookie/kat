@@ -1,5 +1,5 @@
 // This is the command handler, CODENAME: Commander v7.0.0
-import { KATClient as Client } from "./Client.js";
+import { KATClient as Client } from "../Client.js";
 
 // ----- FOR LATER USE -----
 import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";

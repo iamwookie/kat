@@ -1,4 +1,4 @@
-import { KATClient as Client } from "@structures/index.js";
+import { KATClient as Client } from "../Client.js";
 import express, { Express, NextFunction, Request, Response } from "express";
 import Sentry from "@sentry/node";
 import helmet from "helmet";
@@ -11,8 +11,8 @@ import fs from "fs";
 import chalk from "chalk";
 
 // ------------------------------------
-import * as Routes from "../routes/index.js";
-import * as Hooks from "../hooks/index.js";
+import * as Routes from "@api/routes/index.js";
+import * as Hooks from "@api/hooks/index.js";
 // ------------------------------------
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
