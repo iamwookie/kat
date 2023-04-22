@@ -2,6 +2,8 @@ import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "..
 import { emotes } from "../../config.js";
 const musicEmotes = emotes.music;
 export function formatDuration(timeInMs) {
+    if (!timeInMs)
+        return "No Data";
     const time = Math.floor(timeInMs / 1000);
     const hours = Math.floor(time / 3600);
     const minutes = Math.floor(time / 60);

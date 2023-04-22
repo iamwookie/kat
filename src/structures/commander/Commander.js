@@ -1,5 +1,5 @@
 // ----- FOR LATER USE -----
-import { REST, Routes, ChatInputCommandInteraction, Collection } from "discord.js";
+import { REST, Routes, Collection } from "discord.js";
 import { Module } from "./Module.js";
 import { ActionEmbed } from "../../utils/embeds/index.js";
 import chalk from "chalk";
@@ -9,6 +9,7 @@ import * as Events from "../../events/index.js";
 import * as Modules from "../../modules/index.js";
 // -----------------------------------
 const commands = [
+    // Music
     Commands.PlayCommand,
     Commands.LoopCommand,
     Commands.StopCommand,
@@ -17,8 +18,11 @@ const commands = [
     Commands.QueueCommand,
     Commands.VolumeCommand,
     Commands.LyricsCommand,
+    // Misc
     Commands.PrefixCommand,
     Commands.HelpCommand,
+    Commands.StatsCommand,
+    // Reserved
     Commands.AffiliateCommand,
 ];
 export class Commander {
@@ -173,7 +177,7 @@ export class Commander {
         this.client.logger.info("Commander >> Successfully Registered All Guild Commands");
     }
     validate(interaction, command) {
-        const author = interaction instanceof ChatInputCommandInteraction ? interaction.user : interaction.author;
+        const author = command.getAuthor(interaction);
         if (command.users && !command.users.includes(author.id)) {
             command.reply(interaction, { embeds: [new ActionEmbed("fail").setText("You are not allowed to use this command!")] });
             return false;

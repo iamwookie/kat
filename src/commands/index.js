@@ -12,5 +12,6 @@ export { StopCommand } from "./global/music/stop.js";
 export { LoopCommand } from "./global/music/loop.js";
 export { PlayCommand } from "./global/music/play.js";
 // Misc
-export { HelpCommand } from "./global/misc/help.js";
+export { StatsCommand } from "./global/misc/stats.js";
 export { PrefixCommand } from "./global/misc/prefix.js";
+export { HelpCommand } from "./global/misc/help.js";
