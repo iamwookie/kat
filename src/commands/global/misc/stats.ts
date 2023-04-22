@@ -25,8 +25,8 @@ export class StatsCommand extends Command {
             .setColor("Yellow")
             .setTitle("Statistics")
             .addFields(
-                { name: "WS Ping", value: `\`${this.client.ws.ping}\``, inline: true },
                 { name: "Uptime", value: `\`${formatDuration(this.client.uptime)}\``, inline: true },
+                { name: "WS Ping", value: `\`${this.client.ws.ping}\``, inline: true },
                 { name: "RAM Usage", value: `\`${formatBytes(process.memoryUsage().heapUsed)} MB\``, inline: true },
                 { name: "Guilds", value: `\`${this.client.guilds.cache.size}\``, inline: true },
                 { name: "Users", value: `\`${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)}\``, inline: true },
