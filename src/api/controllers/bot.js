@@ -5,7 +5,7 @@ export function fetchStats(client) {
         try {
             const data = {
                 uptime: client.uptime ?? 0,
-                ram_usage: formatBytes(process.memoryUsage().heapUsed),
+                memory_usage: formatBytes(process.memoryUsage().heapUsed),
                 ws_ping: client.ws.ping,
                 guilds: client.guilds.cache.size,
                 users: client.guilds.cache.reduce((a, g) => a + g.memberCount, 0),
