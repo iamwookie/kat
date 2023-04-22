@@ -1,6 +1,6 @@
 import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, EmbedBuilder } from "discord.js";
-import { formatDuration } from "@utils/helpers.js";
+import { formatBytes, formatDuration } from "@utils/helpers.js";
 
 export class StatsCommand extends Command {
     constructor(client: Client, commander: Commander) {
@@ -27,6 +27,7 @@ export class StatsCommand extends Command {
             .addFields(
                 { name: "WS Ping", value: `\`${this.client.ws.ping}\``, inline: true },
                 { name: "Uptime", value: `\`${formatDuration(this.client.uptime)}\``, inline: true },
+                { name: "RAM Usage", value: `\`${formatBytes(process.memoryUsage().heapUsed)} MB\``, inline: true },
                 { name: "Guilds", value: `\`${this.client.guilds.cache.size}\``, inline: true },
                 { name: "Users", value: `\`${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)}\``, inline: true },
                 { name: "Version", value: `\`${this.client.config.version}\``, inline: true }
