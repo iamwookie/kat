@@ -205,7 +205,7 @@ export class Commander {
         const author = command.getAuthor(interaction);
 
         if (command.users && !command.users.includes(author.id)) {
-            command.reply(interaction, { embeds: [new ActionEmbed("fail").setText("You are not allowed to use this command!")] });
+            if (!command.hidden) command.reply(interaction, { embeds: [new ActionEmbed("fail").setText("You are not allowed to use this command!")] });
             return false;
         }
 
