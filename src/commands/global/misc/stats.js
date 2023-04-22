@@ -21,7 +21,7 @@ export class StatsCommand extends Command {
         const embed = new EmbedBuilder()
             .setColor("Yellow")
             .setTitle("Statistics")
-            .addFields({ name: "Uptime", value: `\`${formatDuration(this.client.uptime)}\``, inline: true }, { name: "WS Ping", value: `\`${this.client.ws.ping}\``, inline: true }, { name: "RAM Usage", value: `\`${formatBytes(process.memoryUsage().heapUsed)} MB\``, inline: true }, { name: "Guilds", value: `\`${this.client.guilds.cache.size}\``, inline: true }, { name: "Users", value: `\`${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)}\``, inline: true }, { name: "Version", value: `\`${this.client.config.version}\``, inline: true });
+            .addFields({ name: "Uptime", value: `\`${formatDuration(this.client.uptime)}\``, inline: true }, { name: "WS Ping", value: `\`${this.client.ws.ping}\``, inline: true }, { name: "Memory Usage", value: `\`${formatBytes(process.memoryUsage().heapUsed)} MB\``, inline: true }, { name: "Guilds", value: `\`${this.client.guilds.cache.size}\``, inline: true }, { name: "Users", value: `\`${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)}\``, inline: true }, { name: "Version", value: `\`${this.client.config.version}\``, inline: true });
         const subscription = this.client.subscriptions.get(int.guild?.id);
         if (subscription)
             embed.addFields({ name: "Node", value: `\`${subscription.node.name}\``, inline: true });
