@@ -4,7 +4,8 @@ import { User } from "discord.js";
 import { emotes } from "@config";
 const musicEmotes = emotes.music;
 
-export function formatDuration(timeInMs: number) {
+export function formatDuration(timeInMs?: number | null) {
+    if (!timeInMs) return "No Data";
     const time = Math.floor(timeInMs / 1000);
     const hours = Math.floor(time / 3600);
     const minutes = Math.floor(time / 60);
@@ -14,7 +15,7 @@ export function formatDuration(timeInMs: number) {
     }${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
 }
 
-export function formatBytes(bytes?: number): string {
+export function formatBytes(bytes?: number | null) {
     if (!bytes) return "No Data";
     let sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     if (bytes == 0) return "0 Byte";
