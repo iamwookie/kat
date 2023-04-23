@@ -28,7 +28,6 @@ const commands = [
 export class Commander {
     client;
     rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
-    groups = new Collection();
     commands = new Collection();
     global = new Collection();
     reserved = new Collection();
@@ -38,15 +37,28 @@ export class Commander {
         this.client = client;
     }
     async initialize() {
-        this.initializeCommands();
         this.initializeModules();
+        this.initializeCommands();
         await this.registerGlobalCommands();
         await this.registerReservedCommands();
         this.intiliazeEvents();
     }
+    async initializeModules() {
+        const modules = Object.values(Modules);
+        for (const Module of modules) {
+            try {
+                const module = new Module(this.client, this);
+                this.modules.set(module.name, module);
+            }
+            catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Initializing Module"));
+                console.error(err);
+            }
+        }
+        this.client.logger.info(`Commander >> Successfully Initialized ${modules.length} Module(s)`);
+    }
     initializeCommands() {
-        if (!commands.length)
-            return;
         for (const Command of commands) {
             try {
                 const command = new Command(this.client, this);
@@ -62,10 +74,23 @@ export class Commander {
                 }
                 if (command.users)
                     command.users.push(this.client.devId);
-                if (!this.groups.has(command.group))
-                    this.groups.set(command.group, new Collection());
-                this.groups.get(command.group)?.set(command.name, command);
-                this.commands.set(command.name, command);
+                command.module = this.modules.get(command.module) ?? new Module(this.client, this, { name: command.module });
+                if (!this.modules.has(command.module.name))
+                    this.modules.set(command.module.name, command.module);
+                const loaded = command;
+                command.module.commands.set(command.name, loaded);
+                // Remove reserved in the future and use modules directly for registering
+                if (command.module.guilds) {
+                    for (const guild of command.module.guilds) {
+                        const commands = this.reserved.get(guild) || new Collection();
+                        commands.set(command.name, loaded);
+                        this.reserved.set(guild, commands);
+                    }
+                }
+                else {
+                    this.global.set(command.name, loaded);
+                }
+                this.commands.set(command.name, loaded);
             }
             catch (err) {
                 this.client.logger.error(err);
@@ -77,8 +102,6 @@ export class Commander {
     }
     intiliazeEvents() {
         const events = Object.values(Events);
-        if (!events.length)
-            return;
         for (const Event of events) {
             try {
                 const event = new Event(this.client, this);
@@ -91,39 +114,6 @@ export class Commander {
             }
         }
         this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Event(s)`);
-    }
-    async initializeModules() {
-        const modules = Object.values(Modules);
-        if (!modules.length)
-            return;
-        for (const Module of modules) {
-            try {
-                const module = new Module(this.client, this);
-                this.modules.set(module.name, module);
-            }
-            catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Guild Command"));
-                console.error(err);
-            }
-        }
-        for (const command of this.commands.values()) {
-            // In future, modules will always be required
-            if (command.module && typeof command.module == "string")
-                command.module = this.modules.get(command.module);
-            if (command.module instanceof Module && command.module.guilds) {
-                for (const guild of command.module.guilds) {
-                    const commands = this.reserved.get(guild) || new Collection();
-                    commands.set(command.name, command);
-                    this.reserved.set(guild, commands);
-                }
-            }
-            else {
-                this.global.set(command.name, command);
-            }
-            this.commands.set(command.name, command);
-        }
-        this.client.logger.info(`Commander >> Successfully Initialized ${modules.length} Module(s)`);
     }
     async registerGlobalCommands() {
         try {

@@ -5,7 +5,6 @@ export class AffiliateCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
             name: "affiliate",
-            group: "Affiliate",
             module: "Affiliate",
             description: {
                 content: "Create an affiliate link for a user.",

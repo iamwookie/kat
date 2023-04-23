@@ -5,7 +5,7 @@ export class StatsCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
             name: "stats",
-            group: "Misc",
+            module: "Misc",
             legacy: true,
             description: {
                 content: "Show app statistics.",

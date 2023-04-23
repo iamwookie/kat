@@ -3,7 +3,6 @@ export class Command {
     client;
     commander;
     name;
-    group;
     module;
     aliases;
     legacy;
@@ -19,7 +18,6 @@ export class Command {
         this.client = client;
         this.commander = commander;
         this.name = options.name;
-        this.group = options.group;
         this.module = options.module;
         this.aliases = options.aliases;
         this.legacy = options.legacy;

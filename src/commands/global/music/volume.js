@@ -6,7 +6,7 @@ export class VolumeCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
             name: "volume",
-            group: "Music",
+            module: "Music",
             legacy: true,
             legacyAliases: ["v"],
             description: {

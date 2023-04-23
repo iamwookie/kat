@@ -7,7 +7,7 @@ export class PlayCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
             name: "play",
-            group: "Music",
+            module: "Music",
             legacy: true,
             legacyAliases: ["p"],
             description: {

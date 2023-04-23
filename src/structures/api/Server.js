@@ -43,8 +43,6 @@ export class Server {
     }
     registerRoutes() {
         const routes = Object.values(Routes);
-        if (!routes.length)
-            return;
         for (const Route of routes) {
             try {
                 const route = new Route(this.client);
@@ -60,8 +58,6 @@ export class Server {
     }
     registerHooks() {
         const hooks = Object.values(Hooks);
-        if (!hooks.length)
-            return;
         for (const Hook of hooks) {
             try {
                 const hook = new Hook(this.client);
