@@ -90,25 +90,24 @@ export class Commander {
 
                 if (command.users) command.users.push(this.client.devId);
 
-                if (typeof command.module == "string") {
-                    command.module = this.modules.get(command.module) ?? new Module(this.client, this, { name: command.module });
-                    this.modules.set(command.module.name, command.module);
-                };
+                command.module = this.modules.get(command.module as string) ?? new Module(this.client, this, { name: command.module as string });
+                if (!this.modules.has(command.module.name)) this.modules.set(command.module.name, command.module);
+                const loaded = command as Command<"Loaded">;
 
-                command.module.commands.set(command.name, command as Command<"Loaded">);
+                command.module.commands.set(command.name, loaded);
 
                 // Remove reserved in the future and use modules directly for registering
                 if (command.module.guilds) {
                     for (const guild of command.module.guilds) {
                         const commands = this.reserved.get(guild) || new Collection();
-                        commands.set(command.name, command as Command<"Loaded">);
+                        commands.set(command.name, loaded);
                         this.reserved.set(guild, commands);
                     }
                 } else {
-                    this.global.set(command.name, command as Command<"Loaded">);
+                    this.global.set(command.name, loaded);
                 }
 
-                this.commands.set(command.name, command as Command<"Loaded">);
+                this.commands.set(command.name, loaded);
             } catch (err) {
                 this.client.logger.error(err);
                 console.error(chalk.red("Commander (ERROR) >> Error Initializing Global Command"));
