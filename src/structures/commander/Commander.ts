@@ -36,18 +36,17 @@ const commands = [
 export class Commander {
     private rest: REST = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
-    public groups: Collection<string, Collection<string, Command>> = new Collection();
-    public commands: Collection<string, Command> = new Collection();
-    public global: Collection<string, Command> = new Collection();
-    public reserved: Collection<Snowflake, Collection<string, Command>> = new Collection();
-    public modules: Collection<string, Module> = new Collection();
-    public aliases: Collection<string, string> = new Collection();
+    public commands = new Collection<string, Command<"Loaded">>();
+    public global = new Collection<string, Command<"Loaded">>();
+    public reserved = new Collection<Snowflake, Collection<string, Command<"Loaded">>>();
+    public modules = new Collection<string, Module>();
+    public aliases = new Collection<string, string>();
 
     constructor(public readonly client: Client) {}
 
     async initialize() {
-        this.initializeCommands();
         this.initializeModules();
+        this.initializeCommands();
 
         await this.registerGlobalCommands();
         await this.registerReservedCommands();
@@ -55,9 +54,24 @@ export class Commander {
         this.intiliazeEvents();
     }
 
-    initializeCommands() {
-        if (!commands.length) return;
+    async initializeModules() {
+        const modules = Object.values(Modules);
 
+        for (const Module of modules) {
+            try {
+                const module = new Module(this.client, this);
+                this.modules.set(module.name, module);
+            } catch (err) {
+                this.client.logger.error(err);
+                console.error(chalk.red("Commander (ERROR) >> Error Initializing Module"));
+                console.error(err);
+            }
+        }
+
+        this.client.logger.info(`Commander >> Successfully Initialized ${modules.length} Module(s)`);
+    }
+
+    initializeCommands() {
         for (const Command of commands) {
             try {
                 const command = new Command(this.client, this);
@@ -76,10 +90,25 @@ export class Commander {
 
                 if (command.users) command.users.push(this.client.devId);
 
-                if (!this.groups.has(command.group)) this.groups.set(command.group, new Collection());
-                this.groups.get(command.group)?.set(command.name, command);
+                if (typeof command.module == "string") {
+                    command.module = this.modules.get(command.module) ?? new Module(this.client, this, { name: command.module });
+                    this.modules.set(command.module.name, command.module);
+                };
 
-                this.commands.set(command.name, command);
+                command.module.commands.set(command.name, command as Command<"Loaded">);
+
+                // Remove reserved in the future and use modules directly for registering
+                if (command.module.guilds) {
+                    for (const guild of command.module.guilds) {
+                        const commands = this.reserved.get(guild) || new Collection();
+                        commands.set(command.name, command as Command<"Loaded">);
+                        this.reserved.set(guild, commands);
+                    }
+                } else {
+                    this.global.set(command.name, command as Command<"Loaded">);
+                }
+
+                this.commands.set(command.name, command as Command<"Loaded">);
             } catch (err) {
                 this.client.logger.error(err);
                 console.error(chalk.red("Commander (ERROR) >> Error Initializing Global Command"));
@@ -92,7 +121,6 @@ export class Commander {
 
     intiliazeEvents() {
         const events = Object.values(Events);
-        if (!events.length) return;
 
         for (const Event of events) {
             try {
@@ -106,41 +134,6 @@ export class Commander {
         }
 
         this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Event(s)`);
-    }
-
-    async initializeModules() {
-        const modules = Object.values(Modules);
-        if (!modules.length) return;
-
-        for (const Module of modules) {
-            try {
-                const module = new Module(this.client, this);
-                this.modules.set(module.name, module);
-            } catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Guild Command"));
-                console.error(err);
-            }
-        }
-
-        for (const command of this.commands.values()) {
-            // In future, modules will always be required
-            if (command.module && typeof command.module == "string") command.module = this.modules.get(command.module);
-
-            if (command.module instanceof Module && command.module.guilds) {
-                for (const guild of command.module.guilds) {
-                    const commands = this.reserved.get(guild) || new Collection();
-                    commands.set(command.name, command);
-                    this.reserved.set(guild, commands);
-                }
-            } else {
-                this.global.set(command.name, command);
-            }
-
-            this.commands.set(command.name, command);
-        }
-
-        this.client.logger.info(`Commander >> Successfully Initialized ${modules.length} Module(s)`);
     }
 
     async registerGlobalCommands() {

@@ -14,10 +14,11 @@ import {
     MessageCreateOptions,
 } from "discord.js";
 
-interface CommandOptions {
+type CommandType = "Loaded" | undefined;
+
+interface CommandOptions<T extends CommandType> {
     name: string;
-    group: string;
-    module?: string | Module;
+    module: T extends "Loaded" ? Module : string;
     aliases?: string[];
 
     legacy?: boolean;
@@ -36,10 +37,9 @@ interface CommandOptions {
     users?: Snowflake[];
 }
 
-export abstract class Command implements CommandOptions {
+export abstract class Command<T extends CommandType = CommandType> implements CommandOptions<T> {
     public name: string;
-    public group: string;
-    public module?: string | Module;
+    public module: T extends "Loaded" ? Module : string;
     public aliases?: string[];
 
     public legacy?: boolean;
@@ -62,9 +62,8 @@ export abstract class Command implements CommandOptions {
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
     abstract execute(interaction: string | ChatInputCommandInteraction | Message): Promise<any>;
 
-    constructor(public client: Client, public commander: Commander, options: CommandOptions) {
+    constructor(public client: Client, public commander: Commander, options: CommandOptions<T>) {
         this.name = options.name;
-        this.group = options.group;
         this.module = options.module;
         this.aliases = options.aliases;
 

@@ -6,7 +6,7 @@ export class QueueCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: "queue",
-            group: "Music",
+            module: "Music",
             legacy: true,
             legacyAliases: ["q"],
             description: {

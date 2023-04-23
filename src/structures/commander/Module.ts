@@ -1,15 +1,18 @@
 import { KATClient as Client } from "../Client.js";
+import { Command } from "./Command.js";
 import { Commander } from "./Commander.js";
-import { Client as DiscordClient, Guild, GuildMember, Invite, Snowflake } from "discord.js";
+import { Collection, Client as DiscordClient, Guild, GuildMember, Invite, Snowflake } from "discord.js";
 
 interface ModuleOptions {
     name: string;
     guilds?: Snowflake[];
 }
 
-export abstract class Module {
+export class Module {
     public name: string;
     public guilds?: Snowflake[];
+
+    public commands = new Collection<string, Command<"Loaded">>();
     
     constructor(
         public client: Client,

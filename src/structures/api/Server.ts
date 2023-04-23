@@ -57,7 +57,6 @@ export class Server {
 
     private registerRoutes(): void {
         const routes = Object.values(Routes);
-        if (!routes.length) return;
 
         for (const Route of routes) {
             try {
@@ -75,7 +74,6 @@ export class Server {
 
     private registerHooks(): void {
         const hooks = Object.values(Hooks);
-        if (!hooks.length) return;
 
         for (const Hook of hooks) {
             try {

@@ -6,7 +6,7 @@ export class PauseCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: "pause",
-            group: "Music",
+            module: "Music",
             legacy: true,
             description: {
                 content: "Pause the track. Use `/play` to unpause.",

@@ -6,7 +6,7 @@ export class StopCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: "stop",
-            group: "Music",
+            module: "Music",
             aliases: ["dc"],
             legacy: true,
             description: {

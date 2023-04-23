@@ -7,7 +7,7 @@ export class LoopCommand extends Command {
         super(client, commander, {
             name: "loop",
             aliases: ["repeat"],
-            group: "Music",
+            module: "Music",
             legacy: true,
             description: {
                 content: "Loop the currently playing track.",

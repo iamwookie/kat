@@ -9,8 +9,7 @@ export class LyricsCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: "lyrics",
-            aliases: ["ly"],
-            group: "Music",
+            module: "Music",
             legacy: true,
             description: {
                 content: "View the current tracks lyrics or search for one.",

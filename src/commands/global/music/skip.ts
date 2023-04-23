@@ -6,7 +6,7 @@ export class SkipCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: "skip",
-            group: "Music",
+            module: "Music",
             legacy: true,
             description: {
                 content: "Skip the track.",

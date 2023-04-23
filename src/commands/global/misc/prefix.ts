@@ -6,7 +6,7 @@ export class PrefixCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: "prefix",
-            group: "Misc",
+            module: "Misc",
             legacy: true,
             description: {
                 content: "Set the chat prefix for your guild.",
@@ -26,6 +26,7 @@ export class PrefixCommand extends Command {
 
     async execute(int: ChatInputCommandInteraction<"cached"> | Message) {
         if (!int.member?.permissions.has(PermissionFlagsBits.Administrator)) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("You do not have permission to use this command!")] });
+        if (!this.client.prisma) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("An error occured while setting the prefix!")] });
 
         const args = this.getArgs(int)[0] as string;
         if (!args) return this.reply(int, { embeds: [new ActionEmbed("fail").setText("You did not provide a valid prefix!")] });
