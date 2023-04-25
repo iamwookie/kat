@@ -1,1 +1,1 @@
-export { AffiliateModule } from "./affiliate.js";
+export { AffiliateModule } from './affiliate.js';

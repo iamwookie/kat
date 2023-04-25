@@ -1,18 +1,23 @@
-// This is the command handler, CODENAME: Commander v7.0.0
-import { KATClient as Client } from "../Client.js";
+import { KATClient as Client } from '../Client.js';
 
 // ----- FOR LATER USE -----
-import { REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake } from "discord.js";
-import { Command } from "./Command.js";
-import { Module } from "./Module.js";
-import { ActionEmbed } from "@utils/embeds/index.js";
-
-import chalk from "chalk";
+import {
+    Events as DiscordEvents,
+    REST,
+    Routes,
+    ChatInputCommandInteraction,
+    Message,
+    Collection,
+    Snowflake,
+} from 'discord.js';
+import { Command } from './Command.js';
+import { Module } from './Module.js';
+import { ActionEmbed } from '@utils/embeds/index.js';
 
 // -----------------------------------
-import * as Commands from "@commands/index.js";
-import * as Events from "@events/index.js";
-import * as Modules from "@modules/index.js";
+import * as Commands from '@commands/index.js';
+import * as Events from '@events/index.js';
+import * as Modules from '@modules/index.js';
 // -----------------------------------
 
 const commands = [
@@ -34,11 +39,11 @@ const commands = [
 ];
 
 export class Commander {
-    private rest: REST = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
+    private rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
 
-    public commands = new Collection<string, Command<"Loaded">>();
-    public global = new Collection<string, Command<"Loaded">>();
-    public reserved = new Collection<Snowflake, Collection<string, Command<"Loaded">>>();
+    public commands = new Collection<string, Command<true>>();
+    public global = new Collection<string, Command<true>>();
+    public reserved = new Collection<Snowflake, Collection<string, Command<true>>>();
     public modules = new Collection<string, Module>();
     public aliases = new Collection<string, string>();
 
@@ -54,7 +59,7 @@ export class Commander {
         this.intiliazeEvents();
     }
 
-    async initializeModules() {
+    initializeModules() {
         const modules = Object.values(Modules);
 
         for (const Module of modules) {
@@ -62,13 +67,11 @@ export class Commander {
                 const module = new Module(this.client, this);
                 this.modules.set(module.name, module);
             } catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Module"));
-                console.error(err);
+                this.client.logger.error(err, 'Error Initializing Module', 'Commander');
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${modules.length} Module(s)`);
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${modules.length} Module(s)`);
     }
 
     initializeCommands() {
@@ -90,9 +93,12 @@ export class Commander {
 
                 if (command.users) command.users.push(this.client.devId);
 
-                command.module = this.modules.get(command.module as string) ?? new Module(this.client, this, { name: command.module as string });
+                command.module =
+                    this.modules.get(command.module as string) ??
+                    new Module(this.client, this, { name: command.module as string });
                 if (!this.modules.has(command.module.name)) this.modules.set(command.module.name, command.module);
-                const loaded = command as Command<"Loaded">;
+
+                const loaded = command as Command<true>;
 
                 command.module.commands.set(command.name, loaded);
 
@@ -109,13 +115,11 @@ export class Commander {
 
                 this.commands.set(command.name, loaded);
             } catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Global Command"));
-                console.error(err);
+                this.client.logger.error(err, 'Error Initializing Global Command', 'Commander');
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} Command(s)`);
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${commands.length} Command(s)`);
     }
 
     intiliazeEvents() {
@@ -126,13 +130,11 @@ export class Commander {
                 const event = new Event(this.client, this);
                 this.client.on(event.name, event.execute.bind(event));
             } catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Event"));
-                console.error(err);
+                this.client.logger.error(err, 'Error Initializing Event', 'Commander');
             }
         }
 
-        this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Event(s)`);
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
 
     async registerGlobalCommands() {
@@ -152,12 +154,12 @@ export class Commander {
                 body.push(command.data().toJSON());
             }
 
-            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), { body: body });
-            this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s)`);
+            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), {
+                body: body,
+            });
+            this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
         } catch (err) {
-            this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Registering Global Slash Commands"));
-            console.error(err);
+            this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
         }
     }
 
@@ -181,23 +183,29 @@ export class Commander {
             }
 
             try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), { body: body });
-                this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
+                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), {
+                    body: body,
+                });
+                this.client.emit(
+                    DiscordEvents.Debug,
+                    `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`
+                );
             } catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${guildId}`));
-                console.error(err);
+                this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
             }
         }
 
-        this.client.logger.info("Commander >> Successfully Registered All Guild Commands");
+        this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 
     validate(interaction: ChatInputCommandInteraction | Message, command: Command) {
         const author = command.getAuthor(interaction);
 
         if (command.users && !command.users.includes(author.id)) {
-            if (!command.hidden) command.reply(interaction, { embeds: [new ActionEmbed("fail").setText("You are not allowed to use this command!")] });
+            if (!command.hidden)
+                command.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText('You are not allowed to use this command!')],
+                });
             return false;
         }
 
@@ -206,7 +214,13 @@ export class Commander {
                 const cooldown = command.cooldowns.get(author.id)!;
                 const secondsLeft = (cooldown - Date.now()) / 1000;
 
-                command.reply(interaction, { embeds: [new ActionEmbed("fail").setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                command.reply(interaction, {
+                    embeds: [
+                        new ActionEmbed('fail').setText(
+                            `Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`
+                        ),
+                    ],
+                });
                 return false;
             }
         }

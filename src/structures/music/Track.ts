@@ -1,8 +1,8 @@
-import { KATClient as Client } from "../Client";
-import { TextBasedChannel, User } from "discord.js";
-import { Track as ShoukakuTrack, LavalinkResponse } from "shoukaku";
-
-import { formatDuration } from "@utils/helpers.js";
+import type { QueueData } from 'types';
+import { KATClient as Client } from '../Client';
+import { TextBasedChannel, User } from 'discord.js';
+import { Track as ShoukakuTrack, LavalinkResponse } from 'shoukaku';
+import { formatDuration } from '@utils/helpers.js';
 
 abstract class Track {
     public url: string;
@@ -10,28 +10,38 @@ abstract class Track {
     public duration: string;
     public durationRaw: number;
     public thumbnail?: string;
-
     public onStart: () => void;
     public onFinish: () => void;
     public onError: (err: any) => void;
-    
+
     constructor(
         public client: Client,
         public data: ShoukakuTrack,
         public requester: User,
-        public textChannel: TextBasedChannel | null,
+        public textChannel: TextBasedChannel | null
     ) {
         this.url = this.data.info.uri;
         this.title = this.data.info.title;
         this.duration = formatDuration(this.data.info.length);
         this.durationRaw = this.data.info.length;
-
         this.onStart = () => {};
         this.onFinish = () => {};
         this.onError = (err) => {
-            this.client.logger.error(err);
-            this.textChannel?.send(`An error occurred while playing **${this.title}**. Skipping...`);
-        }
+            this.client.logger.error(err, 'Track Error', 'Music');
+            this.textChannel?.send(`An error occurred while playing **${this.title}**. Skipping...`).catch(() => {});
+        };
+    }
+
+    // Add guildId as a track property in future
+    toData(): QueueData {
+        return {
+            data: JSON.stringify(this.data),
+            url: this.url,
+            title: this.title,
+            requesterId: this.requester.id,
+            textId: this.textChannel?.id ?? null,
+            thumbnail: this.thumbnail ?? null,
+        };
     }
 }
 
@@ -40,7 +50,7 @@ export class YouTubeTrack extends Track {
         public client: Client,
         public data: ShoukakuTrack,
         public requester: User,
-        public textChannel: TextBasedChannel | null,
+        public textChannel: TextBasedChannel | null
     ) {
         super(client, data, requester, textChannel);
         this.thumbnail = `https://i.ytimg.com/vi/${this.data.info.identifier}/mqdefault.jpg`;
@@ -52,7 +62,7 @@ export class SpotifyTrack extends Track {
         public client: Client,
         public data: ShoukakuTrack,
         public requester: User,
-        public textChannel: TextBasedChannel | null,
+        public textChannel: TextBasedChannel | null
     ) {
         super(client, data, requester, textChannel);
     }
@@ -64,10 +74,10 @@ abstract class Playlist {
 
     constructor(
         public url: URL,
-        public info: LavalinkResponse["playlistInfo"],
+        public info: LavalinkResponse['playlistInfo'],
         public tracks: ShoukakuTrack[],
         public requester: User,
-        public textChannel: TextBasedChannel | null,
+        public textChannel: TextBasedChannel | null
     ) {
         this.title = this.info.name!;
     }
@@ -76,10 +86,10 @@ abstract class Playlist {
 export class YouTubePlaylist extends Playlist {
     constructor(
         public url: URL,
-        public info: LavalinkResponse["playlistInfo"],
+        public info: LavalinkResponse['playlistInfo'],
         public tracks: ShoukakuTrack[],
         public requester: User,
-        public textChannel: TextBasedChannel | null,
+        public textChannel: TextBasedChannel | null
     ) {
         super(url, info, tracks, requester, textChannel);
         this.thumbnail = `https://i.ytimg.com/vi/${this.tracks[0].info.identifier}/mqdefault.jpg`;
@@ -89,10 +99,10 @@ export class YouTubePlaylist extends Playlist {
 export class SpotifyPlaylist extends Playlist {
     constructor(
         public url: URL,
-        public info: LavalinkResponse["playlistInfo"],
+        public info: LavalinkResponse['playlistInfo'],
         public tracks: ShoukakuTrack[],
         public requester: User,
-        public textChannel: TextBasedChannel | null,
+        public textChannel: TextBasedChannel | null
     ) {
         super(url, info, tracks, requester, textChannel);
     }

@@ -1,20 +1,26 @@
-import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from "@structures/index.js";
+import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from '@structures/index.js';
 
 export class SubscriptionCreate extends Event {
     constructor(client: Client, commander: Commander) {
-        super(client, commander, "subscriptionCreate");
+        super(client, commander, 'subscriptionCreate');
     }
 
     async execute(subscription: MusicSubscription) {
-        this.client.logger.info(`Music >> Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`);
- 
-        await this.client.prisma.subscription.upsert({
+        this.client.logger.info(
+            `Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`,
+            'Music'
+        );
+
+        const position = await this.client.prisma.track.count({ where: { guildId: subscription.guild.id } });
+        // Controversial, as this may update after the embed is sent
+        subscription.position = position;
+
+        await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,
             },
             update: {
-                voiceId: subscription.voiceChannel.id,
-                textId: subscription.textChannel?.id,
+                position,
             },
             create: {
                 guildId: subscription.guild.id,
@@ -27,7 +33,10 @@ export class SubscriptionCreate extends Event {
             {
                 if (!subscription.active && !subscription.queue.length) {
                     subscription.destroy();
-                    this.client.logger.warn(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id})`);
+                    this.client.logger.warn(
+                        `Subscription Destroyed (Inactivity) For: ${subscription.guild.name} (${subscription.guild.id})`,
+                        'Music'
+                    );
                 }
             }
         }, this.client.config.music.inactiveDuration);

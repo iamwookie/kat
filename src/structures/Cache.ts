@@ -1,6 +1,6 @@
-import { Collection, Snowflake } from "discord.js";
-import { KATClient as Client } from "./Client";
-import { Guild, Music } from "@prisma/client";
+import { Collection, Snowflake } from 'discord.js';
+import { KATClient as Client } from './Client';
+import { Guild, Music } from '@prisma/client';
 
 // Currently only used for guild configs, in the future will be changed
 
@@ -15,7 +15,7 @@ export class Cache {
 }
 
 class BaseCache<T> {
-    public cache: Collection<Snowflake, T> = new Collection();
+    public cache = new Collection<Snowflake, T>();
 
     constructor(public client: Client) {}
 

@@ -1,4 +1,4 @@
-import { KATClient as Client, Commander, Command, Module } from "@structures/index.js";
+import { KATClient as Client, Commander, Command } from "@structures/index.js";
 import {
     SlashCommandBuilder,
     ChatInputCommandInteraction,

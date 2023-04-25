@@ -1,6 +1,6 @@
-import { KATClient as Client } from "../Client.js";
-import { Commander } from "./Commander.js";
-import { Module } from "./Module.js";
+import { KATClient as Client } from '../Client.js';
+import { Commander } from './Commander.js';
+import { Module } from './Module.js';
 import {
     SlashCommandBuilder,
     ChatInputCommandInteraction,
@@ -12,13 +12,11 @@ import {
     MessagePayload,
     MessageEditOptions,
     MessageCreateOptions,
-} from "discord.js";
+} from 'discord.js';
 
-type CommandType = "Loaded" | undefined;
-
-interface CommandOptions<T extends CommandType> {
+interface CommandOptions<T extends boolean = boolean> {
     name: string;
-    module: T extends "Loaded" ? Module : string;
+    module: T extends true ? Module : T extends false ? string : never;
     aliases?: string[];
 
     legacy?: boolean;
@@ -37,9 +35,9 @@ interface CommandOptions<T extends CommandType> {
     users?: Snowflake[];
 }
 
-export abstract class Command<T extends CommandType = CommandType> implements CommandOptions<T> {
+export abstract class Command<T extends boolean = boolean> implements CommandOptions<T> {
     public name: string;
-    public module: T extends "Loaded" ? Module : string;
+    public module: T extends true ? Module : T extends false ? string : never;
     public aliases?: string[];
 
     public legacy?: boolean;
@@ -59,7 +57,7 @@ export abstract class Command<T extends CommandType = CommandType> implements Co
 
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
-    abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
+    abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
     abstract execute(interaction: string | ChatInputCommandInteraction | Message): Promise<any>;
 
     constructor(public client: Client, public commander: Commander, options: CommandOptions<T>) {
@@ -97,13 +95,15 @@ export abstract class Command<T extends CommandType = CommandType> implements Co
         } else if (interaction instanceof Message) {
             return interaction.author;
         } else {
-            throw new Error("Invalid interaction.");
+            throw new Error('Invalid interaction.');
         }
     }
 
     getArgs(interaction: ChatInputCommandInteraction | Message) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => (typeof option.value == "string" ? option.value.split(/ +/) : option.options)).flat();
+            return interaction.options.data
+                .map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options))
+                .flat();
         } else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);
         } else {
@@ -111,28 +111,35 @@ export abstract class Command<T extends CommandType = CommandType> implements Co
         }
     }
 
-    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions) {
+    reply(
+        interaction: ChatInputCommandInteraction | Message,
+        content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
+    ) {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
         } else if (interaction instanceof Message) {
             return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
         } else {
-            return Promise.reject("Invalid interaction.");
+            return Promise.reject('Invalid interaction.');
         }
     }
 
-    edit(interaction: ChatInputCommandInteraction | Message, editable: Message, content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions) {
+    edit(
+        interaction: ChatInputCommandInteraction | Message,
+        editable: Message,
+        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
+    ) {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
         } else if (interaction instanceof Message) {
             return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
         } else {
-            return Promise.reject("Invalid interaction.");
+            return Promise.reject('Invalid interaction.');
         }
     }
 
     get usage() {
-        const aliases = this.aliases ? ", " + this.aliases.map((alias) => this.client.prefix + alias).join(", ") : "";
-        return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? " " + this.description.format : ""}`;
+        const aliases = this.aliases ? ', ' + this.aliases.map((alias) => this.client.prefix + alias).join(', ') : '';
+        return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? ' ' + this.description.format : ''}`;
     }
 }

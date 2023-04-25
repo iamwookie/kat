@@ -1,5 +1,5 @@
-import rateLimit from "express-rate-limit";
-import { server as config } from "@config";
+import rateLimit from 'express-rate-limit';
+import { server as config } from '@config';
 
 export const withLimiter = rateLimit({
     windowMs: config.limiter.duration * 60 * 1000,

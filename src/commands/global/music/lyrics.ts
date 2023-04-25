@@ -51,7 +51,6 @@ export class LyricsCommand extends Command {
             this.reply(int, { embeds: [success] });
         } catch (err) {
             this.client.logger.error(err);
-
             this.reply(int, { embeds: [noResults] });
         }
     }

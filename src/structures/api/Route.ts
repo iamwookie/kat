@@ -3,13 +3,9 @@ import { Router } from 'express';
 
 export abstract class Route {
     public router: Router;
-
     abstract register(): Router;
 
-    constructor(
-        public client: Client,
-        public path: string,
-    ) {
+    constructor(public client: Client, public path: string) {
         this.router = Router();
     }
 }

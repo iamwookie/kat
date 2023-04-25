@@ -1,8 +1,6 @@
-import { Event, KATClient as Client, Commander, Module } from "@structures/index.js";
-import { Events, BaseInteraction } from "discord.js";
-import { ErrorEmbed } from "@utils/embeds/index.js";
-
-import chalk from "chalk";
+import { Event, KATClient as Client, Commander, Module } from '@structures/index.js';
+import { Events, BaseInteraction } from 'discord.js';
+import { ErrorEmbed } from '@utils/embeds/index.js';
 
 export class InteractionCreate extends Event {
     constructor(client: Client, commander: Commander) {
@@ -12,11 +10,14 @@ export class InteractionCreate extends Event {
     async execute(interaction: BaseInteraction) {
         if (!interaction.isChatInputCommand()) return;
 
-        const command = this.commander.commands.get(interaction.commandName) || this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);
+        const command =
+            this.commander.commands.get(interaction.commandName) ||
+            this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);
         if (!command || command.disabled) return;
 
         // In future modules will always be required
-        if (command.module && command.module instanceof Module && !command.module.guilds?.includes(interaction.guild?.id!)) return;
+        if (command.module && command.module instanceof Module && !command.module.guilds?.includes(interaction.guild?.id!))
+            return;
 
         if (!this.commander.validate(interaction, command)) return;
 
@@ -25,10 +26,7 @@ export class InteractionCreate extends Event {
         try {
             await command.execute(interaction);
         } catch (err) {
-            const eventId = this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Running Slash Command"));
-            console.error(err);
-
+            const eventId = this.client.logger.error(err, 'Error Running Slash Command', 'Commander');
             interaction.editReply({ embeds: [new ErrorEmbed(eventId)] });
         }
     }

@@ -1,9 +1,7 @@
 import { EmbedBuilder, User } from 'discord.js';
 
 export class ActionEmbed extends EmbedBuilder {
-    constructor(
-        public embedType?: "success" | "fail" | "warn"
-    ) {
+    constructor(public embedType?: 'success' | 'fail' | 'warn') {
         super();
 
         this.embedType = embedType;
