@@ -1,11 +1,11 @@
-import { Route } from "../../structures/api/Route.js";
-import { fetchStats } from "../../../src/api/controllers/bot.js";
+import { Route } from '../../structures/api/Route.js';
+import { fetchStats } from '../../../src/api/controllers/bot.js';
 export class StatsRoute extends Route {
     constructor(client) {
-        super(client, "/stats");
+        super(client, '/stats');
     }
     register() {
-        this.router.get("/", fetchStats(this.client));
+        this.router.get('/', fetchStats(this.client));
         return this.router;
     }
 }

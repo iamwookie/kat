@@ -1,18 +1,18 @@
-import { Command } from "../../../structures/index.js";
-import { SlashCommandBuilder } from "discord.js";
-import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "../../../structures/index.js";
-import { NodeError, PlayerError } from "../../../utils/errors.js";
-import { ActionEmbed, ErrorEmbed, MusicEmbed } from "../../../utils/embeds/index.js";
+import { Command } from '../../../structures/index.js';
+import { SlashCommandBuilder, } from 'discord.js';
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist, } from '../../../structures/index.js';
+import { NodeError, PlayerError } from '../../../utils/errors.js';
+import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
 export class PlayCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
-            name: "play",
-            module: "Music",
+            name: 'play',
+            module: 'Music',
             legacy: true,
-            legacyAliases: ["p"],
+            legacyAliases: ['p'],
             description: {
-                content: "Add a track to the queue, or resume the current one.",
-                format: "<?title/url>",
+                content: 'Add a track to the queue, or resume the current one.',
+                format: '<?title/url>',
             },
             cooldown: 5,
         });
@@ -22,27 +22,33 @@ export class PlayCommand extends Command {
             .setName(this.name)
             .setDescription(this.description?.content)
             .setDMPermission(false)
-            .addStringOption((option) => option.setName("query").setDescription("The name or URL of the track."));
+            .addStringOption((option) => option.setName('query').setDescription('The name or URL of the track.'));
     }
     async execute(int) {
         const author = this.getAuthor(int);
-        const query = this.getArgs(int).join(" ");
+        const query = this.getArgs(int).join(' ');
         const voiceChannel = int.member.voice.channel;
         if (!voiceChannel)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setText("You are not in a voice channel!")] });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('You are not in a voice channel!')] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setText("I can't play in that voice channel!")] });
+            return this.reply(int, {
+                embeds: [new ActionEmbed('fail').setText("I can't play in that voice channel!")],
+            });
         let subscription = this.client.subscriptions.get(int.guildId);
         if (subscription) {
             if (!subscription.voiceChannel.members.has(author.id))
-                return this.reply(int, { embeds: [new ActionEmbed("fail").setText("You are not in my voice channel!")] });
+                return this.reply(int, {
+                    embeds: [new ActionEmbed('fail').setText('You are not in my voice channel!')],
+                });
             if (!query && subscription.paused) {
                 subscription.resume();
-                return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
+                return this.reply(int, {
+                    embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)],
+                });
             }
         }
         if (!query)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setText("What should I play?")] });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('What should I play?')] });
         this.applyCooldown(author);
         if (!subscription) {
             try {
@@ -50,10 +56,16 @@ export class PlayCommand extends Command {
             }
             catch (err) {
                 if (err instanceof NodeError) {
-                    return this.reply(int, { embeds: [new ActionEmbed("fail").setText("No available music nodes. Please try again!")] });
+                    return this.reply(int, {
+                        embeds: [new ActionEmbed('fail').setText('No available music nodes. Please try again!')],
+                    });
                 }
                 else if (err instanceof PlayerError) {
-                    return this.reply(int, { embeds: [new ActionEmbed("fail").setText("Error establishing a voice channel connection. Try again in a few minutes!")] });
+                    return this.reply(int, {
+                        embeds: [
+                            new ActionEmbed('fail').setText('Error establishing a voice channel connection. Try again in a few minutes!'),
+                        ],
+                    });
                 }
                 else {
                     const eventId = this.client.logger.error(err);
@@ -68,73 +80,85 @@ export class PlayCommand extends Command {
             res = await subscription.node.rest.resolve(url.href);
         }
         catch (err) {
-            res = await subscription.node.rest.resolve("ytsearch:" + query);
+            res = await subscription.node.rest.resolve('ytsearch:' + query);
         }
         switch (res?.loadType) {
-            case "LOAD_FAILED": {
-                this.reply(int, { embeds: [new ActionEmbed("fail").setText(`Failed to load track! \n\`${res.exception?.message}\``)] });
+            case 'LOAD_FAILED': {
+                this.reply(int, {
+                    embeds: [new ActionEmbed('fail').setText(`Failed to load track! \n\`${res.exception?.message}\``)],
+                });
                 break;
             }
-            case "NO_MATCHES": {
-                this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
+            case 'NO_MATCHES': {
+                this.reply(int, { embeds: [new ActionEmbed('fail').setText('Could not find your search result!')] });
                 break;
             }
-            case "SEARCH_RESULT": {
+            case 'SEARCH_RESULT': {
                 const data = res.tracks[0];
                 const track = new YouTubeTrack(this.client, data, author, int.channel);
                 subscription.add(track);
                 this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                 break;
             }
-            case "PLAYLIST_LOADED": {
+            case 'PLAYLIST_LOADED': {
                 if (!url)
-                    return this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
+                    return this.reply(int, {
+                        embeds: [new ActionEmbed('fail').setText('Could not find your search result!')],
+                    });
                 const info = res.playlistInfo;
                 const tracks = res.tracks;
                 switch (tracks[0].info.sourceName) {
-                    case "youtube": {
+                    case 'youtube': {
                         const playlist = new YouTubePlaylist(url, info, tracks, author, int.channel);
                         subscription.add(playlist);
-                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        this.reply(int, {
+                            embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)],
+                        });
                         break;
                     }
-                    case "spotify": {
+                    case 'spotify': {
                         const playlist = new SpotifyPlaylist(url, info, tracks, author, int.channel);
                         subscription.add(playlist);
-                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        this.reply(int, {
+                            embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)],
+                        });
                         break;
                     }
                     default: {
-                        this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
+                        this.reply(int, {
+                            embeds: [new ActionEmbed('fail').setText('Could not find your search result!')],
+                        });
                         break;
                     }
                 }
                 break;
             }
-            case "TRACK_LOADED": {
+            case 'TRACK_LOADED': {
                 const data = res.tracks[0];
                 switch (data.info.sourceName) {
-                    case "youtube": {
+                    case 'youtube': {
                         const track = new YouTubeTrack(this.client, data, author, int.channel);
                         subscription.add(track);
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                         break;
                     }
-                    case "spotify": {
+                    case 'spotify': {
                         const track = new SpotifyTrack(this.client, data, author, int.channel);
                         subscription.add(track);
                         this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                         break;
                     }
                     default: {
-                        this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
+                        this.reply(int, {
+                            embeds: [new ActionEmbed('fail').setText('Could not find your search result!')],
+                        });
                         break;
                     }
                 }
                 break;
             }
             default: {
-                this.reply(int, { embeds: [new ActionEmbed("fail").setText("Could not find your search result!")] });
+                this.reply(int, { embeds: [new ActionEmbed('fail').setText('Could not find your search result!')] });
                 break;
             }
         }

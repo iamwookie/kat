@@ -1,27 +1,41 @@
-import { Event } from "../../structures/index.js";
-import { Events } from "discord.js";
-import { ActionEmbed } from "../../utils/embeds/action.js";
-import chalk from "chalk";
+import { Event } from '../../structures/index.js';
+import { Events } from 'discord.js';
+import { ActionEmbed } from '../../utils/embeds/action.js';
+import chalk from 'chalk';
 export class ClientReady extends Event {
     constructor(client, commander) {
         super(client, commander, Events.ClientReady);
     }
     async execute(client) {
-        this.commander.modules.forEach((module) => module.onReady(client));
+        for (const module of this.commander.modules.values())
+            module.onReady(client);
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
         // Move to a method in the future
-        const res = await this.client.prisma.subscription.findMany();
+        const res = await this.client.prisma.queue.findMany({
+            include: {
+                _count: {
+                    select: {
+                        tracks: true,
+                    },
+                },
+            },
+        });
         if (res.length) {
             this.client.logger.info(`Music >> Warning ${res.length} Subscriptions`);
-            for (const subscription of res) {
-                if (!subscription.textId)
+            for (const queue of res) {
+                // Add queue.active and use that in the future
+                if (queue.position >= queue._count.tracks)
                     continue;
-                const channel = client.channels.cache.get(subscription.textId);
+                if (!queue.textId)
+                    continue;
+                const channel = client.channels.cache.get(queue.textId);
                 if (!channel)
                     continue;
                 try {
-                    await channel.send({ embeds: [new ActionEmbed("warn").setText("The bot has restarted, please replay your track.")] });
+                    await channel.send({
+                        embeds: [new ActionEmbed('warn').setText('The bot has restarted, please replay your track.')],
+                    });
                     this.client.logger.info(`Music >> Warning Sent To: ${channel.guild.name} (${channel.guild.id})`);
                 }
                 catch {
@@ -29,8 +43,6 @@ export class ClientReady extends Event {
                 }
             }
             this.client.logger.info(`Music >> Warnings Sent`);
-            await this.client.prisma.subscription.deleteMany();
-            this.client.logger.info(`Music >> Subscriptions Cleared`);
         }
         // ----------------------------
         console.log(chalk.magenta.bold.underline(`\n---- >>> App Online, Client: ${client.user?.tag} (${client.user?.id}) [Version: ${this.client.config.version}] [Guilds: ${client.guilds.cache.size}]`));

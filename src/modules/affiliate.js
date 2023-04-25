@@ -1,19 +1,16 @@
-import { Module } from "../structures/index.js";
-import { Collection, EmbedBuilder } from "discord.js";
+import { Module } from '../structures/index.js';
+import { Collection, EmbedBuilder } from 'discord.js';
 export class AffiliateModule extends Module {
     invites = new Collection();
     channels = new Collection();
     constructor(client, commander) {
         super(client, commander, {
-            name: "Affiliate",
-            guilds: [
-                "1094860861505544314",
-                "1023866029069320242",
-            ],
+            name: 'Affiliate',
+            guilds: ['1094860861505544314', '1023866029069320242'],
         });
         // In future, this will be handled by the db
-        this.channels.set("1023866029069320242", ["1096530697876930560"]);
-        this.channels.set("1094860861505544314", ["1094861185310011412"]);
+        this.channels.set('1023866029069320242', ['1096530697876930560']);
+        this.channels.set('1094860861505544314', ['1094861185310011412']);
     }
     async onReady() {
         // make this async
@@ -49,7 +46,7 @@ export class AffiliateModule extends Module {
             if (!res)
                 return;
             // @ts-ignore
-            res = "123";
+            res = '123';
             const affiliate = await this.client.prisma.affiliate.update({
                 where: {
                     link: invite.url,
@@ -60,13 +57,11 @@ export class AffiliateModule extends Module {
             });
             if (!affiliate)
                 return;
-            this.client.logger.info(`Module (${this.name}) >> Updated Affiliate Invite Link: ` + affiliate.link + " | Total: " + affiliate.total);
+            this.client.logger.info(`Updated Affiliate Invite Link: ${affiliate.link} | Total: ${affiliate.total}`, `Module (${this.name})`);
             this.sendNotification(member, affiliate);
         }
         catch (err) {
-            this.client.logger.error(err);
-            console.error(`Module (${this.name}) (ERROR) >> Error Registering Invite`);
-            console.error(err);
+            this.client.logger.error(err, 'Error Registering Invite', `Module (${this.name})`);
         }
     }
     async sendNotification(member, affiliate) {
@@ -74,11 +69,11 @@ export class AffiliateModule extends Module {
         if (!channels)
             return;
         const embed = new EmbedBuilder()
-            .setColor("Green")
-            .setTitle("🔗 Affiliate System")
+            .setColor('Green')
+            .setTitle('🔗 Affiliate System')
             .setDescription(`A new user has joined!`)
             .setThumbnail(member.user.avatarURL() ?? null)
-            .addFields({ name: "User", value: member.user.toString(), inline: true }, { name: "Inviter", value: `<@${affiliate.userId}>`, inline: true }, { name: "Total Invites", value: `\`${affiliate.total}\``, inline: true });
+            .addFields({ name: 'User', value: member.user.toString(), inline: true }, { name: 'Inviter', value: `<@${affiliate.userId}>`, inline: true }, { name: 'Total Invites', value: `\`${affiliate.total}\``, inline: true });
         for (const channelId of channels) {
             const channel = member.guild.channels.cache.get(channelId);
             if (channel && channel.isTextBased())
@@ -104,7 +99,7 @@ export class AffiliateModule extends Module {
                 total: 0,
             },
         });
-        this.client.logger.info(`Module (${this.name}) >> Created Affiliate Invite Link: ` + affiliate.link + " | Guild: " + affiliate.guildId + " | User: " + affiliate.userId);
+        this.client.logger.info(`Created Affiliate Invite Link: ${affiliate.link} | Guild: ${affiliate.guildId} | User: ${affiliate.userId}`, `Module (${this.name})`);
         return affiliate;
     }
 }

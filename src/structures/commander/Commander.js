@@ -1,12 +1,11 @@
 // ----- FOR LATER USE -----
-import { REST, Routes, Collection } from "discord.js";
-import { Module } from "./Module.js";
-import { ActionEmbed } from "../../utils/embeds/index.js";
-import chalk from "chalk";
+import { Events as DiscordEvents, REST, Routes, Collection, } from 'discord.js';
+import { Module } from './Module.js';
+import { ActionEmbed } from '../../utils/embeds/index.js';
 // -----------------------------------
-import * as Commands from "../../commands/index.js";
-import * as Events from "../../events/index.js";
-import * as Modules from "../../modules/index.js";
+import * as Commands from '../../commands/index.js';
+import * as Events from '../../events/index.js';
+import * as Modules from '../../modules/index.js';
 // -----------------------------------
 const commands = [
     // Music
@@ -27,7 +26,7 @@ const commands = [
 ];
 export class Commander {
     client;
-    rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
+    rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     commands = new Collection();
     global = new Collection();
     reserved = new Collection();
@@ -43,7 +42,7 @@ export class Commander {
         await this.registerReservedCommands();
         this.intiliazeEvents();
     }
-    async initializeModules() {
+    initializeModules() {
         const modules = Object.values(Modules);
         for (const Module of modules) {
             try {
@@ -51,12 +50,10 @@ export class Commander {
                 this.modules.set(module.name, module);
             }
             catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Module"));
-                console.error(err);
+                this.client.logger.error(err, 'Error Initializing Module', 'Commander');
             }
         }
-        this.client.logger.info(`Commander >> Successfully Initialized ${modules.length} Module(s)`);
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${modules.length} Module(s)`);
     }
     initializeCommands() {
         for (const Command of commands) {
@@ -74,7 +71,9 @@ export class Commander {
                 }
                 if (command.users)
                     command.users.push(this.client.devId);
-                command.module = this.modules.get(command.module) ?? new Module(this.client, this, { name: command.module });
+                command.module =
+                    this.modules.get(command.module) ??
+                        new Module(this.client, this, { name: command.module });
                 if (!this.modules.has(command.module.name))
                     this.modules.set(command.module.name, command.module);
                 const loaded = command;
@@ -93,12 +92,10 @@ export class Commander {
                 this.commands.set(command.name, loaded);
             }
             catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Global Command"));
-                console.error(err);
+                this.client.logger.error(err, 'Error Initializing Global Command', 'Commander');
             }
         }
-        this.client.logger.info(`Commander >> Successfully Initialized ${commands.length} Command(s)`);
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${commands.length} Command(s)`);
     }
     intiliazeEvents() {
         const events = Object.values(Events);
@@ -108,12 +105,10 @@ export class Commander {
                 this.client.on(event.name, event.execute.bind(event));
             }
             catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red("Commander (ERROR) >> Error Initializing Event"));
-                console.error(err);
+                this.client.logger.error(err, 'Error Initializing Event', 'Commander');
             }
         }
-        this.client.logger.info(`Commander >> Successfully Initialized ${events.length} Event(s)`);
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
     async registerGlobalCommands() {
         try {
@@ -129,13 +124,13 @@ export class Commander {
                 }
                 body.push(command.data().toJSON());
             }
-            const res = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID), { body: body });
-            this.client.logger.info(`Commander >> Successfully Registered ${res.length} Global Command(s)`);
+            const res = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID), {
+                body: body,
+            });
+            this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
         }
         catch (err) {
-            this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Registering Global Slash Commands"));
-            console.error(err);
+            this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
         }
     }
     async registerReservedCommands() {
@@ -155,29 +150,35 @@ export class Commander {
                 body.push(command.data().toJSON());
             }
             try {
-                const res = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), { body: body });
-                this.client.logger.info(`Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
+                const res = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), {
+                    body: body,
+                });
+                this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
             }
             catch (err) {
-                this.client.logger.error(err);
-                console.error(chalk.red(`Commander (ERROR) >> Error Registering Guild Slash Commands For Guild: ${guildId}`));
-                console.error(err);
+                this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
             }
         }
-        this.client.logger.info("Commander >> Successfully Registered All Guild Commands");
+        this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
     validate(interaction, command) {
         const author = command.getAuthor(interaction);
         if (command.users && !command.users.includes(author.id)) {
             if (!command.hidden)
-                command.reply(interaction, { embeds: [new ActionEmbed("fail").setText("You are not allowed to use this command!")] });
+                command.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText('You are not allowed to use this command!')],
+                });
             return false;
         }
         if (command.cooldown && command.cooldowns) {
             if (command.cooldowns.has(author.id)) {
                 const cooldown = command.cooldowns.get(author.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-                command.reply(interaction, { embeds: [new ActionEmbed("fail").setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)] });
+                command.reply(interaction, {
+                    embeds: [
+                        new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`),
+                    ],
+                });
                 return false;
             }
         }

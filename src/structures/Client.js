@@ -1,12 +1,12 @@
-import * as Config from "../../config.js";
-import { Client, Events, Collection, PermissionsBitField } from "discord.js";
-import { Logger } from "./Logger.js";
-import { PrismaClient } from "@prisma/client";
-import { Commander } from "./commander/Commander.js";
-import { ShoukakuClient } from "./music/ShoukakuClient.js";
-import { Server } from "./api/Server.js";
-import { Cache } from "./Cache.js";
-import chalk from "chalk";
+import * as Config from '../../config.js';
+import { Client, Events, Collection, PermissionsBitField } from 'discord.js';
+import { Logger } from './Logger.js';
+import { PrismaClient } from '@prisma/client';
+import { Commander } from './commander/Commander.js';
+import { ShoukakuClient } from './music/ShoukakuClient.js';
+import { Server } from './api/Server.js';
+import { Cache } from './Cache.js';
+import chalk from 'chalk';
 export class KATClient extends Client {
     startTime = Date.now();
     permissions = new PermissionsBitField([
@@ -32,7 +32,7 @@ export class KATClient extends Client {
     cliPrefix = Config.bot.cliPrefix;
     logger = new Logger(this);
     // Prisma causes an issue with circular references. Try fixing this later
-    prisma = new PrismaClient({ log: ["warn", "error"] });
+    prisma = new PrismaClient({ log: ['warn', 'error'] });
     commander = new Commander(this);
     shoukaku = new ShoukakuClient(this);
     server = new Server(this);
@@ -40,21 +40,23 @@ export class KATClient extends Client {
     subscriptions = new Collection();
     constructor(options) {
         super(options);
-        this.on(Events.Error, (err) => { this.logger.error(err); });
-        if (process.env.NODE_ENV != "production")
-            this.on(Events.Debug, msg => { this.logger.debug(msg); });
+        this.on(Events.Error, (err) => {
+            this.logger.error(err);
+        });
+        if (process.env.NODE_ENV != 'production')
+            this.on(Events.Debug, (msg) => {
+                this.logger.debug(msg);
+            });
     }
     async initialize() {
         try {
             await this.prisma.$connect();
-            console.log(chalk.greenBright.bold.underline(">>> Prisma Initialized"));
+            console.log(chalk.greenBright.bold.underline('>>> Prisma Initialized!'));
         }
         catch (err) {
-            this.logger.error(err);
-            console.error(chalk.red("Prisma (ERROR) >> Error Connecting"));
-            console.error(err);
+            this.logger.error(err, 'Error Connecting', 'Prisma');
         }
         await this.commander.initialize();
-        console.log(chalk.greenBright.bold.underline(">>> Commander Initialized"));
+        console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
     }
 }

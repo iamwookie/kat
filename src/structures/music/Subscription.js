@@ -1,5 +1,5 @@
-import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from "./Track.js";
-import { NodeError, PlayerError } from "../../utils/errors.js";
+import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from './Track.js';
+import { NodeError, PlayerError } from '../../utils/errors.js';
 export class Subscription {
     client;
     guild;
@@ -10,6 +10,7 @@ export class Subscription {
     shoukaku;
     queue = [];
     active = null;
+    position = 0;
     looped = false;
     volume = 100;
     destroyed = false;
@@ -21,9 +22,9 @@ export class Subscription {
         this.player = player;
         this.node = node;
         this.shoukaku = client.shoukaku;
-        this.player.on("exception", (reason) => this.client.emit("playerException", this, reason));
-        this.player.on("start", (data) => this.client.emit("playerStart", this, data));
-        this.player.on("end", (reason) => this.client.emit("playerEnd", this, reason));
+        this.player.on('exception', (reason) => this.client.emit('playerException', this, reason));
+        this.player.on('start', (data) => this.client.emit('playerStart', this, data));
+        this.player.on('end', (reason) => this.client.emit('playerEnd', this, reason));
         // -----> REQUIRES FIXING FROM SHOUKAKU
         //
         // this.player.on("closed", (reason) => {
@@ -45,19 +46,19 @@ export class Subscription {
                 });
                 const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
                 client.subscriptions.set(guild.id, subscription);
-                client.emit("subscriptionCreate", subscription);
+                client.emit('subscriptionCreate', subscription);
                 const res = await client.cache.music.get(guild.id);
                 if (res?.volume)
                     subscription.volume = res.volume;
                 return subscription;
             }
             catch (err) {
-                client.logger.error(err);
+                client.logger.error(err, 'PlayerError', 'Music');
                 throw new PlayerError(err.message);
             }
         }
         catch (err) {
-            client.logger.error(err);
+            client.logger.error(err, 'NodeError', 'Music');
             throw new NodeError(err.message);
         }
     }
@@ -69,7 +70,7 @@ export class Subscription {
         this.player.connection.disconnect();
         this.client.subscriptions.delete(this.guild.id);
         this.destroyed = true;
-        this.client.emit("subscriptionDestroy", this);
+        this.client.emit('subscriptionDestroy', this);
     }
     process() {
         const track = this.looped ? this.active : this.queue.shift();
@@ -78,6 +79,7 @@ export class Subscription {
         this.active = track;
         this.player.setVolume(this.volume / 100);
         this.player.playTrack({ track: track.data.track });
+        this.client.emit('trackRemove', this, track);
     }
     add(item) {
         if (item instanceof YouTubePlaylist) {
@@ -95,6 +97,7 @@ export class Subscription {
         else {
             this.queue.push(item);
         }
+        this.client.emit('trackAdd', this, item);
         if (!this.active)
             this.process();
     }

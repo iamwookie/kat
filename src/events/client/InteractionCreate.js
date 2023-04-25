@@ -1,7 +1,6 @@
-import { Event, Module } from "../../structures/index.js";
-import { Events } from "discord.js";
-import { ErrorEmbed } from "../../utils/embeds/index.js";
-import chalk from "chalk";
+import { Event, Module } from '../../structures/index.js';
+import { Events } from 'discord.js';
+import { ErrorEmbed } from '../../utils/embeds/index.js';
 export class InteractionCreate extends Event {
     constructor(client, commander) {
         super(client, commander, Events.InteractionCreate);
@@ -9,7 +8,8 @@ export class InteractionCreate extends Event {
     async execute(interaction) {
         if (!interaction.isChatInputCommand())
             return;
-        const command = this.commander.commands.get(interaction.commandName) || this.commander.commands.get(this.commander.aliases.get(interaction.commandName));
+        const command = this.commander.commands.get(interaction.commandName) ||
+            this.commander.commands.get(this.commander.aliases.get(interaction.commandName));
         if (!command || command.disabled)
             return;
         // In future modules will always be required
@@ -22,9 +22,7 @@ export class InteractionCreate extends Event {
             await command.execute(interaction);
         }
         catch (err) {
-            const eventId = this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Running Slash Command"));
-            console.error(err);
+            const eventId = this.client.logger.error(err, 'Error Running Slash Command', 'Commander');
             interaction.editReply({ embeds: [new ErrorEmbed(eventId)] });
         }
     }

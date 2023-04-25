@@ -1,11 +1,11 @@
-import Sentry from "@sentry/node";
-import { ErrorEmbed } from "../utils/embeds/index.js";
-import chalk from "chalk";
+import Sentry from '@sentry/node';
+import { ErrorEmbed } from '../utils/embeds/index.js';
+import chalk from 'chalk';
 export class Logger {
     client;
     constructor(client) {
         this.client = client;
-        console.log(chalk.greenBright.bold.underline(">>> Logger Initialized!"));
+        console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
     }
     async notify(eventId) {
         try {
@@ -14,13 +14,13 @@ export class Logger {
             await dev?.send({ embeds: [embed] });
         }
         catch (err) {
-            console.error(chalk.red("Logger (ERROR): Error Warning Dev!"));
+            console.error(chalk.red('Logger (ERROR): Error Warning Dev!'));
             console.error(err);
         }
     }
     fatal(err) {
         const eventId = Sentry.captureException(err);
-        console.error(chalk.redBright(`Logger (FATAL) (${eventId}): A Fatal Error Has Occured!`));
+        console.error(chalk.redBright(`(FATAL) (${eventId}): A Fatal Error Has Occured!`));
         console.error(err);
         if (this.client.isReady())
             this.notify(eventId);
@@ -28,27 +28,29 @@ export class Logger {
     }
     uncaught(err) {
         const eventId = Sentry.captureException(err);
-        console.error(chalk.redBright(`Logger (UNCAUGHT) (${eventId}): An Uncaught Error Has Occured!`));
+        console.error(chalk.redBright(`(UNCAUGHT) (${eventId}): An Uncaught Error Has Occured!`));
         console.error(err);
         if (this.client.isReady())
             this.notify(eventId);
         return eventId;
     }
-    error(err) {
+    error(err, message, scope) {
         const eventId = Sentry.captureException(err);
-        console.error(chalk.red(`Logger (ERROR) (${eventId}): An Error Has Occured!`));
+        console.error(chalk.red(`(ERROR) (${eventId}): An Error Has Occured!`));
+        if (message && scope)
+            console.error(chalk.red(`${scope} (ERROR) >> ${message}`));
         console.error(err);
         if (this.client.isReady())
             this.notify(eventId);
         return eventId;
     }
-    warn(msg) {
-        console.log(chalk.yellow("Logger (WARN): " + msg));
+    warn(message, scope) {
+        console.log(chalk.yellow('(WARN): ' + (scope ? scope + ' >> ' : '') + message));
     }
-    info(msg) {
-        console.log(chalk.green("Logger (INFO): " + msg));
+    info(message, scope) {
+        console.log(chalk.green('(INFO): ' + (scope ? scope + ' >> ' : '') + message));
     }
-    debug(msg) {
-        console.log(chalk.blue("Logger (DEBUG): " + msg));
+    debug(message) {
+        console.log(chalk.blue('(DEBUG): ' + message));
     }
 }

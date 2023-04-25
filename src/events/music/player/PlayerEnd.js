@@ -1,7 +1,7 @@
-import { Event } from "../../../structures/index.js";
+import { Event } from '../../../structures/index.js';
 export class PlayerEnd extends Event {
     constructor(client, commander) {
-        super(client, commander, "playerEnd");
+        super(client, commander, 'playerEnd');
     }
     async execute(subscription) {
         subscription.active?.onFinish();
@@ -12,7 +12,7 @@ export class PlayerEnd extends Event {
             {
                 if (!subscription.active && !subscription.queue.length) {
                     subscription.destroy();
-                    this.client.logger.warn(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id})`);
+                    this.client.logger.warn(`Subscription Destroyed (Inactivity) For: ${subscription.guild.name} (${subscription.guild.id})`, 'Music');
                 }
             }
         }, this.client.config.music.inactiveDuration);

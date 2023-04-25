@@ -1,5 +1,5 @@
-import { Event } from "../../structures/index.js";
-import { Events } from "discord.js";
+import { Event } from '../../structures/index.js';
+import { Events } from 'discord.js';
 export class VoiceStateUpdate extends Event {
     constructor(client, commander) {
         super(client, commander, Events.VoiceStateUpdate);
@@ -8,14 +8,11 @@ export class VoiceStateUpdate extends Event {
         const subcription = this.client.subscriptions.get(oldState.guild.id);
         if (!subcription)
             return;
-        if (newState.id === this.client.user?.id)
-            if (!newState.channel || newState.channel && newState.channel.members.size <= 1)
-                return subcription.destroy();
-        if (oldState.channelId !== subcription.voiceChannel.id)
-            return;
-        if (newState.channel && newState.channel.members.has(this.client.user.id))
+        if (oldState.id == this.client.user?.id &&
+            newState.id == this.client.user?.id &&
+            oldState.channel &&
+            newState.channel &&
+            newState.channelId != oldState.channelId)
             subcription.voiceChannel = newState.channel;
-        if (oldState.channel && oldState.channel.members.size <= 1)
-            subcription.destroy();
     }
 }

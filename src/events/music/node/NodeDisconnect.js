@@ -1,10 +1,9 @@
-import { Event } from "../../../structures/index.js";
-import chalk from "chalk";
+import { Event } from '../../../structures/index.js';
 export class NodeDisconnect extends Event {
     constructor(client, commander) {
-        super(client, commander, "nodeDisconnect");
+        super(client, commander, 'nodeDisconnect');
     }
     async execute(name) {
-        console.error(chalk.red(`Music >> Node: ${name} has disconnected!`));
+        this.client.logger.warn(`Node: ${name}: Has Disconnected!`, 'Music');
     }
 }

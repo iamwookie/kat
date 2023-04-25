@@ -1,4 +1,4 @@
-import { Collection } from "discord.js";
+import { Collection } from 'discord.js';
 // Currently only used for guild configs, in the future will be changed
 export class Cache {
     client;

@@ -1,23 +1,23 @@
-import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from "../structures/index.js";
-import { emotes } from "../../config.js";
+import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../structures/index.js';
+import { emotes } from '../../config.js';
 const musicEmotes = emotes.music;
 export function formatDuration(timeInMs) {
     if (!timeInMs)
-        return "No Data";
+        return 'No Data';
     const time = Math.floor(timeInMs / 1000);
     const hours = Math.floor(time / 3600);
     const minutes = Math.floor(time / 60);
     const seconds = time - minutes * 60;
-    return `${hours > 0 ? hours.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${minutes > 0 ? minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false }) + ":" : ""}${seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })}`;
+    return `${hours > 0 ? hours.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + ':' : ''}${minutes > 0 ? minutes.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + ':' : ''}${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false })}`;
 }
 export function formatBytes(bytes) {
     if (!bytes)
-        return "No Data";
-    let sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+        return 'No Data';
+    let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     if (bytes == 0)
-        return "0 Byte";
+        return '0 Byte';
     let i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i)) + " " + sizes[i];
+    return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
 }
 export function formatUser(user) {
     return {
@@ -38,6 +38,6 @@ export function getServiceIcon(item) {
         return musicEmotes.spotify;
     }
     else {
-        return "";
+        return '';
     }
 }

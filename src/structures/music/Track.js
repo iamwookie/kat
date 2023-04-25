@@ -1,4 +1,4 @@
-import { formatDuration } from "../../utils/helpers.js";
+import { formatDuration } from '../../utils/helpers.js';
 class Track {
     client;
     data;
@@ -24,8 +24,19 @@ class Track {
         this.onStart = () => { };
         this.onFinish = () => { };
         this.onError = (err) => {
-            this.client.logger.error(err);
-            this.textChannel?.send(`An error occurred while playing **${this.title}**. Skipping...`);
+            this.client.logger.error(err, 'Track Error', 'Music');
+            this.textChannel?.send(`An error occurred while playing **${this.title}**. Skipping...`).catch(() => { });
+        };
+    }
+    // Add guildId as a track property in future
+    toData() {
+        return {
+            data: JSON.stringify(this.data),
+            url: this.url,
+            title: this.title,
+            requesterId: this.requester.id,
+            textId: this.textChannel?.id ?? null,
+            thumbnail: this.thumbnail ?? null,
         };
     }
 }

@@ -1,7 +1,6 @@
-import { Event } from "../../structures/index.js";
-import { Events } from "discord.js";
-import { ErrorEmbed } from "../../utils/embeds/index.js";
-import chalk from "chalk";
+import { Event } from '../../structures/index.js';
+import { Events } from 'discord.js';
+import { ErrorEmbed } from '../../utils/embeds/index.js';
 export class MessageCreate extends Event {
     constructor(client, commander) {
         super(client, commander, Events.MessageCreate);
@@ -14,7 +13,8 @@ export class MessageCreate extends Event {
         if (!message.content.startsWith(prefix))
             return;
         const commandName = message.content.slice(prefix.length).trim().split(/ +/).shift()?.toLowerCase();
-        const command = this.commander.commands.get(commandName) || this.commander.commands.get(this.commander.aliases.get(commandName));
+        const command = this.commander.commands.get(commandName) ||
+            this.commander.commands.get(this.commander.aliases.get(commandName));
         if (!command || !command.legacy || command.disabled)
             return;
         if (command.module.guilds && !command.module.guilds.includes(message.guild?.id))
@@ -25,9 +25,7 @@ export class MessageCreate extends Event {
             await command.execute(message);
         }
         catch (err) {
-            const eventId = this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Running Chat Command"));
-            console.error(err);
+            const eventId = this.client.logger.error(err, 'Error Running Chat Command', 'Commander');
             message.channel.send({ embeds: [new ErrorEmbed(eventId)] });
         }
     }
