@@ -1,6 +1,7 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
 import { MusicEmbed, ActionEmbed } from '@utils/embeds/index.js';
+import { MusicPrompts } from 'enums.js';
 
 export class LoopCommand extends Command {
     constructor(client: Client, commander: Commander) {
@@ -25,7 +26,7 @@ export class LoopCommand extends Command {
     async execute(int: ChatInputCommandInteraction | Message) {
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText("I'm not playing anything!")] });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
 
         subscription.loop();
         this.reply(int, { embeds: [new MusicEmbed(subscription).setLooped(subscription.active)] });

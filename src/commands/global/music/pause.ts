@@ -1,6 +1,7 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
 import { ActionEmbed, MusicEmbed } from '@utils/embeds/index.js';
+import { MusicPrompts } from 'enums.js';
 
 export class PauseCommand extends Command {
     constructor(client: Client, commander: Commander) {
@@ -27,7 +28,7 @@ export class PauseCommand extends Command {
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText("I'm not playing anything!")] });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
 
         this.applyCooldown(author);
 
