@@ -1,7 +1,6 @@
 import { Command } from '../../../structures/index.js';
 import { SlashCommandBuilder } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
-// Add ability to see current volume next
 export class VolumeCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
