@@ -1,6 +1,7 @@
 import { Command } from '../../../structures/index.js';
 import { SlashCommandBuilder } from 'discord.js';
 import { ActionEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
+import { MusicPrompts } from '../../../../enums.js';
 export class PauseCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -23,7 +24,7 @@ export class PauseCommand extends Command {
         const author = this.getAuthor(int);
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText("I'm not playing anything!")] });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
         this.applyCooldown(author);
         const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();

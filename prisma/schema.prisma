@@ -29,6 +29,7 @@ model Queue {
     voiceId   String
     textId    String?
     position  Int      @default(-1)
+    active    Boolean  @default(false)
     createdAt DateTime @default(now())
     tracks    Track[]
 }

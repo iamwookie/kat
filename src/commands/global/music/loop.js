@@ -1,6 +1,7 @@
 import { Command } from '../../../structures/index.js';
 import { SlashCommandBuilder } from 'discord.js';
 import { MusicEmbed, ActionEmbed } from '../../../utils/embeds/index.js';
+import { MusicPrompts } from '../../../../enums.js';
 export class LoopCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -22,7 +23,7 @@ export class LoopCommand extends Command {
     async execute(int) {
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText("I'm not playing anything!")] });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
         subscription.loop();
         this.reply(int, { embeds: [new MusicEmbed(subscription).setLooped(subscription.active)] });
     }

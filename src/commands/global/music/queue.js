@@ -1,6 +1,7 @@
 import { Command } from '../../../structures/index.js';
 import { SlashCommandBuilder } from 'discord.js';
 import { ActionEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
+import { MusicPrompts } from '../../../../enums.js';
 export class QueueCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -23,7 +24,7 @@ export class QueueCommand extends Command {
         const author = this.getAuthor(int);
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || (!subscription.active && !subscription.queue.length))
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('The queue is empty or does not exist!')] });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
         return this.reply(int, {
             embeds: [
                 new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue),

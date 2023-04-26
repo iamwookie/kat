@@ -3,6 +3,7 @@ import { SlashCommandBuilder, } from 'discord.js';
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist, } from '../../../structures/index.js';
 import { NodeError, PlayerError } from '../../../utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
+import { MusicPrompts } from '../../../../enums.js';
 export class PlayCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -29,16 +30,16 @@ export class PlayCommand extends Command {
         const query = this.getArgs(int).join(' ');
         const voiceChannel = int.member.voice.channel;
         if (!voiceChannel)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('You are not in a voice channel!')] });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInVoice)] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
             return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText("I can't play in that voice channel!")],
+                embeds: [new ActionEmbed('fail').setText(MusicPrompts.CantPlayInVoice)],
             });
         let subscription = this.client.subscriptions.get(int.guildId);
         if (subscription) {
             if (!subscription.voiceChannel.members.has(author.id))
                 return this.reply(int, {
-                    embeds: [new ActionEmbed('fail').setText('You are not in my voice channel!')],
+                    embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)],
                 });
             if (!query && subscription.paused) {
                 subscription.resume();
@@ -57,14 +58,12 @@ export class PlayCommand extends Command {
             catch (err) {
                 if (err instanceof NodeError) {
                     return this.reply(int, {
-                        embeds: [new ActionEmbed('fail').setText('No available music nodes. Please try again!')],
+                        embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoNodes)],
                     });
                 }
                 else if (err instanceof PlayerError) {
                     return this.reply(int, {
-                        embeds: [
-                            new ActionEmbed('fail').setText('Error establishing a voice channel connection. Try again in a few minutes!'),
-                        ],
+                        embeds: [new ActionEmbed('fail').setText(MusicPrompts.VoiceError)],
                     });
                 }
                 else {
@@ -90,7 +89,7 @@ export class PlayCommand extends Command {
                 break;
             }
             case 'NO_MATCHES': {
-                this.reply(int, { embeds: [new ActionEmbed('fail').setText('Could not find your search result!')] });
+                this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
                 break;
             }
             case 'SEARCH_RESULT': {
@@ -103,7 +102,7 @@ export class PlayCommand extends Command {
             case 'PLAYLIST_LOADED': {
                 if (!url)
                     return this.reply(int, {
-                        embeds: [new ActionEmbed('fail').setText('Could not find your search result!')],
+                        embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)],
                     });
                 const info = res.playlistInfo;
                 const tracks = res.tracks;
@@ -126,7 +125,7 @@ export class PlayCommand extends Command {
                     }
                     default: {
                         this.reply(int, {
-                            embeds: [new ActionEmbed('fail').setText('Could not find your search result!')],
+                            embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)],
                         });
                         break;
                     }
@@ -150,7 +149,7 @@ export class PlayCommand extends Command {
                     }
                     default: {
                         this.reply(int, {
-                            embeds: [new ActionEmbed('fail').setText('Could not find your search result!')],
+                            embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)],
                         });
                         break;
                     }
@@ -158,7 +157,7 @@ export class PlayCommand extends Command {
                 break;
             }
             default: {
-                this.reply(int, { embeds: [new ActionEmbed('fail').setText('Could not find your search result!')] });
+                this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
                 break;
             }
         }

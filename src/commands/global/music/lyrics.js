@@ -1,6 +1,7 @@
 import { Command } from "../../../structures/index.js";
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { ActionEmbed } from "../../../utils/embeds/index.js";
+import { MusicPrompts } from "../../../../enums.js";
 import GeniusLyrics from "genius-lyrics";
 const genius = new GeniusLyrics.Client();
 export class LyricsCommand extends Command {
@@ -29,9 +30,9 @@ export class LyricsCommand extends Command {
         if (!query && subscription && subscription.active)
             query = subscription.active.title;
         if (!query)
-            return this.reply(int, { embeds: [new ActionEmbed("fail").setText("I am not playing anything!")] });
+            return this.reply(int, { embeds: [new ActionEmbed("fail").setText(MusicPrompts.NotPlaying)] });
         this.applyCooldown(author);
-        const noResults = new ActionEmbed("fail").setText("Couldn't find your search results!");
+        const noResults = new ActionEmbed("fail").setText(MusicPrompts.NoResults);
         try {
             const search = await genius.songs.search(query);
             let lyrics = search[0] ? await search[0].lyrics() : null;
