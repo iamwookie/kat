@@ -4,7 +4,6 @@ export class TrackRemove extends Event {
         super(client, commander, 'trackRemove');
     }
     async execute(subscription) {
-        subscription.position += 1;
         await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,

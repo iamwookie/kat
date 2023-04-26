@@ -23,10 +23,8 @@ export class SubscriptionCreate extends Event {
         });
         setTimeout(() => {
             {
-                if (!subscription.active && !subscription.queue.length) {
+                if (!subscription.active && !subscription.queue.length)
                     subscription.destroy();
-                    this.client.logger.warn(`Subscription Destroyed (Inactivity) For: ${subscription.guild.name} (${subscription.guild.id})`, 'Music');
-                }
             }
         }, this.client.config.music.inactiveDuration);
     }
