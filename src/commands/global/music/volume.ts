@@ -2,7 +2,6 @@ import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 
-// Add ability to see current volume next
 export class VolumeCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {

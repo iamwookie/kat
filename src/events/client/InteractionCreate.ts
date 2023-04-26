@@ -16,8 +16,7 @@ export class InteractionCreate extends Event {
         if (!command || command.disabled) return;
 
         // In future modules will always be required
-        if (command.module && command.module instanceof Module && !command.module.guilds?.includes(interaction.guild?.id!))
-            return;
+        if (command.module.guilds && !command.module.guilds.includes(interaction.guild?.id!)) return;
 
         if (!this.commander.validate(interaction, command)) return;
 

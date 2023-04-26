@@ -19,7 +19,6 @@ export function fetchUser(client: Client) {
             console.error(err);
 
             // Don't log error as missing user can trigger error
-
             return res.status(500).send('Internal Server Error');
         }
     };
