@@ -79,6 +79,7 @@ export class Subscription {
         this.player.connection.disconnect();
         this.client.subscriptions.delete(this.guild.id);
         this.destroyed = true;
+
         this.client.emit('subscriptionDestroy', this);
     }
 
@@ -87,8 +88,10 @@ export class Subscription {
         if (!track) return;
 
         this.active = track;
+        this.position += 1;
         this.player.setVolume(this.volume / 100);
         this.player.playTrack({ track: track.data.track });
+
         this.client.emit('trackRemove', this, track);
     }
 

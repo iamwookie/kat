@@ -6,8 +6,6 @@ export class TrackRemove extends Event {
     }
 
     async execute(subscription: MusicSubscription) {
-        subscription.position += 1;
-
         await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,
