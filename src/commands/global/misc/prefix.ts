@@ -25,7 +25,9 @@ export class PrefixCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message) {
-        if (!int.member?.permissions.has(PermissionFlagsBits.Administrator))
+        const author = this.getAuthor(int);
+
+        if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
             return this.reply(int, {
                 embeds: [new ActionEmbed('fail').setText('You do not have permission to use this command!')],
             });
