@@ -198,7 +198,7 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 
-    validate(interaction: ChatInputCommandInteraction | Message, command: Command) {
+    validate(interaction: ChatInputCommandInteraction | Message<true>, command: Command) {
         const author = command.getAuthor(interaction);
 
         if (command.users && !command.users.includes(author.id)) {

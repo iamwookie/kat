@@ -29,7 +29,7 @@ export class MessageCreate extends Event {
             await command.execute(message);
         } catch (err) {
             const eventId = this.client.logger.error(err, 'Error Running Chat Command', 'Commander');
-            message.channel.send({ embeds: [new ErrorEmbed(eventId)] });
+            message.channel.send({ embeds: [new ErrorEmbed(eventId)] }).catch(() => {});
         }
     }
 }
