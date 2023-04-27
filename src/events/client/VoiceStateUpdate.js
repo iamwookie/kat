@@ -12,7 +12,22 @@ export class VoiceStateUpdate extends Event {
             newState.id == this.client.user?.id &&
             oldState.channel &&
             newState.channel &&
-            newState.channelId != oldState.channelId)
+            newState.channelId != oldState.channelId) {
             subcription.voiceChannel = newState.channel;
+            await this.client.prisma.queue.upsert({
+                where: {
+                    guildId: subcription.guild.id,
+                },
+                update: {
+                    voiceId: subcription.voiceChannel.id,
+                },
+                create: {
+                    guildId: subcription.guild.id,
+                    voiceId: subcription.voiceChannel.id,
+                    textId: subcription.textChannel?.id,
+                    active: true,
+                },
+            });
+        }
     }
 }

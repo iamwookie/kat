@@ -12,22 +12,11 @@ export class ClientReady extends Event {
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
         // Move to a method in the future
-        const res = await this.client.prisma.queue.findMany({
-            include: {
-                _count: {
-                    select: {
-                        tracks: true,
-                    },
-                },
-            },
-        });
+        const res = await this.client.prisma.queue.findMany({});
         if (res.length) {
             this.client.logger.info(`Music >> Warning ${res.length} Subscriptions`);
             for (const queue of res) {
-                // Add queue.active and use that in the future
-                if (queue.position >= queue._count.tracks)
-                    continue;
-                if (!queue.textId)
+                if (!queue.active || !queue.textId)
                     continue;
                 const channel = client.channels.cache.get(queue.textId);
                 if (!channel)

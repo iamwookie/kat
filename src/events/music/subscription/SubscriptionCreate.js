@@ -1,4 +1,5 @@
 import { Event } from '../../../structures/index.js';
+import { Events } from 'discord.js';
 export class SubscriptionCreate extends Event {
     constructor(client, commander) {
         super(client, commander, 'subscriptionCreate');
@@ -14,13 +15,16 @@ export class SubscriptionCreate extends Event {
             },
             update: {
                 position,
+                active: true,
             },
             create: {
                 guildId: subscription.guild.id,
                 voiceId: subscription.voiceChannel.id,
                 textId: subscription.textChannel?.id,
+                active: true,
             },
         });
+        this.client.emit(Events.Debug, `Music (DATABASE) >> Activated And Updated Queue Position For: ${subscription.guild.name} (${subscription.guild.id})`);
         setTimeout(() => {
             {
                 if (!subscription.active && !subscription.queue.length)

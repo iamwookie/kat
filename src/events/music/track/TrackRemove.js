@@ -1,4 +1,5 @@
 import { Event } from '../../../structures/index.js';
+import { Events } from 'discord.js';
 export class TrackRemove extends Event {
     constructor(client, commander) {
         super(client, commander, 'trackRemove');
@@ -19,5 +20,6 @@ export class TrackRemove extends Event {
                 textId: subscription.textChannel?.id,
             },
         });
+        this.client.emit(Events.Debug, `Music (DATABASE) >> Updated Queue Position: ${subscription.guild.name} (${subscription.guild.id}) To: ${subscription.position}`);
     }
 }
