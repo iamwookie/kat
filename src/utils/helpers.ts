@@ -4,15 +4,22 @@ import { User } from 'discord.js';
 import { emotes } from '@config';
 const musicEmotes = emotes.music;
 
-export function formatDuration(timeInMs?: number | null) {
-    if (!timeInMs) return 'No Data';
-    const time = Math.floor(timeInMs / 1000);
-    const hours = Math.floor(time / 3600);
-    const minutes = Math.floor(time / 60);
-    const seconds = time - minutes * 60;
-    return `${hours > 0 ? hours.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + ':' : ''}${
-        minutes > 0 ? minutes.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + ':' : ''
-    }${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false })}`;
+export function formatDuration(milliseconds?: number | null) {
+    if (!milliseconds) return 'No Data';
+    const seconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (hours > 0) {
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds
+            .toString()
+            .padStart(2, '0')}`;
+    } else if (minutes > 0) {
+        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    } else {
+        return `${remainingSeconds.toString().padStart(2, '0')}`;
+    }
 }
 
 export function formatBytes(bytes?: number | null) {
