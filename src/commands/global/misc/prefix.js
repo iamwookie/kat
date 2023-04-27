@@ -22,7 +22,8 @@ export class PrefixCommand extends Command {
             .addStringOption((option) => option.setName('prefix').setRequired(true).setDescription('The prefix to set.'));
     }
     async execute(int) {
-        if (!int.member?.permissions.has(PermissionFlagsBits.Administrator))
+        const author = this.getAuthor(int);
+        if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
             return this.reply(int, {
                 embeds: [new ActionEmbed('fail').setText('You do not have permission to use this command!')],
             });

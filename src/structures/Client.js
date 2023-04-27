@@ -28,8 +28,8 @@ export class KATClient extends Client {
     config = Config;
     devId = Config.bot.devId;
     prefix = Config.bot.prefix;
+    devPrefix = Config.bot.devPrefix;
     legacyPrefix = Config.bot.legacyPrefix;
-    cliPrefix = Config.bot.cliPrefix;
     logger = new Logger(this);
     // Prisma causes an issue with circular references. Try fixing this later
     prisma = new PrismaClient({ log: ['warn', 'error'] });
@@ -58,5 +58,8 @@ export class KATClient extends Client {
         }
         await this.commander.initialize();
         console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
+    }
+    isDev(id) {
+        return this.devId == id;
     }
 }
