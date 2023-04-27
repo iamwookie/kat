@@ -27,7 +27,7 @@ export class LyricsCommand extends Command {
             .addStringOption((option) => option.setName("query").setDescription("The name or URL of the track to search for."));
     }
 
-    async execute(int: ChatInputCommandInteraction | Message) {
+    async execute(int: ChatInputCommandInteraction | Message<true>) {
         const author = this.getAuthor(int);
         let query = this.getArgs(int).join(" ");
 

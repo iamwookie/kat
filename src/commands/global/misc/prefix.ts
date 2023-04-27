@@ -24,7 +24,7 @@ export class PrefixCommand extends Command {
             .addStringOption((option) => option.setName('prefix').setRequired(true).setDescription('The prefix to set.'));
     }
 
-    async execute(int: ChatInputCommandInteraction<'cached'> | Message) {
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const author = this.getAuthor(int);
 
         if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))

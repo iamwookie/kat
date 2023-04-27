@@ -23,7 +23,7 @@ export class PauseCommand extends Command {
             .setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction | Message) {
+    async execute(int: ChatInputCommandInteraction | Message<true>) {
         const author = this.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);

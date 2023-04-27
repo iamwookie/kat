@@ -23,7 +23,7 @@ export class LoopCommand extends Command {
             .setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction | Message) {
+    async execute(int: ChatInputCommandInteraction | Message<true>) {
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active)
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });

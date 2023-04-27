@@ -58,7 +58,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
-    abstract execute(interaction: string | ChatInputCommandInteraction | Message): Promise<any>;
+    abstract execute(interaction: string | ChatInputCommandInteraction | Message<true>): Promise<any>;
 
     constructor(public client: Client, public commander: Commander, options: CommandOptions<T>) {
         this.name = options.name;
@@ -89,7 +89,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
     }
 
-    getAuthor(interaction: ChatInputCommandInteraction | Message) {
+    getAuthor(interaction: ChatInputCommandInteraction | Message<true>) {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.user;
         } else if (interaction instanceof Message) {
@@ -99,7 +99,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         }
     }
 
-    getArgs(interaction: ChatInputCommandInteraction | Message) {
+    getArgs(interaction: ChatInputCommandInteraction | Message<true>) {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.options.data
                 .map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options))
