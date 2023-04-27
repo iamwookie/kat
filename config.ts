@@ -3,7 +3,7 @@ export const version = "7.7.2";
 export const bot = {
     devId: "244662779745665026",
     prefix: "/",
-    cliPrefix: ":",
+    devPrefix: ".",
     legacyPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
 };
 

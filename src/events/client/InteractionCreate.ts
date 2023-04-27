@@ -8,13 +8,12 @@ export class InteractionCreate extends Event {
     }
 
     async execute(interaction: BaseInteraction) {
-        if (!interaction.isChatInputCommand()) return;
+        if (!interaction.isChatInputCommand() || !interaction.inGuild()) return;
 
         const command =
             this.commander.commands.get(interaction.commandName) ||
             this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);
         if (!command || command.disabled) return;
-
         // In future modules will always be required
         if (command.module.guilds && !command.module.guilds.includes(interaction.guild?.id!)) return;
 

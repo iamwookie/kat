@@ -31,8 +31,8 @@ export class KATClient extends Client {
     public config = Config;
     public devId = Config.bot.devId;
     public prefix = Config.bot.prefix;
+    public devPrefix = Config.bot.devPrefix;
     public legacyPrefix = Config.bot.legacyPrefix;
-    public cliPrefix = Config.bot.cliPrefix;
     public logger = new Logger(this);
     // Prisma causes an issue with circular references. Try fixing this later
     public prisma = new PrismaClient({ log: ['warn', 'error'] });
@@ -65,5 +65,9 @@ export class KATClient extends Client {
 
         await this.commander.initialize();
         console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
+    }
+
+    isDev(id: Snowflake) {
+        return this.devId == id;
     }
 }
