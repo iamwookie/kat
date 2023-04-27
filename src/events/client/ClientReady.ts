@@ -39,8 +39,6 @@ export class ClientReady extends Event {
                 }
             }
 
-            this.client.logger.info(`Warnings Sent`, 'Music');
-
             await this.client.prisma.queue.updateMany({
                 where: {
                     active: true,
