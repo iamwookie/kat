@@ -2,7 +2,7 @@ export const version = "7.7.3";
 export const bot = {
     devId: "244662779745665026",
     prefix: "/",
-    devPrefix: ".",
+    devPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
     legacyPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
 };
 export const emotes = {

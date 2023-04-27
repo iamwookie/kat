@@ -1,5 +1,5 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
 export class VolumeCommand extends Command {
     constructor(client, commander) {
@@ -23,6 +23,11 @@ export class VolumeCommand extends Command {
             .addStringOption((option) => option.setName('number').setDescription('The volume to set. (0-100)'));
     }
     async execute(int) {
+        const author = this.getAuthor(int);
+        if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
+            return this.reply(int, {
+                embeds: [new ActionEmbed('fail').setText('You do not have permission to use this command!')],
+            });
         const args = this.getArgs(int)[0];
         if (!args) {
             const res = await this.client.cache.music.get(int.guildId);

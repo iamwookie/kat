@@ -23,7 +23,7 @@ export class InteractionCreate extends Event {
         }
         catch (err) {
             const eventId = this.client.logger.error(err, 'Error Running Slash Command', 'Commander');
-            interaction.editReply({ embeds: [new ErrorEmbed(eventId)] });
+            interaction.editReply({ embeds: [new ErrorEmbed(eventId)] }).catch(() => { });
         }
     }
 }
