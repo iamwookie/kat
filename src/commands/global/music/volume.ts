@@ -11,7 +11,7 @@ export class VolumeCommand extends Command {
             legacy: true,
             legacyAliases: ['v'],
             description: {
-                content: 'View or set the music volume for the server.',
+                content: 'View or set the music volume for the server. [Admin Only]',
                 format: '<?number>(0-100)',
             },
             cooldown: 5,
@@ -28,12 +28,6 @@ export class VolumeCommand extends Command {
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const author = this.getAuthor(int);
-
-        if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
-            return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-            });
-
         const args = this.getArgs(int)[0] as string;
 
         if (!args) {
@@ -42,6 +36,11 @@ export class VolumeCommand extends Command {
                 embeds: [new ActionEmbed('success').setText(`The current volume is \`${res?.volume ?? 100}%\`!`)],
             });
         }
+
+        if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
+            return this.reply(int, {
+                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
+            });
 
         const volume = parseInt(args);
         if (isNaN(volume)) return this.reply(int, { embeds: [new ActionEmbed('fail').setText('Invalid volume provided!')] });
