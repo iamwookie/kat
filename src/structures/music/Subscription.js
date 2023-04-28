@@ -77,10 +77,12 @@ export class Subscription {
         if (!track)
             return;
         this.active = track;
-        this.position += 1;
         this.player.setVolume(this.volume / 100);
         this.player.playTrack({ track: track.data.track });
-        this.client.emit('trackRemove', this, track);
+        if (!this.looped) {
+            this.position += 1;
+            this.client.emit('trackRemove', this, track);
+        }
     }
     add(item) {
         if (item instanceof YouTubePlaylist) {
