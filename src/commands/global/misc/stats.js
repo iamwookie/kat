@@ -25,7 +25,7 @@ export class StatsCommand extends Command {
             name: 'Users',
             value: `\`${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)}\``,
             inline: true,
-        }, { name: 'Version', value: `\`${this.client.config.version}\``, inline: true });
+        }, { name: 'Version', value: `\`${this.client.config.version}\``, inline: true }, { name: 'Active Queues', value: `\`${this.client.subscriptions.size}\``, inline: true });
         const subscription = this.client.subscriptions.get(int.guild?.id);
         if (subscription)
             embed.addFields({ name: 'Node', value: `\`${subscription.node.name}\``, inline: true });

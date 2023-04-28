@@ -1,3 +1,7 @@
+export var ErrorPrompts;
+(function (ErrorPrompts) {
+    ErrorPrompts["TrackError"] = "An error occurred while playing the track. Skipping...";
+})(ErrorPrompts || (ErrorPrompts = {}));
 export var PermissionPrompts;
 (function (PermissionPrompts) {
     PermissionPrompts["NotAllowed"] = "You do not have enough permissions!";

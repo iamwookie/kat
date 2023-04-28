@@ -4,7 +4,6 @@ export class PlayerStart extends Event {
         super(client, commander, 'playerStart');
     }
     async execute(subscription) {
-        subscription.active?.onStart();
-        this.client.logger.info(`Started Playing in ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Music');
+        this.client.logger.info(`Started Playing In: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Music');
     }
 }

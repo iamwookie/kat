@@ -4,7 +4,6 @@ export class PlayerEnd extends Event {
         super(client, commander, 'playerEnd');
     }
     async execute(subscription) {
-        subscription.active?.onFinish();
         if (!subscription.looped)
             subscription.active = null;
         subscription.process();
