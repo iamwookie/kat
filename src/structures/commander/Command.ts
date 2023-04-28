@@ -58,7 +58,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
-    abstract execute(interaction: string | ChatInputCommandInteraction | Message<true>): Promise<any>;
+    abstract execute(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>): Promise<any>;
 
     constructor(public client: Client, public commander: Commander, options: CommandOptions<T>) {
         this.name = options.name;
@@ -89,7 +89,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
     }
 
-    getAuthor(interaction: ChatInputCommandInteraction | Message<true>) {
+    getAuthor(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.user;
         } else if (interaction instanceof Message) {
@@ -99,11 +99,9 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         }
     }
 
-    getArgs(interaction: ChatInputCommandInteraction | Message<true>) {
+    getArgs(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data
-                .map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options))
-                .flat();
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
         } else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);
         } else {
@@ -112,7 +110,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     }
 
     reply(
-        interaction: ChatInputCommandInteraction | Message,
+        interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>,
         content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
     ) {
         if (interaction instanceof ChatInputCommandInteraction) {
@@ -125,7 +123,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     }
 
     edit(
-        interaction: ChatInputCommandInteraction | Message,
+        interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>,
         editable: Message,
         content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
     ) {

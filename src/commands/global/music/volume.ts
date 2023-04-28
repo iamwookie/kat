@@ -1,6 +1,7 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
+import { PermissionPrompts } from 'enums.js';
 
 export class VolumeCommand extends Command {
     constructor(client: Client, commander: Commander) {
@@ -25,14 +26,14 @@ export class VolumeCommand extends Command {
             .addStringOption((option) => option.setName('number').setDescription('The volume to set. (0-100)'));
     }
 
-    async execute(int: ChatInputCommandInteraction<"cached"> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const author = this.getAuthor(int);
 
         if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
             return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText('You do not have permission to use this command!')],
+                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
             });
-        
+
         const args = this.getArgs(int)[0] as string;
 
         if (!args) {
@@ -92,9 +93,7 @@ export class VolumeCommand extends Command {
             embeds: [
                 new ActionEmbed('success').setText(
                     `Set the music volume to \`${res.music.volume}%\`!${
-                        subscription
-                            ? '\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```'
-                            : ''
+                        subscription ? '\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```' : ''
                     }`
                 ),
             ],

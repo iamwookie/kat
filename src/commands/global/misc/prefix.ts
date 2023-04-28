@@ -1,6 +1,7 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/action.js';
+import { PermissionPrompts } from 'enums.js';
 
 export class PrefixCommand extends Command {
     constructor(client: Client, commander: Commander) {
@@ -29,12 +30,11 @@ export class PrefixCommand extends Command {
 
         if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
             return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText('You do not have permission to use this command!')],
+                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
             });
 
         const args = this.getArgs(int)[0] as string;
-        if (!args)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('You did not provide a valid prefix!')] });
+        if (!args) return this.reply(int, { embeds: [new ActionEmbed('fail').setText('You did not provide a valid prefix!')] });
 
         const res = await this.client.prisma.guild.upsert({
             where: {

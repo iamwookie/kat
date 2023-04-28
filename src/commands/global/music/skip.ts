@@ -23,7 +23,7 @@ export class SkipCommand extends Command {
             .setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<"cached" | "raw"> | Message<true>) {
         const author = this.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);

@@ -17,13 +17,10 @@ export class QueueCommand extends Command {
     }
 
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
         const author = this.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
@@ -31,9 +28,7 @@ export class QueueCommand extends Command {
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
 
         return this.reply(int, {
-            embeds: [
-                new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue),
-            ],
+            embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue)],
         });
     }
 }

@@ -1,19 +1,6 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import {
-    SlashCommandBuilder,
-    ChatInputCommandInteraction,
-    Message,
-    GuildMember,
-    VoiceBasedChannel,
-    VoiceChannel,
-} from 'discord.js';
-import {
-    Subscription as MusicSubscription,
-    YouTubeTrack,
-    SpotifyTrack,
-    YouTubePlaylist,
-    SpotifyPlaylist,
-} from '@structures/index.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message, GuildMember, VoiceBasedChannel, VoiceChannel } from 'discord.js';
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '@structures/index.js';
 import { LavalinkResponse } from 'shoukaku';
 import { NodeError, PlayerError } from '@utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '@utils/embeds/index.js';
@@ -42,7 +29,7 @@ export class PlayCommand extends Command {
             .addStringOption((option) => option.setName('query').setDescription('The name or URL of the track.'));
     }
 
-    async execute(int: ChatInputCommandInteraction | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
         const author = this.getAuthor(int);
         const query = this.getArgs(int).join(' ');
 
@@ -50,7 +37,7 @@ export class PlayCommand extends Command {
         if (!voiceChannel) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInVoice)] });
         if (!voiceChannel.joinable || !(voiceChannel as VoiceChannel).speakable)
             return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText(MusicPrompts.CantPlayInVoice)],
+                embeds: [new ActionEmbed('fail').setText(MusicPrompts.CannotPlayInVoice)],
             });
 
         let subscription = this.client.subscriptions.get(int.guildId!);

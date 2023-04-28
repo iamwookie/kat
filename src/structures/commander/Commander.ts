@@ -1,18 +1,11 @@
 import { KATClient as Client } from '../Client.js';
 
 // ----- FOR LATER USE -----
-import {
-    Events as DiscordEvents,
-    REST,
-    Routes,
-    ChatInputCommandInteraction,
-    Message,
-    Collection,
-    Snowflake,
-} from 'discord.js';
+import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake, PermissionFlagsBits } from 'discord.js';
 import { Command } from './Command.js';
 import { Module } from './Module.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
+import { PermissionPrompts } from 'enums.js';
 
 // -----------------------------------
 import * as Commands from '@commands/index.js';
@@ -93,9 +86,7 @@ export class Commander {
 
                 if (command.users) command.users.push(this.client.devId);
 
-                command.module =
-                    this.modules.get(command.module as string) ??
-                    new Module(this.client, this, { name: command.module as string });
+                command.module = this.modules.get(command.module as string) ?? new Module(this.client, this, { name: command.module as string });
                 if (!this.modules.has(command.module.name)) this.modules.set(command.module.name, command.module);
 
                 const loaded = command as Command<true>;
@@ -186,10 +177,7 @@ export class Commander {
                 const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), {
                     body: body,
                 });
-                this.client.emit(
-                    DiscordEvents.Debug,
-                    `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`
-                );
+                this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
             } catch (err) {
                 this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
             }
@@ -198,14 +186,30 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 
-    validate(interaction: ChatInputCommandInteraction | Message<true>, command: Command) {
+    validate(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>, command: Command) {
         const author = command.getAuthor(interaction);
+
+        if (!interaction.channel?.permissionsFor(interaction.guild!.members.me!).has(PermissionFlagsBits.SendMessages)) {
+            if (!command.hidden)
+                author
+                    .send({
+                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
+                    })
+                    .catch((err) => {
+                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                    });
+            return false;
+        }
 
         if (command.users && !command.users.includes(author.id)) {
             if (!command.hidden)
-                command.reply(interaction, {
-                    embeds: [new ActionEmbed('fail').setText('You are not allowed to use this command!')],
-                });
+                command
+                    .reply(interaction, {
+                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
+                    })
+                    .catch((err) => {
+                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                    });
             return false;
         }
 
@@ -213,14 +217,15 @@ export class Commander {
             if (command.cooldowns.has(author.id)) {
                 const cooldown = command.cooldowns.get(author.id)!;
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-
-                command.reply(interaction, {
-                    embeds: [
-                        new ActionEmbed('fail').setText(
-                            `Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`
-                        ),
-                    ],
-                });
+                command
+                    .reply(interaction, {
+                        embeds: [
+                            new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`),
+                        ],
+                    })
+                    .catch((err) => {
+                        this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
+                    });
                 return false;
             }
         }
