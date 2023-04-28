@@ -1,6 +1,6 @@
 import { Event } from '../../../structures/index.js';
 import { ActionEmbed } from '../../../utils/embeds/action.js';
-import { ErrorPrompts } from '../../../../enums';
+import { ErrorPrompts } from '../../../../enums.js';
 export class PlayerException extends Event {
     constructor(client, commander) {
         super(client, commander, 'playerException');
