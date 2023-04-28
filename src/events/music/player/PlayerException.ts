@@ -1,7 +1,7 @@
 import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from '@structures/index.js';
 import { TrackExceptionEvent } from 'shoukaku';
 import { ActionEmbed } from '@utils/embeds/action.js';
-import { ErrorPrompts } from 'enums';
+import { ErrorPrompts } from 'enums.js';
 
 export class PlayerException extends Event {
     constructor(client: Client, commander: Commander) {
