@@ -20,7 +20,7 @@ export class StatsCommand extends Command {
         return new SlashCommandBuilder();
     }
 
-    async execute(int: ChatInputCommandInteraction<"cached" | "raw"> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
         const embed = new EmbedBuilder()
             .setColor('Yellow')
             .setTitle('Statistics')

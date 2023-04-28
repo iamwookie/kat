@@ -26,9 +26,7 @@ export class AffiliateCommand extends Command {
                 subcommand
                     .setName('create')
                     .setDescription('Create an affiliate link.')
-                    .addUserOption((option) =>
-                        option.setName('user').setDescription('The user to create an affiliate link for.').setRequired(true)
-                    )
+                    .addUserOption((option) => option.setName('user').setDescription('The user to create an affiliate link for.').setRequired(true))
             ) as SlashCommandBuilder;
     }
 
@@ -38,8 +36,7 @@ export class AffiliateCommand extends Command {
 
         if (command === 'create') {
             const user = int.options.getUser('user', true);
-            if (!user || user.bot)
-                return this.reply(int, { embeds: [new ActionEmbed('fail').setText('The user you provided is invalid!')] });
+            if (!user || user.bot) return this.reply(int, { embeds: [new ActionEmbed('fail').setText('The user you provided is invalid!')] });
 
             const members = await int.guild?.members.fetch();
             if (!members?.has(user.id))
