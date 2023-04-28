@@ -1,6 +1,7 @@
 import { Command } from '../../../structures/index.js';
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
+import { PermissionPrompts } from '../../../../enums.js';
 export class VolumeCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -26,7 +27,7 @@ export class VolumeCommand extends Command {
         const author = this.getAuthor(int);
         if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
             return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText('You do not have permission to use this command!')],
+                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
             });
         const args = this.getArgs(int)[0];
         if (!args) {
@@ -80,9 +81,7 @@ export class VolumeCommand extends Command {
         }
         return this.reply(int, {
             embeds: [
-                new ActionEmbed('success').setText(`Set the music volume to \`${res.music.volume}%\`!${subscription
-                    ? '\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```'
-                    : ''}`),
+                new ActionEmbed('success').setText(`Set the music volume to \`${res.music.volume}%\`!${subscription ? '\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```' : ''}`),
             ],
         });
     }

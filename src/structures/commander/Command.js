@@ -51,9 +51,7 @@ export class Command {
     }
     getArgs(interaction) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data
-                .map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options))
-                .flat();
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
         }
         else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);

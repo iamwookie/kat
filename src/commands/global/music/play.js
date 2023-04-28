@@ -1,6 +1,6 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder, } from 'discord.js';
-import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist, } from '../../../structures/index.js';
+import { SlashCommandBuilder } from 'discord.js';
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../../../structures/index.js';
 import { NodeError, PlayerError } from '../../../utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../../enums.js';
@@ -33,7 +33,7 @@ export class PlayCommand extends Command {
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInVoice)] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
             return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText(MusicPrompts.CantPlayInVoice)],
+                embeds: [new ActionEmbed('fail').setText(MusicPrompts.CannotPlayInVoice)],
             });
         let subscription = this.client.subscriptions.get(int.guildId);
         if (subscription) {

@@ -1,7 +1,8 @@
 // ----- FOR LATER USE -----
-import { Events as DiscordEvents, REST, Routes, Collection, } from 'discord.js';
+import { Events as DiscordEvents, REST, Routes, Collection, PermissionFlagsBits } from 'discord.js';
 import { Module } from './Module.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
+import { PermissionPrompts } from '../../../enums.js';
 // -----------------------------------
 import * as Commands from '../../commands/index.js';
 import * as Events from '../../events/index.js';
@@ -71,9 +72,7 @@ export class Commander {
                 }
                 if (command.users)
                     command.users.push(this.client.devId);
-                command.module =
-                    this.modules.get(command.module) ??
-                        new Module(this.client, this, { name: command.module });
+                command.module = this.modules.get(command.module) ?? new Module(this.client, this, { name: command.module });
                 if (!this.modules.has(command.module.name))
                     this.modules.set(command.module.name, command.module);
                 const loaded = command;
@@ -163,10 +162,25 @@ export class Commander {
     }
     validate(interaction, command) {
         const author = command.getAuthor(interaction);
+        if (!interaction.channel?.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SendMessages)) {
+            if (!command.hidden)
+                author
+                    .send({
+                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
+                })
+                    .catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                });
+            return false;
+        }
         if (command.users && !command.users.includes(author.id)) {
             if (!command.hidden)
-                command.reply(interaction, {
-                    embeds: [new ActionEmbed('fail').setText('You are not allowed to use this command!')],
+                command
+                    .reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
+                })
+                    .catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
                 });
             return false;
         }
@@ -174,10 +188,14 @@ export class Commander {
             if (command.cooldowns.has(author.id)) {
                 const cooldown = command.cooldowns.get(author.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-                command.reply(interaction, {
+                command
+                    .reply(interaction, {
                     embeds: [
                         new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`),
                     ],
+                })
+                    .catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
                 });
                 return false;
             }

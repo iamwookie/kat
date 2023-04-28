@@ -1,6 +1,7 @@
 import { Command } from '../../../structures/index.js';
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/action.js';
+import { PermissionPrompts } from '../../../../enums.js';
 export class PrefixCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -25,7 +26,7 @@ export class PrefixCommand extends Command {
         const author = this.getAuthor(int);
         if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
             return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText('You do not have permission to use this command!')],
+                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
             });
         const args = this.getArgs(int)[0];
         if (!args)

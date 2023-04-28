@@ -15,10 +15,7 @@ export class QueueCommand extends Command {
         });
     }
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content).setDMPermission(false);
     }
     async execute(int) {
         const author = this.getAuthor(int);
@@ -26,9 +23,7 @@ export class QueueCommand extends Command {
         if (!subscription || (!subscription.active && !subscription.queue.length))
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
         return this.reply(int, {
-            embeds: [
-                new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue),
-            ],
+            embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue)],
         });
     }
 }

@@ -15,10 +15,7 @@ export class LoopCommand extends Command {
         });
     }
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content).setDMPermission(false);
     }
     async execute(int) {
         const subscription = this.client.subscriptions.get(int.guildId);
