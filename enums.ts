@@ -1,3 +1,7 @@
+export enum ErrorPrompts {
+    TrackError = 'An error occurred while playing the track. Skipping...',
+}
+
 export enum PermissionPrompts {
     NotAllowed = 'You do not have enough permissions!',
     CannotSend = 'I can\'t send messages in that channel. Make sure I have the appropriate permissions, or if you don\'t want such errors in the future, give me the `Administrator` permission!',

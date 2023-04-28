@@ -1,5 +1,7 @@
 import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from '@structures/index.js';
 import { TrackExceptionEvent } from 'shoukaku';
+import { ActionEmbed } from '@utils/embeds/action.js';
+import { ErrorPrompts } from 'enums';
 
 export class PlayerException extends Event {
     constructor(client: Client, commander: Commander) {
@@ -13,9 +15,10 @@ export class PlayerException extends Event {
             'Music'
         );
 
-        subscription.active?.onError(reason);
         subscription.looped = false;
         subscription.active = null;
         subscription.process();
+
+        subscription.textChannel?.send({ embeds: [new ActionEmbed().setText(ErrorPrompts.TrackError)] }).catch(() => {});
     }
 }

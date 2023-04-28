@@ -6,7 +6,6 @@ export class PlayerEnd extends Event {
     }
 
     async execute(subscription: MusicSubscription) {
-        subscription.active?.onFinish();
         if (!subscription.looped) subscription.active = null;
         subscription.process();
 

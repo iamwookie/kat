@@ -10,9 +10,6 @@ abstract class Track {
     public duration: string;
     public durationRaw: number;
     public thumbnail?: string;
-    public onStart: () => void;
-    public onFinish: () => void;
-    public onError: (err: any) => void;
 
     constructor(
         public client: Client,
@@ -24,12 +21,6 @@ abstract class Track {
         this.title = this.data.info.title;
         this.duration = formatDuration(this.data.info.length);
         this.durationRaw = this.data.info.length;
-        this.onStart = () => {};
-        this.onFinish = () => {};
-        this.onError = (err) => {
-            this.client.logger.error(err, 'Track Error', 'Music');
-            this.textChannel?.send(`An error occurred while playing **${this.title}**. Skipping...`).catch(() => {});
-        };
     }
 
     // Add guildId as a track property in future
