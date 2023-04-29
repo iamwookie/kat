@@ -1,4 +1,4 @@
-import { EmbedBuilder, User } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 
 export class ActionEmbed extends EmbedBuilder {
     constructor(public embedType?: 'success' | 'fail' | 'warn') {
@@ -11,15 +11,15 @@ export class ActionEmbed extends EmbedBuilder {
         switch (this.embedType) {
             case 'success':
                 super.setColor('Green');
-                super.setDescription(`\u200b ${content}`);
+                super.setDescription(content);
                 break;
             case 'fail':
                 super.setColor('Red');
-                super.setDescription(`\u200b ${content}`);
+                super.setDescription(content);
                 break;
             case 'warn':
                 super.setColor('Yellow');
-                super.setDescription(`\u200b ${content}`);
+                super.setDescription(content);
                 break;
             default:
                 super.setDescription(content);
