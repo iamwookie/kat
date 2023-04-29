@@ -1,7 +1,7 @@
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/action.js';
-import { MusicPrompts } from '../../../enums';
+import { MusicPrompts } from '../../../enums.js';
 import chalk from 'chalk';
 export class ClientReady extends Event {
     constructor(client, commander) {
