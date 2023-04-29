@@ -15,4 +15,5 @@ export var MusicPrompts;
     MusicPrompts["LastTrack"] = "This is the last track in the queue!";
     MusicPrompts["TrackError"] = "An error occurred while playing the track. Skipping...";
     MusicPrompts["NoNodes"] = "There are no available nodes to play on!";
+    MusicPrompts["Restarted"] = "The bot has restarted, please replay your track!";
 })(MusicPrompts || (MusicPrompts = {}));

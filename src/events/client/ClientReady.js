@@ -1,6 +1,7 @@
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/action.js';
+import { MusicPrompts } from '../../../enums';
 import chalk from 'chalk';
 export class ClientReady extends Event {
     constructor(client, commander) {
@@ -18,7 +19,7 @@ export class ClientReady extends Event {
             },
         });
         if (res.length) {
-            this.client.logger.info(`Warning ${res.length} Subscriptions`, 'Music');
+            this.client.logger.info(`Warning ${res.length} Queue(s)`, 'Music');
             for (const queue of res) {
                 if (!queue.active || !queue.textId)
                     continue;
@@ -27,7 +28,7 @@ export class ClientReady extends Event {
                     continue;
                 try {
                     await channel.send({
-                        embeds: [new ActionEmbed('warn').setText('The bot has restarted, please replay your track.')],
+                        embeds: [new ActionEmbed('warn').setText(MusicPrompts.Restarted)],
                     });
                     this.client.logger.info(`Warning Sent To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
                 }
@@ -43,7 +44,7 @@ export class ClientReady extends Event {
                     active: false,
                 },
             });
-            this.client.logger.info(`Queues Set To Inactive`, 'Music');
+            this.client.logger.info(`Queue(s) Set To Inactive`, 'Music');
         }
         // ----------------------------
         console.log(chalk.magenta.bold.underline(`\n---- >>> App Online, Client: ${client.user?.tag} (${client.user?.id}) [Version: ${this.client.config.version}] [Guilds: ${client.guilds.cache.size}]`));
