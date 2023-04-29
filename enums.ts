@@ -16,3 +16,8 @@ export enum MusicPrompts {
     NoNodes = 'There are no available nodes to play on!',
     Restarted = 'The bot has restarted, please replay your track!',
 }
+
+export enum MusicEmojis {
+    YouTube = "<:youtube:1067881972774477844>",
+    Spotify = "<:spotify:1067881968697614476>",
+}
