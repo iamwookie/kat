@@ -1,7 +1,7 @@
 import { Event, KATClient as Client, Commander } from '@structures/index.js';
 import { Events, Client as DiscordClient, TextChannel } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/action.js';
-import { MusicPrompts } from 'enums';
+import { MusicPrompts } from 'enums.js';
 
 import chalk from 'chalk';
 
