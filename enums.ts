@@ -14,4 +14,5 @@ export enum MusicPrompts {
     LastTrack = 'This is the last track in the queue!',
     TrackError = 'An error occurred while playing the track. Skipping...',
     NoNodes = 'There are no available nodes to play on!',
+    Restarted = 'The bot has restarted, please replay your track!',
 }

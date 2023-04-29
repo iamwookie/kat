@@ -1,6 +1,7 @@
 import { Event, KATClient as Client, Commander } from '@structures/index.js';
 import { Events, Client as DiscordClient, TextChannel } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/action.js';
+import { MusicPrompts } from 'enums';
 
 import chalk from 'chalk';
 
@@ -33,7 +34,7 @@ export class ClientReady extends Event {
 
                 try {
                     await channel.send({
-                        embeds: [new ActionEmbed('warn').setText('The bot has restarted, please replay your track.')],
+                        embeds: [new ActionEmbed('warn').setText(MusicPrompts.Restarted)],
                     });
                     this.client.logger.info(`Warning Sent To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
                 } catch {
