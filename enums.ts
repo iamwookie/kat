@@ -1,7 +1,3 @@
-export enum ErrorPrompts {
-    TrackError = 'An error occurred while playing the track. Skipping...',
-}
-
 export enum PermissionPrompts {
     NotAllowed = 'You do not have enough permissions!',
     CannotSend = 'I can\'t send messages in that channel. Make sure I have the appropriate permissions, or if you don\'t want such errors in the future, give me the `Administrator` permission!',
@@ -16,5 +12,6 @@ export enum MusicPrompts {
     VoiceError = 'Error establishing a voice channel connection. Try again in a few minutes!',
     QueueEmpty = 'The current queue is empty!',
     LastTrack = 'This is the last track in the queue!',
+    TrackError = 'An error occurred while playing the track. Skipping...',
     NoNodes = 'There are no available nodes to play on!',
 }
