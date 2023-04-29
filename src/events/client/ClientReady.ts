@@ -23,7 +23,7 @@ export class ClientReady extends Event {
         });
 
         if (res.length) {
-            this.client.logger.info(`Warning ${res.length} Subscriptions`, 'Music');
+            this.client.logger.info(`Warning ${res.length} Queue(s)`, 'Music');
 
             for (const queue of res) {
                 if (!queue.active || !queue.textId) continue;
@@ -50,7 +50,7 @@ export class ClientReady extends Event {
                 },
             });
 
-            this.client.logger.info(`Queues Set To Inactive`, 'Music');
+            this.client.logger.info(`Queue(s) Set To Inactive`, 'Music');
         }
         // ----------------------------
 
