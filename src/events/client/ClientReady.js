@@ -11,8 +11,12 @@ export class ClientReady extends Event {
             module.onReady(client);
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
-        // Move to a method in the future
-        const res = await this.client.prisma.queue.findMany({});
+        // Move to a method in the future (maybe :/)
+        const res = await this.client.prisma.queue.findMany({
+            where: {
+                active: true,
+            },
+        });
         if (res.length) {
             this.client.logger.info(`Warning ${res.length} Subscriptions`, 'Music');
             for (const queue of res) {
@@ -25,10 +29,10 @@ export class ClientReady extends Event {
                     await channel.send({
                         embeds: [new ActionEmbed('warn').setText('The bot has restarted, please replay your track.')],
                     });
-                    this.client.logger.info(`Music >> Warning Sent To: ${channel.guild.name} (${channel.guild.id})`);
+                    this.client.logger.info(`Warning Sent To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
                 }
                 catch {
-                    this.client.logger.warn(`Music >> Failed To Send Warning To: ${channel.guild.name} (${channel.guild.id})`);
+                    this.client.logger.warn(`Failed To Send Warning To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
                 }
             }
             await this.client.prisma.queue.updateMany({
