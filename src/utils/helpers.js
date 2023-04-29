@@ -1,6 +1,5 @@
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../structures/index.js';
-import { emotes } from '../../config.js';
-const musicEmotes = emotes.music;
+import { MusicEmojis } from '../../enums.js';
 export function formatDuration(milliseconds) {
     if (!milliseconds)
         return 'No Data';
@@ -42,10 +41,10 @@ export function formatUser(user) {
 }
 export function getServiceIcon(item) {
     if (item instanceof YouTubeTrack || item instanceof YouTubePlaylist) {
-        return musicEmotes.youtube;
+        return MusicEmojis.YouTube;
     }
     else if (item instanceof SpotifyTrack || item instanceof SpotifyPlaylist) {
-        return musicEmotes.spotify;
+        return MusicEmojis.Spotify;
     }
     else {
         return '';

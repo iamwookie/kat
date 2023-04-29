@@ -10,15 +10,15 @@ export class ActionEmbed extends EmbedBuilder {
         switch (this.embedType) {
             case 'success':
                 super.setColor('Green');
-                super.setDescription(`✅ \u200b ${content}`);
+                super.setDescription(`\u200b ${content}`);
                 break;
             case 'fail':
                 super.setColor('Red');
-                super.setDescription(`🚫 \u200b ${content}`);
+                super.setDescription(`\u200b ${content}`);
                 break;
             case 'warn':
                 super.setColor('Yellow');
-                super.setDescription(`⚠️ \u200b ${content}`);
+                super.setDescription(`\u200b ${content}`);
                 break;
             default:
                 super.setDescription(content);

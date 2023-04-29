@@ -17,3 +17,8 @@ export var MusicPrompts;
     MusicPrompts["NoNodes"] = "There are no available nodes to play on!";
     MusicPrompts["Restarted"] = "The bot has restarted, please replay your track!";
 })(MusicPrompts || (MusicPrompts = {}));
+export var MusicEmojis;
+(function (MusicEmojis) {
+    MusicEmojis["YouTube"] = "<:youtube:1067881972774477844>";
+    MusicEmojis["Spotify"] = "<:spotify:1067881968697614476>";
+})(MusicEmojis || (MusicEmojis = {}));
