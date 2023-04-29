@@ -1,27 +1,27 @@
 // ------------------------------------
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 // ------------------------------------
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import fs from "fs";
+import fs from 'fs';
 // ------------------------------------
-import Sentry from "@sentry/node";
-import "@sentry/tracing";
-import { RewriteFrames } from "@sentry/integrations";
+import Sentry from '@sentry/node';
+import '@sentry/tracing';
+import { RewriteFrames } from '@sentry/integrations';
 // ------------------------------------
-import { KATClient as Client } from "@structures/index.js";
-import { GatewayIntentBits, ActivityType } from "discord.js";
-import { bot as config } from "@config";
+import { KATClient as Client } from '@structures/index.js';
+import { GatewayIntentBits, ActivityType } from 'discord.js';
+import { bot as config } from '@config';
 
-import chalk from "chalk";
+import chalk from 'chalk';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 (async () => {
-    console.log(chalk.magenta.bold.underline(`\n!! >>> App Loading...\n`));
+    console.log(chalk.magenta.bold.underline(`\n---- >>> App Loading...\n`));
 
-    if (!fs.existsSync(path.join(__dirname, "./logs"))) fs.mkdirSync(path.join(__dirname, "./logs"))
+    if (!fs.existsSync(path.join(__dirname, './logs'))) fs.mkdirSync(path.join(__dirname, './logs'));
 
     Sentry.init({
         dsn: process.env.SENTRY_DSN,
@@ -43,7 +43,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             GatewayIntentBits.MessageContent,
         ],
         presence: {
-            status: "online",
+            status: 'online',
             activities: [
                 {
                     name: `${config.prefix}help | ${config.legacyPrefix}help`,
@@ -53,8 +53,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         },
     });
 
-    await client.initialize();
-    await client.login(process.env.DISCORD_TOKEN).catch(err => { client.logger.error(err) });
+    process.on('unhandledRejection', (err) => {
+        client.logger.uncaught(err);
+    });
 
-    return client;
+    process.on('uncaughtException', (err) => {
+        client.logger.uncaught(err);
+    });
+
+    await client.initialize();
+    await client.login(process.env.DISCORD_TOKEN).catch((err) => {
+        client.logger.error(err);
+    });
 })();

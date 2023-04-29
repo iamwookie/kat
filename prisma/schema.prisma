@@ -1,17 +1,57 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Guild {
+    id        Int      @id @default(autoincrement())
+    guildId   String   @unique
+    prefix    String   @default(".")
+    createdAt DateTime @default(now())
+    music     Music?
+}
+
+model Music {
+    id        Int      @id @default(autoincrement())
+    guildId   String   @unique
+    volume    Int      @default(100)
+    createdAt DateTime @default(now())
+    guild     Guild    @relation(fields: [guildId], references: [guildId])
+}
+
+model Queue {
+    id        Int      @id @default(autoincrement())
+    guildId   String   @unique
+    voiceId   String
+    textId    String?
+    position  Int      @default(-1)
+    active    Boolean  @default(false)
+    createdAt DateTime @default(now())
+    tracks    Track[]
+}
+
+model Track {
+    id          Int      @id @default(autoincrement())
+    guildId     String
+    data        String
+    url         String
+    title       String
+    requesterId String
+    textId      String?
+    thumbnail   String?
+    createdAt   DateTime @default(now())
+    queue       Queue    @relation(fields: [guildId], references: [guildId])
 }
 
 model Affiliate {
-  id        Int      @id @default(autoincrement())
-  guildId   String
-  userId    String
-  link      String   @unique
-  total     Int      @default(0)
-  createdAt DateTime @default(now())
+    id        Int      @id @default(autoincrement())
+    guildId   String
+    userId    String
+    link      String   @unique
+    total     Int      @default(0)
+    createdAt DateTime @default(now())
 }

@@ -1,16 +1,18 @@
-import { KATClient as Client } from "../Client.js";
-import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from "./Track.js";
-import { Guild, VoiceBasedChannel, TextBasedChannel } from "discord.js";
-import { Shoukaku, Player, Node } from "shoukaku";
+import { KATClient as Client } from '../Client.js';
+import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from './Track.js';
+import { Guild, VoiceBasedChannel, TextBasedChannel } from 'discord.js';
+import { Shoukaku, Player, Node } from 'shoukaku';
 import { NodeError, PlayerError } from '@utils/errors.js';
 
 export class Subscription {
     public shoukaku: Shoukaku;
     public queue: (YouTubeTrack | SpotifyTrack)[] = [];
     public active: YouTubeTrack | SpotifyTrack | null = null;
-    public looped: boolean = false;
-    public destroyed: boolean = false;
-    
+    public position = 0;
+    public looped = false;
+    public volume = 100;
+    public destroyed = false;
+
     constructor(
         public client: Client,
         public guild: Guild,
@@ -21,9 +23,9 @@ export class Subscription {
     ) {
         this.shoukaku = client.shoukaku;
 
-        this.player.on("exception", (reason) => this.client.emit("playerException", this, reason));
-        this.player.on("start", (data) => this.client.emit("playerStart", this, data));
-        this.player.on("end", (reason) => this.client.emit("playerEnd", this, reason));
+        this.player.on('exception', (reason) => this.client.emit('playerException', this, reason));
+        this.player.on('start', (data) => this.client.emit('playerStart', this, data));
+        this.player.on('end', (reason) => this.client.emit('playerEnd', this, reason));
 
         // -----> REQUIRES FIXING FROM SHOUKAKU
         //
@@ -33,7 +35,12 @@ export class Subscription {
         // });
     }
 
-    static async create(client: Client, guild: Guild, voiceChannel: VoiceBasedChannel, textChannel: TextBasedChannel | null) {
+    static async create(
+        client: Client,
+        guild: Guild,
+        voiceChannel: VoiceBasedChannel,
+        textChannel: TextBasedChannel | null
+    ) {
         try {
             const node = client.shoukaku.getNode();
             if (!node) throw new NodeError("Node doesn't exist.");
@@ -45,18 +52,22 @@ export class Subscription {
                     shardId: 0,
                     deaf: true,
                 });
-                
+
                 const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
+
                 client.subscriptions.set(guild.id, subscription);
-                client.emit("subscriptionCreate", subscription);
+                client.emit('subscriptionCreate', subscription);
+
+                const res = await client.cache.music.get(guild.id);
+                if (res?.volume) subscription.volume = res.volume;
 
                 return subscription;
             } catch (err) {
-                client.logger.error(err);
+                client.logger.error(err, 'PlayerError', 'Music');
                 throw new PlayerError((err as Error).message);
             }
         } catch (err) {
-            client.logger.error(err);
+            client.logger.error(err, 'NodeError', 'Music');
             throw new NodeError((err as Error).message);
         }
     }
@@ -68,7 +79,8 @@ export class Subscription {
         this.player.connection.disconnect();
         this.client.subscriptions.delete(this.guild.id);
         this.destroyed = true;
-        this.client.emit("subscriptionDestroy", this);
+
+        this.client.emit('subscriptionDestroy', this);
     }
 
     process() {
@@ -76,7 +88,13 @@ export class Subscription {
         if (!track) return;
 
         this.active = track;
+        this.player.setVolume(this.volume / 100);
         this.player.playTrack({ track: track.data.track });
+
+        if(!this.looped) {
+            this.position += 1;
+            this.client.emit('trackRemove', this, track);
+        }
     }
 
     add(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
@@ -93,6 +111,8 @@ export class Subscription {
         } else {
             this.queue.push(item);
         }
+
+        this.client.emit('trackAdd', this, item);
 
         if (!this.active) this.process();
     }
@@ -114,7 +134,7 @@ export class Subscription {
     }
 
     loop() {
-        return this.looped = !this.looped;
+        return (this.looped = !this.looped);
     }
 
     // Getters

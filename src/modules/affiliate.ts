@@ -1,28 +1,23 @@
-import { Module, KATClient as Client, Commander } from "@structures/index.js";
-import { Collection, Client as DiscordClient, EmbedBuilder, Guild, GuildMember, Invite, Snowflake, User } from "discord.js";
-import { Affiliate } from "@prisma/client";
+import { Module, KATClient as Client, Commander } from '@structures/index.js';
+import { Collection, Client as DiscordClient, EmbedBuilder, Guild, GuildMember, Invite, Snowflake, User } from 'discord.js';
+import { Affiliate } from '@prisma/client';
 
 export class AffiliateModule extends Module {
-    public name: string;
-    public guilds?: Snowflake[];
     public invites: Collection<Snowflake, Collection<string, number>> = new Collection();
     public channels: Collection<Snowflake, Snowflake[]> = new Collection();
 
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "Affiliate";
-        this.guilds = [
-            "1094860861505544314",
-            "1023866029069320242",
-        ];
+        super(client, commander, {
+            name: 'Affiliate',
+            guilds: ['1094860861505544314', '1023866029069320242'],
+        });
 
         // In future, this will be handled by the db
-        this.channels.set("1023866029069320242", ["1096530697876930560"]);
-        this.channels.set("1094860861505544314", ["1094861185310011412"]);
+        this.channels.set('1023866029069320242', ['1096530697876930560']);
+        this.channels.set('1094860861505544314', ['1094861185310011412']);
     }
 
-    async onReady(client: DiscordClient) {
+    async onReady() {
         // make this async
         const guilds = this.client.guilds.cache.filter((guild) => this.guilds?.includes(guild.id));
         if (!guilds.size) return;
@@ -61,7 +56,7 @@ export class AffiliateModule extends Module {
             if (!res) return;
 
             // @ts-ignore
-            res = "123"
+            res = '123';
 
             const affiliate = await this.client.prisma.affiliate.update({
                 where: {
@@ -73,13 +68,14 @@ export class AffiliateModule extends Module {
             });
             if (!affiliate) return;
 
-            this.client.logger.info(`Module (${this.name}) >> Updated Affiliate Invite Link: ` + affiliate.link + " | Total: " + affiliate.total);
+            this.client.logger.info(
+                `Updated Affiliate Invite Link: ${affiliate.link} | Total: ${affiliate.total}`,
+                `Module (${this.name})`
+            );
 
             this.sendNotification(member, affiliate);
         } catch (err) {
-            this.client.logger.error(err);
-            console.error(`Module (${this.name}) (ERROR) >> Error Registering Invite`);
-            console.error(err);
+            this.client.logger.error(err, 'Error Registering Invite', `Module (${this.name})`);
         }
     }
 
@@ -88,14 +84,14 @@ export class AffiliateModule extends Module {
         if (!channels) return;
 
         const embed = new EmbedBuilder()
-            .setColor("Green")
-            .setTitle("🔗 Affiliate System")
+            .setColor('Green')
+            .setTitle('🔗 Affiliate System')
             .setDescription(`A new user has joined!`)
             .setThumbnail(member.user.avatarURL() ?? null)
             .addFields(
-                { name: "User", value: member.user.toString(), inline: true },
-                { name: "Inviter", value: `<@${affiliate.userId}>`, inline: true },
-                { name: "Total Invites", value: `\`${affiliate.total}\``, inline: true }
+                { name: 'User', value: member.user.toString(), inline: true },
+                { name: 'Inviter', value: `<@${affiliate.userId}>`, inline: true },
+                { name: 'Total Invites', value: `\`${affiliate.total}\``, inline: true }
             );
 
         for (const channelId of channels) {
@@ -115,7 +111,7 @@ export class AffiliateModule extends Module {
         // Watch this, could be risky as channel may be undefined
         const channel = guild?.channels.cache.find((channel) => channel.isTextBased());
         const invite = await guild?.invites.create(channel?.id!, { maxAge: 0, maxUses: 0, unique: true });
-        
+
         const affiliate = await this.client.prisma.affiliate.create({
             data: {
                 link: invite.url,
@@ -125,7 +121,10 @@ export class AffiliateModule extends Module {
             },
         });
 
-        this.client.logger.info(`Module (${this.name}) >> Created Affiliate Invite Link: ` + affiliate.link + " | Guild: " + affiliate.guildId + " | User: " + affiliate.userId);
+        this.client.logger.info(
+            `Created Affiliate Invite Link: ${affiliate.link} | Guild: ${affiliate.guildId} | User: ${affiliate.userId}`,
+            `Module (${this.name})`
+        );
 
         return affiliate;
     }

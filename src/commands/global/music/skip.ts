@@ -1,42 +1,42 @@
-import { KATClient as Client, Commander, Command } from "@structures/index.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
-import { Subscription as MusicSubscription } from "@structures/music/Subscription.js";
-import { ActionEmbed, MusicEmbed } from "@utils/embeds/index.js";
+import { KATClient as Client, Commander, Command } from '@structures/index.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
+import { ActionEmbed, MusicEmbed } from '@utils/embeds/index.js';
+import { MusicPrompts } from 'enums.js';
 
 export class SkipCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "skip";
-        this.group = "Music";
-
-        this.legacy = true;
-
-        this.description = {
-            content: "Skip the track.",
-        };
-
-        this.cooldown = 5;
+        super(client, commander, {
+            name: 'skip',
+            module: 'Music',
+            legacy: true,
+            description: {
+                content: 'Skip the track.',
+            },
+            cooldown: 5,
+        });
     }
 
     data() {
-        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
+        return new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription(this.description?.content!)
+            .setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction) {
-        const author = this.getAuthor(int)!;
+    async execute(int: ChatInputCommandInteraction<"cached" | "raw"> | Message<true>) {
+        const author = this.getAuthor(int);
 
-        const subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
-        if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("The queue is empty or does not exist!")] });
-        if (subscription.queue.length == 0) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("This is the last track in the queue!")] });
+        const subscription = this.client.subscriptions.get(int.guildId!);
+        if (!subscription || !subscription.active || subscription.paused)
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
+        if (subscription.queue.length == 0)
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
 
         this.applyCooldown(author);
 
+        const previous = subscription.active;
         const next = subscription.queue[0];
-        const embed = new MusicEmbed(subscription).setUser(author).setPlaying(next).setSkipped(subscription.active);
         subscription.stop();
-        return this.reply(int, { embeds: [embed] });
+        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(next).setSkipped(previous)] });
     }
 }
-
-// START FULL OVERHAUL OF MUSIC NOW

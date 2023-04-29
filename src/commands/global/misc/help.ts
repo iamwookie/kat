@@ -1,64 +1,84 @@
-import { KATClient as Client, Commander, Command, Module } from "@structures/index.js";
-import { ChatInputCommandInteraction, EmbedBuilder, Message } from "discord.js";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { KATClient as Client, Commander, Command } from '@structures/index.js';
+import {
+    SlashCommandBuilder,
+    ChatInputCommandInteraction,
+    EmbedBuilder,
+    Message,
+    ActionRowBuilder,
+    StringSelectMenuBuilder,
+    StringSelectMenuOptionBuilder,
+    Interaction,
+    StringSelectMenuInteraction,
+} from 'discord.js';
 
 export class HelpCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "help";
-        this.group = "Misc";
-        this.aliases = ["info"];
-
-        this.legacy = true;
-
-        this.description = {
-            content: "Stop it, get some help.",
-        };
-
-        this.ephemeral = true;
+        super(client, commander, {
+            name: 'help',
+            module: 'Misc',
+            aliases: ['info'],
+            legacy: true,
+            description: {
+                content: 'Stop it, get some help.',
+            },
+            ephemeral: true,
+        });
     }
 
     data() {
         return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!);
     }
 
-    async execute(int: ChatInputCommandInteraction | Message) {
-        const author = this.getAuthor(int)!;
+    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
+        const author = this.getAuthor(int);
+        const embed = new EmbedBuilder().setTitle('**Help Menu**').setDescription(`Select an option from the dropdown menu below.`);
+        const menu = new StringSelectMenuBuilder().setCustomId('help_menu').setPlaceholder('Select a category');
 
-        const replyEmbed = new EmbedBuilder()
-            .setTitle("**Help Menu**")
-            .setFooter({ text: "Parameters with a '?' at the start are optional." })
-            .setDescription(`As of right now, you may use some commands with the \`${this.client.legacyPrefix}\` prefix in chat. This may be removed in the future!`);
+        for (const module of this.client.commander.modules.values()) {
+            if (module.guilds && !module.guilds.includes(int.guild?.id!)) continue;
 
-        for (const [name, group] of this.client.commander.groups) {
-            if (name == "CLI") continue;
-
-            let reply = "";
-            for (const command of group.values()) {
-                if (
-                    command.hidden ||
-                    command.disabled ||
-                    (command.module instanceof Module && command.module.guilds && !command.module.guilds.includes(int.guild?.id!)) ||
-                    (command.users && !command.users.includes(author.id))
-                )
-                    continue;
-
-                let aliases = "";
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        aliases += `, ${this.client.prefix}${alias}`;
-                    }
-                }
-
-                reply += `\`\`${this.client.prefix}${command.name}${aliases}${
-                    command.description?.format ? ` ${command.description?.format.replace("[prefix]", this.client.prefix).replace("[aliases]", aliases)}` : ""
-                }\`\` → ${command.description?.content}\n`;
-            }
-
-            if (reply) replyEmbed.addFields([{ name: `${name} Commands`, value: reply }]);
+            const commands = Array.from(module.commands.values()).filter(
+                (c) => !c.disabled && !c.hidden && (c.users ? c.users.includes(author.id) : true)
+            );
+            if (commands.length) menu.addOptions(new StringSelectMenuOptionBuilder().setLabel(module.name + ' Commands').setValue(module.name));
         }
 
-        this.reply(int, { embeds: [replyEmbed] });
+        const reply = await this.reply(int, {
+            embeds: [embed],
+            components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)],
+        });
+        const filter = (i: Interaction) => i.isStringSelectMenu() && i.customId == 'help_menu' && i.message.id == reply.id && i.user.id == author.id;
+        const collector = int.channel?.createMessageComponentCollector({ filter, time: 60_000, max: 1 });
+
+        collector?.on('collect', async (i: StringSelectMenuInteraction) => {
+            const moduleName = i.values[0];
+            const module = this.client.commander.modules.get(moduleName)!;
+
+            const res = await this.client.cache.guilds.get(i.guild?.id!);
+            const prefix = res?.prefix || this.client.legacyPrefix;
+
+            embed.setFooter({ text: "Parameters with a '?' at the start are optional." });
+            embed.setDescription(
+                `As of right now, you may use some commands with the \`${prefix}\` prefix in chat. This may be removed in the future!`
+            );
+            embed.addFields({
+                name: module.name + ' Commands',
+                value: Array.from(module.commands.values())
+                    .filter((c) => !c.disabled && !c.hidden && (c.users ? c.users.includes(author.id) : true))
+                    .map((c) => `\`${c.usage}\` → ${c.description?.content}`)
+                    .join('\n'),
+            });
+
+            this.edit(int, reply, { embeds: [embed], components: [] });
+        });
+
+        collector?.on('end', (collected, reason) => {
+            if (!collected.size && reason == 'time') {
+                this.edit(int, reply, {
+                    embeds: [embed],
+                    components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu.setDisabled(true))],
+                });
+            }
+        });
     }
 }

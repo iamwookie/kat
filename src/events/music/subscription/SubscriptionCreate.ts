@@ -1,20 +1,46 @@
-import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from "@structures/index.js";
+import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from '@structures/index.js';
+import { Events } from 'discord.js';
 
 export class SubscriptionCreate extends Event {
     constructor(client: Client, commander: Commander) {
-        super(client, commander, "subscriptionCreate");
+        super(client, commander, 'subscriptionCreate');
     }
 
     async execute(subscription: MusicSubscription) {
-        this.client.logger.info(`Music >> Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`);
+        this.client.logger.info(
+            `Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`,
+            'Music'
+        );
+
+        const position = await this.client.prisma.track.count({ where: { guildId: subscription.guild.id } });
+        // Controversial, as this may update after the embed is sent
+        subscription.position = position;
+
+        await this.client.prisma.queue.upsert({
+            where: {
+                guildId: subscription.guild.id,
+            },
+            update: {
+                position,
+                active: true,
+            },
+            create: {
+                guildId: subscription.guild.id,
+                voiceId: subscription.voiceChannel.id,
+                textId: subscription.textChannel?.id,
+                active: true,
+            },
+        });
+
+        this.client.emit(
+            Events.Debug,
+            `Music (DATABASE) >> Activated And Updated Queue Position For: ${subscription.guild.name} (${subscription.guild.id})`
+        );
 
         setTimeout(() => {
             {
-                if (!subscription.active && !subscription.queue.length) {
-                    subscription.destroy();
-                    this.client.logger.warn(`Music >> Subscription Destroyed (Inactivity) for ${subscription.guild.name} (${subscription.guild.id})`);
-                }
+                if (!subscription.active && !subscription.queue.length) subscription.destroy();
             }
-        }, 15_000);
+        }, this.client.config.music.inactiveDuration);
     }
 }

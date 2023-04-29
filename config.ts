@@ -1,19 +1,22 @@
+export const version = "7.7.6";
+
 export const bot = {
     devId: "244662779745665026",
     prefix: "/",
+    devPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
     legacyPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
+};
 
-    emotes: {
-        music: {
-            youtube: "<:youtube:1067881972774477844>",
-            spotify: "<:spotify:1067881968697614476>",
-            slider: "⚪",
-        },
+export const emotes = {
+    music: {
+        youtube: "<:youtube:1067881972774477844>",
+        spotify: "<:spotify:1067881968697614476>",
     },
 };
 
 export const server = {
     port: 3030,
+
     limiter: {
         duration: 5,
         max: 50,
@@ -28,12 +31,17 @@ export const server = {
     },
 };
 
+export const music = {
+    inactiveDuration: 30_000, // The time in milliseconds before the bot leaves the voice channel
+};
+
 export const lavalink = {
     nodes: [
         {
             name: "uk:london-1",
-            url: "145.239.205.161:2333",
+            url: "lavalink.bil.al",
             auth: "yoruistrash",
+            secure: true,
         },
     ],
 };

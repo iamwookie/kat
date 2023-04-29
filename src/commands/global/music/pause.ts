@@ -1,21 +1,19 @@
-import { KATClient as Client, Commander, Command } from "@structures/index.js";
-import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
-import { Subscription as MusicSubscription } from "@structures/index.js";
-import { ActionEmbed, MusicEmbed } from "@utils/embeds/index.js";
+import { KATClient as Client, Commander, Command } from '@structures/index.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
+import { ActionEmbed, MusicEmbed } from '@utils/embeds/index.js';
+import { MusicPrompts } from 'enums.js';
 
 export class PauseCommand extends Command {
     constructor(client: Client, commander: Commander) {
-        super(client, commander);
-
-        this.name = "pause";
-        this.group = "Music";
-        this.legacy = true;
-
-        this.description = {
-            content: "Pause the track. Use \`/play\` to unpause.",
-        };
-
-        this.cooldown = 5;
+        super(client, commander, {
+            name: 'pause',
+            module: 'Music',
+            legacy: true,
+            description: {
+                content: 'Pause the track. Use `/play` to unpause.',
+            },
+            cooldown: 5,
+        });
     }
 
     data() {
@@ -25,16 +23,17 @@ export class PauseCommand extends Command {
             .setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction) {
-        const author = this.getAuthor(int)!;
+    async execute(int: ChatInputCommandInteraction<"cached" | "raw"> | Message<true>) {
+        const author = this.getAuthor(int);
 
-        const subscription: MusicSubscription = this.client.subscriptions.get(int.guildId);
-        if (!subscription || !subscription.active || subscription.paused) return this.reply(int, { embeds: [new ActionEmbed("fail").setDesc("I'm not playing anything!")] });
-        
+        const subscription = this.client.subscriptions.get(int.guildId!);
+        if (!subscription || !subscription.active || subscription.paused)
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+
         this.applyCooldown(author);
 
         const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();
-        return this.reply(int, { embeds: [embed] });
+        this.reply(int, { embeds: [embed] });
     }
 }

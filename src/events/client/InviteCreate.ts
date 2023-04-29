@@ -1,5 +1,5 @@
-import { Event, KATClient as Client, Commander } from "@structures/index.js";
-import { Events, Invite } from "discord.js";
+import { Event, KATClient as Client, Commander } from '@structures/index.js';
+import { Events, Invite } from 'discord.js';
 
 export class InviteCreate extends Event {
     constructor(client: Client, commander: Commander) {

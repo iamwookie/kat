@@ -1,8 +1,6 @@
-import { Event, KATClient as Client, Commander, Module } from "@structures/index.js";
-import { Events, Message } from "discord.js";
-import { ErrorEmbed } from "@utils/embeds/index.js";
-
-import chalk from "chalk";
+import { Event, KATClient as Client, Commander } from '@structures/index.js';
+import { Events, Message } from 'discord.js';
+import { ErrorEmbed } from '@utils/embeds/index.js';
 
 export class MessageCreate extends Event {
     constructor(client: Client, commander: Commander) {
@@ -10,28 +8,28 @@ export class MessageCreate extends Event {
     }
 
     async execute(message: Message) {
-        if (message.author.bot) return;
+        if (message.author.bot || !message.inGuild()) return;
 
-        const prefix = this.client.legacyPrefix;
+        const config = await this.client.cache.guilds.get(message.guild.id);
+        const prefix = this.client.isDev(message.author.id)
+            ? this.client.devPrefix
+            : config?.prefix ?? this.client.legacyPrefix;
         if (!message.content.startsWith(prefix)) return;
 
         const commandName = message.content.slice(prefix.length).trim().split(/ +/).shift()?.toLowerCase()!;
-        const command = this.commander.commands.get(commandName) || this.commander.commands.get(this.commander.aliases.get(commandName)!);
+        const command =
+            this.commander.commands.get(commandName) ||
+            this.commander.commands.get(this.commander.aliases.get(commandName)!);
         if (!command || !command.legacy || command.disabled) return;
-
-        // In future modules will always be required
-        if (command.module && command.module instanceof Module && !command.module.guilds?.includes(message.guild?.id!)) return;
+        if (command.module.guilds && !command.module.guilds.includes(message.guild.id)) return;
 
         if (!this.commander.validate(message, command)) return;
 
         try {
             await command.execute(message);
         } catch (err) {
-            const eventId = this.client.logger.error(err);
-            console.error(chalk.red("Commander (ERROR) >> Error Running Chat Command"));
-            console.error(err);
-
-            message.channel.send({ embeds: [new ErrorEmbed(eventId)] });
+            const eventId = this.client.logger.error(err, 'Error Running Chat Command', 'Commander');
+            message.channel.send({ embeds: [new ErrorEmbed(eventId)] }).catch(() => {});
         }
     }
 }
