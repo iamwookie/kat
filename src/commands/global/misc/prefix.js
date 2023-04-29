@@ -9,7 +9,7 @@ export class PrefixCommand extends Command {
             module: 'Misc',
             legacy: true,
             description: {
-                content: 'Set the chat prefix for your guild.',
+                content: 'Set the chat prefix for your server. [Admin Only]',
                 format: '<prefix>',
             },
         });

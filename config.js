@@ -1,4 +1,4 @@
-export const version = "7.7.5";
+export const version = "7.7.6";
 export const bot = {
     devId: "244662779745665026",
     prefix: "/",
