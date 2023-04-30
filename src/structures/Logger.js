@@ -7,17 +7,6 @@ export class Logger {
         this.client = client;
         console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
     }
-    async notify(eventId) {
-        try {
-            const dev = this.client.users.cache.get(this.client.devId);
-            const embed = new ErrorEmbed(eventId);
-            await dev?.send({ embeds: [embed] });
-        }
-        catch (err) {
-            console.error(chalk.red('Logger (ERROR): Error Warning Dev!'));
-            console.error(err);
-        }
-    }
     fatal(err) {
         const eventId = Sentry.captureException(err);
         console.error(chalk.redBright(`(FATAL) (${eventId}): A Fatal Error Has Occured!`));
@@ -52,5 +41,16 @@ export class Logger {
     }
     debug(message) {
         console.log(chalk.blue('(DEBUG): ' + message));
+    }
+    async notify(eventId) {
+        try {
+            const dev = this.client.users.cache.get(this.client.devId);
+            const embed = new ErrorEmbed(eventId);
+            await dev?.send({ embeds: [embed] });
+        }
+        catch (err) {
+            console.error(chalk.red('Logger (ERROR): Error Warning Dev!'));
+            console.error(err);
+        }
     }
 }

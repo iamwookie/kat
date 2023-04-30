@@ -27,12 +27,12 @@ const commands = [
 ];
 export class Commander {
     client;
-    rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     commands = new Collection();
     global = new Collection();
     reserved = new Collection();
     modules = new Collection();
     aliases = new Collection();
+    rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     constructor(client) {
         this.client = client;
     }
@@ -42,6 +42,55 @@ export class Commander {
         await this.registerGlobalCommands();
         await this.registerReservedCommands();
         this.intiliazeEvents();
+    }
+    validate(interaction, command) {
+        const author = command.getAuthor(interaction);
+        if (interaction.inGuild()) {
+            if (command.module.guilds && !command.module.guilds.includes(interaction.guild?.id))
+                return false;
+            if (!interaction.channel?.permissionsFor(interaction.guild?.members.me).has(PermissionFlagsBits.SendMessages)) {
+                if (!command.hidden)
+                    author
+                        .send({
+                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
+                    })
+                        .catch((err) => {
+                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                    });
+                return false;
+            }
+        }
+        else if (!command.allowDM) {
+            return false;
+        }
+        if (command.users && !command.users.includes(author.id)) {
+            if (!command.hidden)
+                command
+                    .reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
+                })
+                    .catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                });
+            return false;
+        }
+        if (command.cooldown && command.cooldowns) {
+            if (command.cooldowns.has(author.id)) {
+                const cooldown = command.cooldowns.get(author.id);
+                const secondsLeft = (cooldown - Date.now()) / 1000;
+                command
+                    .reply(interaction, {
+                    embeds: [
+                        new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`),
+                    ],
+                })
+                    .catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
+                });
+                return false;
+            }
+        }
+        return true;
     }
     initializeModules() {
         const modules = Object.values(Modules);
@@ -159,54 +208,5 @@ export class Commander {
             }
         }
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
-    }
-    validate(interaction, command) {
-        const author = command.getAuthor(interaction);
-        if (interaction.inGuild()) {
-            if (command.module.guilds && !command.module.guilds.includes(interaction.guild?.id))
-                return false;
-            if (!interaction.channel?.permissionsFor(interaction.guild?.members.me).has(PermissionFlagsBits.SendMessages)) {
-                if (!command.hidden)
-                    author
-                        .send({
-                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
-                    })
-                        .catch((err) => {
-                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                    });
-                return false;
-            }
-        }
-        else if (!command.allowDM) {
-            return false;
-        }
-        if (command.users && !command.users.includes(author.id)) {
-            if (!command.hidden)
-                command
-                    .reply(interaction, {
-                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-                })
-                    .catch((err) => {
-                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                });
-            return false;
-        }
-        if (command.cooldown && command.cooldowns) {
-            if (command.cooldowns.has(author.id)) {
-                const cooldown = command.cooldowns.get(author.id);
-                const secondsLeft = (cooldown - Date.now()) / 1000;
-                command
-                    .reply(interaction, {
-                    embeds: [
-                        new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`),
-                    ],
-                })
-                    .catch((err) => {
-                    this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
-                });
-                return false;
-            }
-        }
-        return true;
     }
 }
