@@ -8,11 +8,12 @@ export class Command {
     legacy;
     legacyAliases;
     description;
-    hidden;
-    disabled;
     cooldown;
     ephemeral;
+    allowDM;
     users;
+    hidden;
+    disabled;
     cooldowns = new Collection();
     constructor(client, commander, options) {
         this.client = client;
@@ -23,11 +24,12 @@ export class Command {
         this.legacy = options.legacy;
         this.legacyAliases = options.legacyAliases;
         this.description = options.description;
-        this.hidden = options.hidden;
-        this.disabled = options.disabled;
         this.cooldown = options.cooldown;
         this.ephemeral = options.ephemeral;
+        this.allowDM = options.allowDM;
         this.users = options.users;
+        this.hidden = options.hidden;
+        this.disabled = options.disabled;
     }
     applyCooldown(user) {
         if (!this.cooldown)

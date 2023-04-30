@@ -12,8 +12,6 @@ export class InteractionCreate extends Event {
             this.commander.commands.get(this.commander.aliases.get(interaction.commandName));
         if (!command || command.disabled)
             return;
-        if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id))
-            return;
         if (!this.commander.validate(interaction, command))
             return;
         await interaction.deferReply({ ephemeral: command.ephemeral });

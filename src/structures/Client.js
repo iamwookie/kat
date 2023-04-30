@@ -59,7 +59,7 @@ export class KATClient extends Client {
         await this.commander.initialize();
         console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
     }
-    isDev(id) {
-        return this.devId == id;
+    isDev(user) {
+        return this.devId == user.id;
     }
 }

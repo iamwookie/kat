@@ -162,15 +162,22 @@ export class Commander {
     }
     validate(interaction, command) {
         const author = command.getAuthor(interaction);
-        if (interaction.inGuild() && !interaction.channel?.permissionsFor(interaction.guild?.members.me).has(PermissionFlagsBits.SendMessages)) {
-            if (!command.hidden)
-                author
-                    .send({
-                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
-                })
-                    .catch((err) => {
-                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                });
+        if (interaction.inGuild()) {
+            if (command.module.guilds && !command.module.guilds.includes(interaction.guild?.id))
+                return false;
+            if (!interaction.channel?.permissionsFor(interaction.guild?.members.me).has(PermissionFlagsBits.SendMessages)) {
+                if (!command.hidden)
+                    author
+                        .send({
+                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
+                    })
+                        .catch((err) => {
+                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                    });
+                return false;
+            }
+        }
+        else if (!command.allowDM) {
             return false;
         }
         if (command.users && !command.users.includes(author.id)) {

@@ -32,7 +32,7 @@ export class VolumeCommand extends Command {
                 embeds: [new ActionEmbed('success').setText(`The current volume is \`${res?.volume ?? 100}%\`!`)],
             });
         }
-        if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
+        if (!this.client.isDev(author) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
             return this.reply(int, {
                 embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
             });
