@@ -18,20 +18,16 @@ interface CommandOptions<T extends boolean = boolean> {
     name: string;
     module: T extends true ? Module : T extends false ? string : never;
     aliases?: string[];
-
     legacy?: boolean;
     legacyAliases?: string[];
-
     description?: {
         content?: string;
         format?: string;
     };
-
     hidden?: boolean;
     disabled?: boolean;
     cooldown?: number;
     ephemeral?: boolean;
-
     users?: Snowflake[];
 }
 
@@ -39,42 +35,33 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     public name: string;
     public module: T extends true ? Module : T extends false ? string : never;
     public aliases?: string[];
-
     public legacy?: boolean;
     public legacyAliases?: string[];
-
     public description?: {
         content?: string;
         format?: string;
     };
-
     public hidden?: boolean;
     public disabled?: boolean;
     public cooldown?: number;
     public ephemeral?: boolean;
-
     public users?: Snowflake[];
-
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
-    abstract execute(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>): Promise<any>;
+    abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
     constructor(public client: Client, public commander: Commander, options: CommandOptions<T>) {
         this.name = options.name;
         this.module = options.module;
         this.aliases = options.aliases;
-
         this.legacy = options.legacy;
         this.legacyAliases = options.legacyAliases;
-
         this.description = options.description;
-
         this.hidden = options.hidden;
         this.disabled = options.disabled;
         this.cooldown = options.cooldown;
         this.ephemeral = options.ephemeral;
-
         this.users = options.users;
     }
 
@@ -89,7 +76,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
     }
 
-    getAuthor(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
+    getAuthor(interaction: ChatInputCommandInteraction | Message) {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.user;
         } else if (interaction instanceof Message) {
@@ -99,7 +86,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         }
     }
 
-    getArgs(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
+    getArgs(interaction: ChatInputCommandInteraction | Message) {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
         } else if (interaction instanceof Message) {
@@ -110,7 +97,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     }
 
     reply(
-        interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>,
+        interaction: ChatInputCommandInteraction | Message,
         content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
     ) {
         if (interaction instanceof ChatInputCommandInteraction) {
@@ -123,7 +110,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     }
 
     edit(
-        interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>,
+        interaction: ChatInputCommandInteraction<'cached'> | Message<true>,
         editable: Message,
         content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
     ) {

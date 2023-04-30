@@ -29,7 +29,7 @@ export class HelpCommand extends Command {
         return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!);
     }
 
-    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const author = this.getAuthor(int);
         const embed = new EmbedBuilder().setTitle('**Help Menu**').setDescription(`Select an option from the dropdown menu below.`);
         const menu = new StringSelectMenuBuilder().setCustomId('help_menu').setPlaceholder('Select a category');

@@ -8,6 +8,7 @@ export enum MusicPrompts {
     NotPlaying = 'I\'m not playing anything!',
     NotInVoice = 'You are not in a voice channel!',
     NotInMyVoice = 'You are not in my voice channel!',
+    IncorrectVoice = 'I cannot play in that voice channel!',
     CannotPlayInVoice = 'I can\'t play in that voice channel!',
     VoiceError = 'Error establishing a voice channel connection. Try again in a few minutes!',
     QueueEmpty = 'The current queue is empty!',

@@ -8,7 +8,15 @@ export class InteractionCreate extends Event {
     }
 
     async execute(interaction: BaseInteraction) {
-        if (!interaction.isChatInputCommand() || !interaction.inGuild()) return;
+        if (interaction.user.bot || !interaction.isChatInputCommand()) return;
+
+        if (!interaction.inCachedGuild()) {
+            this.client.logger.warn(
+                `Uncached Interaction: ${interaction.commandName}`,
+                'Commander'
+            )
+            return;
+        }
 
         const command =
             this.commander.commands.get(interaction.commandName) ||

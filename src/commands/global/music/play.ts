@@ -33,14 +33,15 @@ export class PlayCommand extends Command {
         const author = this.getAuthor(int);
         const query = this.getArgs(int).join(' ');
 
-        const voiceChannel: VoiceBasedChannel | null = (int.member as GuildMember).voice.channel;
+        const voiceChannel = (int.member as GuildMember).voice.channel;
         if (!voiceChannel) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInVoice)] });
-        if (!voiceChannel.joinable || !(voiceChannel as VoiceChannel).speakable)
+        if (!(voiceChannel instanceof VoiceChannel)) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.IncorrectVoice)] });
+        if (!voiceChannel.joinable || !voiceChannel.speakable)
             return this.reply(int, {
                 embeds: [new ActionEmbed('fail').setText(MusicPrompts.CannotPlayInVoice)],
             });
 
-        let subscription = this.client.subscriptions.get(int.guildId!);
+        let subscription = this.client.subscriptions.get(int.guildId);
 
         if (subscription) {
             if (!subscription.voiceChannel.members.has(author.id))
@@ -61,7 +62,7 @@ export class PlayCommand extends Command {
 
         if (!subscription) {
             try {
-                subscription = await MusicSubscription.create(this.client, int.guild!, voiceChannel, int.channel);
+                subscription = await MusicSubscription.create(this.client, int.guild, voiceChannel, int.channel);
             } catch (err) {
                 if (err instanceof NodeError) {
                     return this.reply(int, {

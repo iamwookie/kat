@@ -18,16 +18,12 @@ export class StopCommand extends Command {
     }
 
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction<"cached" | "raw"> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const subscription = this.client.subscriptions.get(int.guildId!);
-        if (!subscription)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        if (!subscription) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
 
         subscription.destroy();
         return this.reply(int, { embeds: [new ActionEmbed('success').setText('Successfully disconnected. Cya! 👋')] });

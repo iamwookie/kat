@@ -186,10 +186,10 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 
-    validate(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>, command: Command) {
+    validate(interaction: ChatInputCommandInteraction<'cached'> | Message<true>, command: Command) {
         const author = command.getAuthor(interaction);
 
-        if (!interaction.channel?.permissionsFor(interaction.guild!.members.me!).has(PermissionFlagsBits.SendMessages)) {
+        if (interaction.channel && !interaction.channel.permissionsFor(interaction.guild.members.me!).has(PermissionFlagsBits.SendMessages)) {
             if (!command.hidden)
                 author
                     .send({

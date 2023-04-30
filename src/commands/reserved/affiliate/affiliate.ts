@@ -30,7 +30,7 @@ export class AffiliateCommand extends Command {
             ) as SlashCommandBuilder;
     }
 
-    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'>) {
+    async execute(int: ChatInputCommandInteraction<'cached'>) {
         const module = this.module as AffiliateModule;
         const command = int.options.getSubcommand();
 

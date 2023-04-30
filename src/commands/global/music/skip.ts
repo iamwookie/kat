@@ -17,20 +17,16 @@ export class SkipCommand extends Command {
     }
 
     data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
+        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction<"cached" | "raw"> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const author = this.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active || subscription.paused)
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
-        if (subscription.queue.length == 0)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
+        if (subscription.queue.length == 0) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
 
         this.applyCooldown(author);
 

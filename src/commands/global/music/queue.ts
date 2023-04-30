@@ -20,7 +20,7 @@ export class QueueCommand extends Command {
         return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
     }
 
-    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const author = this.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
