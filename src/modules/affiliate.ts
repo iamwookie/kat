@@ -9,7 +9,7 @@ export class AffiliateModule extends Module {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: 'Affiliate',
-            guilds: ['1094860861505544314', '1023866029069320242'],
+            guilds: ['1094860861505544314', '1023866029069320242', '858675408140369920'],
         });
 
         // In future, this will be handled by the db

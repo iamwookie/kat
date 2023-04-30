@@ -10,14 +10,6 @@ export class InteractionCreate extends Event {
     async execute(interaction: BaseInteraction) {
         if (interaction.user.bot || !interaction.isChatInputCommand()) return;
 
-        if (!interaction.inCachedGuild()) {
-            this.client.logger.warn(
-                `Uncached Interaction: ${interaction.commandName}`,
-                'Commander'
-            )
-            return;
-        }
-
         const command =
             this.commander.commands.get(interaction.commandName) ||
             this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);

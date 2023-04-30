@@ -110,7 +110,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     }
 
     edit(
-        interaction: ChatInputCommandInteraction<'cached'> | Message<true>,
+        interaction: ChatInputCommandInteraction | Message<true>,
         editable: Message,
         content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
     ) {
