@@ -32,13 +32,13 @@ const commands = [
 ];
 
 export class Commander {
-    private rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
-
     public commands = new Collection<string, Command<true>>();
     public global = new Collection<string, Command<true>>();
     public reserved = new Collection<Snowflake, Collection<string, Command<true>>>();
     public modules = new Collection<string, Module>();
     public aliases = new Collection<string, string>();
+
+    private rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
 
     constructor(public readonly client: Client) {}
 
@@ -50,140 +50,6 @@ export class Commander {
         await this.registerReservedCommands();
 
         this.intiliazeEvents();
-    }
-
-    initializeModules() {
-        const modules = Object.values(Modules);
-
-        for (const Module of modules) {
-            try {
-                const module = new Module(this.client, this);
-                this.modules.set(module.name, module);
-            } catch (err) {
-                this.client.logger.error(err, 'Error Initializing Module', 'Commander');
-            }
-        }
-
-        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${modules.length} Module(s)`);
-    }
-
-    initializeCommands() {
-        for (const Command of commands) {
-            try {
-                const command = new Command(this.client, this);
-
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        this.aliases.set(alias, command.name);
-                    }
-                }
-
-                if (command.legacyAliases) {
-                    for (const alias of command.legacyAliases) {
-                        this.aliases.set(alias, command.name);
-                    }
-                }
-
-                if (command.users) command.users.push(this.client.devId);
-
-                command.module = this.modules.get(command.module as string) ?? new Module(this.client, this, { name: command.module as string });
-                if (!this.modules.has(command.module.name)) this.modules.set(command.module.name, command.module);
-
-                const loaded = command as Command<true>;
-
-                command.module.commands.set(command.name, loaded);
-
-                // Remove reserved in the future and use modules directly for registering
-                if (command.module.guilds) {
-                    for (const guild of command.module.guilds) {
-                        const commands = this.reserved.get(guild) || new Collection();
-                        commands.set(command.name, loaded);
-                        this.reserved.set(guild, commands);
-                    }
-                } else {
-                    this.global.set(command.name, loaded);
-                }
-
-                this.commands.set(command.name, loaded);
-            } catch (err) {
-                this.client.logger.error(err, 'Error Initializing Global Command', 'Commander');
-            }
-        }
-
-        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${commands.length} Command(s)`);
-    }
-
-    intiliazeEvents() {
-        const events = Object.values(Events);
-
-        for (const Event of events) {
-            try {
-                const event = new Event(this.client, this);
-                this.client.on(event.name, event.execute.bind(event));
-            } catch (err) {
-                this.client.logger.error(err, 'Error Initializing Event', 'Commander');
-            }
-        }
-
-        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
-    }
-
-    async registerGlobalCommands() {
-        try {
-            let body = [];
-
-            for (const command of this.global.values()) {
-                if (!command.data || command.disabled || command.hidden) continue;
-
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        const data = command.data().setName(alias);
-                        body.push(data);
-                    }
-                }
-
-                body.push(command.data().toJSON());
-            }
-
-            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), {
-                body: body,
-            });
-            this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
-        } catch (err) {
-            this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
-        }
-    }
-
-    async registerReservedCommands() {
-        for (const [guildId, commands] of this.reserved) {
-            if (!this.client.guilds.cache.has(guildId)) continue;
-
-            let body = [];
-
-            for (const command of commands.values()) {
-                if (!command.data || command.disabled || command.hidden) continue;
-
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        const data = command.data().setName(alias);
-                        body.push(data);
-                    }
-                }
-
-                body.push(command.data().toJSON());
-            }
-
-            try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), {
-                    body: body,
-                });
-                this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
-            } catch (err) {
-                this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
-            }
-        }
-
-        this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 
     validate(interaction: ChatInputCommandInteraction | Message, command: Command<true>) {
@@ -236,5 +102,139 @@ export class Commander {
         }
 
         return true;
+    }
+
+    private initializeModules() {
+        const modules = Object.values(Modules);
+
+        for (const Module of modules) {
+            try {
+                const module = new Module(this.client, this);
+                this.modules.set(module.name, module);
+            } catch (err) {
+                this.client.logger.error(err, 'Error Initializing Module', 'Commander');
+            }
+        }
+
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${modules.length} Module(s)`);
+    }
+
+    private initializeCommands() {
+        for (const Command of commands) {
+            try {
+                const command = new Command(this.client, this);
+
+                if (command.aliases) {
+                    for (const alias of command.aliases) {
+                        this.aliases.set(alias, command.name);
+                    }
+                }
+
+                if (command.legacyAliases) {
+                    for (const alias of command.legacyAliases) {
+                        this.aliases.set(alias, command.name);
+                    }
+                }
+
+                if (command.users) command.users.push(this.client.devId);
+
+                command.module = this.modules.get(command.module as string) ?? new Module(this.client, this, { name: command.module as string });
+                if (!this.modules.has(command.module.name)) this.modules.set(command.module.name, command.module);
+
+                const loaded = command as Command<true>;
+
+                command.module.commands.set(command.name, loaded);
+
+                // Remove reserved in the future and use modules directly for registering
+                if (command.module.guilds) {
+                    for (const guild of command.module.guilds) {
+                        const commands = this.reserved.get(guild) || new Collection();
+                        commands.set(command.name, loaded);
+                        this.reserved.set(guild, commands);
+                    }
+                } else {
+                    this.global.set(command.name, loaded);
+                }
+
+                this.commands.set(command.name, loaded);
+            } catch (err) {
+                this.client.logger.error(err, 'Error Initializing Global Command', 'Commander');
+            }
+        }
+
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${commands.length} Command(s)`);
+    }
+
+    private intiliazeEvents() {
+        const events = Object.values(Events);
+
+        for (const Event of events) {
+            try {
+                const event = new Event(this.client, this);
+                this.client.on(event.name, event.execute.bind(event));
+            } catch (err) {
+                this.client.logger.error(err, 'Error Initializing Event', 'Commander');
+            }
+        }
+
+        this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
+    }
+
+    private async registerGlobalCommands() {
+        try {
+            let body = [];
+
+            for (const command of this.global.values()) {
+                if (!command.data || command.disabled || command.hidden) continue;
+
+                if (command.aliases) {
+                    for (const alias of command.aliases) {
+                        const data = command.data().setName(alias);
+                        body.push(data);
+                    }
+                }
+
+                body.push(command.data().toJSON());
+            }
+
+            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), {
+                body: body,
+            });
+            this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
+        } catch (err) {
+            this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
+        }
+    }
+
+    private async registerReservedCommands() {
+        for (const [guildId, commands] of this.reserved) {
+            if (!this.client.guilds.cache.has(guildId)) continue;
+
+            let body = [];
+
+            for (const command of commands.values()) {
+                if (!command.data || command.disabled || command.hidden) continue;
+
+                if (command.aliases) {
+                    for (const alias of command.aliases) {
+                        const data = command.data().setName(alias);
+                        body.push(data);
+                    }
+                }
+
+                body.push(command.data().toJSON());
+            }
+
+            try {
+                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), {
+                    body: body,
+                });
+                this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
+            } catch (err) {
+                this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
+            }
+        }
+
+        this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 }
