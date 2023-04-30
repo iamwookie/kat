@@ -6,7 +6,7 @@ export class InteractionCreate extends Event {
         super(client, commander, Events.InteractionCreate);
     }
     async execute(interaction) {
-        if (!interaction.isChatInputCommand() || !interaction.inGuild())
+        if (interaction.user.bot || !interaction.isChatInputCommand())
             return;
         const command = this.commander.commands.get(interaction.commandName) ||
             this.commander.commands.get(this.commander.aliases.get(interaction.commandName));

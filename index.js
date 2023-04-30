@@ -11,7 +11,7 @@ import '@sentry/tracing';
 import { RewriteFrames } from '@sentry/integrations';
 // ------------------------------------
 import { KATClient as Client } from './src/structures/index.js';
-import { GatewayIntentBits, ActivityType } from 'discord.js';
+import { GatewayIntentBits, ActivityType, Partials } from 'discord.js';
 import { bot as config } from './config.js';
 import chalk from 'chalk';
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -37,6 +37,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.MessageContent,
         ],
+        partials: [Partials.Channel],
         presence: {
             status: 'online',
             activities: [

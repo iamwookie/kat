@@ -6,7 +6,7 @@ export class AffiliateModule extends Module {
     constructor(client, commander) {
         super(client, commander, {
             name: 'Affiliate',
-            guilds: ['1094860861505544314', '1023866029069320242'],
+            guilds: ['1094860861505544314', '1023866029069320242', '858675408140369920'],
         });
         // In future, this will be handled by the db
         this.channels.set('1023866029069320242', ['1096530697876930560']);

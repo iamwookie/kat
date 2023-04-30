@@ -21,6 +21,8 @@ export class HelpCommand extends Command {
         const embed = new EmbedBuilder().setTitle('**Help Menu**').setDescription(`Select an option from the dropdown menu below.`);
         const menu = new StringSelectMenuBuilder().setCustomId('help_menu').setPlaceholder('Select a category');
         for (const module of this.client.commander.modules.values()) {
+            if (!int.inGuild() && module.guilds)
+                continue;
             if (module.guilds && !module.guilds.includes(int.guild?.id))
                 continue;
             const commands = Array.from(module.commands.values()).filter((c) => !c.disabled && !c.hidden && (c.users ? c.users.includes(author.id) : true));
@@ -32,14 +34,17 @@ export class HelpCommand extends Command {
             components: [new ActionRowBuilder().addComponents(menu)],
         });
         const filter = (i) => i.isStringSelectMenu() && i.customId == 'help_menu' && i.message.id == reply.id && i.user.id == author.id;
-        const collector = int.channel?.createMessageComponentCollector({ filter, time: 60_000, max: 1 });
-        collector?.on('collect', async (i) => {
+        const collector = int.channel.createMessageComponentCollector({ filter, time: 60_000, max: 1 });
+        collector.on('collect', async (i) => {
             const moduleName = i.values[0];
             const module = this.client.commander.modules.get(moduleName);
-            const res = await this.client.cache.guilds.get(i.guild?.id);
-            const prefix = res?.prefix || this.client.legacyPrefix;
+            let legacyPrefix = this.client.legacyPrefix;
+            if (i.inCachedGuild()) {
+                const config = await this.client.cache.guilds.get(i.guild.id);
+                legacyPrefix = config?.prefix ?? this.client.legacyPrefix;
+            }
             embed.setFooter({ text: "Parameters with a '?' at the start are optional." });
-            embed.setDescription(`As of right now, you may use some commands with the \`${prefix}\` prefix in chat. This may be removed in the future!`);
+            embed.setDescription(`As of right now, you may use some commands with the \`${legacyPrefix}\` prefix in chat. This may be removed in the future!`);
             embed.addFields({
                 name: module.name + ' Commands',
                 value: Array.from(module.commands.values())
@@ -49,7 +54,7 @@ export class HelpCommand extends Command {
             });
             this.edit(int, reply, { embeds: [embed], components: [] });
         });
-        collector?.on('end', (collected, reason) => {
+        collector.on('end', (collected, reason) => {
             if (!collected.size && reason == 'time') {
                 this.edit(int, reply, {
                     embeds: [embed],

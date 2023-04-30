@@ -162,7 +162,7 @@ export class Commander {
     }
     validate(interaction, command) {
         const author = command.getAuthor(interaction);
-        if (!interaction.channel?.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SendMessages)) {
+        if (interaction.inGuild() && !interaction.channel?.permissionsFor(interaction.guild?.members.me).has(PermissionFlagsBits.SendMessages)) {
             if (!command.hidden)
                 author
                     .send({

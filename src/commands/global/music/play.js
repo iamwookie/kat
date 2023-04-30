@@ -1,5 +1,5 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, VoiceChannel } from 'discord.js';
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../../../structures/index.js';
 import { NodeError, PlayerError } from '../../../utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
@@ -31,6 +31,8 @@ export class PlayCommand extends Command {
         const voiceChannel = int.member.voice.channel;
         if (!voiceChannel)
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInVoice)] });
+        if (!(voiceChannel instanceof VoiceChannel))
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.IncorrectVoice)] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
             return this.reply(int, {
                 embeds: [new ActionEmbed('fail').setText(MusicPrompts.CannotPlayInVoice)],

@@ -9,6 +9,7 @@ export var MusicPrompts;
     MusicPrompts["NotPlaying"] = "I'm not playing anything!";
     MusicPrompts["NotInVoice"] = "You are not in a voice channel!";
     MusicPrompts["NotInMyVoice"] = "You are not in my voice channel!";
+    MusicPrompts["IncorrectVoice"] = "I cannot play in that voice channel!";
     MusicPrompts["CannotPlayInVoice"] = "I can't play in that voice channel!";
     MusicPrompts["VoiceError"] = "Error establishing a voice channel connection. Try again in a few minutes!";
     MusicPrompts["QueueEmpty"] = "The current queue is empty!";
