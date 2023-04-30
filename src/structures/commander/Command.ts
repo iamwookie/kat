@@ -24,11 +24,12 @@ interface CommandOptions<T extends boolean = boolean> {
         content?: string;
         format?: string;
     };
-    hidden?: boolean;
-    disabled?: boolean;
     cooldown?: number;
     ephemeral?: boolean;
+    allowDM?: boolean;
     users?: Snowflake[];
+    hidden?: boolean;
+    disabled?: boolean;
 }
 
 export abstract class Command<T extends boolean = boolean> implements CommandOptions<T> {
@@ -41,11 +42,12 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         content?: string;
         format?: string;
     };
-    public hidden?: boolean;
-    public disabled?: boolean;
     public cooldown?: number;
     public ephemeral?: boolean;
+    public allowDM?: boolean;
     public users?: Snowflake[];
+    public hidden?: boolean;
+    public disabled?: boolean;
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
     abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
@@ -58,11 +60,12 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         this.legacy = options.legacy;
         this.legacyAliases = options.legacyAliases;
         this.description = options.description;
-        this.hidden = options.hidden;
-        this.disabled = options.disabled;
         this.cooldown = options.cooldown;
         this.ephemeral = options.ephemeral;
+        this.allowDM = options.allowDM;
         this.users = options.users;
+        this.hidden = options.hidden;
+        this.disabled = options.disabled;
     }
 
     applyCooldown(user: User): void {
@@ -96,10 +99,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         }
     }
 
-    reply(
-        interaction: ChatInputCommandInteraction | Message,
-        content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
-    ) {
+    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions) {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
         } else if (interaction instanceof Message) {

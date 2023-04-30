@@ -14,7 +14,6 @@ export class InteractionCreate extends Event {
             this.commander.commands.get(interaction.commandName) ||
             this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);
         if (!command || command.disabled) return;
-        if (command.module.guilds && !command.module.guilds.includes(interaction.guild!.id)) return;
 
         if (!this.commander.validate(interaction, command)) return;
 

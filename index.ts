@@ -40,9 +40,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             GatewayIntentBits.GuildMembers,
             GatewayIntentBits.GuildVoiceStates,
             GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.DirectMessages,
             GatewayIntentBits.MessageContent,
+
         ],
-        partials: [Partials.Channel],
+        partials: [Partials.Message, Partials.Channel],
         presence: {
             status: 'online',
             activities: [

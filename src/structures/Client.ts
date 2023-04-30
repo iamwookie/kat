@@ -1,5 +1,5 @@
 import * as Config from '@config';
-import { Client, ClientOptions, Events, Collection, PermissionsBitField, Snowflake } from 'discord.js';
+import { Client, ClientOptions, Events, Collection, PermissionsBitField, Snowflake, User } from 'discord.js';
 import { Logger } from './Logger.js';
 import { PrismaClient } from '@prisma/client';
 import { Commander } from './commander/Commander.js';
@@ -67,7 +67,7 @@ export class KATClient extends Client {
         console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
     }
 
-    isDev(id: Snowflake) {
-        return this.devId == id;
+    isDev(user: User) {
+        return this.devId == user.id;
     }
 }

@@ -23,6 +23,7 @@ export class HelpCommand extends Command {
                 content: 'Stop it, get some help.',
             },
             ephemeral: true,
+            allowDM: true,
         });
     }
 
