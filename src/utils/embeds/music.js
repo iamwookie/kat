@@ -55,6 +55,8 @@ export class MusicEmbed extends EmbedBuilder {
     setSkipped(item) {
         if (!item)
             return this;
+        if (item.thumbnail)
+            super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: 'Skipped:',
             value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,

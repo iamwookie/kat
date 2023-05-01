@@ -25,9 +25,8 @@ export class SkipCommand extends Command {
         if (subscription.queue.length == 0)
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
         this.applyCooldown(author);
-        const previous = subscription.active;
-        const next = subscription.queue[0];
+        const skipped = subscription.active;
         subscription.stop();
-        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(next).setSkipped(previous)] });
+        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setSkipped(skipped)] });
     }
 }
