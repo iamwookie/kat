@@ -27,10 +27,6 @@ export class HelpCommand extends Command {
         });
     }
 
-    data() {
-        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!);
-    }
-
     async execute(int: ChatInputCommandInteraction | Message) {
         const author = this.getAuthor(int);
         const embed = new EmbedBuilder().setTitle('**Help Menu**').setDescription(`Select an option from the dropdown menu below.`);

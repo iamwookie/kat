@@ -50,7 +50,6 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     public disabled?: boolean;
     public cooldowns: Collection<Snowflake, number> = new Collection();
 
-    abstract data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
     abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
     constructor(public client: Client, public commander: Commander, options: CommandOptions<T>) {
@@ -66,6 +65,13 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         this.users = options.users;
         this.hidden = options.hidden;
         this.disabled = options.disabled;
+    }
+
+    data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> {
+        return new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription(this.description?.content ?? '')
+            .setDMPermission(this.allowDM)
     }
 
     applyCooldown(user: User): void {

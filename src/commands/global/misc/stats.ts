@@ -16,10 +16,6 @@ export class StatsCommand extends Command {
         });
     }
 
-    data() {
-        return new SlashCommandBuilder();
-    }
-
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const embed = new EmbedBuilder()
             .setColor('Yellow')

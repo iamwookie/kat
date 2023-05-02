@@ -189,8 +189,8 @@ export class Commander {
             let body = [];
 
             for (const command of this.global.values()) {
-                if (!command.data || command.disabled || command.hidden) continue;
-
+                if (command.disabled || command.hidden) continue;
+                
                 if (command.aliases) {
                     for (const alias of command.aliases) {
                         const data = command.data().setName(alias);
@@ -217,7 +217,7 @@ export class Commander {
             let body = [];
 
             for (const command of commands.values()) {
-                if (!command.data || command.disabled || command.hidden) continue;
+                if (command.disabled || command.hidden) continue;
 
                 if (command.aliases) {
                     for (const alias of command.aliases) {

@@ -21,14 +21,6 @@ export class PlayCommand extends Command {
         });
     }
 
-    data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false)
-            .addStringOption((option) => option.setName('query').setDescription('The name or URL of the track.'));
-    }
-
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const author = this.getAuthor(int);
         const query = this.getArgs(int).join(' ');

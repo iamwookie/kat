@@ -16,10 +16,6 @@ export class LoopCommand extends Command {
         });
     }
 
-    data() {
-        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
-    }
-
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
