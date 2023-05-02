@@ -39,16 +39,20 @@ export class Commander {
     async initialize() {
         this.initializeModules();
         this.initializeCommands();
-        await this.registerGlobalCommands();
-        await this.registerReservedCommands();
+        if (process.argv.includes('--register')) {
+            this.client.logger.info('Registering Commands...', 'Commander');
+            await this.registerGlobalCommands();
+            await this.registerReservedCommands();
+            this.client.logger.info('Commands Registered!', 'Commander');
+        }
         this.intiliazeEvents();
     }
     validate(interaction, command) {
         const author = command.getAuthor(interaction);
         if (interaction.inGuild()) {
-            if (command.module.guilds && !command.module.guilds.includes(interaction.guild?.id))
+            if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id))
                 return false;
-            if (!interaction.channel?.permissionsFor(interaction.guild?.members.me).has(PermissionFlagsBits.SendMessages)) {
+            if (!interaction.channel?.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SendMessages)) {
                 if (!command.hidden)
                     author
                         .send({
