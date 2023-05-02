@@ -64,7 +64,7 @@ export class KATClient extends Client {
         }
 
         await this.commander.initialize();
-        console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
+        console.log(chalk.greenBright.bold.underline('>>> Commander Initialized!'));
     }
 
     isDev(user: User) {
