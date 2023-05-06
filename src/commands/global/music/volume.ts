@@ -32,15 +32,11 @@ export class VolumeCommand extends Command {
 
         if (!args) {
             const res = await this.client.cache.music.get(int.guildId!);
-            return this.reply(int, {
-                embeds: [new ActionEmbed('success').setText(`The current volume is \`${res?.volume ?? 100}%\`!`)],
-            });
+            return this.reply(int, { embeds: [new ActionEmbed('success').setText(`The current volume is \`${res?.volume ?? 100}%\`!`)] });
         }
 
         if (!this.client.isDev(author) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
-            return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-            });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)] });
 
         const volume = parseInt(args);
         if (isNaN(volume)) return this.reply(int, { embeds: [new ActionEmbed('fail').setText('Invalid volume provided!')] });
@@ -75,10 +71,7 @@ export class VolumeCommand extends Command {
                 music: true,
             },
         });
-        if (!res?.music)
-            return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')],
-            });
+        if (!res?.music) return this.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
 
         this.client.cache.music.update(int.guildId!, res.music);
 
@@ -88,7 +81,7 @@ export class VolumeCommand extends Command {
             subscription.player.setVolume(res.music.volume / 100);
         }
 
-        return this.reply(int, {
+        this.reply(int, {
             embeds: [
                 new ActionEmbed('success').setText(
                     `Set the music volume to \`${res.music.volume}%\`!${

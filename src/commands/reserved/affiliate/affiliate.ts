@@ -40,15 +40,11 @@ export class AffiliateCommand extends Command {
 
             const members = await int.guild?.members.fetch();
             if (!members?.has(user.id))
-                return this.reply(int, {
-                    embeds: [new ActionEmbed('fail').setText('The user you provided is not in this server!')],
-                });
+                return this.reply(int, { embeds: [new ActionEmbed('fail').setText('The user you provided is not in this server!')] });
 
             const affiliate = await module.createAffiliate(int.guild!, user);
             if (!affiliate)
-                return this.reply(int, {
-                    embeds: [new ActionEmbed('fail').setText('An error occured while creating the affiliate link!')],
-                });
+                return this.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while creating the affiliate link!')] });
 
             const embed = new EmbedBuilder()
                 .setColor('Green')

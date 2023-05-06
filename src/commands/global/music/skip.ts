@@ -22,6 +22,8 @@ export class SkipCommand extends Command {
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active || subscription.paused)
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
+        if (!subscription.voiceChannel.members.has(author.id))
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
         if (subscription.queue.length == 0) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
 
         this.applyCooldown(author);

@@ -29,9 +29,7 @@ export class PrefixCommand extends Command {
         const author = this.getAuthor(int);
 
         if (!this.client.isDev(author) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
-            return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-            });
+            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)] });
 
         const args = this.getArgs(int)[0] as string;
         if (!args) return this.reply(int, { embeds: [new ActionEmbed('fail').setText('You did not provide a valid prefix!')] });
@@ -52,9 +50,7 @@ export class PrefixCommand extends Command {
         this.client.cache.guilds.update(res.guildId, res);
 
         if (res) {
-            this.reply(int, {
-                embeds: [new ActionEmbed('success').setText(`Successfully set the prefix to \`${res.prefix}\`!`)],
-            });
+            this.reply(int, { embeds: [new ActionEmbed('success').setText(`Successfully set the prefix to \`${res.prefix}\`!`)] });
         } else {
             this.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the prefix!')] });
         }
