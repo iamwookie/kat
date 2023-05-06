@@ -166,7 +166,7 @@ export class Commander {
         try {
             let body = [];
             for (const command of this.global.values()) {
-                if (!command.data || command.disabled || command.hidden)
+                if (command.disabled || command.hidden)
                     continue;
                 if (command.aliases) {
                     for (const alias of command.aliases) {
@@ -191,7 +191,7 @@ export class Commander {
                 continue;
             let body = [];
             for (const command of commands.values()) {
-                if (!command.data || command.disabled || command.hidden)
+                if (command.disabled || command.hidden)
                     continue;
                 if (command.aliases) {
                     for (const alias of command.aliases) {

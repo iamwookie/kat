@@ -1,5 +1,5 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, } from 'discord.js';
+import { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, } from 'discord.js';
 export class HelpCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -13,9 +13,6 @@ export class HelpCommand extends Command {
             ephemeral: true,
             allowDM: true,
         });
-    }
-    data() {
-        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content);
     }
     async execute(int) {
         const author = this.getAuthor(int);

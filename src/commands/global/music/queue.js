@@ -1,5 +1,4 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder } from 'discord.js';
 import { ActionEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../../enums.js';
 export class QueueCommand extends Command {
@@ -13,9 +12,6 @@ export class QueueCommand extends Command {
                 content: 'View the server queue.',
             },
         });
-    }
-    data() {
-        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content).setDMPermission(false);
     }
     async execute(int) {
         const author = this.getAuthor(int);

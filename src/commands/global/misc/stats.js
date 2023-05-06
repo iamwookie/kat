@@ -1,5 +1,5 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { formatBytes, formatDuration } from '../../../utils/helpers.js';
 export class StatsCommand extends Command {
     constructor(client, commander) {
@@ -13,9 +13,6 @@ export class StatsCommand extends Command {
             users: [],
             hidden: true,
         });
-    }
-    data() {
-        return new SlashCommandBuilder();
     }
     async execute(int) {
         const embed = new EmbedBuilder()

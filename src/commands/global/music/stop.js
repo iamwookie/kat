@@ -1,5 +1,4 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../../enums.js';
 export class StopCommand extends Command {
@@ -14,9 +13,6 @@ export class StopCommand extends Command {
             },
             cooldown: 5,
         });
-    }
-    data() {
-        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content).setDMPermission(false);
     }
     async execute(int) {
         const subscription = this.client.subscriptions.get(int.guildId);

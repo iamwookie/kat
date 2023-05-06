@@ -1,5 +1,4 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder } from 'discord.js';
 import { ActionEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../../enums.js';
 export class PauseCommand extends Command {
@@ -13,12 +12,6 @@ export class PauseCommand extends Command {
             },
             cooldown: 5,
         });
-    }
-    data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content)
-            .setDMPermission(false);
     }
     async execute(int) {
         const author = this.getAuthor(int);

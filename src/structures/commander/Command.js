@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Message, Collection, } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message, Collection, } from 'discord.js';
 export class Command {
     client;
     commander;
@@ -30,6 +30,12 @@ export class Command {
         this.users = options.users;
         this.hidden = options.hidden;
         this.disabled = options.disabled;
+    }
+    data() {
+        return new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription(this.description?.content ?? '')
+            .setDMPermission(this.allowDM);
     }
     applyCooldown(user) {
         if (!this.cooldown)
