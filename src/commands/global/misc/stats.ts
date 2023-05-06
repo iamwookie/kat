@@ -11,6 +11,7 @@ export class StatsCommand extends Command {
             description: {
                 content: 'Show app statistics.',
             },
+            allowDM: true,
             users: [],
             hidden: true,
         });
