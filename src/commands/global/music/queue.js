@@ -18,7 +18,7 @@ export class QueueCommand extends Command {
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || (!subscription.active && !subscription.queue.length))
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
-        return this.reply(int, {
+        this.reply(int, {
             embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue)],
         });
     }
