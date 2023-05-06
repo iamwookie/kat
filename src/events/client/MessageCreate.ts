@@ -17,8 +17,8 @@ export class MessageCreate extends Event {
         }
         if (!message.content.startsWith(prefix)) return;
 
-        const commandName = message.content.slice(prefix.length).trim().split(/ +/).shift()?.toLowerCase()!;
-        const command = this.commander.commands.get(commandName) || this.commander.commands.get(this.commander.aliases.get(commandName)!);
+        const commandName = message.content.slice(prefix.length).split(/ +/).shift()?.toLowerCase();
+        const command = commandName ? this.commander.commands.get(commandName) || this.commander.commands.get(this.commander.aliases.get(commandName)!) : undefined;
         if (!command || !command.legacy || command.disabled) return;
 
         if (!this.commander.validate(message, command)) return;
