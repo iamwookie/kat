@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 import { ActionEmbed, MusicEmbed } from '@utils/embeds/index.js';
 import { MusicPrompts } from 'enums.js';
 

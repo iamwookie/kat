@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message, GuildMember, VoiceBasedChannel, VoiceChannel } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message, GuildMember, VoiceChannel } from 'discord.js';
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '@structures/index.js';
 import { LavalinkResponse } from 'shoukaku';
 import { NodeError, PlayerError } from '@utils/errors.js';
@@ -19,6 +19,14 @@ export class PlayCommand extends Command {
             },
             cooldown: 5,
         });
+    }
+
+    data() {
+        return new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription(this.description?.content!)
+            .setDMPermission(false)
+            .addStringOption((option) => option.setName('query').setDescription('The name or URL of the track to search for.'));
     }
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {

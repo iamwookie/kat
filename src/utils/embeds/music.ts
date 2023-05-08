@@ -63,16 +63,6 @@ export class MusicEmbed extends EmbedBuilder {
         });
     }
 
-    setSkipped(item: YouTubeTrack | SpotifyTrack | null) {
-        if (!item) return this;
-
-        if (item.thumbnail) super.setThumbnail(item.thumbnail);
-        return super.addFields({
-            name: 'Skipped:',
-            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
-        });
-    }
-
     setLooped(item: YouTubeTrack | SpotifyTrack | null) {
         if (!item) return this;
 

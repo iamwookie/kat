@@ -1,6 +1,5 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import {
-    SlashCommandBuilder,
     ChatInputCommandInteraction,
     EmbedBuilder,
     Message,
@@ -8,7 +7,6 @@ import {
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
     Interaction,
-    StringSelectMenuInteraction,
     ComponentType,
 } from 'discord.js';
 
