@@ -23,8 +23,12 @@ export class SkipCommand extends Command {
         if (subscription.queue.length == 0)
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
         this.applyCooldown(author);
-        const skipped = subscription.active;
         subscription.stop();
-        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setSkipped(skipped)] });
+        this.reply(int, {
+            embeds: [
+                new ActionEmbed('success').setText('Skipping...'),
+                new MusicEmbed(subscription).setUser(author).setPlaying(subscription.queue[0]),
+            ],
+        });
     }
 }

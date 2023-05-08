@@ -52,16 +52,6 @@ export class MusicEmbed extends EmbedBuilder {
             value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
         });
     }
-    setSkipped(item) {
-        if (!item)
-            return this;
-        if (item.thumbnail)
-            super.setThumbnail(item.thumbnail);
-        return super.addFields({
-            name: 'Skipped:',
-            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
-        });
-    }
     setLooped(item) {
         if (!item)
             return this;

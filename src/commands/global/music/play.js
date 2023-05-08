@@ -1,5 +1,5 @@
 import { Command } from '../../../structures/index.js';
-import { VoiceChannel } from 'discord.js';
+import { SlashCommandBuilder, VoiceChannel } from 'discord.js';
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../../../structures/index.js';
 import { NodeError, PlayerError } from '../../../utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
@@ -17,6 +17,13 @@ export class PlayCommand extends Command {
             },
             cooldown: 5,
         });
+    }
+    data() {
+        return new SlashCommandBuilder()
+            .setName(this.name)
+            .setDescription(this.description?.content)
+            .setDMPermission(false)
+            .addStringOption((option) => option.setName('query').setDescription('The name or URL of the track to search for.'));
     }
     async execute(int) {
         const author = this.getAuthor(int);
