@@ -1,11 +1,5 @@
 import { EmbedBuilder, User } from 'discord.js';
-import {
-    Subscription as MusicSubscription,
-    YouTubeTrack,
-    SpotifyTrack,
-    YouTubePlaylist,
-    SpotifyPlaylist,
-} from '@structures/index.js';
+import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '@structures/index.js';
 import { getServiceIcon } from '../helpers.js';
 
 export class MusicEmbed extends EmbedBuilder {
@@ -34,9 +28,9 @@ export class MusicEmbed extends EmbedBuilder {
         } else {
             return super.addFields({
                 name: 'Enqueued:',
-                value: `\`${this.subscription.position + this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${
-                    item.title
-                } [${item.duration}]\`](${item.url})`,
+                value: `\`${this.subscription.position + this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${
+                    item.duration
+                }]\`](${item.url})`,
             });
         }
     }
@@ -47,9 +41,7 @@ export class MusicEmbed extends EmbedBuilder {
         if (item.thumbnail) super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: 'Now Playing:',
-            value: `${this.subscription.looped ? '🔁 - ' : ''}${getServiceIcon(item)} [\`${item.title} [${
-                item.duration
-            }]\`](${item.url})`,
+            value: `${this.subscription.paused ? '⏸️ - ' : ''}${this.subscription.looped ? '🔁 - ' : ''}${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
         });
     }
 
@@ -66,12 +58,10 @@ export class MusicEmbed extends EmbedBuilder {
     setLooped(item: YouTubeTrack | SpotifyTrack | null) {
         if (!item) return this;
 
-        return super
-            .setColor(this.subscription.looped ? 'Green' : 'Red')
-            .addFields({
-                name: `Track ${this.subscription.looped ? 'Looped' : 'Un-looped'}:`,
-                value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
-            });
+        return super.setColor(this.subscription.looped ? 'Green' : 'Red').addFields({
+            name: `Track ${this.subscription.looped ? 'Looped' : 'Un-looped'}:`,
+            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+        });
     }
 
     setQueue(queue: (YouTubeTrack | SpotifyTrack)[]) {
@@ -79,11 +69,10 @@ export class MusicEmbed extends EmbedBuilder {
 
         let res = '';
         for (const [index, track] of queue.entries()) {
-            if (res.length >= 840)
-                return super.addFields({ name: 'Server Queue:', value: `${res}+ \`${queue.length - index}\` more...` });
-            res += `\`${this.subscription.position + index + 1}.\` - ${getServiceIcon(track)} [\`${track.title} [${
-                track.duration
-            }]\`](${track.url})\n`;
+            if (res.length >= 840) return super.addFields({ name: 'Server Queue:', value: `${res}+ \`${queue.length - index}\` more...` });
+            res += `\`${this.subscription.position + index + 1}.\` - ${getServiceIcon(track)} [\`${track.title} [${track.duration}]\`](${
+                track.url
+            })\n`;
         }
 
         return super.addFields({ name: 'Server Queue:', value: `${res}` });
