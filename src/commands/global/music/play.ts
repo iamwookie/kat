@@ -70,8 +70,8 @@ export class PlayCommand extends Command {
             }
         }
 
-        let res: LavalinkResponse | null = null;
         let url: URL | null = null;
+        let res: LavalinkResponse | null = null;
 
         try {
             url = new URL(query);
@@ -98,10 +98,7 @@ export class PlayCommand extends Command {
                 break;
             }
             case 'PLAYLIST_LOADED': {
-                if (!url)
-                    return this.reply(int, {
-                        embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)],
-                    });
+                if (!url) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
 
                 const info = res.playlistInfo;
                 const tracks = res.tracks;
