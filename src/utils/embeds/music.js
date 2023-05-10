@@ -1,5 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
-import { YouTubePlaylist, SpotifyPlaylist, } from '../../structures/index.js';
+import { YouTubePlaylist, SpotifyPlaylist } from '../../structures/index.js';
 import { getServiceIcon } from '../helpers.js';
 export class MusicEmbed extends EmbedBuilder {
     subscription;
@@ -39,7 +39,7 @@ export class MusicEmbed extends EmbedBuilder {
             super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: 'Now Playing:',
-            value: `${this.subscription.looped ? '🔁 - ' : ''}${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+            value: `${this.subscription.paused ? '⏸️ - ' : ''}${this.subscription.looped ? '🔁 - ' : ''}${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
         });
     }
     setPaused(item) {
@@ -55,9 +55,7 @@ export class MusicEmbed extends EmbedBuilder {
     setLooped(item) {
         if (!item)
             return this;
-        return super
-            .setColor(this.subscription.looped ? 'Green' : 'Red')
-            .addFields({
+        return super.setColor(this.subscription.looped ? 'Green' : 'Red').addFields({
             name: `Track ${this.subscription.looped ? 'Looped' : 'Un-looped'}:`,
             value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
         });
