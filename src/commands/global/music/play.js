@@ -64,8 +64,8 @@ export class PlayCommand extends Command {
                 }
             }
         }
-        let res = null;
         let url = null;
+        let res = null;
         try {
             url = new URL(query);
             res = await subscription.node.rest.resolve(url.href);
@@ -91,9 +91,7 @@ export class PlayCommand extends Command {
             }
             case 'PLAYLIST_LOADED': {
                 if (!url)
-                    return this.reply(int, {
-                        embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)],
-                    });
+                    return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
                 const info = res.playlistInfo;
                 const tracks = res.tracks;
                 switch (tracks[0].info.sourceName) {

@@ -6,15 +6,12 @@ export class SubscriptionCreate extends Event {
     }
     async execute(subscription) {
         this.client.logger.info(`Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Music');
-        const position = await this.client.prisma.track.count({ where: { guildId: subscription.guild.id } });
-        // Controversial, as this may update after the embed is sent
-        subscription.position = position;
         await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,
             },
             update: {
-                position,
+                position: subscription.position,
                 active: true,
             },
             create: {
@@ -26,10 +23,8 @@ export class SubscriptionCreate extends Event {
         });
         this.client.emit(Events.Debug, `Music (DATABASE) >> Activated And Updated Queue Position For: ${subscription.guild.name} (${subscription.guild.id})`);
         setTimeout(() => {
-            {
-                if (!subscription.active && !subscription.queue.length)
-                    subscription.destroy();
-            }
+            if (!subscription.active && !subscription.queue.length)
+                subscription.destroy();
         }, this.client.config.music.inactiveDuration);
     }
 }

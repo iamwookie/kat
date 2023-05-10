@@ -1,13 +1,14 @@
 import { Collection } from 'discord.js';
-// Currently only used for guild configs, in the future will be changed
 export class Cache {
     client;
     guilds;
     music;
+    queue;
     constructor(client) {
         this.client = client;
         this.guilds = new GuildCache(client);
         this.music = new MusicCache(client);
+        this.queue = new QueueCache(client);
     }
 }
 class BaseCache {
@@ -57,5 +58,29 @@ class MusicCache extends BaseCache {
         if (res)
             this.cache.set(guildId, res);
         return res ?? undefined;
+    }
+}
+class QueueCache extends BaseCache {
+    client;
+    counts = new Collection();
+    constructor(client) {
+        super(client);
+        this.client = client;
+    }
+    async count(guildId) {
+        if (this.counts.has(guildId))
+            return this.counts.get(guildId);
+        const res = await this.client.prisma.track.count({
+            where: {
+                guildId,
+            },
+        });
+        this.counts.set(guildId, res);
+        return res;
+    }
+    increment(guildId) {
+        const count = this.counts.get(guildId) ?? 0;
+        if (this.counts.has(guildId))
+            this.counts.set(guildId, count + 1);
     }
 }

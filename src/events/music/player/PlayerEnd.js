@@ -8,10 +8,8 @@ export class PlayerEnd extends Event {
             subscription.active = null;
         subscription.process();
         setTimeout(() => {
-            {
-                if (!subscription.active && !subscription.queue.length)
-                    subscription.destroy();
-            }
+            if (!subscription.active && !subscription.queue.length)
+                subscription.destroy();
         }, this.client.config.music.inactiveDuration);
     }
 }

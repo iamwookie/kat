@@ -5,6 +5,7 @@ export class TrackRemove extends Event {
         super(client, commander, 'trackRemove');
     }
     async execute(subscription) {
+        this.client.cache.queue.increment(subscription.guild.id);
         await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,

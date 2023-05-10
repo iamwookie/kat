@@ -45,11 +45,13 @@ export class Subscription {
                     deaf: true,
                 });
                 const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
-                client.subscriptions.set(guild.id, subscription);
-                client.emit('subscriptionCreate', subscription);
+                const position = await client.cache.queue.count(guild.id);
+                subscription.position = position;
                 const res = await client.cache.music.get(guild.id);
                 if (res?.volume)
                     subscription.volume = res.volume;
+                client.subscriptions.set(guild.id, subscription);
+                client.emit('subscriptionCreate', subscription);
                 return subscription;
             }
             catch (err) {
