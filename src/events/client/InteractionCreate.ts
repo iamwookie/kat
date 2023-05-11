@@ -14,10 +14,10 @@ export class InteractionCreate extends Event {
             this.commander.commands.get(interaction.commandName) ||
             this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);
         if (!command || command.disabled) return;
+        
+        await interaction.deferReply({ ephemeral: command.ephemeral });
 
         if (!this.commander.validate(interaction, command)) return;
-
-        await interaction.deferReply({ ephemeral: command.ephemeral });
 
         try {
             await command.execute(interaction);
