@@ -56,7 +56,7 @@ export class Commander {
         this.intiliazeEvents();
     }
 
-    validate(interaction: ChatInputCommandInteraction | Message, command: Command<true>) {
+    authorize(interaction: ChatInputCommandInteraction | Message, command: Command<true>) {
         const author = command.getAuthor(interaction);
 
         if (interaction.inGuild()) {

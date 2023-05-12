@@ -21,7 +21,7 @@ export class MessageCreate extends Event {
         const command = commandName ? this.commander.commands.get(commandName) || this.commander.commands.get(this.commander.aliases.get(commandName)!) : undefined;
         if (!command || !command.legacy || command.disabled) return;
 
-        if (!this.commander.validate(message, command)) return;
+        if (!this.commander.authorize(message, command)) return;
 
         try {
             await command.execute(message);

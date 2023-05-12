@@ -11,7 +11,7 @@ export class VolumeCommand extends Command {
             legacy: true,
             legacyAliases: ['v'],
             description: {
-                content: 'View or set the music volume for the server. [Admin Only]',
+                content: 'View or set the server music volume. [Admin Only]',
                 format: '<?number>(0-100)',
             },
             cooldown: 5,
