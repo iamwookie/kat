@@ -13,7 +13,7 @@ export class InteractionCreate extends Event {
         if (!command || command.disabled)
             return;
         await interaction.deferReply({ ephemeral: command.ephemeral });
-        if (!this.commander.validate(interaction, command))
+        if (!this.commander.authorize(interaction, command))
             return;
         try {
             await command.execute(interaction);

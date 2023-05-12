@@ -47,7 +47,7 @@ export class Commander {
         }
         this.intiliazeEvents();
     }
-    validate(interaction, command) {
+    authorize(interaction, command) {
         const author = command.getAuthor(interaction);
         if (interaction.inGuild()) {
             if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id))

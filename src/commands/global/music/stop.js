@@ -1,5 +1,6 @@
 import { Command } from '../../../structures/index.js';
-import { ActionEmbed } from '../../../utils/embeds/index.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { ActionEmbed, ReviewEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../../enums.js';
 export class StopCommand extends Command {
     constructor(client, commander) {
@@ -18,7 +19,8 @@ export class StopCommand extends Command {
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription)
             return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setURL('https://top.gg/bot/916639727220846592#reviews').setLabel('Leave a review!').setStyle(ButtonStyle.Link));
         subscription.destroy();
-        this.reply(int, { embeds: [new ActionEmbed('success').setText('Stopped playing and disconnected. Cya! 👋')] });
+        this.reply(int, { embeds: [new ActionEmbed('success').setText('Stopped playing and disconnected. Cya! 👋'), new ReviewEmbed()], components: [row] });
     }
 }
