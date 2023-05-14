@@ -17,7 +17,6 @@ export class AffiliateModule extends Module {
         this.channels.set('1094860861505544314', ['1094861185310011412']);
 
         this.on('ready', this.onReady.bind(this));
-        this.on('messageCreate', this.onMessageCreate.bind(this));
         this.on('inviteCreate', this.onInviteCreate.bind(this));
         this.on('guildCreate', this.onGuildCreate.bind(this));
         this.on('guildMemberAdd', this.onGuildMemberAdd.bind(this));
@@ -31,17 +30,6 @@ export class AffiliateModule extends Module {
         for (const guild of guilds.values()) {
             const invites = await guild.invites.fetch();
             this.invites.set(guild.id, new Collection(invites.map((invite) => [invite.code, invite.uses ?? 0])));
-        }
-    }
-
-    async onMessageCreate(message: Message) {
-        const channels = ['1095042493197844651', '1023921941364604969'];
-        if (!message.channel || !channels.includes(message.id)) return;
-
-        try {
-            await message.channel.send('<@&1095034387613089822>');
-        } catch (err) {
-            this.client.logger.error(err, 'Error Pinging Roles', `Module (${this.name})`);
         }
     }
 
