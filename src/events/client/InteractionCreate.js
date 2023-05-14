@@ -8,7 +8,7 @@ export class InteractionCreate extends Event {
     async execute(interaction) {
         if (interaction.user.bot || !interaction.isChatInputCommand())
             return;
-        const command = this.commander.commands.get(interaction.commandName) ||
+        const command = this.commander.commands.get(interaction.commandName) ??
             this.commander.commands.get(this.commander.aliases.get(interaction.commandName));
         if (!command || command.disabled)
             return;

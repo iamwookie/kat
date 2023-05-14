@@ -9,7 +9,7 @@ export class ClientReady extends Event {
     }
     async execute(client) {
         for (const module of this.commander.modules.values())
-            module.onReady(client);
+            module.emit(this.name, client);
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
         // Move to a method in the future (maybe :/)
