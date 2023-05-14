@@ -9,7 +9,6 @@ export class MessageCreate extends Event {
 
     async execute(message: Message) {
         if (message.author.bot) return;
-        for (const module of this.commander.modules.values()) module.emit(this.name, message);
 
         let prefix = this.client.isDev(message.author) ? this.client.devPrefix : this.client.legacyPrefix;
         if (!this.client.isDev(message.author) && message.inGuild()) {
