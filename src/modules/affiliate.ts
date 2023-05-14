@@ -1,10 +1,10 @@
 import { Module, KATClient as Client, Commander } from '@structures/index.js';
-import { Collection, Client as DiscordClient, EmbedBuilder, Guild, GuildMember, Invite, Snowflake, User } from 'discord.js';
+import { Collection, EmbedBuilder, Guild, GuildMember, Invite, Message, Snowflake, User } from 'discord.js';
 import { Affiliate } from '@prisma/client';
 
 export class AffiliateModule extends Module {
-    public invites: Collection<Snowflake, Collection<string, number>> = new Collection();
-    public channels: Collection<Snowflake, Snowflake[]> = new Collection();
+    public invites = new Collection<Snowflake, Collection<string, number>>();
+    public channels = new Collection<Snowflake, Snowflake[]>();
 
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
@@ -15,6 +15,12 @@ export class AffiliateModule extends Module {
         // In future, this will be handled by the db
         this.channels.set('1023866029069320242', ['1096530697876930560']);
         this.channels.set('1094860861505544314', ['1094861185310011412']);
+
+        this.on('ready', this.onReady.bind(this));
+        this.on('messageCreate', this.onMessageCreate.bind(this));
+        this.on('inviteCreate', this.onInviteCreate.bind(this));
+        this.on('guildCreate', this.onGuildCreate.bind(this));
+        this.on('guildMemberAdd', this.onGuildMemberAdd.bind(this));
     }
 
     async onReady() {
@@ -28,13 +34,24 @@ export class AffiliateModule extends Module {
         }
     }
 
+    async onMessageCreate(message: Message) {
+        const channels = ['1095042493197844651', '1023921941364604969'];
+        if (!message.channel || !channels.includes(message.id)) return;
+
+        try {
+            await message.channel.send('<@&1095034387613089822>');
+        } catch (err) {
+            this.client.logger.error(err, 'Error Pinging Roles', `Module (${this.name})`);
+        }
+    }
+
     async onInviteCreate(invite: Invite) {
+        if (!invite.guild || !this.guilds?.includes(invite.guild.id)) return;
         this.invites.get(invite.guild?.id!)?.set(invite.code, invite.uses ?? 0);
     }
 
     async onGuildCreate(guild: Guild) {
         if (!this.guilds?.includes(guild.id)) return;
-
         const invites = await guild.invites.fetch();
         this.invites.set(guild.id, new Collection(invites.map((invite) => [invite.code, invite.uses ?? 0])));
     }
@@ -68,10 +85,7 @@ export class AffiliateModule extends Module {
             });
             if (!affiliate) return;
 
-            this.client.logger.info(
-                `Updated Affiliate Invite Link: ${affiliate.link} | Total: ${affiliate.total}`,
-                `Module (${this.name})`
-            );
+            this.client.logger.info(`Updated Affiliate Invite Link: ${affiliate.link} | Total: ${affiliate.total}`, `Module (${this.name})`);
 
             this.sendNotification(member, affiliate);
         } catch (err) {

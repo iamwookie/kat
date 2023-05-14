@@ -1,25 +1,27 @@
 import { KATClient as Client } from '../Client.js';
 import { Command } from './Command.js';
 import { Commander } from './Commander.js';
-import { Collection, Client as DiscordClient, Guild, GuildMember, Invite, Snowflake } from 'discord.js';
+import { Collection, Snowflake } from 'discord.js';
+import { EventEmitter } from 'events';
 
 interface ModuleOptions {
     name: string;
     guilds?: Snowflake[];
 }
 
-export class Module {
+export class Module extends EventEmitter {
     public name: string;
     public guilds?: Snowflake[];
     public commands = new Collection<string, Command<true>>();
 
     constructor(public client: Client, public commander: Commander, options: ModuleOptions) {
+        super({ captureRejections: true });
+
         this.name = options.name;
         this.guilds = options.guilds;
-    }
 
-    onReady(client: DiscordClient) {}
-    onInviteCreate(invite: Invite) {}
-    onGuildCreate(guild: Guild) {}
-    onGuildMemberAdd(member: GuildMember) {}
+        this.on('error', (err) => {
+            this.client.logger.error(err, 'An Error Has Occured', `Module ${this.name}`);
+        });
+    }
 }

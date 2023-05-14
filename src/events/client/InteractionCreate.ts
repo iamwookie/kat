@@ -1,4 +1,4 @@
-import { Event, KATClient as Client, Commander, Module } from '@structures/index.js';
+import { Event, KATClient as Client, Commander } from '@structures/index.js';
 import { Events, BaseInteraction } from 'discord.js';
 import { ErrorEmbed } from '@utils/embeds/index.js';
 
@@ -11,7 +11,7 @@ export class InteractionCreate extends Event {
         if (interaction.user.bot || !interaction.isChatInputCommand()) return;
 
         const command =
-            this.commander.commands.get(interaction.commandName) ||
+            this.commander.commands.get(interaction.commandName) ??
             this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);
         if (!command || command.disabled) return;
         

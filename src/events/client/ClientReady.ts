@@ -11,7 +11,7 @@ export class ClientReady extends Event {
     }
 
     async execute(client: DiscordClient) {
-        for (const module of this.commander.modules.values()) module.onReady(client);
+        for (const module of this.commander.modules.values()) module.emit(this.name, client);
 
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
