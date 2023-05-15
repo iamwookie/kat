@@ -12,7 +12,7 @@
     "author": "wookie",
     "license": "ISC",
     "dependencies": {
-        "@prisma/client": "^4.13.0",
+        "@prisma/client": "^4.14.0",
         "@sentry/integrations": "^7.39.0",
         "@sentry/node": "^7.39.0",
         "@sentry/tracing": "^7.28.0",
