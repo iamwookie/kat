@@ -1,7 +1,20 @@
 import { KATClient as Client } from '../Client.js';
 
 // ----- FOR LATER USE -----
-import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake, PermissionFlagsBits } from 'discord.js';
+import {
+    Events as DiscordEvents,
+    REST,
+    Routes,
+    ChatInputCommandInteraction,
+    Message,
+    Collection,
+    Snowflake,
+    PermissionFlagsBits,
+    MessagePayload,
+    MessageEditOptions,
+    InteractionEditReplyOptions,
+    MessageCreateOptions,
+} from 'discord.js';
 import { Command } from './Command.js';
 import { Module } from './Module.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
@@ -32,13 +45,13 @@ const commands = [
 ];
 
 export class Commander {
-    private rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
-
     public commands = new Collection<string, Command<true>>();
     public global = new Collection<string, Command<true>>();
     public reserved = new Collection<Snowflake, Collection<string, Command<true>>>();
     public modules = new Collection<string, Module>();
     public aliases = new Collection<string, string>();
+
+    private rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
 
     constructor(public readonly client: Client) {}
 
@@ -46,13 +59,63 @@ export class Commander {
         this.initializeModules();
         this.initializeCommands();
 
-        await this.registerGlobalCommands();
-        await this.registerReservedCommands();
+        if (process.argv.includes('--register')) {
+            this.client.logger.info('Registering Commands...', 'Commander');
+            await this.registerGlobalCommands();
+            await this.registerReservedCommands();
+            this.client.logger.info('Commands Registered!', 'Commander');
+        }
 
         this.intiliazeEvents();
     }
 
-    initializeModules() {
+    authorize(interaction: ChatInputCommandInteraction | Message, command: Command<true>) {
+        const author = this.getAuthor(interaction);
+
+        if (interaction.inGuild()) {
+            if (command.module.guilds && !command.module.guilds.includes(interaction.guild!.id)) return false;
+            if (!interaction.channel?.permissionsFor(interaction.guild!.members.me!).has(PermissionFlagsBits.SendMessages)) {
+                if (!command.hidden)
+                    author
+                        .send({
+                            embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
+                        })
+                        .catch((err) => {
+                            this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                        });
+                return false;
+            }
+        } else if (!command.allowDM) {
+            return false;
+        }
+
+        if (command.users && !command.users.includes(author.id)) {
+            if (!command.hidden)
+                this.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
+                }).catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                });
+            return false;
+        }
+
+        if (command.cooldown && command.cooldowns) {
+            if (command.cooldowns.has(author.id)) {
+                const cooldown = command.cooldowns.get(author.id)!;
+                const secondsLeft = (cooldown - Date.now()) / 1000;
+                this.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)],
+                }).catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
+                });
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private initializeModules() {
         const modules = Object.values(Modules);
 
         for (const Module of modules) {
@@ -67,7 +130,7 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${modules.length} Module(s)`);
     }
 
-    initializeCommands() {
+    private initializeCommands() {
         for (const Command of commands) {
             try {
                 const command = new Command(this.client, this);
@@ -113,7 +176,7 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${commands.length} Command(s)`);
     }
 
-    intiliazeEvents() {
+    private intiliazeEvents() {
         const events = Object.values(Events);
 
         for (const Event of events) {
@@ -128,12 +191,12 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
 
-    async registerGlobalCommands() {
+    private async registerGlobalCommands() {
         try {
             let body = [];
 
             for (const command of this.global.values()) {
-                if (!command.data || command.disabled || command.hidden) continue;
+                if (command.disabled || command.hidden) continue;
 
                 if (command.aliases) {
                     for (const alias of command.aliases) {
@@ -154,14 +217,14 @@ export class Commander {
         }
     }
 
-    async registerReservedCommands() {
+    private async registerReservedCommands() {
         for (const [guildId, commands] of this.reserved) {
             if (!this.client.guilds.cache.has(guildId)) continue;
 
             let body = [];
 
             for (const command of commands.values()) {
-                if (!command.data || command.disabled || command.hidden) continue;
+                if (command.disabled || command.hidden) continue;
 
                 if (command.aliases) {
                     for (const alias of command.aliases) {
@@ -186,50 +249,47 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 
-    validate(interaction: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>, command: Command) {
-        const author = command.getAuthor(interaction);
-
-        if (!interaction.channel?.permissionsFor(interaction.guild!.members.me!).has(PermissionFlagsBits.SendMessages)) {
-            if (!command.hidden)
-                author
-                    .send({
-                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
-                    })
-                    .catch((err) => {
-                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                    });
-            return false;
+    getAuthor(interaction: ChatInputCommandInteraction | Message) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.user;
+        } else if (interaction instanceof Message) {
+            return interaction.author;
+        } else {
+            throw new Error('Invalid interaction.');
         }
+    }
 
-        if (command.users && !command.users.includes(author.id)) {
-            if (!command.hidden)
-                command
-                    .reply(interaction, {
-                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-                    })
-                    .catch((err) => {
-                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                    });
-            return false;
+    getArgs(interaction: ChatInputCommandInteraction | Message) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
+        } else if (interaction instanceof Message) {
+            return interaction.content.split(/ +/).slice(1);
+        } else {
+            return [];
         }
+    }
 
-        if (command.cooldown && command.cooldowns) {
-            if (command.cooldowns.has(author.id)) {
-                const cooldown = command.cooldowns.get(author.id)!;
-                const secondsLeft = (cooldown - Date.now()) / 1000;
-                command
-                    .reply(interaction, {
-                        embeds: [
-                            new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`),
-                        ],
-                    })
-                    .catch((err) => {
-                        this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
-                    });
-                return false;
-            }
+    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
+        } else if (interaction instanceof Message) {
+            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject('Invalid interaction.');
         }
+    }
 
-        return true;
+    edit(
+        interaction: ChatInputCommandInteraction | Message,
+        editable: Message,
+        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
+    ) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
+        } else if (interaction instanceof Message) {
+            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject('Invalid interaction.');
+        }
     }
 }

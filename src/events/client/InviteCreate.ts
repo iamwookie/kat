@@ -7,8 +7,11 @@ export class InviteCreate extends Event {
     }
 
     async execute(invite: Invite) {
-        this.commander.modules.forEach((module) => {
-            if (module.guilds?.includes(invite.guild?.id!)) module.onInviteCreate(invite);
-        });
+        if (!invite.guild) return;
+
+        for (const module of this.commander.modules.values()) {
+            if (module.guilds && !module.guilds.includes(invite.guild.id)) continue;
+            module.emit(this.name, invite);
+        }
     }
 }

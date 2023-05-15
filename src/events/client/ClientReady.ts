@@ -1,6 +1,7 @@
 import { Event, KATClient as Client, Commander } from '@structures/index.js';
 import { Events, Client as DiscordClient, TextChannel } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/action.js';
+import { MusicPrompts } from 'enums.js';
 
 import chalk from 'chalk';
 
@@ -10,16 +11,20 @@ export class ClientReady extends Event {
     }
 
     async execute(client: DiscordClient) {
-        for (const module of this.commander.modules.values()) module.onReady(client);
+        for (const module of this.commander.modules.values()) module.emit(this.name, client);
 
         await this.client.server.initialize();
         console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
 
-        // Move to a method in the future
-        const res = await this.client.prisma.queue.findMany({});
+        // Move to a method in the future (maybe :/)
+        const res = await this.client.prisma.queue.findMany({
+            where: {
+                active: true,
+            },
+        });
 
         if (res.length) {
-            this.client.logger.info(`Warning ${res.length} Subscriptions`, 'Music');
+            this.client.logger.info(`Warning ${res.length} Queue(s)`, 'Music');
 
             for (const queue of res) {
                 if (!queue.active || !queue.textId) continue;
@@ -29,13 +34,11 @@ export class ClientReady extends Event {
 
                 try {
                     await channel.send({
-                        embeds: [new ActionEmbed('warn').setText('The bot has restarted, please replay your track.')],
+                        embeds: [new ActionEmbed('warn').setText(MusicPrompts.Restarted)],
                     });
-                    this.client.logger.info(`Music >> Warning Sent To: ${channel.guild.name} (${channel.guild.id})`);
+                    this.client.logger.info(`Warning Sent To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
                 } catch {
-                    this.client.logger.warn(
-                        `Music >> Failed To Send Warning To: ${channel.guild.name} (${channel.guild.id})`
-                    );
+                    this.client.logger.warn(`Failed To Send Warning To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
                 }
             }
 
@@ -48,7 +51,7 @@ export class ClientReady extends Event {
                 },
             });
 
-            this.client.logger.info(`Queues Set To Inactive`, 'Music');
+            this.client.logger.info(`Queue(s) Set To Inactive`, 'Music');
         }
         // ----------------------------
 

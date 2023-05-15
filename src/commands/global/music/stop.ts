@@ -1,6 +1,6 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
-import { ActionEmbed } from '@utils/embeds/index.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Message } from 'discord.js';
+import { ActionEmbed, ReviewEmbed } from '@utils/embeds/index.js';
 import { MusicPrompts } from 'enums.js';
 
 export class StopCommand extends Command {
@@ -17,19 +17,18 @@ export class StopCommand extends Command {
         });
     }
 
-    data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
-    }
-
-    async execute(int: ChatInputCommandInteraction<"cached" | "raw"> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const subscription = this.client.subscriptions.get(int.guildId!);
-        if (!subscription)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        if (!subscription) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+
+        const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder().setURL('https://top.gg/bot/916639727220846592#reviews').setLabel('Leave a review').setStyle(ButtonStyle.Link)
+        );
 
         subscription.destroy();
-        return this.reply(int, { embeds: [new ActionEmbed('success').setText('Successfully disconnected. Cya! 👋')] });
+        this.commander.reply(int, {
+            embeds: [new ActionEmbed('success').setText('Stopped playing and disconnected. Cya! 👋'), new ReviewEmbed()],
+            components: [buttons],
+        });
     }
 }

@@ -8,22 +8,22 @@ export class MessageCreate extends Event {
     }
 
     async execute(message: Message) {
-        if (message.author.bot || !message.inGuild()) return;
+        if (message.author.bot) return;
 
-        const config = await this.client.cache.guilds.get(message.guild.id);
-        const prefix = this.client.isDev(message.author.id)
-            ? this.client.devPrefix
-            : config?.prefix ?? this.client.legacyPrefix;
+        let prefix = this.client.isDev(message.author) ? this.client.devPrefix : this.client.legacyPrefix;
+        if (!this.client.isDev(message.author) && message.inGuild()) {
+            const config = await this.client.cache.guilds.get(message.guild.id);
+            prefix = config?.prefix ?? prefix;
+        }
         if (!message.content.startsWith(prefix)) return;
 
-        const commandName = message.content.slice(prefix.length).trim().split(/ +/).shift()?.toLowerCase()!;
-        const command =
-            this.commander.commands.get(commandName) ||
-            this.commander.commands.get(this.commander.aliases.get(commandName)!);
+        const commandName = message.content.slice(prefix.length).split(/ +/).shift()?.toLowerCase();
+        const command = commandName
+            ? this.commander.commands.get(commandName) ?? this.commander.commands.get(this.commander.aliases.get(commandName)!)
+            : undefined;
         if (!command || !command.legacy || command.disabled) return;
-        if (command.module.guilds && !command.module.guilds.includes(message.guild.id)) return;
 
-        if (!this.commander.validate(message, command)) return;
+        if (!this.commander.authorize(message, command)) return;
 
         try {
             await command.execute(message);

@@ -11,7 +11,7 @@ export class VolumeCommand extends Command {
             legacy: true,
             legacyAliases: ['v'],
             description: {
-                content: 'View or set the music volume for the server. [Admin Only]',
+                content: 'View or set the server music volume. [Admin Only]',
                 format: '<?number>(0-100)',
             },
             cooldown: 5,
@@ -27,25 +27,21 @@ export class VolumeCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const author = this.getAuthor(int);
-        const args = this.getArgs(int)[0] as string;
+        const author = this.commander.getAuthor(int);
+        const args = this.commander.getArgs(int)[0] as string;
 
         if (!args) {
             const res = await this.client.cache.music.get(int.guildId!);
-            return this.reply(int, {
-                embeds: [new ActionEmbed('success').setText(`The current volume is \`${res?.volume ?? 100}%\`!`)],
-            });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(`The current volume is \`${res?.volume ?? 100}%\`!`)] });
         }
 
-        if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
-            return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-            });
+        if (!this.client.isDev(author) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)] });
 
         const volume = parseInt(args);
-        if (isNaN(volume)) return this.reply(int, { embeds: [new ActionEmbed('fail').setText('Invalid volume provided!')] });
+        if (isNaN(volume)) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('Invalid volume provided!')] });
         if (volume < 0 || volume > 100)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('Volume must be between `0` and `100`!')] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('Volume must be between `0` and `100`!')] });
 
         const res = await this.client.prisma.guild.upsert({
             where: {
@@ -75,10 +71,7 @@ export class VolumeCommand extends Command {
                 music: true,
             },
         });
-        if (!res?.music)
-            return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')],
-            });
+        if (!res?.music) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
 
         this.client.cache.music.update(int.guildId!, res.music);
 
@@ -88,7 +81,7 @@ export class VolumeCommand extends Command {
             subscription.player.setVolume(res.music.volume / 100);
         }
 
-        return this.reply(int, {
+        this.commander.reply(int, {
             embeds: [
                 new ActionEmbed('success').setText(
                     `Set the music volume to \`${res.music.volume}%\`!${

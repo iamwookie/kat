@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 import { MusicEmbed, ActionEmbed } from '@utils/embeds/index.js';
 import { MusicPrompts } from 'enums.js';
 
@@ -16,15 +16,16 @@ export class LoopCommand extends Command {
         });
     }
 
-    data() {
-        return new SlashCommandBuilder().setName(this.name).setDescription(this.description?.content!).setDMPermission(false);
-    }
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
+        const author = this.commander.getAuthor(int);
 
-    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
         const subscription = this.client.subscriptions.get(int.guildId!);
-        if (!subscription || !subscription.active) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        if (!subscription || !subscription.active)
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        if (!subscription.voiceChannel.members.has(author.id))
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
 
         subscription.loop();
-        this.reply(int, { embeds: [new MusicEmbed(subscription).setLooped(subscription.active)] });
+        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setLooped(subscription.active)] });
     }
 }

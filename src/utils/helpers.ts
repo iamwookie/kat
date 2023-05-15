@@ -1,8 +1,6 @@
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '@structures/index.js';
 import { User } from 'discord.js';
-
-import { emotes } from '@config';
-const musicEmotes = emotes.music;
+import { MusicEmojis } from 'enums.js';
 
 export function formatDuration(milliseconds?: number | null) {
     if (!milliseconds) return 'No Data';
@@ -52,9 +50,9 @@ export function formatUser(user: User): {
 
 export function getServiceIcon(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
     if (item instanceof YouTubeTrack || item instanceof YouTubePlaylist) {
-        return musicEmotes.youtube;
+        return MusicEmojis.YouTube;
     } else if (item instanceof SpotifyTrack || item instanceof SpotifyPlaylist) {
-        return musicEmotes.spotify;
+        return MusicEmojis.Spotify;
     } else {
         return '';
     }

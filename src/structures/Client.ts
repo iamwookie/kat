@@ -1,5 +1,5 @@
 import * as Config from '@config';
-import { Client, ClientOptions, Events, Collection, PermissionsBitField, Snowflake } from 'discord.js';
+import { Client, ClientOptions, Events, Collection, PermissionsBitField, Snowflake, User } from 'discord.js';
 import { Logger } from './Logger.js';
 import { PrismaClient } from '@prisma/client';
 import { Commander } from './commander/Commander.js';
@@ -60,14 +60,14 @@ export class KATClient extends Client {
             await this.prisma.$connect();
             console.log(chalk.greenBright.bold.underline('>>> Prisma Initialized!'));
         } catch (err) {
-            this.logger.error(err, 'Error Connecting', 'Prisma');
+            this.logger.error(err, 'Error Initializing', 'Prisma');
         }
 
         await this.commander.initialize();
-        console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
+        console.log(chalk.greenBright.bold.underline('>>> Commander Initialized!'));
     }
 
-    isDev(id: Snowflake) {
-        return this.devId == id;
+    isDev(user: User) {
+        return this.devId == user.id;
     }
 }

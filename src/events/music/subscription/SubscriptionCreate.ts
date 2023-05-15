@@ -12,16 +12,12 @@ export class SubscriptionCreate extends Event {
             'Music'
         );
 
-        const position = await this.client.prisma.track.count({ where: { guildId: subscription.guild.id } });
-        // Controversial, as this may update after the embed is sent
-        subscription.position = position;
-
         await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,
             },
             update: {
-                position,
+                position: subscription.position,
                 active: true,
             },
             create: {
@@ -38,9 +34,7 @@ export class SubscriptionCreate extends Event {
         );
 
         setTimeout(() => {
-            {
-                if (!subscription.active && !subscription.queue.length) subscription.destroy();
-            }
+            if (!subscription.active && !subscription.queue.length) subscription.destroy();
         }, this.client.config.music.inactiveDuration);
     }
 }

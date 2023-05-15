@@ -1,17 +1,10 @@
-export const version = "7.7.6";
+export const version = "7.7.16";
 
 export const bot = {
     devId: "244662779745665026",
     prefix: "/",
     devPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
     legacyPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
-};
-
-export const emotes = {
-    music: {
-        youtube: "<:youtube:1067881972774477844>",
-        spotify: "<:spotify:1067881968697614476>",
-    },
 };
 
 export const server = {

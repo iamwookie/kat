@@ -26,15 +26,13 @@ export class PrefixCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const author = this.getAuthor(int);
+        const author = this.commander.getAuthor(int);
 
-        if (!this.client.isDev(author.id) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
-            return this.reply(int, {
-                embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-            });
+        if (!this.client.isDev(author) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)] });
 
-        const args = this.getArgs(int)[0] as string;
-        if (!args) return this.reply(int, { embeds: [new ActionEmbed('fail').setText('You did not provide a valid prefix!')] });
+        const args = this.commander.getArgs(int)[0] as string;
+        if (!args) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('You did not provide a valid prefix!')] });
 
         const res = await this.client.prisma.guild.upsert({
             where: {
@@ -52,11 +50,9 @@ export class PrefixCommand extends Command {
         this.client.cache.guilds.update(res.guildId, res);
 
         if (res) {
-            this.reply(int, {
-                embeds: [new ActionEmbed('success').setText(`Successfully set the prefix to \`${res.prefix}\`!`)],
-            });
+            this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(`Successfully set the prefix to \`${res.prefix}\`!`)] });
         } else {
-            this.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the prefix!')] });
+            this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the prefix!')] });
         }
     }
 }

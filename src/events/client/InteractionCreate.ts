@@ -1,4 +1,4 @@
-import { Event, KATClient as Client, Commander, Module } from '@structures/index.js';
+import { Event, KATClient as Client, Commander } from '@structures/index.js';
 import { Events, BaseInteraction } from 'discord.js';
 import { ErrorEmbed } from '@utils/embeds/index.js';
 
@@ -8,17 +8,16 @@ export class InteractionCreate extends Event {
     }
 
     async execute(interaction: BaseInteraction) {
-        if (!interaction.isChatInputCommand() || !interaction.inGuild()) return;
+        if (interaction.user.bot || !interaction.isChatInputCommand()) return;
 
         const command =
-            this.commander.commands.get(interaction.commandName) ||
-            this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);
+            this.commander.commands.get(interaction.commandName) ??
+            this.commander.commands.get(this.commander.aliases.get(interaction.commandName)!);
         if (!command || command.disabled) return;
-        if (command.module.guilds && !command.module.guilds.includes(interaction.guild!.id)) return;
-
-        if (!this.commander.validate(interaction, command)) return;
-
+        
         await interaction.deferReply({ ephemeral: command.ephemeral });
+
+        if (!this.commander.authorize(interaction, command)) return;
 
         try {
             await command.execute(interaction);

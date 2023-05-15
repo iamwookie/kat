@@ -1,20 +1,25 @@
 import { Module, KATClient as Client, Commander } from '@structures/index.js';
-import { Collection, Client as DiscordClient, EmbedBuilder, Guild, GuildMember, Invite, Snowflake, User } from 'discord.js';
+import { Collection, EmbedBuilder, Guild, GuildMember, Invite, Snowflake, User } from 'discord.js';
 import { Affiliate } from '@prisma/client';
 
 export class AffiliateModule extends Module {
-    public invites: Collection<Snowflake, Collection<string, number>> = new Collection();
-    public channels: Collection<Snowflake, Snowflake[]> = new Collection();
+    public invites = new Collection<Snowflake, Collection<string, number>>();
+    public channels = new Collection<Snowflake, Snowflake[]>();
 
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: 'Affiliate',
-            guilds: ['1094860861505544314', '1023866029069320242'],
+            guilds: ['1094860861505544314', '1023866029069320242', '858675408140369920'],
         });
 
         // In future, this will be handled by the db
         this.channels.set('1023866029069320242', ['1096530697876930560']);
         this.channels.set('1094860861505544314', ['1094861185310011412']);
+
+        this.on('ready', this.onReady.bind(this));
+        this.on('inviteCreate', this.onInviteCreate.bind(this));
+        this.on('guildCreate', this.onGuildCreate.bind(this));
+        this.on('guildMemberAdd', this.onGuildMemberAdd.bind(this));
     }
 
     async onReady() {
@@ -33,8 +38,6 @@ export class AffiliateModule extends Module {
     }
 
     async onGuildCreate(guild: Guild) {
-        if (!this.guilds?.includes(guild.id)) return;
-
         const invites = await guild.invites.fetch();
         this.invites.set(guild.id, new Collection(invites.map((invite) => [invite.code, invite.uses ?? 0])));
     }
@@ -68,10 +71,7 @@ export class AffiliateModule extends Module {
             });
             if (!affiliate) return;
 
-            this.client.logger.info(
-                `Updated Affiliate Invite Link: ${affiliate.link} | Total: ${affiliate.total}`,
-                `Module (${this.name})`
-            );
+            this.client.logger.info(`Updated Affiliate Invite Link: ${affiliate.link} | Total: ${affiliate.total}`, `Module (${this.name})`);
 
             this.sendNotification(member, affiliate);
         } catch (err) {

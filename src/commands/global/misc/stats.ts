@@ -11,16 +11,13 @@ export class StatsCommand extends Command {
             description: {
                 content: 'Show app statistics.',
             },
-            hidden: true,
+            allowDM: true,
             users: [],
+            hidden: true,
         });
     }
 
-    data() {
-        return new SlashCommandBuilder();
-    }
-
-    async execute(int: ChatInputCommandInteraction<'cached' | 'raw'> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const embed = new EmbedBuilder()
             .setColor('Yellow')
             .setTitle('Statistics')
@@ -38,9 +35,9 @@ export class StatsCommand extends Command {
                 { name: 'Active Queues', value: `\`${this.client.subscriptions.size}\``, inline: true }
             );
 
-        const subscription = this.client.subscriptions.get(int.guild?.id!);
+        const subscription = this.client.subscriptions.get(int.guild?.id);
         if (subscription) embed.addFields({ name: 'Node', value: `\`${subscription.node.name}\``, inline: true });
 
-        this.reply(int, { embeds: [embed] });
+        this.commander.reply(int, { embeds: [embed] });
     }
 }

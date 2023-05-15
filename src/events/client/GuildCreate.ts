@@ -1,5 +1,5 @@
 import { Event, KATClient as Client, Commander } from '@structures/index.js';
-import { Events, Guild, PermissionFlagsBits, EmbedBuilder, ChannelType } from 'discord.js';
+import { EmbedBuilder, Events, Guild } from 'discord.js';
 
 export class GuildCreate extends Event {
     constructor(client: Client, commander: Commander) {
@@ -7,29 +7,25 @@ export class GuildCreate extends Event {
     }
 
     async execute(guild: Guild) {
+        this.client.logger.info(`Joined Guild ${guild.name} (${guild.id}) With ${guild.memberCount} Members`, 'DISCORD');
+
         for (const module of this.commander.modules.values()) {
-            if (module.guilds?.includes(guild.id)) module.onGuildCreate(guild);
+            if (module.guilds && !module.guilds.includes(guild.id)) continue;
+            module.emit(this.name, guild);
         }
 
-        const channel = guild.channels.cache.find(
-            (c) =>
-                c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me!)?.has(PermissionFlagsBits.SendMessages)
-        );
-        if (channel && channel.isTextBased()) {
-            const embed = new EmbedBuilder()
-                .setColor('White')
-                .setTitle('Thanks for adding me!')
-                .setThumbnail(this.client.user?.avatarURL() ?? null)
-                .setDescription(
-                    `✨ KAT is a small multipurpose Discord bot that can play high quality music from YouTube and Spotify!
-                \n🎵 Use \`/play\` or \`.play\` to play music!
-                \n❓ Use \`/help\` or \`.help\` for the help menu!
-                \nVisit the official website here: https://kat.bil.al`
-                );
-
-            channel.send({ embeds: [embed] }).catch(() => {});
-        }
-
-        this.client.logger.info(`DISCORD >> Joined Guild ${guild.name} (${guild.id}) With ${guild.memberCount} Members!`);
+        const owner = await guild.fetchOwner();
+        const embed = new EmbedBuilder()
+            .setColor('Green')
+            .setTitle('Joined Guild')
+            .addFields(
+                { name: 'Name', value: `\`${guild.name}\``, inline: true },
+                { name: 'Owner', value: `\`${owner.user.tag}\``, inline: true },
+                { name: 'Guild ID', value: `\`${guild.id}\``, inline: true },
+                { name: 'Owner ID', value: `\`${guild.ownerId}\``, inline: true },
+                { name: 'Members', value: `\`${guild.memberCount}\``, inline: true }
+            )
+            .setTimestamp();
+        this.client.logger.notify(embed);
     }
 }

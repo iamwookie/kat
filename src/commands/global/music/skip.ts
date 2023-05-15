@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 import { ActionEmbed, MusicEmbed } from '@utils/embeds/index.js';
 import { MusicPrompts } from 'enums.js';
 
@@ -16,27 +16,24 @@ export class SkipCommand extends Command {
         });
     }
 
-    data() {
-        return new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description?.content!)
-            .setDMPermission(false);
-    }
-
-    async execute(int: ChatInputCommandInteraction<"cached" | "raw"> | Message<true>) {
-        const author = this.getAuthor(int);
+    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
+        const author = this.commander.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
-        if (subscription.queue.length == 0)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
+        if (!subscription.voiceChannel.members.has(author.id))
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
+        if (subscription.queue.length == 0) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
 
         this.applyCooldown(author);
 
-        const previous = subscription.active;
-        const next = subscription.queue[0];
         subscription.stop();
-        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(next).setSkipped(previous)] });
+        this.commander.reply(int, {
+            embeds: [
+                new ActionEmbed('success').setText('Skipping...'),
+                new MusicEmbed(subscription).setUser(author).setPlaying(subscription.queue[0]),
+            ],
+        });
     }
 }
