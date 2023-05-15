@@ -5,6 +5,7 @@ export class GuildCreate extends Event {
         super(client, commander, Events.GuildCreate);
     }
     async execute(guild) {
+        this.client.logger.info(`Joined Guild ${guild.name} (${guild.id}) With ${guild.memberCount} Members`, 'DISCORD');
         for (const module of this.commander.modules.values()) {
             if (module.guilds && !module.guilds.includes(guild.id))
                 continue;
@@ -17,6 +18,5 @@ export class GuildCreate extends Event {
             .addFields({ name: 'Name', value: `\`${guild.name}\``, inline: true }, { name: 'Owner', value: `\`${owner.user.tag}\``, inline: true }, { name: 'Guild ID', value: `\`${guild.id}\``, inline: true }, { name: 'Owner ID', value: `\`${guild.ownerId}\``, inline: true }, { name: 'Members', value: `\`${guild.memberCount}\``, inline: true })
             .setTimestamp();
         this.client.logger.notify(embed);
-        this.client.logger.info(`DISCORD >> Joined Guild ${guild.name} (${guild.id}) With ${guild.memberCount} Members!`);
     }
 }
