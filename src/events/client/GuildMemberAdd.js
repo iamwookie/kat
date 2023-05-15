@@ -7,7 +7,10 @@ export class GuildMemberAdd extends Event {
     async execute(member) {
         if (member.user.bot)
             return;
-        for (const module of this.commander.modules.values())
+        for (const module of this.commander.modules.values()) {
+            if (module.guilds && !module.guilds.includes(member.guild.id))
+                continue;
             module.emit(this.name, member);
+        }
     }
 }

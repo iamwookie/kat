@@ -1,5 +1,5 @@
 // ----- FOR LATER USE -----
-import { Events as DiscordEvents, REST, Routes, Collection, PermissionFlagsBits } from 'discord.js';
+import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, PermissionFlagsBits, } from 'discord.js';
 import { Module } from './Module.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
 import { PermissionPrompts } from '../../../enums.js';
@@ -48,7 +48,7 @@ export class Commander {
         this.intiliazeEvents();
     }
     authorize(interaction, command) {
-        const author = command.getAuthor(interaction);
+        const author = this.getAuthor(interaction);
         if (interaction.inGuild()) {
             if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id))
                 return false;
@@ -69,11 +69,9 @@ export class Commander {
         }
         if (command.users && !command.users.includes(author.id)) {
             if (!command.hidden)
-                command
-                    .reply(interaction, {
+                this.reply(interaction, {
                     embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-                })
-                    .catch((err) => {
+                }).catch((err) => {
                     this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
                 });
             return false;
@@ -82,13 +80,9 @@ export class Commander {
             if (command.cooldowns.has(author.id)) {
                 const cooldown = command.cooldowns.get(author.id);
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-                command
-                    .reply(interaction, {
-                    embeds: [
-                        new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`),
-                    ],
-                })
-                    .catch((err) => {
+                this.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)],
+                }).catch((err) => {
                     this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
                 });
                 return false;
@@ -212,5 +206,49 @@ export class Commander {
             }
         }
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
+    }
+    getAuthor(interaction) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.user;
+        }
+        else if (interaction instanceof Message) {
+            return interaction.author;
+        }
+        else {
+            throw new Error('Invalid interaction.');
+        }
+    }
+    getArgs(interaction) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
+        }
+        else if (interaction instanceof Message) {
+            return interaction.content.split(/ +/).slice(1);
+        }
+        else {
+            return [];
+        }
+    }
+    reply(interaction, content) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content);
+        }
+        else if (interaction instanceof Message) {
+            return interaction.channel.send(content);
+        }
+        else {
+            return Promise.reject('Invalid interaction.');
+        }
+    }
+    edit(interaction, editable, content) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content);
+        }
+        else if (interaction instanceof Message) {
+            return editable.edit(content);
+        }
+        else {
+            return Promise.reject('Invalid interaction.');
+        }
     }
 }

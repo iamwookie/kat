@@ -27,13 +27,9 @@ export class AffiliateModule extends Module {
         }
     }
     async onInviteCreate(invite) {
-        if (!invite.guild || !this.guilds?.includes(invite.guild.id))
-            return;
         this.invites.get(invite.guild?.id)?.set(invite.code, invite.uses ?? 0);
     }
     async onGuildCreate(guild) {
-        if (!this.guilds?.includes(guild.id))
-            return;
         const invites = await guild.invites.fetch();
         this.invites.set(guild.id, new Collection(invites.map((invite) => [invite.code, invite.uses ?? 0])));
     }

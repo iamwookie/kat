@@ -24,19 +24,19 @@ export class VolumeCommand extends Command {
             .addStringOption((option) => option.setName('number').setDescription('The volume to set. (0-100)'));
     }
     async execute(int) {
-        const author = this.getAuthor(int);
-        const args = this.getArgs(int)[0];
+        const author = this.commander.getAuthor(int);
+        const args = this.commander.getArgs(int)[0];
         if (!args) {
             const res = await this.client.cache.music.get(int.guildId);
-            return this.reply(int, { embeds: [new ActionEmbed('success').setText(`The current volume is \`${res?.volume ?? 100}%\`!`)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(`The current volume is \`${res?.volume ?? 100}%\`!`)] });
         }
         if (!this.client.isDev(author) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)] });
         const volume = parseInt(args);
         if (isNaN(volume))
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('Invalid volume provided!')] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('Invalid volume provided!')] });
         if (volume < 0 || volume > 100)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('Volume must be between `0` and `100`!')] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('Volume must be between `0` and `100`!')] });
         const res = await this.client.prisma.guild.upsert({
             where: {
                 guildId: int.guildId,
@@ -66,14 +66,14 @@ export class VolumeCommand extends Command {
             },
         });
         if (!res?.music)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
         this.client.cache.music.update(int.guildId, res.music);
         const subscription = this.client.subscriptions.get(int.guildId);
         if (subscription) {
             subscription.volume = res.music.volume;
             subscription.player.setVolume(res.music.volume / 100);
         }
-        this.reply(int, {
+        this.commander.reply(int, {
             embeds: [
                 new ActionEmbed('success').setText(`Set the music volume to \`${res.music.volume}%\`!${subscription ? '\n```⚠️ It may take a few seconds to update the volume for the currently playing track.```' : ''}`),
             ],

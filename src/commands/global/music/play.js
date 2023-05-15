@@ -26,26 +26,26 @@ export class PlayCommand extends Command {
             .addStringOption((option) => option.setName('query').setDescription('The name or URL of the track to search for.'));
     }
     async execute(int) {
-        const author = this.getAuthor(int);
-        const query = this.getArgs(int).join(' ');
+        const author = this.commander.getAuthor(int);
+        const query = this.commander.getArgs(int).join(' ');
         const voiceChannel = int.member.voice.channel;
         if (!voiceChannel)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInVoice)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInVoice)] });
         if (!(voiceChannel instanceof VoiceChannel))
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.IncorrectVoice)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.IncorrectVoice)] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.CannotPlayInVoice)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.CannotPlayInVoice)] });
         let subscription = this.client.subscriptions.get(int.guildId);
         if (subscription) {
             if (!subscription.voiceChannel.members.has(author.id))
-                return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
+                return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
             if (!query && subscription.paused) {
                 subscription.resume();
-                return this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
+                return this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
             }
         }
         if (!query)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText('What should I play?')] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('What should I play?')] });
         this.applyCooldown(author);
         if (!subscription) {
             try {
@@ -53,14 +53,14 @@ export class PlayCommand extends Command {
             }
             catch (err) {
                 if (err instanceof NodeError) {
-                    return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoNodes)] });
+                    return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoNodes)] });
                 }
                 else if (err instanceof PlayerError) {
-                    return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.VoiceError)] });
+                    return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.VoiceError)] });
                 }
                 else {
                     const eventId = this.client.logger.error(err);
-                    return this.reply(int, { embeds: [new ErrorEmbed(eventId)] });
+                    return this.commander.reply(int, { embeds: [new ErrorEmbed(eventId)] });
                 }
             }
         }
@@ -75,40 +75,40 @@ export class PlayCommand extends Command {
         }
         switch (res?.loadType) {
             case 'LOAD_FAILED': {
-                this.reply(int, { embeds: [new ActionEmbed('fail').setText(`Failed to load track! \n\`${res.exception?.message}\``)] });
+                this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(`Failed to load track! \n\`${res.exception?.message}\``)] });
                 break;
             }
             case 'NO_MATCHES': {
-                this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
+                this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
                 break;
             }
             case 'SEARCH_RESULT': {
                 const data = res.tracks[0];
                 const track = new YouTubeTrack(this.client, data, author, int.channel);
                 subscription.add(track);
-                this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                 break;
             }
             case 'PLAYLIST_LOADED': {
                 if (!url)
-                    return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
+                    return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
                 const info = res.playlistInfo;
                 const tracks = res.tracks;
                 switch (tracks[0].info.sourceName) {
                     case 'youtube': {
                         const playlist = new YouTubePlaylist(url, info, tracks, author, int.channel);
                         subscription.add(playlist);
-                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
                         break;
                     }
                     case 'spotify': {
                         const playlist = new SpotifyPlaylist(url, info, tracks, author, int.channel);
                         subscription.add(playlist);
-                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
                         break;
                     }
                     default: {
-                        this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
+                        this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
                         break;
                     }
                 }
@@ -120,24 +120,24 @@ export class PlayCommand extends Command {
                     case 'youtube': {
                         const track = new YouTubeTrack(this.client, data, author, int.channel);
                         subscription.add(track);
-                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                         break;
                     }
                     case 'spotify': {
                         const track = new SpotifyTrack(this.client, data, author, int.channel);
                         subscription.add(track);
-                        this.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
                         break;
                     }
                     default: {
-                        this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
+                        this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
                         break;
                     }
                 }
                 break;
             }
             default: {
-                this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
+                this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
                 break;
             }
         }

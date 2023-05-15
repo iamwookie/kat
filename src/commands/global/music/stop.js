@@ -18,9 +18,12 @@ export class StopCommand extends Command {
     async execute(int) {
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setURL('https://top.gg/bot/916639727220846592#reviews').setLabel('Leave a review!').setStyle(ButtonStyle.Link));
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder().setURL('https://top.gg/bot/916639727220846592#reviews').setLabel('Leave a review').setStyle(ButtonStyle.Link));
         subscription.destroy();
-        this.reply(int, { embeds: [new ActionEmbed('success').setText('Stopped playing and disconnected. Cya! 👋'), new ReviewEmbed()], components: [row] });
+        this.commander.reply(int, {
+            embeds: [new ActionEmbed('success').setText('Stopped playing and disconnected. Cya! 👋'), new ReviewEmbed()],
+            components: [buttons],
+        });
     }
 }

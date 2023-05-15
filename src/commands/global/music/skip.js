@@ -14,17 +14,17 @@ export class SkipCommand extends Command {
         });
     }
     async execute(int) {
-        const author = this.getAuthor(int);
+        const author = this.commander.getAuthor(int);
         const subscription = this.client.subscriptions.get(int.guildId);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
         if (!subscription.voiceChannel.members.has(author.id))
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
         if (subscription.queue.length == 0)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
         this.applyCooldown(author);
         subscription.stop();
-        this.reply(int, {
+        this.commander.reply(int, {
             embeds: [
                 new ActionEmbed('success').setText('Skipping...'),
                 new MusicEmbed(subscription).setUser(author).setPlaying(subscription.queue[0]),

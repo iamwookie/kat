@@ -5,8 +5,11 @@ export class GuildCreate extends Event {
         super(client, commander, Events.GuildCreate);
     }
     async execute(guild) {
-        for (const module of this.commander.modules.values())
+        for (const module of this.commander.modules.values()) {
+            if (module.guilds && !module.guilds.includes(guild.id))
+                continue;
             module.emit(this.name, guild);
+        }
         const owner = await guild.fetchOwner();
         const embed = new EmbedBuilder()
             .setColor('Green')

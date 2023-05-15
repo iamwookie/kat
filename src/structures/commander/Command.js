@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message, Collection, } from 'discord.js';
+import { SlashCommandBuilder, Collection } from 'discord.js';
 export class Command {
     client;
     commander;
@@ -45,50 +45,6 @@ export class Command {
         if (!this.cooldowns.has(user.id))
             this.cooldowns?.set(user.id, now + cooldown);
         setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
-    }
-    getAuthor(interaction) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.user;
-        }
-        else if (interaction instanceof Message) {
-            return interaction.author;
-        }
-        else {
-            throw new Error('Invalid interaction.');
-        }
-    }
-    getArgs(interaction) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
-        }
-        else if (interaction instanceof Message) {
-            return interaction.content.split(/ +/).slice(1);
-        }
-        else {
-            return [];
-        }
-    }
-    reply(interaction, content) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content);
-        }
-        else if (interaction instanceof Message) {
-            return interaction.channel.send(content);
-        }
-        else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
-    edit(interaction, editable, content) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content);
-        }
-        else if (interaction instanceof Message) {
-            return editable.edit(content);
-        }
-        else {
-            return Promise.reject('Invalid interaction.');
-        }
     }
     get usage() {
         const aliases = this.aliases ? ', ' + this.aliases.map((alias) => this.client.prefix + alias).join(', ') : '';

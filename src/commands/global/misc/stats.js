@@ -27,6 +27,6 @@ export class StatsCommand extends Command {
         const subscription = this.client.subscriptions.get(int.guild?.id);
         if (subscription)
             embed.addFields({ name: 'Node', value: `\`${subscription.node.name}\``, inline: true });
-        this.reply(int, { embeds: [embed] });
+        this.commander.reply(int, { embeds: [embed] });
     }
 }

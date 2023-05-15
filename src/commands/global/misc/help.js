@@ -15,7 +15,7 @@ export class HelpCommand extends Command {
         });
     }
     async execute(int) {
-        const author = this.getAuthor(int);
+        const author = this.commander.getAuthor(int);
         const embed = new EmbedBuilder().setTitle('**Help Menu**').setDescription(`Select an option from the dropdown menu below.`);
         const menu = new StringSelectMenuBuilder().setCustomId('help_menu').setPlaceholder('Select a category');
         for (const module of this.client.commander.modules.values()) {
@@ -27,7 +27,7 @@ export class HelpCommand extends Command {
             if (commands.length)
                 menu.addOptions(new StringSelectMenuOptionBuilder().setLabel(module.name + ' Commands').setValue(module.name));
         }
-        const reply = await this.reply(int, {
+        const reply = await this.commander.reply(int, {
             embeds: [embed],
             components: [new ActionRowBuilder().addComponents(menu)],
         });
@@ -50,11 +50,11 @@ export class HelpCommand extends Command {
                     .map((c) => `\`${c.usage}\` → ${c.description?.content}`)
                     .join('\n'),
             });
-            this.edit(int, reply, { embeds: [embed], components: [] });
+            this.commander.edit(int, reply, { embeds: [embed], components: [] });
         });
         collector.on('end', (collected, reason) => {
             if (!collected.size && reason == 'time') {
-                this.edit(int, reply, {
+                this.commander.edit(int, reply, {
                     embeds: [embed],
                     components: [new ActionRowBuilder().addComponents(menu.setDisabled(true))],
                 });
