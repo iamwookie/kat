@@ -28,12 +28,12 @@ export class LyricsCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const author = this.getAuthor(int);
-        let query = this.getArgs(int).join(' ');
+        const author = this.commander.getAuthor(int);
+        let query = this.commander.getArgs(int).join(' ');
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!query && subscription && subscription.active) query = subscription.active.title;
-        if (!query) return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        if (!query) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
 
         this.applyCooldown(author);
 
@@ -43,7 +43,7 @@ export class LyricsCommand extends Command {
             const search = await genius.songs.search(query);
 
             let lyrics = search[0] ? await search[0].lyrics() : null;
-            if (!lyrics) return this.reply(int, { embeds: [noResults] });
+            if (!lyrics) return this.commander.reply(int, { embeds: [noResults] });
             if (lyrics.length > 4000) lyrics = lyrics.substring(0, 4000) + '\n...';
 
             const success = new EmbedBuilder();
@@ -51,10 +51,10 @@ export class LyricsCommand extends Command {
                 `**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`
             );
 
-            this.reply(int, { embeds: [success] });
+            this.commander.reply(int, { embeds: [success] });
         } catch (err) {
             this.client.logger.error(err);
-            this.reply(int, { embeds: [noResults] });
+            this.commander.reply(int, { embeds: [noResults] });
         }
     }
 }

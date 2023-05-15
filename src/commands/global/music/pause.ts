@@ -17,13 +17,13 @@ export class PauseCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const author = this.getAuthor(int);
+        const author = this.commander.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
         if (!subscription.voiceChannel.members.has(author.id))
-            return this.reply(int, {
+            return this.commander.reply(int, {
                 embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)],
             });
 
@@ -31,6 +31,6 @@ export class PauseCommand extends Command {
 
         const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();
-        this.reply(int, { embeds: [embed] });
+        this.commander.reply(int, { embeds: [embed] });
     }
 }

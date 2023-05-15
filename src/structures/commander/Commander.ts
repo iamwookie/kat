@@ -1,7 +1,20 @@
 import { KATClient as Client } from '../Client.js';
 
 // ----- FOR LATER USE -----
-import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, Snowflake, PermissionFlagsBits } from 'discord.js';
+import {
+    Events as DiscordEvents,
+    REST,
+    Routes,
+    ChatInputCommandInteraction,
+    Message,
+    Collection,
+    Snowflake,
+    PermissionFlagsBits,
+    MessagePayload,
+    MessageEditOptions,
+    InteractionEditReplyOptions,
+    MessageCreateOptions,
+} from 'discord.js';
 import { Command } from './Command.js';
 import { Module } from './Module.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
@@ -57,7 +70,7 @@ export class Commander {
     }
 
     authorize(interaction: ChatInputCommandInteraction | Message, command: Command<true>) {
-        const author = command.getAuthor(interaction);
+        const author = this.getAuthor(interaction);
 
         if (interaction.inGuild()) {
             if (command.module.guilds && !command.module.guilds.includes(interaction.guild!.id)) return false;
@@ -78,13 +91,11 @@ export class Commander {
 
         if (command.users && !command.users.includes(author.id)) {
             if (!command.hidden)
-                command
-                    .reply(interaction, {
-                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-                    })
-                    .catch((err) => {
-                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                    });
+                this.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
+                }).catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                });
             return false;
         }
 
@@ -92,15 +103,11 @@ export class Commander {
             if (command.cooldowns.has(author.id)) {
                 const cooldown = command.cooldowns.get(author.id)!;
                 const secondsLeft = (cooldown - Date.now()) / 1000;
-                command
-                    .reply(interaction, {
-                        embeds: [
-                            new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`),
-                        ],
-                    })
-                    .catch((err) => {
-                        this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
-                    });
+                this.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)],
+                }).catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
+                });
                 return false;
             }
         }
@@ -190,7 +197,7 @@ export class Commander {
 
             for (const command of this.global.values()) {
                 if (command.disabled || command.hidden) continue;
-                
+
                 if (command.aliases) {
                     for (const alias of command.aliases) {
                         const data = command.data().setName(alias);
@@ -240,5 +247,49 @@ export class Commander {
         }
 
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
+    }
+
+    getAuthor(interaction: ChatInputCommandInteraction | Message) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.user;
+        } else if (interaction instanceof Message) {
+            return interaction.author;
+        } else {
+            throw new Error('Invalid interaction.');
+        }
+    }
+
+    getArgs(interaction: ChatInputCommandInteraction | Message) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
+        } else if (interaction instanceof Message) {
+            return interaction.content.split(/ +/).slice(1);
+        } else {
+            return [];
+        }
+    }
+
+    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
+        } else if (interaction instanceof Message) {
+            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject('Invalid interaction.');
+        }
+    }
+
+    edit(
+        interaction: ChatInputCommandInteraction | Message,
+        editable: Message,
+        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
+    ) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
+        } else if (interaction instanceof Message) {
+            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject('Invalid interaction.');
+        }
     }
 }

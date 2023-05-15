@@ -7,6 +7,11 @@ export class InviteCreate extends Event {
     }
 
     async execute(invite: Invite) {
-        for (const module of this.commander.modules.values()) module.emit(this.name, invite);
+        if (!invite.guild) return;
+
+        for (const module of this.commander.modules.values()) {
+            if (module.guilds && !module.guilds.includes(invite.guild.id)) continue;
+            module.emit(this.name, invite);
+        }
     }
 }

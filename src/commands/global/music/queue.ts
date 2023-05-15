@@ -17,13 +17,13 @@ export class QueueCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const author = this.getAuthor(int);
+        const author = this.commander.getAuthor(int);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription || (!subscription.active && !subscription.queue.length))
-            return this.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
 
-        this.reply(int, {
+        this.commander.reply(int, {
             embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue)],
         });
     }

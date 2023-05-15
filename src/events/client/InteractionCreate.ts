@@ -12,7 +12,7 @@ export class InteractionCreate extends Event {
 
         const command =
             this.commander.commands.get(interaction.commandName) ??
-            this.commander.commands.get(this.commander.aliases.get(interaction.commandName) as string);
+            this.commander.commands.get(this.commander.aliases.get(interaction.commandName)!);
         if (!command || command.disabled) return;
         
         await interaction.deferReply({ ephemeral: command.ephemeral });

@@ -1,5 +1,5 @@
 import { Module, KATClient as Client, Commander } from '@structures/index.js';
-import { Collection, EmbedBuilder, Guild, GuildMember, Invite, Message, Snowflake, User } from 'discord.js';
+import { Collection, EmbedBuilder, Guild, GuildMember, Invite, Snowflake, User } from 'discord.js';
 import { Affiliate } from '@prisma/client';
 
 export class AffiliateModule extends Module {
@@ -34,12 +34,10 @@ export class AffiliateModule extends Module {
     }
 
     async onInviteCreate(invite: Invite) {
-        if (!invite.guild || !this.guilds?.includes(invite.guild.id)) return;
         this.invites.get(invite.guild?.id!)?.set(invite.code, invite.uses ?? 0);
     }
 
     async onGuildCreate(guild: Guild) {
-        if (!this.guilds?.includes(guild.id)) return;
         const invites = await guild.invites.fetch();
         this.invites.set(guild.id, new Collection(invites.map((invite) => [invite.code, invite.uses ?? 0])));
     }

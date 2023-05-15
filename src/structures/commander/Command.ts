@@ -1,18 +1,7 @@
 import { KATClient as Client } from '../Client.js';
 import { Commander } from './Commander.js';
 import { Module } from './Module.js';
-import {
-    SlashCommandBuilder,
-    ChatInputCommandInteraction,
-    User,
-    Message,
-    Collection,
-    Snowflake,
-    InteractionEditReplyOptions,
-    MessagePayload,
-    MessageEditOptions,
-    MessageCreateOptions,
-} from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake } from 'discord.js';
 
 interface CommandOptions<T extends boolean = boolean> {
     name: string;
@@ -71,7 +60,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         return new SlashCommandBuilder()
             .setName(this.name)
             .setDescription(this.description?.content ?? '')
-            .setDMPermission(this.allowDM)
+            .setDMPermission(this.allowDM);
     }
 
     applyCooldown(user: User): void {
@@ -83,50 +72,6 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         if (!this.cooldowns.has(user.id)) this.cooldowns?.set(user.id, now + cooldown);
 
         setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
-    }
-
-    getAuthor(interaction: ChatInputCommandInteraction | Message) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.user;
-        } else if (interaction instanceof Message) {
-            return interaction.author;
-        } else {
-            throw new Error('Invalid interaction.');
-        }
-    }
-
-    getArgs(interaction: ChatInputCommandInteraction | Message) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
-        } else if (interaction instanceof Message) {
-            return interaction.content.split(/ +/).slice(1);
-        } else {
-            return [];
-        }
-    }
-
-    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
-        } else if (interaction instanceof Message) {
-            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
-        } else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
-
-    edit(
-        interaction: ChatInputCommandInteraction | Message,
-        editable: Message,
-        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
-    ) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
-        } else if (interaction instanceof Message) {
-            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
-        } else {
-            return Promise.reject('Invalid interaction.');
-        }
     }
 
     get usage() {
