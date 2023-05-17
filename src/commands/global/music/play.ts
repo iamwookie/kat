@@ -70,15 +70,15 @@ export class PlayCommand extends Command {
             }
         }
 
-        let url: URL | null = null;
-        let res: LavalinkResponse | null = null;
+        let search: string | URL;
 
         try {
-            url = new URL(query);
-            res = await subscription.node.rest.resolve(url.href);
+            search = new URL(query);
         } catch (err) {
-            res = await subscription.node.rest.resolve('ytsearch:' + query);
+            search = query;
         }
+
+        const res = await subscription.node.rest.resolve(search instanceof URL ? search.href : `ytsearch:${search}`)
 
         switch (res?.loadType) {
             case 'LOAD_FAILED': {
@@ -98,21 +98,21 @@ export class PlayCommand extends Command {
                 break;
             }
             case 'PLAYLIST_LOADED': {
-                if (!url) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
+                if (!(search instanceof URL)) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
 
                 const info = res.playlistInfo;
                 const tracks = res.tracks;
 
                 switch (tracks[0].info.sourceName) {
                     case 'youtube': {
-                        const playlist = new YouTubePlaylist(url, info, tracks, author, int.channel);
+                        const playlist = new YouTubePlaylist(search, info, tracks, author, int.channel);
                         subscription.add(playlist);
 
                         this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
                         break;
                     }
                     case 'spotify': {
-                        const playlist = new SpotifyPlaylist(url, info, tracks, author, int.channel);
+                        const playlist = new SpotifyPlaylist(search, info, tracks, author, int.channel);
                         subscription.add(playlist);
 
                         this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
