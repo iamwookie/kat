@@ -118,7 +118,7 @@ export class Commander {
                     }
                 }
                 if (command.users)
-                    command.users.push(this.client.devId);
+                    command.users = command.users.concat(this.client.config.devs);
                 command.module = this.modules.get(command.module) ?? new Module(this.client, this, { name: command.module });
                 if (!this.modules.has(command.module.name))
                     this.modules.set(command.module.name, command.module);

@@ -26,7 +26,6 @@ export class KATClient extends Client {
         PermissionsBitField.Flags.UseVAD,
     ]);
     config = Config;
-    devId = Config.bot.devId;
     prefix = Config.bot.prefix;
     devPrefix = Config.bot.devPrefix;
     legacyPrefix = Config.bot.legacyPrefix;
@@ -60,6 +59,6 @@ export class KATClient extends Client {
         console.log(chalk.greenBright.bold.underline('>>> Commander Initialized!'));
     }
     isDev(user) {
-        return this.devId == user.id;
+        return this.config.devs.includes(user.id);
     }
 }

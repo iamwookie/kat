@@ -43,13 +43,15 @@ export class Logger {
         console.log(chalk.blue('(DEBUG): ' + message));
     }
     async notify(embed) {
-        try {
-            const dev = this.client.users.cache.get(this.client.devId);
-            await dev?.send({ embeds: [embed] });
-        }
-        catch (err) {
-            console.error(chalk.red('(ERROR): Error Warning Dev!'));
-            console.error(err);
+        for (const devId of this.client.config.devs) {
+            try {
+                const dev = await this.client.users.fetch(devId);
+                await dev.send({ embeds: [embed] });
+            }
+            catch (err) {
+                console.error(chalk.red('(ERROR): Error Warning Dev!'));
+                console.error(err);
+            }
         }
     }
 }

@@ -47,8 +47,6 @@ export class AffiliateModule extends Module {
             });
             if (!res)
                 return;
-            // @ts-ignore
-            res = '123';
             const affiliate = await this.client.prisma.affiliate.update({
                 where: {
                     link: invite.url,
