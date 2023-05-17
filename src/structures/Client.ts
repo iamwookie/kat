@@ -29,7 +29,6 @@ export class KATClient extends Client {
         PermissionsBitField.Flags.UseVAD,
     ]);
     public config = Config;
-    public devId = Config.bot.devId;
     public prefix = Config.bot.prefix;
     public devPrefix = Config.bot.devPrefix;
     public legacyPrefix = Config.bot.legacyPrefix;
@@ -68,6 +67,6 @@ export class KATClient extends Client {
     }
 
     isDev(user: User) {
-        return this.devId == user.id;
+        return this.config.devs.includes(user.id);
     }
 }
