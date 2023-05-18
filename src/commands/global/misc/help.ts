@@ -51,15 +51,12 @@ export class HelpCommand extends Command {
             const moduleName = i.values[0];
             const module = this.client.commander.modules.get(moduleName)!;
 
-            let legacyPrefix = this.client.legacyPrefix;
-            if (i.inCachedGuild()) {
-                const config = await this.client.cache.guilds.get(i.guild.id);
-                legacyPrefix = config?.prefix ?? this.client.legacyPrefix;
-            }
+            let prefix = this.client.legacyPrefix;
+            if (i.inCachedGuild()) prefix = await this.client.cache.guilds.prefix(i.guild.id);
 
             embed.setFooter({ text: "Parameters with a '?' at the start are optional." });
             embed.setDescription(
-                `As of right now, you may use some commands with the \`${legacyPrefix}\` prefix in chat. This may be removed in the future!`
+                `As of right now, you may use some commands with the \`${prefix}\` prefix in chat. This may be removed in the future!`
             );
             embed.addFields({
                 name: module.name + ' Commands',
