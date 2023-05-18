@@ -13,6 +13,7 @@ export class PrefixCommand extends Command {
                 content: 'Set the chat prefix for your server. [Admin Only]',
                 format: '<prefix>',
             },
+            cooldown: 5,
         });
     }
 
