@@ -12,6 +12,7 @@ export class PrefixCommand extends Command {
                 content: 'Set the chat prefix for your server. [Admin Only]',
                 format: '<prefix>',
             },
+            cooldown: 5,
         });
     }
     data() {
@@ -27,8 +28,12 @@ export class PrefixCommand extends Command {
         if (!this.client.isDev(author) && !int.member?.permissions.has(PermissionFlagsBits.Administrator))
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)] });
         const args = this.commander.getArgs(int)[0];
-        if (!args)
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('You did not provide a valid prefix!')] });
+        if (!args) {
+            const prefix = await this.client.cache.guilds.prefix(int.guild.id);
+            return this.commander.reply(int, {
+                embeds: [new ActionEmbed('success').setText(`The current chat prefix is \`${prefix}\`. To set a new one, use: \`${this.usage}\`.`)],
+            });
+        }
         const res = await this.client.prisma.guild.upsert({
             where: {
                 guildId: int.guild.id,
@@ -43,7 +48,7 @@ export class PrefixCommand extends Command {
         });
         this.client.cache.guilds.update(res.guildId, res);
         if (res) {
-            this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(`Successfully set the prefix to \`${res.prefix}\`!`)] });
+            this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(`Successfully set the chat prefix to \`${res.prefix}\`!`)] });
         }
         else {
             this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the prefix!')] });
