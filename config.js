@@ -1,4 +1,4 @@
-export const version = '7.7.18';
+export const version = '7.8.0';
 export const devs = ['244662779745665026'];
 export const bot = {
     prefix: '/',

@@ -9,7 +9,6 @@ import fs from 'fs';
 import { Events } from 'discord.js';
 // ------------------------------------
 import * as Routes from '../../api/routes/index.js';
-import * as Hooks from '../../api/hooks/index.js';
 // ------------------------------------
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export class Server {
@@ -33,7 +32,6 @@ export class Server {
                 flags: 'a+',
             });
             this.app.use(morgan('combined', { stream: accessLogStream }));
-            this.registerHooks();
             this.registerRoutes();
             this.app.use(Sentry.Handlers.errorHandler());
             this.app.listen(this.port, () => resolve());
@@ -51,18 +49,5 @@ export class Server {
             }
         }
         this.client.emit(Events.Debug, `Server >> Successfully Registered ${routes.length} Route(s)`);
-    }
-    registerHooks() {
-        const hooks = Object.values(Hooks);
-        for (const Hook of hooks) {
-            try {
-                const hook = new Hook(this.client);
-                this.app.use('/hooks' + hook.path, hook.register());
-            }
-            catch (err) {
-                this.client.logger.error(err, 'Error Registering Hook', 'Server');
-            }
-        }
-        this.client.emit(Events.Debug, `Server >> Successfully Registered ${hooks.length} Hook(s)`);
     }
 }
