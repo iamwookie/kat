@@ -28,7 +28,7 @@ export class TrackAdd extends Event {
             create: {
                 guildId: subscription.guild.id,
                 voiceId: subscription.voiceChannel.id,
-                textId: subscription.textChannel?.id,
+                textId: subscription.textChannel.id,
                 tracks: {
                     createMany: {
                         data,

@@ -14,6 +14,9 @@ export { NodeDisconnect } from './music/node/NodeDisconnect.js';
 export { NodeReady } from './music/node/NodeReady.js';
 export { NodeError } from './music/node/NodeError.js';
 // Track
+export { TrackLoop } from './music/track/TrackLoop.js';
+export { TrackPause } from './music/track/TrackPause.js';
+export { TrackResume } from './music/track/TrackResume.js';
 export { TrackRemove } from './music/track/TrackRemove.js';
 export { TrackAdd } from './music/track/TrackAdd.js';
 // Player

@@ -18,7 +18,7 @@ export class TrackRemove extends Event {
             create: {
                 guildId: subscription.guild.id,
                 voiceId: subscription.voiceChannel.id,
-                textId: subscription.textChannel?.id,
+                textId: subscription.textChannel.id,
             },
         });
         this.client.emit(Events.Debug, `Music (DATABASE) >> Updated Queue Position: ${subscription.guild.name} (${subscription.guild.id}) To: ${subscription.position}`);

@@ -1,5 +1,5 @@
 import { Command } from '../../../structures/index.js';
-import { ActionEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
+import { ActionEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../../enums.js';
 export class PauseCommand extends Command {
     constructor(client, commander) {
@@ -11,6 +11,7 @@ export class PauseCommand extends Command {
                 content: 'Pause the track. Use `/play` to unpause.',
             },
             cooldown: 5,
+            ephemeral: true,
         });
     }
     async execute(int) {
@@ -23,8 +24,7 @@ export class PauseCommand extends Command {
                 embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)],
             });
         this.applyCooldown(author);
-        const embed = new MusicEmbed(subscription).setUser(author).setPaused(subscription.active);
         subscription.pause();
-        this.commander.reply(int, { embeds: [embed] });
+        this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(MusicPrompts.TrackPaused)] });
     }
 }

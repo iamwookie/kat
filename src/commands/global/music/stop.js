@@ -13,6 +13,7 @@ export class StopCommand extends Command {
                 content: 'Clear the queue and/or leave.',
             },
             cooldown: 5,
+            ephemeral: true,
         });
     }
     async execute(int) {

@@ -6,6 +6,8 @@ export class SubscriptionDestroy extends Event {
     }
     async execute(subscription) {
         this.client.logger.warn(`Subscription Destroyed For: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Music');
+        if (subscription.message?.deletable)
+            await subscription.message.delete().catch(() => { });
         await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,
@@ -16,7 +18,7 @@ export class SubscriptionDestroy extends Event {
             create: {
                 guildId: subscription.guild.id,
                 voiceId: subscription.voiceChannel.id,
-                textId: subscription.textChannel?.id,
+                textId: subscription.textChannel.id,
             },
         });
         this.client.emit(Events.Debug, `Music (DATABASE) >> Set Queue To Inactive: ${subscription.guild.name} (${subscription.guild.id})`);

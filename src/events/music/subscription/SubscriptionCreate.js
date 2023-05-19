@@ -17,7 +17,7 @@ export class SubscriptionCreate extends Event {
             create: {
                 guildId: subscription.guild.id,
                 voiceId: subscription.voiceChannel.id,
-                textId: subscription.textChannel?.id,
+                textId: subscription.textChannel.id,
                 active: true,
             },
         });

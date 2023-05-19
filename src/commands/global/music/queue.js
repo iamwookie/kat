@@ -11,6 +11,8 @@ export class QueueCommand extends Command {
             description: {
                 content: 'View the server queue.',
             },
+            cooldown: 5,
+            ephemeral: true,
         });
     }
     async execute(int) {

@@ -13,6 +13,7 @@ export class Subscription {
     position = 0;
     looped = false;
     volume = 100;
+    message;
     destroyed = false;
     constructor(client, guild, voiceChannel, textChannel, player, node) {
         this.client = client;
@@ -114,15 +115,21 @@ export class Subscription {
     pause() {
         if (!this.active)
             return;
-        return this.player.setPaused(true);
+        this.player.setPaused(true);
+        this.client.emit('trackPause', this, this.active);
+        return this.paused;
     }
     resume() {
         if (!this.active)
             return;
-        return this.player.setPaused(false);
+        this.player.setPaused(false);
+        this.client.emit('trackResume', this, this.active);
+        return this.paused;
     }
     loop() {
-        return (this.looped = !this.looped);
+        this.looped = !this.looped;
+        this.client.emit('trackLoop', this, this.active);
+        return this.looped;
     }
     // Getters
     get duration() {

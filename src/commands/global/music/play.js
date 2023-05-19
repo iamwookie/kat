@@ -16,6 +16,7 @@ export class PlayCommand extends Command {
                 format: '<?title/url>',
             },
             cooldown: 5,
+            ephemeral: true,
         });
     }
     data() {
@@ -41,7 +42,7 @@ export class PlayCommand extends Command {
                 return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
             if (!query && subscription.paused) {
                 subscription.resume();
-                return this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
+                return this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(MusicPrompts.TrackResumed)] });
             }
         }
         if (!query)

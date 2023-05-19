@@ -10,6 +10,6 @@ export class PlayerException extends Event {
         subscription.looped = false;
         subscription.active = null;
         subscription.process();
-        subscription.textChannel?.send({ embeds: [new ActionEmbed().setText(MusicPrompts.TrackError)] }).catch(() => { });
+        await subscription.textChannel.send({ embeds: [new ActionEmbed().setText(MusicPrompts.TrackError)] }).catch(() => { });
     }
 }
