@@ -15,6 +15,7 @@ export class VolumeCommand extends Command {
                 format: '<?number>(0-100)',
             },
             cooldown: 5,
+            ephemeral: true,
         });
     }
 

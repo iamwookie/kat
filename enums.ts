@@ -14,6 +14,10 @@ export enum MusicPrompts {
     QueueEmpty = 'The current queue is empty!',
     LastTrack = 'This is the last track in the queue!',
     TrackError = 'An error occurred while playing the track. Skipping...',
+    TrackResumed = 'Resumed the current track!',
+    TrackPaused = 'Paused the current track!',
+    TrackLooped = 'Looped the current track!',
+    TrackUnlooped = 'Unlooped the current track!',
     NoNodes = 'There are no available nodes to play on!',
     Restarted = 'The bot has restarted, please replay your track!',
 }

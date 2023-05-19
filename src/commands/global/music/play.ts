@@ -1,7 +1,6 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, GuildMember, VoiceChannel } from 'discord.js';
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '@structures/index.js';
-import { LavalinkResponse } from 'shoukaku';
 import { NodeError, PlayerError } from '@utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '@utils/embeds/index.js';
 import { MusicPrompts } from 'enums.js';
@@ -18,6 +17,7 @@ export class PlayCommand extends Command {
                 format: '<?title/url>',
             },
             cooldown: 5,
+            ephemeral: true,
         });
     }
 
@@ -47,7 +47,7 @@ export class PlayCommand extends Command {
                 return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
             if (!query && subscription.paused) {
                 subscription.resume();
-                return this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
+                return this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(MusicPrompts.TrackResumed)] });
             }
         }
 
@@ -57,7 +57,7 @@ export class PlayCommand extends Command {
 
         if (!subscription) {
             try {
-                subscription = await MusicSubscription.create(this.client, int.guild, voiceChannel, int.channel);
+                subscription = await MusicSubscription.create(this.client, int.guild, voiceChannel, int.channel!);
             } catch (err) {
                 if (err instanceof NodeError) {
                     return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoNodes)] });
