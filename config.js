@@ -1,4 +1,4 @@
-export const version = '7.9.1';
+export const version = '7.9.2';
 export const devs = ['244662779745665026'];
 export const bot = {
     prefix: '/',
@@ -10,13 +10,6 @@ export const server = {
     limiter: {
         duration: 5,
         max: 50,
-    },
-    hooks: {
-        asap: {
-            unbox: ['1055019802361598023'],
-            suits: ['1054873048160927774'],
-            staff: ['520652380799369218', '634141378229567498'],
-        },
     },
 };
 export const music = {

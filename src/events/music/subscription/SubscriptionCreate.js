@@ -1,5 +1,7 @@
 import { Event } from '../../../structures/index.js';
 import { Events } from 'discord.js';
+import { ActionEmbed } from '../../../utils/embeds/index.js';
+import { MusicPrompts } from '../../../../enums.js';
 export class SubscriptionCreate extends Event {
     constructor(client, commander) {
         super(client, commander, 'subscriptionCreate');
@@ -22,9 +24,11 @@ export class SubscriptionCreate extends Event {
             },
         });
         this.client.emit(Events.Debug, `Music (DATABASE) >> Activated And Updated Queue Position For: ${subscription.guild.name} (${subscription.guild.id})`);
-        setTimeout(() => {
-            if (!subscription.active && !subscription.queue.length)
+        setTimeout(async () => {
+            if (!subscription.active && !subscription.queue.length) {
+                await subscription.textChannel.send({ embeds: [new ActionEmbed('warn').setText(MusicPrompts.Inactive)] }).catch(() => { });
                 subscription.destroy();
+            }
         }, this.client.config.music.inactiveDuration);
     }
 }

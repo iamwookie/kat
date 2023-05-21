@@ -19,6 +19,7 @@ export var MusicPrompts;
     MusicPrompts["TrackPaused"] = "Paused the current track!";
     MusicPrompts["TrackLooped"] = "Looped the current track!";
     MusicPrompts["TrackUnlooped"] = "Unlooped the current track!";
+    MusicPrompts["Inactive"] = "I have disconnected due to inactivity!";
     MusicPrompts["NoNodes"] = "There are no available nodes to play on!";
     MusicPrompts["Restarted"] = "The bot has restarted, please replay your track!";
 })(MusicPrompts || (MusicPrompts = {}));

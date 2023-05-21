@@ -1,4 +1,6 @@
 import { Event } from '../../../structures/index.js';
+import { ActionEmbed } from '../../../utils/embeds/index.js';
+import { MusicPrompts } from '../../../../enums.js';
 export class PlayerEnd extends Event {
     constructor(client, commander) {
         super(client, commander, 'playerEnd');
@@ -7,9 +9,11 @@ export class PlayerEnd extends Event {
         if (!subscription.looped)
             subscription.active = null;
         subscription.process();
-        setTimeout(() => {
-            if (!subscription.active && !subscription.queue.length)
+        setTimeout(async () => {
+            if (!subscription.active && !subscription.queue.length) {
+                await subscription.textChannel.send({ embeds: [new ActionEmbed('warn').setText(MusicPrompts.Inactive)] }).catch(() => { });
                 subscription.destroy();
+            }
         }, this.client.config.music.inactiveDuration);
     }
 }
