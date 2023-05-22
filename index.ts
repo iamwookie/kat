@@ -49,7 +49,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             status: 'online',
             activities: [
                 {
-                    name: `${config.prefix}help | ${config.legacyPrefix}help`,
+                    name: `/help | ${config.prefix}help`,
                     type: ActivityType.Listening,
                 },
             ],

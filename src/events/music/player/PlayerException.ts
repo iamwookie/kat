@@ -8,9 +8,9 @@ export class PlayerException extends Event {
         super(client, commander, 'playerException');
     }
 
-    async execute(subscription: MusicSubscription, reason: TrackExceptionEvent) {
+    async execute(subscription: MusicSubscription, data: TrackExceptionEvent) {
         this.client.logger.error(
-            reason,
+            data.exception,
             `Player Exception In: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`,
             'Music'
         );

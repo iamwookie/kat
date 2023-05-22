@@ -51,18 +51,16 @@ export class HelpCommand extends Command {
             const moduleName = i.values[0];
             const module = this.client.commander.modules.get(moduleName)!;
 
-            let prefix = this.client.legacyPrefix;
+            let prefix = this.client.prefix;
             if (i.inCachedGuild()) prefix = await this.client.cache.guilds.prefix(i.guild.id);
 
             embed.setFooter({ text: "Parameters with a '?' at the start are optional." });
-            embed.setDescription(
-                `As of right now, you may use some commands with the \`${prefix}\` prefix in chat. This may be removed in the future!`
-            );
+            embed.setDescription(`Commands may also be run as slash commands.`)
             embed.addFields({
                 name: module.name + ' Commands',
                 value: Array.from(module.commands.values())
                     .filter((c) => !c.disabled && !c.hidden && (c.users ? c.users.includes(author.id) : true))
-                    .map((c) => `\`${c.usage}\` → ${c.description?.content}`)
+                    .map((c) => `\`${c.usage(prefix)}\` → ${c.description?.content}`)
                     .join('\n'),
             });
 

@@ -45,7 +45,7 @@ class GuildCache extends BaseCache<Guild> {
 
     async prefix(guildId: Snowflake) {
         const res = await this.get(guildId);
-        return res?.prefix ?? this.client.legacyPrefix;
+        return res?.prefix ?? this.client.prefix;
     }
 }
 

@@ -3,8 +3,7 @@ export const version = '7.9.2';
 export const devs = ['244662779745665026'];
 
 export const bot = {
-    prefix: '/',
-    legacyPrefix: process.env.NODE_ENV != 'production' ? '!' : '.',
+    prefix: process.env.NODE_ENV != 'production' ? '!' : '.',
     devPrefix: process.env.NODE_ENV != 'production' ? '!' : '.',
 };
 

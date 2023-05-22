@@ -9,7 +9,7 @@ export class QueueCommand extends Command {
             name: 'queue',
             module: 'Music',
             legacy: true,
-            legacyAliases: ['q'],
+            aliases: ['q'],
             description: {
                 content: 'View the server queue.',
             },

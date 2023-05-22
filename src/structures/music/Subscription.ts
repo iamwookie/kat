@@ -25,7 +25,7 @@ export class Subscription {
     ) {
         this.shoukaku = client.shoukaku;
 
-        this.player.on('exception', (reason) => this.client.emit('playerException', this, reason));
+        this.player.on('exception', (data) => this.client.emit('playerException', this, data));
         this.player.on('start', (data) => this.client.emit('playerStart', this, data));
         this.player.on('end', (reason) => this.client.emit('playerEnd', this, reason));
         

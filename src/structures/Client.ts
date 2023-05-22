@@ -31,7 +31,6 @@ export class KATClient extends Client {
     public config = Config;
     public prefix = Config.bot.prefix;
     public devPrefix = Config.bot.devPrefix;
-    public legacyPrefix = Config.bot.legacyPrefix;
     public logger = new Logger(this);
     // Prisma causes an issue with circular references. Try fixing this later
     public prisma = new PrismaClient({ log: ['warn', 'error'] });
