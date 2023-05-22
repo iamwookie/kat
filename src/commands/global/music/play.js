@@ -10,7 +10,7 @@ export class PlayCommand extends Command {
             name: 'play',
             module: 'Music',
             legacy: true,
-            legacyAliases: ['p'],
+            aliases: ['p'],
             description: {
                 content: 'Add a track to the queue, or resume the current one.',
                 format: '<?title/url>',

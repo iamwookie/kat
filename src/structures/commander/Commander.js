@@ -112,11 +112,6 @@ export class Commander {
                         this.aliases.set(alias, command.name);
                     }
                 }
-                if (command.legacyAliases) {
-                    for (const alias of command.legacyAliases) {
-                        this.aliases.set(alias, command.name);
-                    }
-                }
                 if (command.users)
                     command.users = command.users.concat(this.client.config.devs);
                 command.module = this.modules.get(command.module) ?? new Module(this.client, this, { name: command.module });
@@ -162,12 +157,6 @@ export class Commander {
             for (const command of this.global.values()) {
                 if (command.disabled || command.hidden)
                     continue;
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        const data = command.data().setName(alias);
-                        body.push(data);
-                    }
-                }
                 body.push(command.data().toJSON());
             }
             const res = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID), {
@@ -187,12 +176,6 @@ export class Commander {
             for (const command of commands.values()) {
                 if (command.disabled || command.hidden)
                     continue;
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        const data = command.data().setName(alias);
-                        body.push(data);
-                    }
-                }
                 body.push(command.data().toJSON());
             }
             try {

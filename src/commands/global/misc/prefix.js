@@ -31,7 +31,7 @@ export class PrefixCommand extends Command {
         if (!args) {
             const prefix = await this.client.cache.guilds.prefix(int.guild.id);
             return this.commander.reply(int, {
-                embeds: [new ActionEmbed('success').setText(`The current chat prefix is \`${prefix}\`. To set a new one, use: \`${this.usage}\`.`)],
+                embeds: [new ActionEmbed('success').setText(`The current chat prefix is \`${prefix}\`. To set a new one, use: \`${this.usage(prefix)}\`.`)],
             });
         }
         const res = await this.client.prisma.guild.upsert({

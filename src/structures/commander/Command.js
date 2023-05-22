@@ -4,9 +4,8 @@ export class Command {
     commander;
     name;
     module;
-    aliases;
     legacy;
-    legacyAliases;
+    aliases;
     description;
     cooldown;
     ephemeral;
@@ -20,9 +19,8 @@ export class Command {
         this.commander = commander;
         this.name = options.name;
         this.module = options.module;
-        this.aliases = options.aliases;
         this.legacy = options.legacy;
-        this.legacyAliases = options.legacyAliases;
+        this.aliases = options.aliases;
         this.description = options.description;
         this.cooldown = options.cooldown;
         this.ephemeral = options.ephemeral;
@@ -46,8 +44,8 @@ export class Command {
             this.cooldowns?.set(user.id, now + cooldown);
         setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
     }
-    get usage() {
-        const aliases = this.aliases ? ', ' + this.aliases.map((alias) => this.client.prefix + alias).join(', ') : '';
-        return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? ' ' + this.description.format : ''}`;
+    usage(prefix) {
+        const aliases = this.aliases ? ', ' + this.aliases.map((alias) => prefix + alias).join(', ') : '';
+        return `${prefix}${this.name}${aliases}${this.description?.format ? ' ' + this.description.format : ''}`;
     }
 }

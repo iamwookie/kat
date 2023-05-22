@@ -1,5 +1,5 @@
 import { Module } from '../structures/index.js';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, DiscordAPIError, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 export class WelcomeModule extends Module {
     constructor(client, commander) {
         super(client, commander, {
@@ -23,7 +23,12 @@ export class WelcomeModule extends Module {
                 await channel.send({ embeds: [embed], components: [buttons] });
             }
             catch (err) {
-                this.client.logger.error(err, 'Error Sending Guild Join Message', `Module ${this.name}`);
+                if (err instanceof DiscordAPIError && err.code == 50001) {
+                    this.client.logger.warn(`Error Sending Guild Join Message: ${err.message}`, `Module (${this.name})`);
+                }
+                else {
+                    this.client.logger.error(err, 'Error Sending Guild Join Message', `Module (${this.name})`);
+                }
             }
         }
     }

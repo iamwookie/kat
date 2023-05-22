@@ -42,7 +42,7 @@ class GuildCache extends BaseCache {
     }
     async prefix(guildId) {
         const res = await this.get(guildId);
-        return res?.prefix ?? this.client.legacyPrefix;
+        return res?.prefix ?? this.client.prefix;
     }
 }
 class MusicCache extends BaseCache {

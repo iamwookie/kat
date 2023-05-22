@@ -6,10 +6,9 @@ export class InteractionCreate extends Event {
         super(client, commander, Events.InteractionCreate);
     }
     async execute(interaction) {
-        if (interaction.user.bot || !interaction.isChatInputCommand())
+        if (!interaction.isChatInputCommand() || interaction.user.bot)
             return;
-        const command = this.commander.commands.get(interaction.commandName) ??
-            this.commander.commands.get(this.commander.aliases.get(interaction.commandName));
+        const command = this.commander.commands.get(interaction.commandName);
         if (!command || command.disabled)
             return;
         await interaction.deferReply({ ephemeral: command.ephemeral });
