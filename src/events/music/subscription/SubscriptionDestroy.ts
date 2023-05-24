@@ -12,7 +12,7 @@ export class SubscriptionDestroy extends Event {
             'Music'
         );
 
-        if (subscription.message?.deletable) subscription.message.delete().catch(() => {});
+        if (subscription.message?.deletable) await subscription.message.delete().catch(() => {});
 
         await this.client.prisma.queue.upsert({
             where: {

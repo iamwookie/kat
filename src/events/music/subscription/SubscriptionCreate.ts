@@ -37,8 +37,8 @@ export class SubscriptionCreate extends Event {
 
         setTimeout(async () => {
             if (!subscription.active && !subscription.queue.length) {
+                await subscription.textChannel.send({ embeds: [new ActionEmbed('warn').setText(MusicPrompts.Inactive)]}).catch(() => {});
                 subscription.destroy();
-                subscription.textChannel.send({ embeds: [new ActionEmbed('warn').setText(MusicPrompts.Inactive)] }).catch(() => {});
             }
         }, this.client.config.music.inactiveDuration);
     }
