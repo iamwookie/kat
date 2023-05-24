@@ -8,6 +8,6 @@ export class TrackResume extends Event {
 
     async execute(subscription: MusicSubscription) {
         if (subscription.message?.editable)
-            await subscription.message.edit({ embeds: [new MusicEmbed(subscription).setColor('White').setPlaying(subscription.active)] });
+            subscription.message.edit({ embeds: [new MusicEmbed(subscription).setColor('White').setPlaying(subscription.active)] });
     }
 }
