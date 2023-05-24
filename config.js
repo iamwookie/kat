@@ -18,9 +18,8 @@ export const lavalink = {
     nodes: [
         {
             name: 'uk:london-1',
-            url: 'lavalink.bil.al',
+            url: 'localhost:2333',
             auth: 'yoruistrash',
-            secure: true,
         },
     ],
 };
