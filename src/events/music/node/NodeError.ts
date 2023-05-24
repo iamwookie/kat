@@ -22,9 +22,7 @@ export class NodeError extends Event {
         for (const subscription of subscriptions.values()) {
             if (subscription.node.name == name) subscription.destroy();
             subscription.textChannel
-                ?.send({
-                    embeds: [new ActionEmbed('fail').setText('The voice node has disconnected. Try playing another track!')],
-                })
+                .send({ embeds: [new ActionEmbed('fail').setText('The voice node has disconnected. Try playing another track!')] })
                 .catch(() => {});
         }
     }
