@@ -7,7 +7,7 @@ export class SubscriptionDestroy extends Event {
     async execute(subscription) {
         this.client.logger.warn(`Subscription Destroyed For: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Music');
         if (subscription.message?.deletable)
-            subscription.message.delete().catch(() => { });
+            await subscription.message.delete().catch(() => { });
         await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,
