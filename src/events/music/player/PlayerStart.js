@@ -9,7 +9,7 @@ export class PlayerStart extends Event {
         if (!subscription.active)
             return;
         if (subscription.message?.deletable)
-            await subscription.message.delete().catch(() => undefined);
+            subscription.message.delete().catch(() => undefined);
         subscription.message = await subscription.textChannel
             .send({ embeds: [new MusicEmbed(subscription).setColor('White').setUser(subscription.active.requester).setPlaying(subscription.active)] })
             .catch(() => undefined);

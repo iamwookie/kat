@@ -6,6 +6,6 @@ export class TrackLoop extends Event {
     }
     async execute(subscription) {
         if (subscription.message?.editable)
-            await subscription.message.edit({ embeds: [new MusicEmbed(subscription).setColor('White').setPlaying(subscription.active)] });
+            subscription.message.edit({ embeds: [new MusicEmbed(subscription).setColor('White').setPlaying(subscription.active)] });
     }
 }
