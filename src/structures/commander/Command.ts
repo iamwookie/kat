@@ -35,7 +35,7 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     public users?: Snowflake[];
     public hidden?: boolean;
     public disabled?: boolean;
-    public cooldowns: Collection<Snowflake, number> = new Collection();
+    public cooldowns = new Collection<Snowflake, number>();
 
     abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
