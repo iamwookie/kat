@@ -78,7 +78,8 @@ export class PlayCommand extends Command {
             search = query;
         }
 
-        const res = await subscription.node.rest.resolve(search instanceof URL ? search.href : `ytsearch:${search}`)
+        const res = await subscription.node.rest.resolve(search instanceof URL ? search.href : `ytsearch:${search}`);
+        const embed = new MusicEmbed(subscription).setUser(author);
 
         switch (res?.loadType) {
             case 'LOAD_FAILED': {
@@ -94,7 +95,7 @@ export class PlayCommand extends Command {
                 const track = new YouTubeTrack(this.client, data, author, int.channel);
                 subscription.add(track);
 
-                this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                 break;
             }
             case 'PLAYLIST_LOADED': {
@@ -108,14 +109,14 @@ export class PlayCommand extends Command {
                         const playlist = new YouTubePlaylist(search, info, tracks, author, int.channel);
                         subscription.add(playlist);
 
-                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        this.commander.reply(int, { embeds: [embed.setEnqueued(playlist)] });
                         break;
                     }
                     case 'spotify': {
                         const playlist = new SpotifyPlaylist(search, info, tracks, author, int.channel);
                         subscription.add(playlist);
 
-                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        this.commander.reply(int, { embeds: [embed.setEnqueued(playlist)] });
                         break;
                     }
                     default: {
@@ -134,14 +135,14 @@ export class PlayCommand extends Command {
                         const track = new YouTubeTrack(this.client, data, author, int.channel);
                         subscription.add(track);
 
-                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                        if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                         break;
                     }
                     case 'spotify': {
                         const track = new SpotifyTrack(this.client, data, author, int.channel);
                         subscription.add(track);
 
-                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                        if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                         break;
                     }
                     default: {
