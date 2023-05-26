@@ -25,7 +25,7 @@ export class SubscriptionCreate extends Event {
         });
         this.client.emit(Events.Debug, `Music (DATABASE) >> Activated And Updated Queue Position For: ${subscription.guild.name} (${subscription.guild.id})`);
         setTimeout(async () => {
-            if (!subscription.active && !subscription.queue.length) {
+            if (!subscription.destroyed && !subscription.active && !subscription.queue.length) {
                 subscription.textChannel.send({ embeds: [new ActionEmbed('warn').setText(MusicPrompts.Inactive)] }).catch(() => { });
                 subscription.destroy();
             }

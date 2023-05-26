@@ -10,7 +10,7 @@ export class PlayerEnd extends Event {
             subscription.active = null;
         subscription.process();
         setTimeout(async () => {
-            if (!subscription.active && !subscription.queue.length) {
+            if (!subscription.destroyed && !subscription.active && !subscription.queue.length) {
                 subscription.textChannel.send({ embeds: [new ActionEmbed('warn').setText(MusicPrompts.Inactive)] }).catch(() => { });
                 subscription.destroy();
             }
