@@ -12,8 +12,7 @@ export class Subscription {
     public looped = false;
     public volume = 100;
     public message?: Message;
-
-    private destroyed = false;
+    public destroyed = false;
 
     constructor(
         public client: Client,
