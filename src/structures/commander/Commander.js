@@ -113,20 +113,19 @@ export class Commander {
                     command.users = command.users.concat(this.client.config.devs);
                 if (!this.modules.has(command.module.name))
                     this.modules.set(command.module.name, command.module);
-                const loaded = command;
-                command.module.commands.set(command.name, loaded);
+                command.module.commands.set(command.name, command);
                 // Remove reserved in the future and use modules directly for registering
                 if (command.module.guilds) {
                     for (const guild of command.module.guilds) {
                         const commands = this.reserved.get(guild) || new Collection();
-                        commands.set(command.name, loaded);
+                        commands.set(command.name, command);
                         this.reserved.set(guild, commands);
                     }
                 }
                 else {
-                    this.global.set(command.name, loaded);
+                    this.global.set(command.name, command);
                 }
-                this.commands.set(command.name, loaded);
+                this.commands.set(command.name, command);
             }
             catch (err) {
                 this.client.logger.error(err, 'Error Initializing Global Command', 'Commander');
