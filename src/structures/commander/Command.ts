@@ -51,9 +51,7 @@ export abstract class Command<T extends boolean = boolean> {
         this.hidden = options.hidden;
         this.disabled = options.disabled;
 
-        if (options.module) {
-            this.module = this.commander.modules.get(options.module) ?? new Module(this.client, commander, { name: options.module });
-        }
+        if (options.module) this.module = this.commander.modules.get(options.module) ?? new Module(this.client, commander, { name: options.module });
     }
 
     data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> {
