@@ -10,10 +10,11 @@ export class Logger {
         console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
     }
 
-    fatal(err: any): void {
+    fatal(err: any, message?: string, scope?: string): void {
         const eventId = Sentry.captureException(err);
 
-        console.error(chalk.redBright(`(FATAL) (${eventId}): A Fatal Error Has Occured!`));
+        console.error(chalk.red(`(FATAL) (${eventId}): An Error Has Occured!`));
+        if (message && scope) console.error(chalk.red(`${scope} (FATAL) >> ${message}`));
         console.error(err);
 
         if (this.client.isReady()) this.notify(new ErrorEmbed(eventId));

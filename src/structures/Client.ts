@@ -58,7 +58,7 @@ export class KATClient extends Client {
             await this.prisma.$connect();
             console.log(chalk.greenBright.bold.underline('>>> Prisma Initialized!'));
         } catch (err) {
-            this.logger.error(err, 'Error Initializing', 'Prisma');
+            this.logger.fatal(err, 'Error Initializing', 'Prisma');
         }
 
         await this.commander.initialize();
