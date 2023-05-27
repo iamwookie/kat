@@ -12,7 +12,7 @@ interface ModuleOptions {
 export class Module extends EventEmitter {
     public name: string;
     public guilds?: Snowflake[];
-    public commands = new Collection<string, Command<true>>();
+    public commands = new Collection<string, Command>();
 
     constructor(public client: Client, public commander: Commander, options: ModuleOptions) {
         super({ captureRejections: true });
