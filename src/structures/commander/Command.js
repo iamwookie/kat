@@ -28,9 +28,8 @@ export class Command {
         this.users = options.users;
         this.hidden = options.hidden;
         this.disabled = options.disabled;
-        if (options.module) {
+        if (options.module)
             this.module = this.commander.modules.get(options.module) ?? new Module(this.client, commander, { name: options.module });
-        }
     }
     data() {
         return new SlashCommandBuilder()
