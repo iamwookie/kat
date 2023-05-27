@@ -3,9 +3,9 @@ import { Commander } from './Commander.js';
 import { Module } from './Module.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake } from 'discord.js';
 
-interface CommandOptions<T extends boolean = boolean> {
+interface CommandOptions {
     name: string;
-    module: T extends true ? Module : T extends false ? string : never;
+    module: string;
     aliases?: string[];
     legacy?: boolean;
     description?: {
@@ -20,9 +20,9 @@ interface CommandOptions<T extends boolean = boolean> {
     disabled?: boolean;
 }
 
-export abstract class Command<T extends boolean = boolean> implements CommandOptions<T> {
+export abstract class Command<T extends boolean = boolean> {
     public name: string;
-    public module: T extends true ? Module : T extends false ? string : never;
+    public module: Module;
     public legacy?: boolean;
     public aliases?: string[];
     public description?: {
@@ -39,9 +39,8 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
 
     abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
-    constructor(public client: Client, public commander: Commander, options: CommandOptions<T>) {
+    constructor(public client: Client, public commander: Commander, options: CommandOptions) {
         this.name = options.name;
-        this.module = options.module;
         this.legacy = options.legacy;
         this.aliases = options.aliases;
         this.description = options.description;
@@ -51,6 +50,10 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         this.users = options.users;
         this.hidden = options.hidden;
         this.disabled = options.disabled;
+
+        if (options.module) {
+            this.module = this.commander.modules.get(options.module) ?? new Module(this.client, commander, { name: options.module });
+        }
     }
 
     data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> {
