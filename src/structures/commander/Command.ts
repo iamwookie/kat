@@ -20,7 +20,7 @@ interface CommandOptions {
     disabled?: boolean;
 }
 
-export abstract class Command<T extends boolean = boolean> {
+export abstract class Command {
     public name: string;
     public module: Module;
     public legacy?: boolean;
