@@ -1,3 +1,4 @@
+import { Module } from './Module.js';
 import { SlashCommandBuilder, Collection } from 'discord.js';
 export class Command {
     client;
@@ -18,7 +19,6 @@ export class Command {
         this.client = client;
         this.commander = commander;
         this.name = options.name;
-        this.module = options.module;
         this.legacy = options.legacy;
         this.aliases = options.aliases;
         this.description = options.description;
@@ -28,6 +28,9 @@ export class Command {
         this.users = options.users;
         this.hidden = options.hidden;
         this.disabled = options.disabled;
+        if (options.module) {
+            this.module = this.commander.modules.get(options.module) ?? new Module(this.client, commander, { name: options.module });
+        }
     }
     data() {
         return new SlashCommandBuilder()

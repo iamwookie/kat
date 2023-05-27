@@ -26,7 +26,7 @@ export class StatsCommand extends Command {
         }, { name: 'Version', value: `\`${this.client.config.version}\``, inline: true }, { name: 'Active Queues', value: `\`${this.client.subscriptions.size}\``, inline: true });
         const subscription = this.client.subscriptions.get(int.guild?.id);
         if (subscription)
-            embed.addFields({ name: 'Node', value: `\`${subscription.node.name}\``, inline: true });
+            embed.addFields({ name: 'Guild Node', value: `\`${subscription.node.name}\``, inline: true });
         this.commander.reply(int, { embeds: [embed] });
     }
 }

@@ -1,6 +1,5 @@
 // ----- FOR LATER USE -----
 import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, PermissionFlagsBits, } from 'discord.js';
-import { Module } from './Module.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
 import { PermissionPrompts } from '../../../enums.js';
 // -----------------------------------
@@ -22,8 +21,6 @@ const commands = [
     Commands.PrefixCommand,
     Commands.HelpCommand,
     Commands.StatsCommand,
-    // Reserved
-    Commands.AffiliateCommand,
 ];
 export class Commander {
     client;
@@ -114,7 +111,6 @@ export class Commander {
                 }
                 if (command.users)
                     command.users = command.users.concat(this.client.config.devs);
-                command.module = this.modules.get(command.module) ?? new Module(this.client, this, { name: command.module });
                 if (!this.modules.has(command.module.name))
                     this.modules.set(command.module.name, command.module);
                 const loaded = command;
