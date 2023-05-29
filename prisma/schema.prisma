@@ -46,12 +46,3 @@ model Track {
     createdAt   DateTime @default(now())
     queue       Queue    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
 }
-
-model Affiliate {
-    id        Int      @id @default(autoincrement())
-    guildId   String
-    userId    String
-    link      String   @unique
-    total     Int      @default(0)
-    createdAt DateTime @default(now())
-}
