@@ -9,9 +9,7 @@ export class Logger {
     }
     fatal(err, message, scope) {
         const eventId = Sentry.captureException(err);
-        console.error(chalk.red(`(FATAL) (${eventId}): An Error Has Occured!`));
-        if (message && scope)
-            console.error(chalk.red(`${scope} (FATAL) >> ${message}`));
+        console.error(chalk.red(`${scope ? `${scope} ` : ''}(FATAL) (${eventId}): ${message ?? 'An Error Has Occurred!'}`));
         console.error(err);
         if (this.client.isReady())
             this.notify(new ErrorEmbed(eventId));
@@ -27,9 +25,7 @@ export class Logger {
     }
     error(err, message, scope) {
         const eventId = Sentry.captureException(err);
-        console.error(chalk.red(`(ERROR) (${eventId}): An Error Has Occured!`));
-        if (message && scope)
-            console.error(chalk.red(`${scope} (ERROR) >> ${message}`));
+        console.error(chalk.red(`${scope ? `${scope} ` : ''}(ERROR) (${eventId}): ${message ?? 'An Error Has Occurred!'}`));
         console.error(err);
         if (this.client.isReady())
             this.notify(new ErrorEmbed(eventId));
