@@ -13,8 +13,8 @@ import * as Routes from '../../api/routes/index.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export class Server {
     client;
-    port;
     app;
+    port;
     constructor(client) {
         this.client = client;
         this.port = client.config.server.port;
@@ -28,9 +28,7 @@ export class Server {
             this.app.use(helmet());
             this.app.use(bodyParser.urlencoded({ extended: true }));
             this.app.use(express.json());
-            const accessLogStream = fs.createWriteStream(path.join(__dirname, '../../../logs/access.log'), {
-                flags: 'a+',
-            });
+            const accessLogStream = fs.createWriteStream(path.join(__dirname, '../../../logs/access.log'), { flags: 'a+' });
             this.app.use(morgan('combined', { stream: accessLogStream }));
             this.registerRoutes();
             this.app.use(Sentry.Handlers.errorHandler());
