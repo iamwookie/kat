@@ -1,4 +1,4 @@
-export const version = '7.9.7';
+export const version = '7.9.8';
 export const devs = ['244662779745665026'];
 export const bot = {
     prefix: process.env.NODE_ENV != 'production' ? '!' : '.',

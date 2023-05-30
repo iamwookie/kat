@@ -6,6 +6,8 @@ export class PlayerEnd extends Event {
         super(client, commander, 'playerEnd');
     }
     async execute(subscription) {
+        if (subscription.message?.deletable)
+            subscription.message.delete().catch(() => { });
         if (!subscription.looped)
             subscription.active = null;
         subscription.process();

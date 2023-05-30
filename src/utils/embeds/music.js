@@ -6,6 +6,7 @@ export class MusicEmbed extends EmbedBuilder {
     constructor(subscription) {
         super();
         this.subscription = subscription;
+        super.setColor('White');
         super.setFooter({ text: `🎵 ${this.subscription.node.name}` });
     }
     setUser(user) {
