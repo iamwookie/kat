@@ -12,10 +12,10 @@ export class PlayerStart extends Event {
             'Music'
         );
 
-        if (!subscription.active) return;
-        if (subscription.message?.deletable) subscription.message.delete().catch(() => undefined);
-        subscription.message = await subscription.textChannel
-            .send({ embeds: [new MusicEmbed(subscription).setColor('White').setUser(subscription.active.requester).setPlaying(subscription.active)] })
-            .catch(() => undefined);
+        if (subscription.message?.deletable) subscription.message.delete().catch(() => {});
+        if (subscription.active)
+            subscription.message = await subscription.textChannel
+                .send({ embeds: [new MusicEmbed(subscription).setUser(subscription.active.requester).setPlaying(subscription.active)] })
+                .catch(() => undefined);
     }
 }

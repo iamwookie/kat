@@ -31,7 +31,7 @@
         "libsodium-wrappers": "^0.7.9",
         "morgan": "^1.10.0",
         "redis": "^4.0.2",
-        "shoukaku": "^3.3.1"
+        "shoukaku": "^3.4.0"
     },
     "devDependencies": {
         "@types/body-parser": "^1.19.2",
