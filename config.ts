@@ -1,4 +1,4 @@
-export const version = '7.9.8';
+export const version = '7.9.9';
 
 export const devs = ['244662779745665026'];
 
