@@ -28,9 +28,6 @@ export class SubscriptionDestroy extends Event {
             },
         });
 
-        this.client.emit(
-            Events.Debug,
-            `Music (DATABASE) >> Set Queue To Inactive: ${subscription.guild.name} (${subscription.guild.id})`
-        );
+        this.client.emit(Events.Debug, `DATABASE >> Set Queue To Inactive: ${subscription.guild.name} (${subscription.guild.id})`);
     }
 }

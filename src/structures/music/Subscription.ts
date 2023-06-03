@@ -50,9 +50,7 @@ export class Subscription {
                 });
 
                 const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
-
-                const position = await client.cache.queue.count(guild.id);
-                subscription.position = position;
+                subscription.position = await client.cache.queue.count(guild.id);
 
                 const res = await client.cache.music.get(guild.id);
                 if (res?.volume) subscription.volume = res.volume;
