@@ -1,4 +1,4 @@
-export const version = '7.9.8';
+export const version = '7.9.9';
 export const devs = ['244662779745665026'];
 export const bot = {
     prefix: process.env.NODE_ENV != 'production' ? '!' : '.',
@@ -12,7 +12,7 @@ export const server = {
     },
 };
 export const music = {
-    inactiveDuration: 30_000, // The time in milliseconds before the bot leaves the voice channel
+    inactiveDuration: 300_000, // The time in milliseconds before the bot leaves the voice channel
 };
 export const lavalink = {
     nodes: [
