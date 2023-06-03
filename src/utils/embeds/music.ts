@@ -42,7 +42,9 @@ export class MusicEmbed extends EmbedBuilder {
         if (item.thumbnail) super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: 'Now Playing:',
-            value: `${this.subscription.paused ? '⏸️ - ' : ''}${this.subscription.looped ? '🔁 - ' : ''}${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+            value: `\`${this.subscription.position}.\` - ${this.subscription.paused ? '⏸️ - ' : ''}${
+                this.subscription.looped ? '🔁 - ' : ''
+            }${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
         });
     }
 
