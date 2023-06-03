@@ -16,7 +16,7 @@ export const server = {
 };
 
 export const music = {
-    inactiveDuration: 30_000, // The time in milliseconds before the bot leaves the voice channel
+    inactiveDuration: 300_000, // The time in milliseconds before the bot leaves the voice channel
 };
 
 export const lavalink = {
