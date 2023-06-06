@@ -1,4 +1,3 @@
-// ----- FOR LATER USE -----
 import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, PermissionFlagsBits, } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
 import { PermissionPrompts } from '../../../enums.js';

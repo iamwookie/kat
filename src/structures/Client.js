@@ -1,5 +1,5 @@
 import * as Config from '../../config.js';
-import { Client, Events, Collection, PermissionsBitField } from 'discord.js';
+import { Client, Events, Collection } from 'discord.js';
 import { Logger } from './Logger.js';
 import { PrismaClient } from '@prisma/client';
 import { Commander } from './commander/Commander.js';
@@ -9,25 +9,10 @@ import { Cache } from './Cache.js';
 import chalk from 'chalk';
 export class KATClient extends Client {
     startTime = Date.now();
-    permissions = new PermissionsBitField([
-        // GENERAL
-        PermissionsBitField.Flags.ViewChannel,
-        // TEXT
-        PermissionsBitField.Flags.SendMessages,
-        PermissionsBitField.Flags.EmbedLinks,
-        PermissionsBitField.Flags.AttachFiles,
-        PermissionsBitField.Flags.ReadMessageHistory,
-        PermissionsBitField.Flags.UseExternalEmojis,
-        PermissionsBitField.Flags.UseExternalStickers,
-        PermissionsBitField.Flags.AddReactions,
-        // VOICE
-        PermissionsBitField.Flags.Connect,
-        PermissionsBitField.Flags.Speak,
-        PermissionsBitField.Flags.UseVAD,
-    ]);
     config = Config;
     prefix = Config.bot.prefix;
     devPrefix = Config.bot.devPrefix;
+    permissions = Config.bot.permissions;
     logger = new Logger(this);
     // Prisma causes an issue with circular references. Try fixing this later
     prisma = new PrismaClient({ log: ['warn', 'error'] });

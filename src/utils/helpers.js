@@ -31,9 +31,9 @@ export function formatBytes(bytes) {
 export function formatUser(user) {
     return {
         id: user.id,
+        tag: user.tag,
         username: user.username,
         discriminator: user.discriminator,
-        tag: user.tag,
         avatarURL: user.avatarURL() ?? undefined,
         bannerURL: user.bannerURL() ?? undefined,
         accentHex: user.hexAccentColor ?? undefined,
