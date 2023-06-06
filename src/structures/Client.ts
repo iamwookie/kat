@@ -12,25 +12,10 @@ import chalk from 'chalk';
 
 export class KATClient extends Client {
     public startTime = Date.now();
-    public permissions = new PermissionsBitField([
-        // GENERAL
-        PermissionsBitField.Flags.ViewChannel,
-        // TEXT
-        PermissionsBitField.Flags.SendMessages,
-        PermissionsBitField.Flags.EmbedLinks,
-        PermissionsBitField.Flags.AttachFiles,
-        PermissionsBitField.Flags.ReadMessageHistory,
-        PermissionsBitField.Flags.UseExternalEmojis,
-        PermissionsBitField.Flags.UseExternalStickers,
-        PermissionsBitField.Flags.AddReactions,
-        // VOICE
-        PermissionsBitField.Flags.Connect,
-        PermissionsBitField.Flags.Speak,
-        PermissionsBitField.Flags.UseVAD,
-    ]);
     public config = Config;
     public prefix = Config.bot.prefix;
     public devPrefix = Config.bot.devPrefix;
+    public permissions = Config.bot.permissions;
     public logger = new Logger(this);
     // Prisma causes an issue with circular references. Try fixing this later
     public prisma = new PrismaClient({ log: ['warn', 'error'] });

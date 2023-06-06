@@ -30,18 +30,18 @@ export function formatBytes(bytes?: number | null) {
 
 export function formatUser(user: User): {
     id: string;
+    tag: string;
     username: string;
     discriminator: string;
-    tag: string;
     avatarURL?: string;
     bannerURL?: string;
     accentHex?: string;
 } {
     return {
         id: user.id,
+        tag: user.tag,
         username: user.username,
         discriminator: user.discriminator,
-        tag: user.tag,
         avatarURL: user.avatarURL() ?? undefined,
         bannerURL: user.bannerURL() ?? undefined,
         accentHex: user.hexAccentColor ?? undefined,

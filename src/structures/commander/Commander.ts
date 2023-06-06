@@ -1,6 +1,6 @@
 import { KATClient as Client } from '../Client.js';
-
-// ----- FOR LATER USE -----
+import { Command } from './Command.js';
+import { Module } from './Module.js';
 import {
     Events as DiscordEvents,
     REST,
@@ -15,8 +15,6 @@ import {
     InteractionEditReplyOptions,
     MessageCreateOptions,
 } from 'discord.js';
-import { Command } from './Command.js';
-import { Module } from './Module.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 import { PermissionPrompts } from 'enums.js';
 
