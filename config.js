@@ -1,5 +1,5 @@
 import { PermissionsBitField } from 'discord.js';
-export const version = '7.9.10';
+export const version = '7.9.11';
 export const devs = ['244662779745665026'];
 export const bot = {
     prefix: process.env.NODE_ENV != 'production' ? '!' : '.',
