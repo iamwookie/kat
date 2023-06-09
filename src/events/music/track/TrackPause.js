@@ -6,6 +6,6 @@ export class TrackPause extends Event {
     }
     async execute(subscription) {
         if (subscription.message?.editable)
-            subscription.message.edit({ embeds: [new MusicEmbed(subscription).setColor('Yellow').setPlaying(subscription.active)] });
+            subscription.message.edit({ embeds: [new MusicEmbed(subscription).setColor('Yellow').setPlaying(subscription.active)] }).catch(() => { });
     }
 }
