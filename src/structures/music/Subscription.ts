@@ -1,6 +1,6 @@
 import { KATClient as Client } from '../Client.js';
 import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from './Track.js';
-import { Guild, VoiceBasedChannel, TextBasedChannel } from 'discord.js';
+import { Guild, VoiceBasedChannel, TextBasedChannel, Message } from 'discord.js';
 import { Shoukaku, Player, Node } from 'shoukaku';
 import { NodeError, PlayerError } from '@utils/errors.js';
 
@@ -11,22 +11,23 @@ export class Subscription {
     public position = 0;
     public looped = false;
     public volume = 100;
+    public message?: Message;
     public destroyed = false;
 
     constructor(
         public client: Client,
         public guild: Guild,
         public voiceChannel: VoiceBasedChannel,
-        public textChannel: TextBasedChannel | null,
+        public textChannel: TextBasedChannel,
         public player: Player,
         public node: Node
     ) {
         this.shoukaku = client.shoukaku;
 
-        this.player.on('exception', (reason) => this.client.emit('playerException', this, reason));
+        this.player.on('exception', (data) => this.client.emit('playerException', this, data));
         this.player.on('start', (data) => this.client.emit('playerStart', this, data));
         this.player.on('end', (reason) => this.client.emit('playerEnd', this, reason));
-
+        
         // -----> REQUIRES FIXING FROM SHOUKAKU
         //
         // this.player.on("closed", (reason) => {
@@ -35,12 +36,7 @@ export class Subscription {
         // });
     }
 
-    static async create(
-        client: Client,
-        guild: Guild,
-        voiceChannel: VoiceBasedChannel,
-        textChannel: TextBasedChannel | null
-    ) {
+    static async create(client: Client, guild: Guild, voiceChannel: VoiceBasedChannel, textChannel: TextBasedChannel) {
         try {
             const node = client.shoukaku.getNode();
             if (!node) throw new NodeError("Node doesn't exist.");
@@ -54,9 +50,7 @@ export class Subscription {
                 });
 
                 const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
-
-                const position = await client.cache.queue.count(guild.id);
-                subscription.position = position;
+                subscription.position = await client.cache.queue.count(guild.id);
 
                 const res = await client.cache.music.get(guild.id);
                 if (res?.volume) subscription.volume = res.volume;
@@ -94,7 +88,7 @@ export class Subscription {
         this.player.setVolume(this.volume / 100);
         this.player.playTrack({ track: track.data.track });
 
-        if(!this.looped) {
+        if (!this.looped) {
             this.position += 1;
             this.client.emit('trackRemove', this, track);
         }
@@ -128,16 +122,22 @@ export class Subscription {
 
     pause() {
         if (!this.active) return;
-        return this.player.setPaused(true);
+        this.player.setPaused(true);
+        this.client.emit('trackPause', this, this.active);
+        return this.paused;
     }
 
     resume() {
         if (!this.active) return;
-        return this.player.setPaused(false);
+        this.player.setPaused(false);
+        this.client.emit('trackResume', this, this.active);
+        return this.paused;
     }
 
     loop() {
-        return (this.looped = !this.looped);
+        this.looped = !this.looped;
+        this.client.emit('trackLoop', this, this.active);
+        return this.looped;
     }
 
     // Getters

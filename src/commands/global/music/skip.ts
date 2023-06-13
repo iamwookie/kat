@@ -1,6 +1,6 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { ChatInputCommandInteraction, Message } from 'discord.js';
-import { ActionEmbed, MusicEmbed } from '@utils/embeds/index.js';
+import { ActionEmbed } from '@utils/embeds/index.js';
 import { MusicPrompts } from 'enums.js';
 
 export class SkipCommand extends Command {
@@ -13,6 +13,7 @@ export class SkipCommand extends Command {
                 content: 'Skip the track.',
             },
             cooldown: 5,
+            ephemeral: true,
         });
     }
 
@@ -30,10 +31,7 @@ export class SkipCommand extends Command {
 
         subscription.stop();
         this.commander.reply(int, {
-            embeds: [
-                new ActionEmbed('success').setText('Skipping...'),
-                new MusicEmbed(subscription).setUser(author).setPlaying(subscription.queue[0]),
-            ],
+            embeds: [new ActionEmbed('success').setText('Skipping...')],
         });
     }
 }

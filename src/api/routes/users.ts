@@ -1,17 +1,11 @@
 import { KATClient as Client } from '@structures/index.js';
-import { Route } from '@structures/api/Route.js';
+import { Router } from 'express';
+import { withLimiter } from '@api/middlewares/limiter.middleware.js';
+const router = Router();
 
-import { withLimiter } from '@api/middlewares/limiter.js';
-import { fetchUser } from '@api/controllers/user.js';
+import * as UserController from '@api/controllers/user.controller.js';
 
-export class UsersRoute extends Route {
-    constructor(client: Client) {
-        super(client, '/users');
-    }
-
-    register() {
-        this.router.get('/:id', withLimiter, fetchUser(this.client));
-
-        return this.router;
-    }
+export default (client: Client) => {
+    router.get('/:id', withLimiter, UserController.fetchUser(client));
+    return router;
 }

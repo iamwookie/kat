@@ -42,6 +42,11 @@ class GuildCache extends BaseCache<Guild> {
 
         return res ?? undefined;
     }
+
+    async prefix(guildId: Snowflake) {
+        const res = await this.get(guildId);
+        return res?.prefix ?? this.client.prefix;
+    }
 }
 
 class MusicCache extends BaseCache<Music> {

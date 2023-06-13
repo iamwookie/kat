@@ -6,6 +6,7 @@ export class MusicEmbed extends EmbedBuilder {
     constructor(private subscription: MusicSubscription) {
         super();
 
+        super.setColor('White');
         super.setFooter({ text: `🎵 ${this.subscription.node.name}` });
     }
 
@@ -41,26 +42,9 @@ export class MusicEmbed extends EmbedBuilder {
         if (item.thumbnail) super.setThumbnail(item.thumbnail);
         return super.addFields({
             name: 'Now Playing:',
-            value: `${this.subscription.paused ? '⏸️ - ' : ''}${this.subscription.looped ? '🔁 - ' : ''}${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
-        });
-    }
-
-    setPaused(item: YouTubeTrack | SpotifyTrack | null) {
-        if (!item) return this;
-
-        if (item.thumbnail) super.setThumbnail(item.thumbnail);
-        return super.addFields({
-            name: 'Paused Track:',
-            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
-        });
-    }
-
-    setLooped(item: YouTubeTrack | SpotifyTrack | null) {
-        if (!item) return this;
-
-        return super.setColor(this.subscription.looped ? 'Green' : 'Red').addFields({
-            name: `Track ${this.subscription.looped ? 'Looped' : 'Un-looped'}:`,
-            value: `${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
+            value: `\`${this.subscription.position}.\` - ${this.subscription.paused ? '⏸️ - ' : ''}${
+                this.subscription.looped ? '🔁 - ' : ''
+            }${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
         });
     }
 

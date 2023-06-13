@@ -1,6 +1,6 @@
 {
     "name": "cat-bot",
-    "version": "7.7.16",
+    "version": "7.10.0",
     "description": "",
     "main": "index.js",
     "type": "module",
@@ -12,7 +12,7 @@
     "author": "wookie",
     "license": "ISC",
     "dependencies": {
-        "@prisma/client": "^4.13.0",
+        "@prisma/client": "^4.14.0",
         "@sentry/integrations": "^7.39.0",
         "@sentry/node": "^7.39.0",
         "@sentry/tracing": "^7.28.0",
@@ -22,7 +22,7 @@
         "body-parser": "^1.20.0",
         "chalk": "^5.2.0",
         "discord-api-types": "^0.37.2",
-        "discord.js": "^14.9.0",
+        "discord.js": "^14.11.0",
         "dotenv": "^16.0.3",
         "express": "^4.18.1",
         "express-rate-limit": "^6.5.1",
@@ -31,7 +31,7 @@
         "libsodium-wrappers": "^0.7.9",
         "morgan": "^1.10.0",
         "redis": "^4.0.2",
-        "shoukaku": "^3.3.1"
+        "shoukaku": "^3.4.0"
     },
     "devDependencies": {
         "@types/body-parser": "^1.19.2",

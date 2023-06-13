@@ -1,5 +1,7 @@
 import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from '@structures/index.js';
 import { Events } from 'discord.js';
+import { ActionEmbed } from '@utils/embeds/index.js';
+import { MusicPrompts } from 'enums.js';
 
 export class SubscriptionCreate extends Event {
     constructor(client: Client, commander: Commander) {
@@ -23,18 +25,18 @@ export class SubscriptionCreate extends Event {
             create: {
                 guildId: subscription.guild.id,
                 voiceId: subscription.voiceChannel.id,
-                textId: subscription.textChannel?.id,
+                textId: subscription.textChannel.id,
                 active: true,
             },
         });
 
-        this.client.emit(
-            Events.Debug,
-            `Music (DATABASE) >> Activated And Updated Queue Position For: ${subscription.guild.name} (${subscription.guild.id})`
-        );
+        this.client.emit(Events.Debug, `DATABASE >> Activated Queue And Updated Position For: ${subscription.guild.name} (${subscription.guild.id})`);
 
-        setTimeout(() => {
-            if (!subscription.active && !subscription.queue.length) subscription.destroy();
+        setTimeout(async () => {
+            if (!subscription.destroyed && !subscription.active && !subscription.queue.length) {
+                subscription.textChannel.send({ embeds: [new ActionEmbed('warn').setText(MusicPrompts.Inactive)] }).catch(() => {});
+                subscription.destroy();
+            }
         }, this.client.config.music.inactiveDuration);
     }
 }

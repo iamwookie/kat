@@ -1,12 +1,6 @@
-// ----- RESERVED -----
-
-// Affiliate
-export { AffiliateCommand } from './reserved/affiliate/affiliate.js';
-
 // ----- GLOBAL -----
 
 // Music
-
 export { LyricsCommand } from './global/music/lyrics.js';
 export { VolumeCommand } from './global/music/volume.js';
 export { QueueCommand } from './global/music/queue.js';

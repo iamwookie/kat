@@ -3,12 +3,11 @@ import { Commander } from './Commander.js';
 import { Module } from './Module.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake } from 'discord.js';
 
-interface CommandOptions<T extends boolean = boolean> {
+interface CommandOptions {
     name: string;
-    module: T extends true ? Module : T extends false ? string : never;
+    module: string;
     aliases?: string[];
     legacy?: boolean;
-    legacyAliases?: string[];
     description?: {
         content?: string;
         format?: string;
@@ -21,12 +20,11 @@ interface CommandOptions<T extends boolean = boolean> {
     disabled?: boolean;
 }
 
-export abstract class Command<T extends boolean = boolean> implements CommandOptions<T> {
+export abstract class Command {
     public name: string;
-    public module: T extends true ? Module : T extends false ? string : never;
-    public aliases?: string[];
+    public module: Module;
     public legacy?: boolean;
-    public legacyAliases?: string[];
+    public aliases?: string[];
     public description?: {
         content?: string;
         format?: string;
@@ -37,16 +35,14 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
     public users?: Snowflake[];
     public hidden?: boolean;
     public disabled?: boolean;
-    public cooldowns: Collection<Snowflake, number> = new Collection();
+    public cooldowns = new Collection<Snowflake, number>();
 
     abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
-    constructor(public client: Client, public commander: Commander, options: CommandOptions<T>) {
+    constructor(public client: Client, public commander: Commander, options: CommandOptions) {
         this.name = options.name;
-        this.module = options.module;
-        this.aliases = options.aliases;
         this.legacy = options.legacy;
-        this.legacyAliases = options.legacyAliases;
+        this.aliases = options.aliases;
         this.description = options.description;
         this.cooldown = options.cooldown;
         this.ephemeral = options.ephemeral;
@@ -54,6 +50,8 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         this.users = options.users;
         this.hidden = options.hidden;
         this.disabled = options.disabled;
+
+        if (options.module) this.module = this.commander.modules.get(options.module) ?? new Module(this.client, commander, { name: options.module });
     }
 
     data(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> {
@@ -74,8 +72,8 @@ export abstract class Command<T extends boolean = boolean> implements CommandOpt
         setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
     }
 
-    get usage() {
-        const aliases = this.aliases ? ', ' + this.aliases.map((alias) => this.client.prefix + alias).join(', ') : '';
-        return `${this.client.prefix}${this.name}${aliases}${this.description?.format ? ' ' + this.description.format : ''}`;
+    usage(prefix: string) {
+        const aliases = this.aliases ? ', ' + this.aliases.map((alias) => prefix + alias).join(', ') : '';
+        return `${prefix}${this.name}${aliases}${this.description?.format ? ' ' + this.description.format : ''}`;
     }
 }

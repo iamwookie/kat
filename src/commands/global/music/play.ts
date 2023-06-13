@@ -1,7 +1,6 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, GuildMember, VoiceChannel } from 'discord.js';
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '@structures/index.js';
-import { LavalinkResponse } from 'shoukaku';
 import { NodeError, PlayerError } from '@utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '@utils/embeds/index.js';
 import { MusicPrompts } from 'enums.js';
@@ -12,12 +11,13 @@ export class PlayCommand extends Command {
             name: 'play',
             module: 'Music',
             legacy: true,
-            legacyAliases: ['p'],
+            aliases: ['p'],
             description: {
                 content: 'Add a track to the queue, or resume the current one.',
                 format: '<?title/url>',
             },
             cooldown: 5,
+            ephemeral: true,
         });
     }
 
@@ -47,7 +47,7 @@ export class PlayCommand extends Command {
                 return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
             if (!query && subscription.paused) {
                 subscription.resume();
-                return this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active)] });
+                return this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(MusicPrompts.TrackResumed)] });
             }
         }
 
@@ -57,7 +57,7 @@ export class PlayCommand extends Command {
 
         if (!subscription) {
             try {
-                subscription = await MusicSubscription.create(this.client, int.guild, voiceChannel, int.channel);
+                subscription = await MusicSubscription.create(this.client, int.guild, voiceChannel, int.channel!);
             } catch (err) {
                 if (err instanceof NodeError) {
                     return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoNodes)] });
@@ -70,15 +70,16 @@ export class PlayCommand extends Command {
             }
         }
 
-        let url: URL | null = null;
-        let res: LavalinkResponse | null = null;
+        let search: string | URL;
 
         try {
-            url = new URL(query);
-            res = await subscription.node.rest.resolve(url.href);
+            search = new URL(query);
         } catch (err) {
-            res = await subscription.node.rest.resolve('ytsearch:' + query);
+            search = query;
         }
+
+        const res = await subscription.node.rest.resolve(search instanceof URL ? search.href : `ytsearch:${search}`);
+        const embed = new MusicEmbed(subscription).setUser(author);
 
         switch (res?.loadType) {
             case 'LOAD_FAILED': {
@@ -94,28 +95,28 @@ export class PlayCommand extends Command {
                 const track = new YouTubeTrack(this.client, data, author, int.channel);
                 subscription.add(track);
 
-                this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                 break;
             }
             case 'PLAYLIST_LOADED': {
-                if (!url) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
+                if (!(search instanceof URL)) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
 
                 const info = res.playlistInfo;
                 const tracks = res.tracks;
 
                 switch (tracks[0].info.sourceName) {
                     case 'youtube': {
-                        const playlist = new YouTubePlaylist(url, info, tracks, author, int.channel);
+                        const playlist = new YouTubePlaylist(search, info, tracks, author, int.channel);
                         subscription.add(playlist);
 
-                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        this.commander.reply(int, { embeds: [embed.setEnqueued(playlist)] });
                         break;
                     }
                     case 'spotify': {
-                        const playlist = new SpotifyPlaylist(url, info, tracks, author, int.channel);
+                        const playlist = new SpotifyPlaylist(search, info, tracks, author, int.channel);
                         subscription.add(playlist);
 
-                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(playlist)] });
+                        this.commander.reply(int, { embeds: [embed.setEnqueued(playlist)] });
                         break;
                     }
                     default: {
@@ -134,14 +135,14 @@ export class PlayCommand extends Command {
                         const track = new YouTubeTrack(this.client, data, author, int.channel);
                         subscription.add(track);
 
-                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                        if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                         break;
                     }
                     case 'spotify': {
                         const track = new SpotifyTrack(this.client, data, author, int.channel);
                         subscription.add(track);
 
-                        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(track)] });
+                        if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                         break;
                     }
                     default: {

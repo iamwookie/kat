@@ -1,6 +1,6 @@
 import { KATClient as Client } from '../Client.js';
-
-// ----- FOR LATER USE -----
+import { Command } from './Command.js';
+import { Module } from './Module.js';
 import {
     Events as DiscordEvents,
     REST,
@@ -15,8 +15,6 @@ import {
     InteractionEditReplyOptions,
     MessageCreateOptions,
 } from 'discord.js';
-import { Command } from './Command.js';
-import { Module } from './Module.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 import { PermissionPrompts } from 'enums.js';
 
@@ -40,14 +38,12 @@ const commands = [
     Commands.PrefixCommand,
     Commands.HelpCommand,
     Commands.StatsCommand,
-    // Reserved
-    Commands.AffiliateCommand,
 ];
 
 export class Commander {
-    public commands = new Collection<string, Command<true>>();
-    public global = new Collection<string, Command<true>>();
-    public reserved = new Collection<Snowflake, Collection<string, Command<true>>>();
+    public commands = new Collection<string, Command>();
+    public global = new Collection<string, Command>();
+    public reserved = new Collection<Snowflake, Collection<string, Command>>();
     public modules = new Collection<string, Module>();
     public aliases = new Collection<string, string>();
 
@@ -69,7 +65,7 @@ export class Commander {
         this.intiliazeEvents();
     }
 
-    authorize(interaction: ChatInputCommandInteraction | Message, command: Command<true>) {
+    authorize(interaction: ChatInputCommandInteraction | Message, command: Command) {
         const author = this.getAuthor(interaction);
 
         if (interaction.inGuild()) {
@@ -141,33 +137,22 @@ export class Commander {
                     }
                 }
 
-                if (command.legacyAliases) {
-                    for (const alias of command.legacyAliases) {
-                        this.aliases.set(alias, command.name);
-                    }
-                }
-
-                if (command.users) command.users.push(this.client.devId);
-
-                command.module = this.modules.get(command.module as string) ?? new Module(this.client, this, { name: command.module as string });
+                if (command.users) command.users = command.users.concat(this.client.config.devs);
                 if (!this.modules.has(command.module.name)) this.modules.set(command.module.name, command.module);
-
-                const loaded = command as Command<true>;
-
-                command.module.commands.set(command.name, loaded);
+                command.module.commands.set(command.name, command);
 
                 // Remove reserved in the future and use modules directly for registering
                 if (command.module.guilds) {
                     for (const guild of command.module.guilds) {
                         const commands = this.reserved.get(guild) || new Collection();
-                        commands.set(command.name, loaded);
+                        commands.set(command.name, command);
                         this.reserved.set(guild, commands);
                     }
                 } else {
-                    this.global.set(command.name, loaded);
+                    this.global.set(command.name, command);
                 }
 
-                this.commands.set(command.name, loaded);
+                this.commands.set(command.name, command);
             } catch (err) {
                 this.client.logger.error(err, 'Error Initializing Global Command', 'Commander');
             }
@@ -197,14 +182,6 @@ export class Commander {
 
             for (const command of this.global.values()) {
                 if (command.disabled || command.hidden) continue;
-
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        const data = command.data().setName(alias);
-                        body.push(data);
-                    }
-                }
-
                 body.push(command.data().toJSON());
             }
 
@@ -225,14 +202,6 @@ export class Commander {
 
             for (const command of commands.values()) {
                 if (command.disabled || command.hidden) continue;
-
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        const data = command.data().setName(alias);
-                        body.push(data);
-                    }
-                }
-
                 body.push(command.data().toJSON());
             }
 

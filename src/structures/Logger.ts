@@ -10,10 +10,10 @@ export class Logger {
         console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
     }
 
-    fatal(err: any): void {
+    fatal(err: any, message?: string, scope?: string): void {
         const eventId = Sentry.captureException(err);
 
-        console.error(chalk.redBright(`(FATAL) (${eventId}): A Fatal Error Has Occured!`));
+        console.error(chalk.red(`${scope ? `${scope} ` : ''}(FATAL) (${eventId}): ${message ?? 'An Error Has Occurred!'}`));
         console.error(err);
 
         if (this.client.isReady()) this.notify(new ErrorEmbed(eventId));
@@ -35,8 +35,7 @@ export class Logger {
     error(err: any, message?: string, scope?: string): string {
         const eventId = Sentry.captureException(err);
 
-        console.error(chalk.red(`(ERROR) (${eventId}): An Error Has Occured!`));
-        if (message && scope) console.error(chalk.red(`${scope} (ERROR) >> ${message}`));
+        console.error(chalk.red(`${scope ? `${scope} ` : ''}(ERROR) (${eventId}): ${message ?? 'An Error Has Occurred!'}`));
         console.error(err);
 
         if (this.client.isReady()) this.notify(new ErrorEmbed(eventId));
@@ -57,12 +56,14 @@ export class Logger {
     }
 
     async notify(embed: APIEmbed | JSONEncodable<APIEmbed>) {
-        try {
-            const dev = this.client.users.cache.get(this.client.devId);
-            await dev?.send({ embeds: [embed] });
-        } catch (err) {
-            console.error(chalk.red('(ERROR): Error Warning Dev!'));
-            console.error(err);
+        for (const devId of this.client.config.devs) {
+            try {
+                const dev = await this.client.users.fetch(devId);
+                await dev.send({ embeds: [embed] });
+            } catch (err) {
+                console.error(chalk.red('(ERROR): Error Warning Dev!'));
+                console.error(err);
+            }
         }
     }
 }

@@ -1,18 +1,19 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { ChatInputCommandInteraction, Message } from 'discord.js';
-import { MusicEmbed, ActionEmbed } from '@utils/embeds/index.js';
+import { ActionEmbed } from '@utils/embeds/index.js';
 import { MusicPrompts } from 'enums.js';
 
 export class LoopCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: 'loop',
-            aliases: ['repeat'],
             module: 'Music',
             legacy: true,
+            aliases: ['repeat'],
             description: {
                 content: 'Loop the currently playing track.',
             },
+            ephemeral: true,
         });
     }
 
@@ -25,7 +26,7 @@ export class LoopCommand extends Command {
         if (!subscription.voiceChannel.members.has(author.id))
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
 
-        subscription.loop();
-        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setLooped(subscription.active)] });
+        const looped = subscription.loop();
+        this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(looped ? MusicPrompts.TrackLooped : MusicPrompts.TrackUnlooped)] });
     }
 }

@@ -8,13 +8,11 @@ export class InteractionCreate extends Event {
     }
 
     async execute(interaction: BaseInteraction) {
-        if (interaction.user.bot || !interaction.isChatInputCommand()) return;
+        if (!interaction.isChatInputCommand() || interaction.user.bot) return;
 
-        const command =
-            this.commander.commands.get(interaction.commandName) ??
-            this.commander.commands.get(this.commander.aliases.get(interaction.commandName)!);
+        const command = this.commander.commands.get(interaction.commandName);
         if (!command || command.disabled) return;
-        
+
         await interaction.deferReply({ ephemeral: command.ephemeral });
 
         if (!this.commander.authorize(interaction, command)) return;

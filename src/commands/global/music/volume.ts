@@ -9,12 +9,13 @@ export class VolumeCommand extends Command {
             name: 'volume',
             module: 'Music',
             legacy: true,
-            legacyAliases: ['v'],
+            aliases: ['v'],
             description: {
                 content: 'View or set the server music volume. [Admin Only]',
                 format: '<?number>(0-100)',
             },
             cooldown: 5,
+            ephemeral: true,
         });
     }
 
@@ -71,7 +72,8 @@ export class VolumeCommand extends Command {
                 music: true,
             },
         });
-        if (!res?.music) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
+        if (!res?.music) 
+            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
 
         this.client.cache.music.update(int.guildId!, res.music);
 

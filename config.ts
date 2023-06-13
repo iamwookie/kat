@@ -1,40 +1,48 @@
-export const version = "7.7.16";
+import { PermissionsBitField } from 'discord.js';
+
+export const version = '7.10.0';
+
+export const devs = ['244662779745665026'];
 
 export const bot = {
-    devId: "244662779745665026",
-    prefix: "/",
-    devPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
-    legacyPrefix: process.env.NODE_ENV != "production" ? "!" : ".",
+    prefix: process.env.NODE_ENV != 'production' ? '!' : '.',
+    devPrefix: process.env.NODE_ENV != 'production' ? '!' : '.',
+    permissions: new PermissionsBitField([
+        // GENERAL
+        PermissionsBitField.Flags.ViewChannel,
+        // TEXT
+        PermissionsBitField.Flags.SendMessages,
+        PermissionsBitField.Flags.EmbedLinks,
+        PermissionsBitField.Flags.AttachFiles,
+        PermissionsBitField.Flags.ReadMessageHistory,
+        PermissionsBitField.Flags.UseExternalEmojis,
+        PermissionsBitField.Flags.UseExternalStickers,
+        PermissionsBitField.Flags.AddReactions,
+        // VOICE
+        PermissionsBitField.Flags.Connect,
+        PermissionsBitField.Flags.Speak,
+        PermissionsBitField.Flags.UseVAD,
+    ]),
 };
 
 export const server = {
     port: 3030,
-
     limiter: {
         duration: 5,
         max: 50,
     },
-
-    hooks: {
-        asap: {
-            unbox: ["1055019802361598023"],
-            suits: ["1054873048160927774"],
-            staff: ["520652380799369218", "634141378229567498"],
-        },
-    },
 };
 
 export const music = {
-    inactiveDuration: 30_000, // The time in milliseconds before the bot leaves the voice channel
+    inactiveDuration: 300_000, // The time in milliseconds before the bot leaves the voice channel
 };
 
 export const lavalink = {
     nodes: [
         {
-            name: "uk:london-1",
-            url: "lavalink.bil.al",
-            auth: "yoruistrash",
-            secure: true,
+            name: 'uk:london-1',
+            url: 'localhost:2333',
+            auth: 'yoruistrash',
         },
     ],
 };

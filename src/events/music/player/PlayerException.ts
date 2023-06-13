@@ -8,9 +8,9 @@ export class PlayerException extends Event {
         super(client, commander, 'playerException');
     }
 
-    async execute(subscription: MusicSubscription, reason: TrackExceptionEvent) {
+    async execute(subscription: MusicSubscription, data: TrackExceptionEvent) {
         this.client.logger.error(
-            reason,
+            data.exception,
             `Player Exception In: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`,
             'Music'
         );
@@ -19,6 +19,6 @@ export class PlayerException extends Event {
         subscription.active = null;
         subscription.process();
 
-        subscription.textChannel?.send({ embeds: [new ActionEmbed().setText(MusicPrompts.TrackError)] }).catch(() => {});
+        subscription.textChannel.send({ embeds: [new ActionEmbed().setText(MusicPrompts.TrackError)] }).catch(() => {});
     }
 }
