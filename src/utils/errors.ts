@@ -1,7 +1,7 @@
 export class NodeError extends Error {
     public name = 'NodeError';
 
-    public constructor(message: string) {
+    public constructor(message?: string) {
         super(message);
     }
 }
@@ -9,7 +9,7 @@ export class NodeError extends Error {
 export class PlayerError extends Error {
     public name = 'PlayerError';
 
-    public constructor(message: string) {
+    public constructor(message?: string) {
         super(message);
     }
 }
