@@ -1,5 +1,5 @@
 import { Event } from '../../../structures/index.js';
-import { PlayerError } from '../../../utils/errors';
+import { PlayerError } from '../../../utils/errors.js';
 import { ActionEmbed } from '../../../utils/embeds/action.js';
 import { MusicPrompts } from '../../../../enums.js';
 export class PlayerException extends Event {
