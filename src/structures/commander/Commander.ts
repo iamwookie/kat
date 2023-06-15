@@ -14,6 +14,8 @@ import {
     MessageEditOptions,
     InteractionEditReplyOptions,
     MessageCreateOptions,
+    EmojiIdentifierResolvable,
+    EmojiResolvable,
 } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 import { PermissionPrompts } from 'enums.js';
@@ -240,7 +242,9 @@ export class Commander {
 
     reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
         } else if (interaction instanceof Message) {
             return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
         } else {
@@ -254,7 +258,9 @@ export class Commander {
         content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
     ) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
         } else if (interaction instanceof Message) {
             return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
         } else {

@@ -95,7 +95,14 @@ export class PlayCommand extends Command {
                 const track = new YouTubeTrack(this.client, data, author, int.channel);
                 subscription.add(track);
 
-                if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                if (subscription.queue.length) {
+                    this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                } else if (int instanceof ChatInputCommandInteraction) {
+                    this.commander.reply(int, { content: '✅' });
+                } else if (int instanceof Message) {
+                    int.react('✅');
+                }
+
                 break;
             }
             case 'PLAYLIST_LOADED': {
@@ -135,14 +142,28 @@ export class PlayCommand extends Command {
                         const track = new YouTubeTrack(this.client, data, author, int.channel);
                         subscription.add(track);
 
-                        if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                        if (subscription.queue.length) {
+                            this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                        } else if (int instanceof ChatInputCommandInteraction) {
+                            this.commander.reply(int, { content: '✅' });
+                        } else if (int instanceof Message) {
+                            int.react('✅');
+                        }
+
                         break;
                     }
                     case 'spotify': {
                         const track = new SpotifyTrack(this.client, data, author, int.channel);
                         subscription.add(track);
 
-                        if (subscription.queue.length) this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                        if (subscription.queue.length) {
+                            this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                        } else if (int instanceof ChatInputCommandInteraction) {
+                            this.commander.reply(int, { content: '✅' });
+                        } else if (int instanceof Message) {
+                            int.react('✅');
+                        }
+
                         break;
                     }
                     default: {

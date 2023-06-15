@@ -27,8 +27,11 @@ export class StopCommand extends Command {
         );
 
         subscription.destroy();
+
+        if (int instanceof Message) int.react('👋');
         this.commander.reply(int, {
-            embeds: [new ActionEmbed('success').setText('Stopped playing and disconnected. Cya! 👋'), new ReviewEmbed()],
+            content: int instanceof ChatInputCommandInteraction ? '👋' : '',
+            embeds: [new ReviewEmbed()],
             components: [buttons],
         });
     }
