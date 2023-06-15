@@ -19,9 +19,9 @@ export class TrackAdd extends Event {
         let data: QueueData | QueueData[];
 
         if (item instanceof YouTubePlaylist) {
-            data = item.tracks.map((track) => new YouTubeTrack(this.client, track, item.requester, item.textChannel).toData());
+            data = item.tracks.map((track) => new YouTubeTrack(track, item.requester, item.textChannel).toData());
         } else if (item instanceof SpotifyPlaylist) {
-            data = item.tracks.map((track) => new SpotifyTrack(this.client, track, item.requester, item.textChannel).toData());
+            data = item.tracks.map((track) => new SpotifyTrack(track, item.requester, item.textChannel).toData());
         } else {
             data = item.toData();
         }

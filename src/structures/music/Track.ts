@@ -12,7 +12,6 @@ abstract class Track {
     public thumbnail?: string;
 
     constructor(
-        public client: Client,
         public data: ShoukakuTrack,
         public requester: User,
         public textChannel: TextBasedChannel | null
@@ -38,24 +37,23 @@ abstract class Track {
 
 export class YouTubeTrack extends Track {
     constructor(
-        public client: Client,
         public data: ShoukakuTrack,
         public requester: User,
         public textChannel: TextBasedChannel | null
     ) {
-        super(client, data, requester, textChannel);
+        super(data, requester, textChannel);
         this.thumbnail = `https://i.ytimg.com/vi/${this.data.info.identifier}/mqdefault.jpg`;
     }
 }
 
 export class SpotifyTrack extends Track {
     constructor(
-        public client: Client,
         public data: ShoukakuTrack,
         public requester: User,
         public textChannel: TextBasedChannel | null
     ) {
-        super(client, data, requester, textChannel);
+        super(data, requester, textChannel);
+        // Fix title to add author
     }
 }
 
