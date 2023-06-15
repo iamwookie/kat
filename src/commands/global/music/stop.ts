@@ -21,18 +21,15 @@ export class StopCommand extends Command {
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
-
-        const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder().setURL('https://top.gg/bot/916639727220846592#reviews').setLabel('Leave a review').setStyle(ButtonStyle.Link)
-        );
-
         subscription.destroy();
+
+        const reviewEmbed = new ReviewEmbed();
 
         if (int instanceof Message) int.react('👋');
         this.commander.reply(int, {
             content: int instanceof ChatInputCommandInteraction ? '👋' : '',
-            embeds: [new ReviewEmbed()],
-            components: [buttons],
+            embeds: [reviewEmbed],
+            components: [reviewEmbed.row],
         });
     }
 }
