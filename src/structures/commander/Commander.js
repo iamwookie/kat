@@ -208,7 +208,9 @@ export class Commander {
     }
     reply(interaction, content) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content);
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply(content);
         }
         else if (interaction instanceof Message) {
             return interaction.channel.send(content);
@@ -219,7 +221,9 @@ export class Commander {
     }
     edit(interaction, editable, content) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content);
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply(content);
         }
         else if (interaction instanceof Message) {
             return editable.edit(content);

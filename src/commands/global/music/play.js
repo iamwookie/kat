@@ -1,5 +1,5 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder, VoiceChannel } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, Message, VoiceChannel } from 'discord.js';
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../../../structures/index.js';
 import { NodeError, PlayerError } from '../../../utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
@@ -87,8 +87,15 @@ export class PlayCommand extends Command {
                 const data = res.tracks[0];
                 const track = new YouTubeTrack(this.client, data, author, int.channel);
                 subscription.add(track);
-                if (subscription.queue.length)
+                if (subscription.queue.length) {
                     this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                }
+                else if (int instanceof ChatInputCommandInteraction) {
+                    this.commander.reply(int, { content: '✅' });
+                }
+                else if (int instanceof Message) {
+                    int.react('✅');
+                }
                 break;
             }
             case 'PLAYLIST_LOADED': {
@@ -122,15 +129,29 @@ export class PlayCommand extends Command {
                     case 'youtube': {
                         const track = new YouTubeTrack(this.client, data, author, int.channel);
                         subscription.add(track);
-                        if (subscription.queue.length)
+                        if (subscription.queue.length) {
                             this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                        }
+                        else if (int instanceof ChatInputCommandInteraction) {
+                            this.commander.reply(int, { content: '✅' });
+                        }
+                        else if (int instanceof Message) {
+                            int.react('✅');
+                        }
                         break;
                     }
                     case 'spotify': {
                         const track = new SpotifyTrack(this.client, data, author, int.channel);
                         subscription.add(track);
-                        if (subscription.queue.length)
+                        if (subscription.queue.length) {
                             this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
+                        }
+                        else if (int instanceof ChatInputCommandInteraction) {
+                            this.commander.reply(int, { content: '✅' });
+                        }
+                        else if (int instanceof Message) {
+                            int.react('✅');
+                        }
                         break;
                     }
                     default: {
