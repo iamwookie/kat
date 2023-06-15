@@ -1,6 +1,5 @@
 import { formatDuration } from '../../utils/helpers.js';
 class Track {
-    client;
     data;
     requester;
     textChannel;
@@ -9,8 +8,7 @@ class Track {
     duration;
     durationRaw;
     thumbnail;
-    constructor(client, data, requester, textChannel) {
-        this.client = client;
+    constructor(data, requester, textChannel) {
         this.data = data;
         this.requester = requester;
         this.textChannel = textChannel;
@@ -32,13 +30,11 @@ class Track {
     }
 }
 export class YouTubeTrack extends Track {
-    client;
     data;
     requester;
     textChannel;
-    constructor(client, data, requester, textChannel) {
-        super(client, data, requester, textChannel);
-        this.client = client;
+    constructor(data, requester, textChannel) {
+        super(data, requester, textChannel);
         this.data = data;
         this.requester = requester;
         this.textChannel = textChannel;
@@ -46,16 +42,15 @@ export class YouTubeTrack extends Track {
     }
 }
 export class SpotifyTrack extends Track {
-    client;
     data;
     requester;
     textChannel;
-    constructor(client, data, requester, textChannel) {
-        super(client, data, requester, textChannel);
-        this.client = client;
+    constructor(data, requester, textChannel) {
+        super(data, requester, textChannel);
         this.data = data;
         this.requester = requester;
         this.textChannel = textChannel;
+        // Fix title to add author
     }
 }
 class Playlist {

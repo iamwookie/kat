@@ -85,7 +85,7 @@ export class PlayCommand extends Command {
             }
             case 'SEARCH_RESULT': {
                 const data = res.tracks[0];
-                const track = new YouTubeTrack(this.client, data, author, int.channel);
+                const track = new YouTubeTrack(data, author, int.channel);
                 subscription.add(track);
                 if (subscription.queue.length) {
                     this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
@@ -127,7 +127,7 @@ export class PlayCommand extends Command {
                 const data = res.tracks[0];
                 switch (data.info.sourceName) {
                     case 'youtube': {
-                        const track = new YouTubeTrack(this.client, data, author, int.channel);
+                        const track = new YouTubeTrack(data, author, int.channel);
                         subscription.add(track);
                         if (subscription.queue.length) {
                             this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
@@ -141,7 +141,7 @@ export class PlayCommand extends Command {
                         break;
                     }
                     case 'spotify': {
-                        const track = new SpotifyTrack(this.client, data, author, int.channel);
+                        const track = new SpotifyTrack(data, author, int.channel);
                         subscription.add(track);
                         if (subscription.queue.length) {
                             this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
