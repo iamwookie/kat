@@ -14,8 +14,6 @@ import {
     MessageEditOptions,
     InteractionEditReplyOptions,
     MessageCreateOptions,
-    EmojiIdentifierResolvable,
-    EmojiResolvable,
 } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 import { PermissionPrompts } from 'enums.js';
@@ -43,15 +41,22 @@ const commands = [
 ];
 
 export class Commander {
-    public commands = new Collection<string, Command>();
-    public global = new Collection<string, Command>();
-    public reserved = new Collection<Snowflake, Collection<string, Command>>();
-    public modules = new Collection<string, Module>();
-    public aliases = new Collection<string, string>();
+    public commands: Collection<string, Command>;
+    public global: Collection<string, Command>;
+    public reserved: Collection<Snowflake, Collection<string, Command>>;
+    public modules: Collection<string, Module>;
+    public aliases: Collection<string, string>;
 
-    private rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
+    private rest: REST;
 
-    constructor(public readonly client: Client) {}
+    constructor(public readonly client: Client) {
+        this.commands = new Collection<string, Command>();
+        this.global = new Collection<string, Command>();
+        this.reserved = new Collection<Snowflake, Collection<string, Command>>();
+        this.modules = new Collection<string, Module>();
+        this.aliases = new Collection<string, string>();
+        this.rest = new REST({ version: '9' }).setToken(this.client.token!);
+    }
 
     async initialize() {
         this.initializeModules();
@@ -65,6 +70,8 @@ export class Commander {
         }
 
         this.intiliazeEvents();
+
+        this.client.logger.status('>>>> Commander Initialized!');
     }
 
     authorize(interaction: ChatInputCommandInteraction | Message, command: Command) {
@@ -187,9 +194,7 @@ export class Commander {
                 body.push(command.data().toJSON());
             }
 
-            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), {
-                body: body,
-            });
+            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), { body });
             this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
         } catch (err) {
             this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
@@ -208,9 +213,7 @@ export class Commander {
             }
 
             try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), {
-                    body: body,
-                });
+                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), { body });
                 this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
             } catch (err) {
                 this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');

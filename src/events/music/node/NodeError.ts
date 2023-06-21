@@ -11,6 +11,7 @@ export class NodeError extends Event {
         this.client.once(this.name, (_, err) => {
             this.client.logger.error(err);
         });
+        
         this.client.emit(Events.Debug, 'Events (NodeError) >> Registered Sub Event');
     }
 

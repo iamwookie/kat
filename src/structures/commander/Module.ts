@@ -12,13 +12,14 @@ interface ModuleOptions {
 export class Module extends EventEmitter {
     public name: string;
     public guilds?: Snowflake[];
-    public commands = new Collection<string, Command>();
+    public commands: Collection<string, Command>;
 
     constructor(public client: Client, public commander: Commander, options: ModuleOptions) {
         super({ captureRejections: true });
 
         this.name = options.name;
         this.guilds = options.guilds;
+        this.commands = new Collection<string, Command>();
 
         this.on('error', (err) => {
             this.client.logger.error(err, 'An Error Has Occured', `Module ${this.name}`);

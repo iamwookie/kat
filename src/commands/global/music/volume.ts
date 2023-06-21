@@ -72,10 +72,9 @@ export class VolumeCommand extends Command {
                 music: true,
             },
         });
-        if (!res?.music) 
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
+        if (!res?.music) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
 
-        this.client.cache.music.update(int.guildId!, res.music);
+        this.client.cache.music.set(int.guildId!, res.music);
 
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (subscription) {

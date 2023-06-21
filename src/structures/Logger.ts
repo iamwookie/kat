@@ -7,7 +7,7 @@ import chalk from 'chalk';
 
 export class Logger {
     constructor(private client: Client) {
-        console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
+        this.status('>>>> Logger Initialized!');
     }
 
     fatal(err: any, message?: string, scope?: string): void {
@@ -53,6 +53,10 @@ export class Logger {
 
     debug(message: string): void {
         console.log(chalk.blue('(DEBUG): ' + message));
+    }
+
+    status(message: string): void {
+        console.log(chalk.greenBright.bold.underline(message));
     }
 
     async notify(embed: APIEmbed | JSONEncodable<APIEmbed>) {

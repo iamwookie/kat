@@ -3,7 +3,7 @@ import { EmbedBuilder } from 'discord.js';
 export class ActionEmbed extends EmbedBuilder {
     constructor(public embedType?: 'success' | 'fail' | 'warn') {
         super();
-
+        
         this.embedType = embedType;
     }
 
