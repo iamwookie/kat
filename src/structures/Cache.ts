@@ -1,9 +1,9 @@
-import { Collection, Snowflake } from 'discord.js';
 import { KATClient as Client } from './Client';
-import { Guild, Music, Queue } from '@prisma/client';
+import { Snowflake } from 'discord.js';
+import { Guild, Music } from '@prisma/client';
 
 export class Cache {
-    public guilds: GuildCache;
+    public guilds: GuildCache
     public music: MusicCache;
     public queue: QueueCache;
 
@@ -11,85 +11,117 @@ export class Cache {
         this.guilds = new GuildCache(client);
         this.music = new MusicCache(client);
         this.queue = new QueueCache(client);
+
+        this.client.logger.status('>>>> Cache Initialized!');
     }
 }
 
-class BaseCache<T> {
-    public cache = new Collection<Snowflake, T>();
+class GuildCache {
+    public key: string;
 
-    constructor(public client: Client) {}
-
-    update(key: string, data: T) {
-        this.cache.set(key, data);
-        return data;
-    }
-}
-
-class GuildCache extends BaseCache<Guild> {
-    constructor(public client: Client) {
-        super(client);
+    constructor(private client: Client) {
+        this.key = 'kat:guilds'
     }
 
-    async get(guildId: Snowflake) {
-        if (this.cache.has(guildId)) return this.cache.get(guildId)!;
+    async get(guildId: Snowflake): Promise<Guild | null> {
+        try {
+            const res = await this.client.redis.hget<Guild>(this.key, guildId);
+            if (res) return res;
 
-        const res = await this.client.prisma.guild.findUnique({
-            where: {
-                guildId,
-            },
-        });
-        if (res) this.cache.set(guildId, res);
+            const data = await this.client.prisma.guild.findUnique({ where: { guildId } });
+            if (data) {
+                await this.client.redis.hset(this.key, { guildId: data });
+                await this.client.redis.expire(this.key, this.client.config.cache.guildTimeout);
+            }
 
-        return res ?? undefined;
+            return data;
+        } catch (err) {
+            this.client.logger.error(err, 'Error Getting Guild Data', 'GuildCache');
+            return null;
+        }
     }
 
-    async prefix(guildId: Snowflake) {
+    async set(guildId: Snowflake, data: Guild): Promise<void> {
+        try {
+            await this.client.redis.hset(this.key, { [guildId]: data });
+            await this.client.redis.expire(this.key, this.client.config.cache.guildTimeout);
+        } catch (err) {
+            this.client.logger.error(err, 'Error Setting Music Data', 'MusicCache');
+        }
+    }
+
+    async prefix(guildId: Snowflake): Promise<string> {
         const res = await this.get(guildId);
         return res?.prefix ?? this.client.prefix;
     }
 }
 
-class MusicCache extends BaseCache<Music> {
-    constructor(public client: Client) {
-        super(client);
+class MusicCache {
+    private key: string;
+
+    constructor(private client: Client) {
+        this.key = 'kat:music'
     }
 
-    async get(guildId: Snowflake) {
-        if (this.cache.has(guildId)) return this.cache.get(guildId)!;
+    async get(guildId: Snowflake): Promise<Music | null> {
+        try {
+            const res = await this.client.redis.hget<Music>(this.key, guildId);
+            if (res) return res;
 
-        const res = await this.client.prisma.music.findUnique({
-            where: {
-                guildId,
-            },
-        });
-        if (res) this.cache.set(guildId, res);
+            const data = await this.client.prisma.music.findUnique({ where: { guildId } });
+            if (data) {
+                await this.client.redis.hset(this.key, { [guildId]: data });
+                await this.client.redis.expire(this.key, this.client.config.cache.musicTimeout);
+            }
 
-        return res ?? undefined;
+            return data;
+        } catch (err) {
+            this.client.logger.error(err, 'Error Getting Music Data', 'MusicCache');
+            return null;
+        }
+    }
+
+    async set(guildId: Snowflake, data: Music): Promise<void> {
+        try {
+            await this.client.redis.hset(this.key, { [guildId]: data });
+            await this.client.redis.expire(this.key, this.client.config.cache.musicTimeout);
+        } catch (err) {
+            this.client.logger.error(err, 'Error Setting Music Data', 'MusicCache');
+        }
     }
 }
 
-class QueueCache extends BaseCache<Queue> {
-    public counts = new Collection<Snowflake, number>();
+class QueueCache {
+    private key;
 
-    constructor(public client: Client) {
-        super(client);
+    constructor(private client: Client) {
+        this.key = 'kat:queue'
     }
 
-    async count(guildId: Snowflake) {
-        if (this.counts.has(guildId)) return this.counts.get(guildId)!;
+    async count(guildId: Snowflake):  Promise<number> {
+        try {
+            const res = await this.client.redis.hget<number>(this.key + ':counts', guildId);
+            if (res) return res;
 
-        const res = await this.client.prisma.track.count({
-            where: {
-                guildId,
-            },
-        });
-        this.counts.set(guildId, res);
+            const data = await this.client.prisma.track.count({ where: { guildId } });
+            if (data) {
+                await this.client.redis.hset(this.key + ':counts', { [guildId]: data });
+                await this.client.redis.expire(this.key + ':counts', this.client.config.cache.queueTimeout);
+            }
 
-        return res;
+            return data;
+        } catch (err) {
+            this.client.logger.error(err, 'Error Getting Queue Count', 'QueueCache');
+            return 0;
+        }
     }
 
-    increment(guildId: Snowflake) {
-        const count = this.counts.get(guildId) ?? 0;
-        if(this.counts.has(guildId)) this.counts.set(guildId, count + 1);
+    async increment(guildId: Snowflake): Promise<void> {
+        try {
+            await this.client.redis.hincrby(this.key + ':counts', guildId, 1);
+            await this.client.redis.expire(this.key + ':counts', this.client.config.cache.queueTimeout);
+        } catch (err) {
+            this.client.logger.error(err, 'Error Incrementing Queue Count', 'QueueCache');
+        }
     }
 }

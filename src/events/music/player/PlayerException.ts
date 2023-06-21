@@ -1,5 +1,6 @@
 import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from '@structures/index.js';
 import { TrackExceptionEvent } from 'shoukaku';
+import { PlayerError } from '@utils/errors.js';
 import { ActionEmbed } from '@utils/embeds/action.js';
 import { MusicPrompts } from 'enums.js';
 
@@ -10,7 +11,7 @@ export class PlayerException extends Event {
 
     async execute(subscription: MusicSubscription, data: TrackExceptionEvent) {
         this.client.logger.error(
-            data.exception,
+            new PlayerError(data.exception?.message),
             `Player Exception In: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`,
             'Music'
         );

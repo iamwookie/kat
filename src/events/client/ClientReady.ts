@@ -14,7 +14,6 @@ export class ClientReady extends Event {
         for (const module of this.commander.modules.values()) module.emit(this.name, client);
 
         await this.client.server.initialize();
-        console.log(chalk.greenBright.bold.underline(`>>> Server Initialized (Port: ${this.client.server.port})`));
 
         // Move to a method in the future (maybe :/)
         const res = await this.client.prisma.queue.findMany({

@@ -6,13 +6,13 @@ import { NodeError, PlayerError } from '@utils/errors.js';
 
 export class Subscription {
     public shoukaku: Shoukaku;
-    public queue: (YouTubeTrack | SpotifyTrack)[] = [];
-    public active: YouTubeTrack | SpotifyTrack | null = null;
-    public position = 0;
-    public looped = false;
-    public volume = 100;
+    public queue: (YouTubeTrack | SpotifyTrack)[];
+    public active: YouTubeTrack | SpotifyTrack | null;
+    public position: number;
+    public volume: number;
+    public looped: boolean;
+    public destroyed: boolean;
     public message?: Message;
-    public destroyed = false;
 
     constructor(
         public client: Client,
@@ -23,11 +23,17 @@ export class Subscription {
         public node: Node
     ) {
         this.shoukaku = client.shoukaku;
+        this.queue = [];
+        this.active = null;
+        this.position = 0;
+        this.looped = false;
+        this.volume = 100;
+        this.destroyed = false;
 
         this.player.on('exception', (data) => this.client.emit('playerException', this, data));
         this.player.on('start', (data) => this.client.emit('playerStart', this, data));
         this.player.on('end', (reason) => this.client.emit('playerEnd', this, reason));
-        
+
         // -----> REQUIRES FIXING FROM SHOUKAKU
         //
         // this.player.on("closed", (reason) => {
@@ -97,12 +103,12 @@ export class Subscription {
     add(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
         if (item instanceof YouTubePlaylist) {
             for (const data of item.tracks) {
-                const track = new YouTubeTrack(this.client, data, item.requester, item.textChannel);
+                const track = new YouTubeTrack(data, item.requester, item.textChannel);
                 this.queue.push(track);
             }
         } else if (item instanceof SpotifyPlaylist) {
             for (const data of item.tracks) {
-                const track = new SpotifyTrack(this.client, data, item.requester, item.textChannel);
+                const track = new SpotifyTrack(data, item.requester, item.textChannel);
                 this.queue.push(track);
             }
         } else {

@@ -35,7 +35,7 @@ export abstract class Command {
     public users?: Snowflake[];
     public hidden?: boolean;
     public disabled?: boolean;
-    public cooldowns = new Collection<Snowflake, number>();
+    public cooldowns: Collection<Snowflake, number>;
 
     abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
 
@@ -50,6 +50,7 @@ export abstract class Command {
         this.users = options.users;
         this.hidden = options.hidden;
         this.disabled = options.disabled;
+        this.cooldowns = new Collection<Snowflake, number>();
 
         if (options.module) this.module = this.commander.modules.get(options.module) ?? new Module(this.client, commander, { name: options.module });
     }

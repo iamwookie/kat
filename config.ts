@@ -1,6 +1,6 @@
 import { PermissionsBitField } from 'discord.js';
 
-export const version = '7.10.0';
+export const version = '7.11.0';
 
 export const devs = ['244662779745665026'];
 
@@ -24,6 +24,12 @@ export const bot = {
         PermissionsBitField.Flags.UseVAD,
     ]),
 };
+
+export const cache = {
+    guildTimeout: 300, // The time in seconds when the guild cache will expire
+    musicTimeout: 300, // The time in seconds when the music cache will expire
+    queueTimeout: 300, // The time in seconds when the queue cache will expire
+}
 
 export const server = {
     port: 3030,

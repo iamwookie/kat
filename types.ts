@@ -1,2 +1,3 @@
-import type { Track } from "@prisma/client";
-export type QueueData = Omit<Track, "id" | "guildId" | "createdAt">;
+import { Track } from '@prisma/client';
+
+export type QueueData = Omit<Track, 'id' | 'guildId' | 'createdAt'>;

@@ -1,8 +1,6 @@
 import { KATClient as Client } from '../Client.js';
 import { Shoukaku, Connectors } from 'shoukaku';
 
-import chalk from 'chalk';
-
 declare module 'shoukaku' {
     interface LavalinkResponse {
         exception?: {
@@ -27,6 +25,6 @@ export class ShoukakuClient extends Shoukaku {
         this.on('disconnect', (name) => this.client.emit('nodeDisconnect', name));
         this.on('close', (name, code) => this.client.emit('nodeClose', name, code));
 
-        console.log(chalk.greenBright.bold.underline('>>> Shoukaku Initialized'));
+        this.client.logger.status('>>>> Shoukaku Initialized');
     }
 }
