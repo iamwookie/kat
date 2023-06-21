@@ -5,13 +5,14 @@ export class Module extends EventEmitter {
     commander;
     name;
     guilds;
-    commands = new Collection();
+    commands;
     constructor(client, commander, options) {
         super({ captureRejections: true });
         this.client = client;
         this.commander = commander;
         this.name = options.name;
         this.guilds = options.guilds;
+        this.commands = new Collection();
         this.on('error', (err) => {
             this.client.logger.error(err, 'An Error Has Occured', `Module ${this.name}`);
         });

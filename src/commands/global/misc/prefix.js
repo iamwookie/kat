@@ -46,7 +46,7 @@ export class PrefixCommand extends Command {
                 prefix: args,
             },
         });
-        this.client.cache.guilds.update(res.guildId, res);
+        this.client.cache.guilds.set(res.guildId, res);
         if (res) {
             this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(`Successfully set the chat prefix to \`${res.prefix}\`!`)] });
         }

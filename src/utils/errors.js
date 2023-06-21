@@ -1,12 +1,12 @@
 export class NodeError extends Error {
-    name = 'NodeError';
     constructor(message) {
         super(message);
+        this.name = 'NodeError';
     }
 }
 export class PlayerError extends Error {
-    name = 'PlayerError';
     constructor(message) {
         super(message);
+        this.name = 'PlayerError';
     }
 }

@@ -14,7 +14,7 @@ export class Command {
     users;
     hidden;
     disabled;
-    cooldowns = new Collection();
+    cooldowns;
     constructor(client, commander, options) {
         this.client = client;
         this.commander = commander;
@@ -28,6 +28,7 @@ export class Command {
         this.users = options.users;
         this.hidden = options.hidden;
         this.disabled = options.disabled;
+        this.cooldowns = new Collection();
         if (options.module)
             this.module = this.commander.modules.get(options.module) ?? new Module(this.client, commander, { name: options.module });
     }

@@ -1,5 +1,5 @@
 import { PermissionsBitField } from 'discord.js';
-export const version = '7.10.3';
+export const version = '7.11.0';
 export const devs = ['244662779745665026'];
 export const bot = {
     prefix: process.env.NODE_ENV != 'production' ? '!' : '.',
@@ -20,6 +20,11 @@ export const bot = {
         PermissionsBitField.Flags.Speak,
         PermissionsBitField.Flags.UseVAD,
     ]),
+};
+export const cache = {
+    guildTimeout: 300,
+    musicTimeout: 300,
+    queueTimeout: 300, // The time in seconds when the queue cache will expire
 };
 export const server = {
     port: 3030,

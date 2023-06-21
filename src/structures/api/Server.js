@@ -32,6 +32,7 @@ export class Server {
             this.app.use(GlobalRoute(this.client));
             this.app.use(Sentry.Handlers.errorHandler());
             this.app.listen(this.port, () => resolve());
+            this.client.logger.status(`>>> Server Initialized (Port: ${this.client.server.port})`);
         });
     }
 }

@@ -1,4 +1,3 @@
-import { Collection } from 'discord.js';
 export class Cache {
     client;
     guilds;
@@ -9,82 +8,112 @@ export class Cache {
         this.guilds = new GuildCache(client);
         this.music = new MusicCache(client);
         this.queue = new QueueCache(client);
+        this.client.logger.status('>>>> Cache Initialized!');
     }
 }
-class BaseCache {
+class GuildCache {
     client;
-    cache = new Collection();
+    key;
     constructor(client) {
         this.client = client;
-    }
-    update(key, data) {
-        this.cache.set(key, data);
-        return data;
-    }
-}
-class GuildCache extends BaseCache {
-    client;
-    constructor(client) {
-        super(client);
-        this.client = client;
+        this.key = 'kat:guilds';
     }
     async get(guildId) {
-        if (this.cache.has(guildId))
-            return this.cache.get(guildId);
-        const res = await this.client.prisma.guild.findUnique({
-            where: {
-                guildId,
-            },
-        });
-        if (res)
-            this.cache.set(guildId, res);
-        return res ?? undefined;
+        try {
+            const res = await this.client.redis.hget(this.key, guildId);
+            if (res)
+                return res;
+            const data = await this.client.prisma.guild.findUnique({ where: { guildId } });
+            if (data) {
+                await this.client.redis.hset(this.key, { guildId: data });
+                await this.client.redis.expire(this.key, this.client.config.cache.guildTimeout);
+            }
+            return data;
+        }
+        catch (err) {
+            this.client.logger.error(err, 'Error Getting Guild Data', 'GuildCache');
+            return null;
+        }
+    }
+    async set(guildId, data) {
+        try {
+            await this.client.redis.hset(this.key, { [guildId]: data });
+            await this.client.redis.expire(this.key, this.client.config.cache.guildTimeout);
+        }
+        catch (err) {
+            this.client.logger.error(err, 'Error Setting Music Data', 'MusicCache');
+        }
     }
     async prefix(guildId) {
         const res = await this.get(guildId);
         return res?.prefix ?? this.client.prefix;
     }
 }
-class MusicCache extends BaseCache {
+class MusicCache {
     client;
+    key;
     constructor(client) {
-        super(client);
         this.client = client;
+        this.key = 'kat:music';
     }
     async get(guildId) {
-        if (this.cache.has(guildId))
-            return this.cache.get(guildId);
-        const res = await this.client.prisma.music.findUnique({
-            where: {
-                guildId,
-            },
-        });
-        if (res)
-            this.cache.set(guildId, res);
-        return res ?? undefined;
+        try {
+            const res = await this.client.redis.hget(this.key, guildId);
+            if (res)
+                return res;
+            const data = await this.client.prisma.music.findUnique({ where: { guildId } });
+            if (data) {
+                await this.client.redis.hset(this.key, { [guildId]: data });
+                await this.client.redis.expire(this.key, this.client.config.cache.musicTimeout);
+            }
+            return data;
+        }
+        catch (err) {
+            this.client.logger.error(err, 'Error Getting Music Data', 'MusicCache');
+            return null;
+        }
+    }
+    async set(guildId, data) {
+        try {
+            await this.client.redis.hset(this.key, { [guildId]: data });
+            await this.client.redis.expire(this.key, this.client.config.cache.musicTimeout);
+        }
+        catch (err) {
+            this.client.logger.error(err, 'Error Setting Music Data', 'MusicCache');
+        }
     }
 }
-class QueueCache extends BaseCache {
+class QueueCache {
     client;
-    counts = new Collection();
+    key;
     constructor(client) {
-        super(client);
         this.client = client;
+        this.key = 'kat:queue';
     }
     async count(guildId) {
-        if (this.counts.has(guildId))
-            return this.counts.get(guildId);
-        const res = await this.client.prisma.track.count({
-            where: {
-                guildId,
-            },
-        });
-        this.counts.set(guildId, res);
-        return res;
+        try {
+            const res = await this.client.redis.hget(this.key + ':counts', guildId);
+            if (res)
+                return res;
+            const data = await this.client.prisma.track.count({ where: { guildId } });
+            if (data) {
+                await this.client.redis.hset(this.key + ':counts', { [guildId]: data });
+                await this.client.redis.expire(this.key + ':counts', this.client.config.cache.queueTimeout);
+            }
+            return data;
+        }
+        catch (err) {
+            this.client.logger.error(err, 'Error Getting Queue Count', 'QueueCache');
+            return 0;
+        }
     }
-    increment(guildId) {
-        const count = this.counts.get(guildId) ?? 0;
-        if (this.counts.has(guildId))
-            this.counts.set(guildId, count + 1);
+    async increment(guildId) {
+        try {
+            await this.client.redis.hincrby(this.key + ':counts', guildId, 1);
+            await this.client.redis.expire(this.key + ':counts', this.client.config.cache.queueTimeout);
+        }
+        catch (err) {
+            this.client.logger.error(err, 'Error Incrementing Queue Count', 'QueueCache');
+        }
     }
 }

@@ -8,13 +8,13 @@ export class Subscription {
     player;
     node;
     shoukaku;
-    queue = [];
-    active = null;
-    position = 0;
-    looped = false;
-    volume = 100;
+    queue;
+    active;
+    position;
+    volume;
+    looped;
+    destroyed;
     message;
-    destroyed = false;
     constructor(client, guild, voiceChannel, textChannel, player, node) {
         this.client = client;
         this.guild = guild;
@@ -23,6 +23,12 @@ export class Subscription {
         this.player = player;
         this.node = node;
         this.shoukaku = client.shoukaku;
+        this.queue = [];
+        this.active = null;
+        this.position = 0;
+        this.looped = false;
+        this.volume = 100;
+        this.destroyed = false;
         this.player.on('exception', (data) => this.client.emit('playerException', this, data));
         this.player.on('start', (data) => this.client.emit('playerStart', this, data));
         this.player.on('end', (reason) => this.client.emit('playerEnd', this, reason));

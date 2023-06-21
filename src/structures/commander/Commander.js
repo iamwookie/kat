@@ -23,14 +23,20 @@ const commands = [
 ];
 export class Commander {
     client;
-    commands = new Collection();
-    global = new Collection();
-    reserved = new Collection();
-    modules = new Collection();
-    aliases = new Collection();
-    rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+    commands;
+    global;
+    reserved;
+    modules;
+    aliases;
+    rest;
     constructor(client) {
         this.client = client;
+        this.commands = new Collection();
+        this.global = new Collection();
+        this.reserved = new Collection();
+        this.modules = new Collection();
+        this.aliases = new Collection();
+        this.rest = new REST({ version: '9' }).setToken(this.client.token);
     }
     async initialize() {
         this.initializeModules();
@@ -42,6 +48,7 @@ export class Commander {
             this.client.logger.info('Commands Registered!', 'Commander');
         }
         this.intiliazeEvents();
+        this.client.logger.status('>>>> Commander Initialized!');
     }
     authorize(interaction, command) {
         const author = this.getAuthor(interaction);
@@ -153,9 +160,7 @@ export class Commander {
                     continue;
                 body.push(command.data().toJSON());
             }
-            const res = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID), {
-                body: body,
-            });
+            const res = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID), { body });
             this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
         }
         catch (err) {
@@ -173,9 +178,7 @@ export class Commander {
                 body.push(command.data().toJSON());
             }
             try {
-                const res = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), {
-                    body: body,
-                });
+                const res = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), { body });
                 this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
             }
             catch (err) {

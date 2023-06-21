@@ -5,7 +5,7 @@ export class Logger {
     client;
     constructor(client) {
         this.client = client;
-        console.log(chalk.greenBright.bold.underline('>>> Logger Initialized!'));
+        this.status('>>>> Logger Initialized!');
     }
     fatal(err, message, scope) {
         const eventId = Sentry.captureException(err);
@@ -39,6 +39,9 @@ export class Logger {
     }
     debug(message) {
         console.log(chalk.blue('(DEBUG): ' + message));
+    }
+    status(message) {
+        console.log(chalk.greenBright.bold.underline(message));
     }
     async notify(embed) {
         for (const devId of this.client.config.devs) {
