@@ -30,8 +30,11 @@ export class SkipCommand extends Command {
         this.applyCooldown(author);
 
         subscription.stop();
-        this.commander.reply(int, {
-            embeds: [new ActionEmbed('success').setText('Skipping...')],
-        });
+
+        if (int instanceof ChatInputCommandInteraction) {
+            this.commander.reply(int, { content: '✅' });
+        } else if (int instanceof Message) {
+            int.react('✅');
+        }
     }
 }
