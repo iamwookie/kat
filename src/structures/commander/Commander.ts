@@ -197,7 +197,7 @@ export class Commander {
                 body.push(command.data().toJSON());
             }
 
-            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), { body });
+            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID), { body });
             this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
         } catch (err) {
             this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
@@ -216,7 +216,7 @@ export class Commander {
             }
 
             try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), { body });
+                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), { body });
                 this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
             } catch (err) {
                 this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');

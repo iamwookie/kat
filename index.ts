@@ -12,7 +12,7 @@ import { RewriteFrames } from '@sentry/integrations';
 // ------------------------------------
 import { KATClient as Client } from '@structures/index.js';
 import { GatewayIntentBits, ActivityType, Partials } from 'discord.js';
-import { bot as config } from '@config';
+import { bot as config } from './config.js';
 
 import chalk from 'chalk';
 

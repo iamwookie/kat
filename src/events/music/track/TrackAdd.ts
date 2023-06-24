@@ -1,4 +1,3 @@
-import type { QueueData } from 'types';
 import {
     Event,
     KATClient as Client,
@@ -9,6 +8,7 @@ import {
     YouTubePlaylist,
     SpotifyPlaylist,
 } from '@structures/index.js';
+import { QueueData } from 'types';
 
 export class TrackAdd extends Event {
     constructor(client: Client, commander: Commander) {

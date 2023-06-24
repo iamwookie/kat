@@ -1,8 +1,7 @@
-import type { QueueData } from 'types';
-import { KATClient as Client } from '../Client';
 import { TextBasedChannel, User } from 'discord.js';
 import { Track as ShoukakuTrack, LavalinkResponse } from 'shoukaku';
 import { formatDuration } from '@utils/helpers.js';
+import { QueueData } from 'types';
 
 abstract class Track {
     public url: string;

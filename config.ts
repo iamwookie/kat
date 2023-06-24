@@ -47,8 +47,8 @@ export const lavalink = {
     nodes: [
         {
             name: 'uk:london-1',
-            url: '157.245.41.162:2333',
-            auth: 'yoruistrash',
+            url: process.env.LAVALINK_HOST,
+            auth: process.env.LAVALINK_AUTH,
         },
     ],
 };
