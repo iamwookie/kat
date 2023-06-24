@@ -31,10 +31,6 @@ export class SkipCommand extends Command {
 
         subscription.stop();
 
-        if (int instanceof ChatInputCommandInteraction) {
-            this.commander.reply(int, { content: '✅' });
-        } else if (int instanceof Message) {
-            int.react('✅');
-        }
+        this.commander.react(int, '✅');
     }
 }

@@ -97,10 +97,8 @@ export class PlayCommand extends Command {
 
                 if (subscription.queue.length) {
                     this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
-                } else if (int instanceof ChatInputCommandInteraction) {
-                    this.commander.reply(int, { content: '✅' });
-                } else if (int instanceof Message) {
-                    int.react('✅');
+                } else {
+                    this.commander.react(int, '✅');
                 }
 
                 break;
@@ -144,10 +142,8 @@ export class PlayCommand extends Command {
 
                         if (subscription.queue.length) {
                             this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
-                        } else if (int instanceof ChatInputCommandInteraction) {
-                            this.commander.reply(int, { content: '✅' });
-                        } else if (int instanceof Message) {
-                            int.react('✅');
+                        } else {
+                            this.commander.react(int, '✅');
                         }
 
                         break;
@@ -158,10 +154,8 @@ export class PlayCommand extends Command {
 
                         if (subscription.queue.length) {
                             this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
-                        } else if (int instanceof ChatInputCommandInteraction) {
-                            this.commander.reply(int, { content: '✅' });
-                        } else if (int instanceof Message) {
-                            int.react('✅');
+                        } else {
+                            this.commander.react(int, '✅');
                         }
 
                         break;

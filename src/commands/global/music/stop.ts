@@ -21,15 +21,14 @@ export class StopCommand extends Command {
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
         const subscription = this.client.subscriptions.get(int.guildId!);
         if (!subscription) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+
         subscription.destroy();
 
-        const reviewEmbed = new ReviewEmbed();
+        this.commander.react(int, '✅');
 
-        if (int instanceof Message) int.react('👋');
-        this.commander.reply(int, {
-            content: int instanceof ChatInputCommandInteraction ? '👋' : '',
-            embeds: [reviewEmbed],
-            components: [reviewEmbed.row],
-        });
+        if (int.channel) {
+            const reviewEmbed = new ReviewEmbed();
+            int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] });
+        }
     }
 }
