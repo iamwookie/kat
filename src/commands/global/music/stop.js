@@ -1,5 +1,4 @@
 import { Command } from '../../../structures/index.js';
-import { ChatInputCommandInteraction, Message } from 'discord.js';
 import { ActionEmbed, ReviewEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../../enums.js';
 export class StopCommand extends Command {
@@ -21,13 +20,10 @@ export class StopCommand extends Command {
         if (!subscription)
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
         subscription.destroy();
-        const reviewEmbed = new ReviewEmbed();
-        if (int instanceof Message)
-            int.react('👋');
-        this.commander.reply(int, {
-            content: int instanceof ChatInputCommandInteraction ? '👋' : '',
-            embeds: [reviewEmbed],
-            components: [reviewEmbed.row],
-        });
+        this.commander.react(int, '✅');
+        if (int.channel) {
+            const reviewEmbed = new ReviewEmbed();
+            int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] });
+        }
     }
 }

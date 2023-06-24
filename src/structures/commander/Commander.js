@@ -235,4 +235,17 @@ export class Commander {
             return Promise.reject('Invalid interaction.');
         }
     }
+    react(interaction, emoji) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply({ content: emoji });
+        }
+        else if (interaction instanceof Message) {
+            return interaction.react(emoji);
+        }
+        else {
+            return Promise.reject('Invalid interaction.');
+        }
+    }
 }

@@ -1,5 +1,5 @@
 import { Command } from '../../../structures/index.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message, VoiceChannel } from 'discord.js';
+import { SlashCommandBuilder, VoiceChannel } from 'discord.js';
 import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../../../structures/index.js';
 import { NodeError, PlayerError } from '../../../utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
@@ -90,11 +90,8 @@ export class PlayCommand extends Command {
                 if (subscription.queue.length) {
                     this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                 }
-                else if (int instanceof ChatInputCommandInteraction) {
-                    this.commander.reply(int, { content: '✅' });
-                }
-                else if (int instanceof Message) {
-                    int.react('✅');
+                else {
+                    this.commander.react(int, '✅');
                 }
                 break;
             }
@@ -132,11 +129,8 @@ export class PlayCommand extends Command {
                         if (subscription.queue.length) {
                             this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                         }
-                        else if (int instanceof ChatInputCommandInteraction) {
-                            this.commander.reply(int, { content: '✅' });
-                        }
-                        else if (int instanceof Message) {
-                            int.react('✅');
+                        else {
+                            this.commander.react(int, '✅');
                         }
                         break;
                     }
@@ -146,11 +140,8 @@ export class PlayCommand extends Command {
                         if (subscription.queue.length) {
                             this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
                         }
-                        else if (int instanceof ChatInputCommandInteraction) {
-                            this.commander.reply(int, { content: '✅' });
-                        }
-                        else if (int instanceof Message) {
-                            int.react('✅');
+                        else {
+                            this.commander.react(int, '✅');
                         }
                         break;
                     }

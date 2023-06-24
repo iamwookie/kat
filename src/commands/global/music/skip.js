@@ -1,5 +1,4 @@
 import { Command } from '../../../structures/index.js';
-import { ChatInputCommandInteraction, Message } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../../enums.js';
 export class SkipCommand extends Command {
@@ -26,11 +25,6 @@ export class SkipCommand extends Command {
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
         this.applyCooldown(author);
         subscription.stop();
-        if (int instanceof ChatInputCommandInteraction) {
-            this.commander.reply(int, { content: '✅' });
-        }
-        else if (int instanceof Message) {
-            int.react('✅');
-        }
+        this.commander.react(int, '✅');
     }
 }
