@@ -12,7 +12,7 @@ export class MusicEmbed extends EmbedBuilder {
 
     setUser(user: User) {
         return super.setFooter({
-            text: `${user.tag} \u200b • \u200b 🎵 ${this.subscription.node.name}`,
+            text: `${user.tag.replace('#0', '')} \u200b • \u200b 🎵 ${this.subscription.node.name}`,
             iconURL: user.avatarURL() ?? undefined,
         });
     }

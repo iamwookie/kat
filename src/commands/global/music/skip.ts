@@ -30,8 +30,7 @@ export class SkipCommand extends Command {
         this.applyCooldown(author);
 
         subscription.stop();
-        this.commander.reply(int, {
-            embeds: [new ActionEmbed('success').setText('Skipping...')],
-        });
+
+        this.commander.react(int, '✅');
     }
 }

@@ -14,6 +14,9 @@ import {
     MessageEditOptions,
     InteractionEditReplyOptions,
     MessageCreateOptions,
+    EmojiIdentifierResolvable,
+    User,
+    MessageReaction,
 } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 import { PermissionPrompts } from 'enums.js';
@@ -74,7 +77,7 @@ export class Commander {
         this.client.logger.status('>>>> Commander Initialized!');
     }
 
-    authorize(interaction: ChatInputCommandInteraction | Message, command: Command) {
+    authorize(interaction: ChatInputCommandInteraction | Message, command: Command): boolean {
         const author = this.getAuthor(interaction);
 
         if (interaction.inGuild()) {
@@ -120,7 +123,7 @@ export class Commander {
         return true;
     }
 
-    private initializeModules() {
+    private initializeModules(): void {
         const modules = Object.values(Modules);
 
         for (const Module of modules) {
@@ -135,7 +138,7 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${modules.length} Module(s)`);
     }
 
-    private initializeCommands() {
+    private initializeCommands(): void {
         for (const Command of commands) {
             try {
                 const command = new Command(this.client, this);
@@ -170,7 +173,7 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${commands.length} Command(s)`);
     }
 
-    private intiliazeEvents() {
+    private intiliazeEvents(): void {
         const events = Object.values(Events);
 
         for (const Event of events) {
@@ -185,7 +188,7 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
 
-    private async registerGlobalCommands() {
+    private async registerGlobalCommands(): Promise<void> {
         try {
             let body = [];
 
@@ -194,14 +197,14 @@ export class Commander {
                 body.push(command.data().toJSON());
             }
 
-            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID!), { body });
+            const res: any = await this.rest.put(Routes.applicationCommands(process.env.DISCORD_APP_ID), { body });
             this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
         } catch (err) {
             this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
         }
     }
 
-    private async registerReservedCommands() {
+    private async registerReservedCommands(): Promise<void> {
         for (const [guildId, commands] of this.reserved) {
             if (!this.client.guilds.cache.has(guildId)) continue;
 
@@ -213,7 +216,7 @@ export class Commander {
             }
 
             try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID!, guildId), { body });
+                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), { body });
                 this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
             } catch (err) {
                 this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
@@ -223,7 +226,7 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 
-    getAuthor(interaction: ChatInputCommandInteraction | Message) {
+    getAuthor(interaction: ChatInputCommandInteraction | Message): User {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.user;
         } else if (interaction instanceof Message) {
@@ -233,9 +236,9 @@ export class Commander {
         }
     }
 
-    getArgs(interaction: ChatInputCommandInteraction | Message) {
+    getArgs(interaction: ChatInputCommandInteraction | Message): (string | undefined)[] {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat() as string[];
         } else if (interaction instanceof Message) {
             return interaction.content.split(/ +/).slice(1);
         } else {
@@ -243,7 +246,10 @@ export class Commander {
         }
     }
 
-    reply(interaction: ChatInputCommandInteraction | Message, content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions) {
+    reply(
+        interaction: ChatInputCommandInteraction | Message,
+        content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
+    ): Promise<Message> {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.replied
                 ? Promise.reject('Interaction already replied.')
@@ -259,13 +265,25 @@ export class Commander {
         interaction: ChatInputCommandInteraction | Message,
         editable: Message,
         content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
-    ) {
+    ): Promise<Message> {
         if (interaction instanceof ChatInputCommandInteraction) {
             return interaction.replied
                 ? Promise.reject('Interaction already replied.')
                 : interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
         } else if (interaction instanceof Message) {
             return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject('Invalid interaction.');
+        }
+    }
+
+    react(interaction: ChatInputCommandInteraction | Message, emoji: string | EmojiIdentifierResolvable): Promise<Message | MessageReaction> {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply({ content: emoji as Exclude<typeof emoji, EmojiIdentifierResolvable> });
+        } else if (interaction instanceof Message) {
+            return interaction.react(emoji);
         } else {
             return Promise.reject('Invalid interaction.');
         }
