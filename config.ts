@@ -1,6 +1,6 @@
 import { PermissionsBitField } from 'discord.js';
 
-export const version = '7.11.3';
+export const version = '8.0.0';
 
 export const devs = ['244662779745665026'];
 
