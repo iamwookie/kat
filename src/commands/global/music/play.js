@@ -1,9 +1,6 @@
-import { Command } from '../../../structures/index.js';
+import { Command, MusicPrompts, NodeError, PlayerError, SearchError } from '../../../structures/index.js';
 import { SlashCommandBuilder, VoiceChannel } from 'discord.js';
-import { Subscription as MusicSubscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../../../structures/index.js';
-import { NodeError, PlayerError } from '../../../utils/errors.js';
 import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
-import { MusicPrompts } from '../../../../enums.js';
 export class PlayCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -36,125 +33,38 @@ export class PlayCommand extends Command {
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.IncorrectVoice)] });
         if (!voiceChannel.joinable || !voiceChannel.speakable)
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.CannotPlayInVoice)] });
-        let subscription = this.client.subscriptions.get(int.guildId);
-        if (subscription) {
-            if (!subscription.voiceChannel.members.has(author.id))
-                return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
-            if (!query && subscription.paused) {
-                subscription.resume();
-                return this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(MusicPrompts.TrackResumed)] });
-            }
+        if (!query) {
+            const subscription = this.client.dispatcher.getSubscription(int.guild);
+            if (!subscription?.paused)
+                return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('What should I play?')] });
+            subscription.resume();
+            return this.commander.react(int, '▶️');
         }
-        if (!query)
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('What should I play?')] });
         this.applyCooldown(author);
-        if (!subscription) {
-            try {
-                subscription = await MusicSubscription.create(this.client, int.guild, voiceChannel, int.channel);
-            }
-            catch (err) {
-                if (err instanceof NodeError) {
-                    return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoNodes)] });
-                }
-                else if (err instanceof PlayerError) {
-                    return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.VoiceError)] });
-                }
-                else {
-                    const eventId = this.client.logger.error(err);
-                    return this.commander.reply(int, { embeds: [new ErrorEmbed(eventId)] });
-                }
-            }
-        }
-        let search;
         try {
-            search = new URL(query);
+            const res = await this.client.dispatcher.search(query, author);
+            if (!res)
+                return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
+            const subscription = await this.client.dispatcher.createSubscription(int.guild, voiceChannel, int.channel);
+            subscription.add(res);
+            // Could use an empty flag for this in the future
+            if (subscription.queue.length)
+                return this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setEnqueued(res)] });
+            this.commander.react(int, '✅');
         }
         catch (err) {
-            search = query;
-        }
-        const res = await subscription.node.rest.resolve(search instanceof URL ? search.href : `ytsearch:${search}`);
-        const embed = new MusicEmbed(subscription).setUser(author);
-        switch (res?.loadType) {
-            case 'LOAD_FAILED': {
-                this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(`Failed to load track! \n\`${res.exception?.message}\``)] });
-                break;
+            if (err instanceof NodeError) {
+                return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoNodes)] });
             }
-            case 'NO_MATCHES': {
-                this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
-                break;
+            else if (err instanceof SearchError && err.code == 1) {
+                return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(`Failed to load track! \n\`${err.message}\``)] });
             }
-            case 'SEARCH_RESULT': {
-                const data = res.tracks[0];
-                const track = new YouTubeTrack(data, author, int.channel);
-                subscription.add(track);
-                if (subscription.queue.length) {
-                    this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
-                }
-                else {
-                    this.commander.react(int, '✅');
-                }
-                break;
+            else if (err instanceof PlayerError) {
+                return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.VoiceError)] });
             }
-            case 'PLAYLIST_LOADED': {
-                if (!(search instanceof URL))
-                    return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
-                const info = res.playlistInfo;
-                const tracks = res.tracks;
-                switch (tracks[0].info.sourceName) {
-                    case 'youtube': {
-                        const playlist = new YouTubePlaylist(search, info, tracks, author, int.channel);
-                        subscription.add(playlist);
-                        this.commander.reply(int, { embeds: [embed.setEnqueued(playlist)] });
-                        break;
-                    }
-                    case 'spotify': {
-                        const playlist = new SpotifyPlaylist(search, info, tracks, author, int.channel);
-                        subscription.add(playlist);
-                        this.commander.reply(int, { embeds: [embed.setEnqueued(playlist)] });
-                        break;
-                    }
-                    default: {
-                        this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
-                        break;
-                    }
-                }
-                break;
-            }
-            case 'TRACK_LOADED': {
-                const data = res.tracks[0];
-                switch (data.info.sourceName) {
-                    case 'youtube': {
-                        const track = new YouTubeTrack(data, author, int.channel);
-                        subscription.add(track);
-                        if (subscription.queue.length) {
-                            this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
-                        }
-                        else {
-                            this.commander.react(int, '✅');
-                        }
-                        break;
-                    }
-                    case 'spotify': {
-                        const track = new SpotifyTrack(data, author, int.channel);
-                        subscription.add(track);
-                        if (subscription.queue.length) {
-                            this.commander.reply(int, { embeds: [embed.setEnqueued(track)] });
-                        }
-                        else {
-                            this.commander.react(int, '✅');
-                        }
-                        break;
-                    }
-                    default: {
-                        this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
-                        break;
-                    }
-                }
-                break;
-            }
-            default: {
-                this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NoResults)] });
-                break;
+            else {
+                const eventId = this.client.logger.error(err);
+                return this.commander.reply(int, { embeds: [new ErrorEmbed(eventId)] });
             }
         }
     }

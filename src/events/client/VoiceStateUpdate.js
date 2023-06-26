@@ -5,7 +5,7 @@ export class VoiceStateUpdate extends Event {
         super(client, commander, Events.VoiceStateUpdate);
     }
     async execute(oldState, newState) {
-        const subcription = this.client.subscriptions.get(oldState.guild.id);
+        const subcription = this.client.dispatcher.getSubscription(oldState.guild);
         if (!subcription)
             return;
         if (oldState.id == this.client.user?.id && !newState.channel)

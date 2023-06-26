@@ -1,6 +1,6 @@
 import { Event } from '../../../structures/index.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
-import { MusicPrompts } from '../../../../enums.js';
+import { MusicPrompts } from '../../../structures/interfaces/Enums.js';
 export class PlayerEnd extends Event {
     constructor(client, commander) {
         super(client, commander, 'playerEnd');

@@ -4,6 +4,6 @@ export class NodeReady extends Event {
         super(client, commander, 'nodeReady');
     }
     async execute(name) {
-        this.client.logger.info(`Node: ${name}: Has Connected!`, 'Music');
+        this.client.logger.info(`Node: ${name}: Has Connected!`, 'Dispatcher');
     }
 }

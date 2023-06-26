@@ -1,6 +1,5 @@
-import { Command } from '../../../structures/index.js';
+import { Command, MusicPrompts } from '../../../structures/index.js';
 import { ActionEmbed, ReviewEmbed } from '../../../utils/embeds/index.js';
-import { MusicPrompts } from '../../../../enums.js';
 export class StopCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -16,11 +15,11 @@ export class StopCommand extends Command {
         });
     }
     async execute(int) {
-        const subscription = this.client.subscriptions.get(int.guildId);
+        const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!subscription)
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
         subscription.destroy();
-        this.commander.react(int, '✅');
+        this.commander.react(int, '👋');
         if (int.channel) {
             const reviewEmbed = new ReviewEmbed();
             int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] });

@@ -1,7 +1,6 @@
-import { Command } from '../../../structures/index.js';
+import { Command, MusicPrompts } from '../../../structures/index.js';
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
-import { MusicPrompts } from '../../../../enums.js';
 import GeniusLyrics from 'genius-lyrics';
 const genius = new GeniusLyrics.Client();
 export class LyricsCommand extends Command {
@@ -26,7 +25,7 @@ export class LyricsCommand extends Command {
     async execute(int) {
         const author = this.commander.getAuthor(int);
         let query = this.commander.getArgs(int).join(' ');
-        const subscription = this.client.subscriptions.get(int.guildId);
+        const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!query && subscription && subscription.active)
             query = subscription.active.title;
         if (!query)

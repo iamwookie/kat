@@ -1,6 +1,6 @@
 import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, PermissionFlagsBits, } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
-import { PermissionPrompts } from '../../../enums.js';
+import { PermissionPrompts } from '../interfaces/Enums.js';
 // -----------------------------------
 import * as Commands from '../../commands/index.js';
 import * as Events from '../../events/index.js';
@@ -23,20 +23,20 @@ const commands = [
 ];
 export class Commander {
     client;
+    rest;
     commands;
     global;
     reserved;
     modules;
     aliases;
-    rest;
     constructor(client) {
         this.client = client;
+        this.rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
         this.commands = new Collection();
         this.global = new Collection();
         this.reserved = new Collection();
         this.modules = new Collection();
         this.aliases = new Collection();
-        this.rest = new REST({ version: '9' }).setToken(this.client.token);
     }
     async initialize() {
         this.initializeModules();

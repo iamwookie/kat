@@ -1,7 +1,7 @@
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/action.js';
-import { MusicPrompts } from '../../../enums.js';
+import { MusicPrompts } from '../../structures/interfaces/Enums.js';
 import chalk from 'chalk';
 export class ClientReady extends Event {
     constructor(client, commander) {
@@ -18,7 +18,7 @@ export class ClientReady extends Event {
             },
         });
         if (res.length) {
-            this.client.logger.info(`Warning ${res.length} Queue(s)`, 'Music');
+            this.client.logger.info(`Warning ${res.length} Queue(s)`, 'Dispatcher');
             for (const queue of res) {
                 if (!queue.active || !queue.textId)
                     continue;
@@ -29,10 +29,10 @@ export class ClientReady extends Event {
                     await channel.send({
                         embeds: [new ActionEmbed('warn').setText(MusicPrompts.Restarted)],
                     });
-                    this.client.logger.info(`Warning Sent To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
+                    this.client.logger.info(`Warning Sent To: ${channel.guild.name} (${channel.guild.id})`, 'Dispatcher');
                 }
                 catch {
-                    this.client.logger.warn(`Failed To Send Warning To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
+                    this.client.logger.warn(`Failed To Send Warning To: ${channel.guild.name} (${channel.guild.id})`, 'Dispatcher');
                 }
             }
             await this.client.prisma.queue.updateMany({
@@ -43,7 +43,7 @@ export class ClientReady extends Event {
                     active: false,
                 },
             });
-            this.client.logger.info(`Queue(s) Set To Inactive`, 'Music');
+            this.client.logger.info(`Queue(s) Set To Inactive`, 'Dispatcher');
         }
         // ----------------------------
         console.log(chalk.magenta.bold.underline(`\n---- >>> App Online, Client: ${client.user?.tag} (${client.user?.id}) [Version: ${this.client.config.version}] [Guilds: ${client.guilds.cache.size}]`));

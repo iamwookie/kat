@@ -1,8 +1,8 @@
-import { Event } from '../../../structures/index.js';
+import { Event, Events } from '../../../structures/index.js';
 import { MusicEmbed } from '../../../utils/embeds/index.js';
-export class TrackPause extends Event {
+export class PlayerPause extends Event {
     constructor(client, commander) {
-        super(client, commander, 'trackPause');
+        super(client, commander, Events.PlayerPause);
     }
     async execute(subscription) {
         if (subscription.message?.editable)

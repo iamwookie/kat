@@ -15,8 +15,6 @@ export var MusicPrompts;
     MusicPrompts["QueueEmpty"] = "The current queue is empty!";
     MusicPrompts["LastTrack"] = "This is the last track in the queue!";
     MusicPrompts["TrackError"] = "An error occurred while playing the track. Skipping...";
-    MusicPrompts["TrackResumed"] = "Resumed the current track!";
-    MusicPrompts["TrackPaused"] = "Paused the current track!";
     MusicPrompts["TrackLooped"] = "Looped the current track!";
     MusicPrompts["TrackUnlooped"] = "Unlooped the current track!";
     MusicPrompts["Inactive"] = "I have disconnected due to inactivity!";

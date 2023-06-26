@@ -1,7 +1,6 @@
-import { Command } from '../../../structures/index.js';
+import { Command, PermissionPrompts } from '../../../structures/index.js';
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
-import { PermissionPrompts } from '../../../../enums.js';
 export class VolumeCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -69,7 +68,7 @@ export class VolumeCommand extends Command {
         if (!res?.music)
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText('An error occured while setting the volume!')] });
         this.client.cache.music.set(int.guildId, res.music);
-        const subscription = this.client.subscriptions.get(int.guildId);
+        const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (subscription) {
             subscription.volume = res.music.volume;
             subscription.player.setVolume(res.music.volume / 100);

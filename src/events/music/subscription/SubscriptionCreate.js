@@ -1,13 +1,12 @@
-import { Event } from '../../../structures/index.js';
-import { Events } from 'discord.js';
+import { Event, Events, MusicPrompts } from '../../../structures/index.js';
+import { Events as DiscordEvents } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
-import { MusicPrompts } from '../../../../enums.js';
 export class SubscriptionCreate extends Event {
     constructor(client, commander) {
-        super(client, commander, 'subscriptionCreate');
+        super(client, commander, Events.SubscriptionCreate);
     }
     async execute(subscription) {
-        this.client.logger.info(`Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Music');
+        this.client.logger.info(`Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Dispatcher');
         await this.client.prisma.queue.upsert({
             where: {
                 guildId: subscription.guild.id,
@@ -23,7 +22,7 @@ export class SubscriptionCreate extends Event {
                 active: true,
             },
         });
-        this.client.emit(Events.Debug, `DATABASE >> Activated Queue And Updated Position For: ${subscription.guild.name} (${subscription.guild.id})`);
+        this.client.emit(DiscordEvents.Debug, `DATABASE >> Activated Queue And Updated Position For: ${subscription.guild.name} (${subscription.guild.id})`);
         setTimeout(async () => {
             if (!subscription.destroyed && !subscription.active && !subscription.queue.length) {
                 subscription.textChannel.send({ embeds: [new ActionEmbed('warn').setText(MusicPrompts.Inactive)] }).catch(() => { });

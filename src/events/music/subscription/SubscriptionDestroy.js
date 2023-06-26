@@ -1,11 +1,11 @@
-import { Event } from '../../../structures/index.js';
-import { Events } from 'discord.js';
+import { Event, Events } from '../../../structures/index.js';
+import { Events as DiscordEvents } from 'discord.js';
 export class SubscriptionDestroy extends Event {
     constructor(client, commander) {
-        super(client, commander, 'subscriptionDestroy');
+        super(client, commander, Events.SubscriptionDestroy);
     }
     async execute(subscription) {
-        this.client.logger.warn(`Subscription Destroyed For: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Music');
+        this.client.logger.warn(`Subscription Destroyed For: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`, 'Dispatcher');
         if (subscription.message?.deletable)
             subscription.message.delete().catch(() => { });
         await this.client.prisma.queue.upsert({
@@ -21,6 +21,6 @@ export class SubscriptionDestroy extends Event {
                 textId: subscription.textChannel.id,
             },
         });
-        this.client.emit(Events.Debug, `DATABASE >> Set Queue To Inactive: ${subscription.guild.name} (${subscription.guild.id})`);
+        this.client.emit(DiscordEvents.Debug, `DATABASE >> Set Queue To Inactive: ${subscription.guild.name} (${subscription.guild.id})`);
     }
 }

@@ -1,6 +1,5 @@
-import { Command } from '../../../structures/index.js';
+import { Command, MusicPrompts } from '../../../structures/index.js';
 import { ActionEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
-import { MusicPrompts } from '../../../../enums.js';
 export class QueueCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -17,11 +16,9 @@ export class QueueCommand extends Command {
     }
     async execute(int) {
         const author = this.commander.getAuthor(int);
-        const subscription = this.client.subscriptions.get(int.guildId);
+        const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!subscription || (!subscription.active && !subscription.queue.length))
             return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
-        this.commander.reply(int, {
-            embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue)],
-        });
+        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue)] });
     }
 }
