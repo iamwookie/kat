@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, Message, EmbedBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, Message, EmbedBuilder } from 'discord.js';
 import { formatBytes, formatDuration } from '@utils/helpers.js';
 
 export class StatsCommand extends Command {
@@ -32,10 +32,11 @@ export class StatsCommand extends Command {
                     inline: true,
                 },
                 { name: 'Version', value: `\`${this.client.config.version}\``, inline: true },
-                { name: 'Active Queues', value: `\`${this.client.subscriptions.size}\``, inline: true }
+                // Might use a flag for subscription size in the future
+                { name: 'Active Queues', value: `\`${this.client.dispatcher.subscriptions.size}\``, inline: true }
             );
 
-        const subscription = this.client.subscriptions.get(int.guild?.id);
+        const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (subscription) embed.addFields({ name: 'Guild Node', value: `\`${subscription.node.name}\``, inline: true });
 
         this.commander.reply(int, { embeds: [embed] });

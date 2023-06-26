@@ -1,7 +1,6 @@
-import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Message } from 'discord.js';
+import { Command, KATClient as Client, Commander, MusicPrompts } from '@structures/index.js';
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 import { ActionEmbed, ReviewEmbed } from '@utils/embeds/index.js';
-import { MusicPrompts } from 'enums.js';
 
 export class StopCommand extends Command {
     constructor(client: Client, commander: Commander) {
@@ -19,12 +18,12 @@ export class StopCommand extends Command {
     }
 
     async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const subscription = this.client.subscriptions.get(int.guildId!);
+        const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!subscription) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
 
         subscription.destroy();
 
-        this.commander.react(int, '✅');
+        this.commander.react(int, '👋');
 
         if (int.channel) {
             const reviewEmbed = new ReviewEmbed();

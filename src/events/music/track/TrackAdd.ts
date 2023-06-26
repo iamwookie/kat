@@ -1,30 +1,22 @@
 import {
     Event,
-    KATClient as Client,
+    KATClient,
     Commander,
-    Subscription as MusicSubscription,
+    Events,
+    Subscription,
     YouTubeTrack,
     SpotifyTrack,
     YouTubePlaylist,
-    SpotifyPlaylist,
+    SpotifyPlaylist
 } from '@structures/index.js';
-import { QueueData } from 'types';
 
 export class TrackAdd extends Event {
-    constructor(client: Client, commander: Commander) {
-        super(client, commander, 'trackAdd');
+    constructor(client: KATClient, commander: Commander) {
+        super(client, commander, Events.TrackAdd);
     }
 
-    async execute(subscription: MusicSubscription, item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
-        let data: QueueData | QueueData[];
-
-        if (item instanceof YouTubePlaylist) {
-            data = item.tracks.map((track) => new YouTubeTrack(track, item.requester, item.textChannel).toData());
-        } else if (item instanceof SpotifyPlaylist) {
-            data = item.tracks.map((track) => new SpotifyTrack(track, item.requester, item.textChannel).toData());
-        } else {
-            data = item.toData();
-        }
+    async execute(subscription: Subscription, item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
+        const data = item instanceof YouTubePlaylist || item instanceof SpotifyPlaylist ? item.tracks.map((track) => track.raw) : item.raw;
 
         await this.client.prisma.queue.upsert({
             where: {
@@ -51,7 +43,7 @@ export class TrackAdd extends Event {
 
         this.client.logger.info(
             `Added ${data instanceof Array ? data.length : 1} Track(s) For: ${subscription.guild.name} (${subscription.guild.id})`,
-            'Music'
+            'Dispatcher'
         );
     }
 }

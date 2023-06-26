@@ -19,7 +19,7 @@ import {
     MessageReaction,
 } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
-import { PermissionPrompts } from 'enums.js';
+import { PermissionPrompts } from '@structures/interfaces/Enums.js';
 
 // -----------------------------------
 import * as Commands from '@commands/index.js';
@@ -44,21 +44,21 @@ const commands = [
 ];
 
 export class Commander {
+    private rest: REST;
+
     public commands: Collection<string, Command>;
     public global: Collection<string, Command>;
     public reserved: Collection<Snowflake, Collection<string, Command>>;
     public modules: Collection<string, Module>;
     public aliases: Collection<string, string>;
 
-    private rest: REST;
-
-    constructor(public readonly client: Client) {
+    constructor(public client: Client) {
+        this.rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
         this.commands = new Collection<string, Command>();
         this.global = new Collection<string, Command>();
         this.reserved = new Collection<Snowflake, Collection<string, Command>>();
         this.modules = new Collection<string, Module>();
         this.aliases = new Collection<string, string>();
-        this.rest = new REST({ version: '9' }).setToken(this.client.token!);
     }
 
     async initialize() {

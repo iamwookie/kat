@@ -1,11 +1,10 @@
-import { KATClient as Client } from '../Client.js';
 import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from './Track.js';
 import { Guild, VoiceBasedChannel, TextBasedChannel, Message } from 'discord.js';
-import { Shoukaku, Player, Node } from 'shoukaku';
-import { NodeError, PlayerError } from '@utils/errors.js';
+import { Player, Node, TrackExceptionEvent, TrackStartEvent, TrackEndEvent } from 'shoukaku';
+import { Dispatcher } from './Dispatcher.js';
+import { Events } from '../interfaces/Events.js';
 
 export class Subscription {
-    public shoukaku: Shoukaku;
     public queue: (YouTubeTrack | SpotifyTrack)[];
     public active: YouTubeTrack | SpotifyTrack | null;
     public position: number;
@@ -14,15 +13,17 @@ export class Subscription {
     public destroyed: boolean;
     public message?: Message;
 
+    // Use options interface here in the future
     constructor(
-        public client: Client,
+        private dispatcher: Dispatcher,
         public guild: Guild,
         public voiceChannel: VoiceBasedChannel,
         public textChannel: TextBasedChannel,
         public player: Player,
         public node: Node
     ) {
-        this.shoukaku = client.shoukaku;
+        this.dispatcher = dispatcher;
+
         this.queue = [];
         this.active = null;
         this.position = 0;
@@ -30,9 +31,9 @@ export class Subscription {
         this.volume = 100;
         this.destroyed = false;
 
-        this.player.on('exception', (data) => this.client.emit('playerException', this, data));
-        this.player.on('start', (data) => this.client.emit('playerStart', this, data));
-        this.player.on('end', (reason) => this.client.emit('playerEnd', this, reason));
+        this.player.on('exception', (data: TrackExceptionEvent) => this.dispatcher.client.emit(Events.PlayerException, this, data));
+        this.player.on('start', (data: TrackStartEvent) => this.dispatcher.client.emit(Events.PlayerStart, this, data));
+        this.player.on('end', (data: TrackEndEvent) => this.dispatcher.client.emit(Events.PlayerEnd, this, data));
 
         // -----> REQUIRES FIXING FROM SHOUKAKU
         //
@@ -42,51 +43,7 @@ export class Subscription {
         // });
     }
 
-    static async create(client: Client, guild: Guild, voiceChannel: VoiceBasedChannel, textChannel: TextBasedChannel) {
-        try {
-            const node = client.shoukaku.getNode();
-            if (!node) throw new NodeError("Node doesn't exist.");
-
-            try {
-                const player: Player = await node.joinChannel({
-                    guildId: guild.id,
-                    channelId: voiceChannel.id,
-                    shardId: 0,
-                    deaf: true,
-                });
-
-                const subscription = new Subscription(client, guild, voiceChannel, textChannel, player, node);
-                subscription.position = await client.cache.queue.count(guild.id);
-
-                const res = await client.cache.music.get(guild.id);
-                if (res?.volume) subscription.volume = res.volume;
-
-                client.subscriptions.set(guild.id, subscription);
-                client.emit('subscriptionCreate', subscription);
-
-                return subscription;
-            } catch (err) {
-                client.logger.error(err, 'PlayerError', 'Music');
-                throw new PlayerError((err as Error).message);
-            }
-        } catch (err) {
-            client.logger.error(err, 'NodeError', 'Music');
-            throw new NodeError((err as Error).message);
-        }
-    }
-
-    destroy() {
-        if (this.destroyed) return;
-        this.queue = [];
-        this.active = null;
-        this.player.connection.disconnect();
-        this.client.subscriptions.delete(this.guild.id);
-        this.destroyed = true;
-
-        this.client.emit('subscriptionDestroy', this);
-    }
-
-    process() {
+    public process() {
         const track = this.looped ? this.active : this.queue.shift();
         if (!track) return;
 
@@ -96,63 +53,70 @@ export class Subscription {
 
         if (!this.looped) {
             this.position += 1;
-            this.client.emit('trackRemove', this, track);
+            this.dispatcher.client.emit(Events.TrackRemove, this, track);
         }
     }
 
-    add(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist) {
+    public destroy(): void {
+        if (this.destroyed) return;
+
+        this.queue = [];
+        this.active = null;
+        this.player.connection.disconnect();
+        this.dispatcher.subscriptions.delete(this.guild.id);
+        this.destroyed = true;
+
+        this.dispatcher.client.emit('subscriptionDestroy', this);
+    }
+
+    public add(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist): void {
         if (item instanceof YouTubePlaylist) {
-            for (const data of item.tracks) {
-                const track = new YouTubeTrack(data, item.requester, item.textChannel);
-                this.queue.push(track);
-            }
+            this.queue.push(...item.tracks);
         } else if (item instanceof SpotifyPlaylist) {
-            for (const data of item.tracks) {
-                const track = new SpotifyTrack(data, item.requester, item.textChannel);
-                this.queue.push(track);
-            }
+            this.queue.push(...item.tracks);
         } else {
             this.queue.push(item);
         }
 
-        this.client.emit('trackAdd', this, item);
+        this.dispatcher.client.emit(Events.TrackAdd, this, item);
 
         if (!this.active) this.process();
     }
 
-    stop() {
+    public stop(): Subscription {
         this.looped = false;
         this.active = null;
-        return this.player.stopTrack();
+        this.player.stopTrack();
+        return this;
     }
 
-    pause() {
-        if (!this.active) return;
+    public pause(): boolean {
+        if (!this.active) return true;
         this.player.setPaused(true);
-        this.client.emit('trackPause', this, this.active);
+        this.dispatcher.client.emit(Events.PlayerPause, this, this.active);
         return this.paused;
     }
 
-    resume() {
-        if (!this.active) return;
+    public resume(): boolean {
+        if (!this.active) return false;
         this.player.setPaused(false);
-        this.client.emit('trackResume', this, this.active);
+        this.dispatcher.client.emit(Events.PlayerResume, this, this.active);
         return this.paused;
     }
 
-    loop() {
+    public loop(): boolean {
         this.looped = !this.looped;
-        this.client.emit('trackLoop', this, this.active);
+        this.dispatcher.client.emit(Events.PlayerLoop, this, this.active);
         return this.looped;
     }
 
     // Getters
 
-    get duration() {
+    public get duration() {
         return this.player.position;
     }
 
-    get paused() {
+    public get paused() {
         return this.player.paused;
     }
 }

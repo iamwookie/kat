@@ -1,17 +1,16 @@
-import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from '@structures/index.js';
-import { Events } from 'discord.js';
+import { Event, KATClient as Client, Commander, Events, Subscription, MusicPrompts } from '@structures/index.js';
+import { Events as DiscordEvents } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
-import { MusicPrompts } from 'enums.js';
 
 export class SubscriptionCreate extends Event {
     constructor(client: Client, commander: Commander) {
-        super(client, commander, 'subscriptionCreate');
+        super(client, commander, Events.SubscriptionCreate);
     }
 
-    async execute(subscription: MusicSubscription) {
+    async execute(subscription: Subscription) {
         this.client.logger.info(
             `Subscription Created for ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`,
-            'Music'
+            'Dispatcher'
         );
 
         await this.client.prisma.queue.upsert({
@@ -30,7 +29,7 @@ export class SubscriptionCreate extends Event {
             },
         });
 
-        this.client.emit(Events.Debug, `DATABASE >> Activated Queue And Updated Position For: ${subscription.guild.name} (${subscription.guild.id})`);
+        this.client.emit(DiscordEvents.Debug, `DATABASE >> Activated Queue And Updated Position For: ${subscription.guild.name} (${subscription.guild.id})`);
 
         setTimeout(async () => {
             if (!subscription.destroyed && !subscription.active && !subscription.queue.length) {

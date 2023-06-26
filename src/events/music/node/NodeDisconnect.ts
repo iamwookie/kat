@@ -6,6 +6,6 @@ export class NodeDisconnect extends Event {
     }
 
     async execute(name: string) {
-        this.client.logger.warn(`Node: ${name}: Has Disconnected!`, 'Music');
+        this.client.logger.warn(`Node: ${name}: Has Disconnected!`, 'Dispatcher');
     }
 }
