@@ -140,7 +140,7 @@ export class Dispatcher {
         }
     }
 
-    public getSubscription(guild: Guild): Subscription | undefined {
-        return this.subscriptions.get(guild.id);
+    public getSubscription(guild: Guild | null): Subscription | undefined {
+        if (guild) return this.subscriptions.get(guild.id);
     }
 }
