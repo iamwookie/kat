@@ -116,6 +116,7 @@ export class Dispatcher {
         }
     }
     getSubscription(guild) {
-        return this.subscriptions.get(guild.id);
+        if (guild)
+            return this.subscriptions.get(guild.id);
     }
 }
