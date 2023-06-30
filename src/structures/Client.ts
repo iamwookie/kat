@@ -1,5 +1,5 @@
 import * as Config from '@config';
-import { Client, ClientOptions, Events, Collection, PermissionsBitField, Snowflake, User } from 'discord.js';
+import { Client, ClientOptions, Events, PermissionsBitField, User } from 'discord.js';
 import { Logger } from './Logger.js';
 import { PrismaClient } from '@prisma/client';
 import { Redis } from '@upstash/redis';
@@ -7,7 +7,6 @@ import { Commander } from './commander/Commander.js';
 import { Dispatcher } from './music/Dispatcher.js';
 import { Server } from '@structures/api/Server.js';
 import { Cache } from './Cache.js';
-import { Subscription as MusicSubscription } from './music/Subscription.js';
 
 export class KATClient extends Client {
     public startTime: number;
@@ -45,10 +44,7 @@ export class KATClient extends Client {
             this.logger.error(err);
         });
 
-        if (process.env.NODE_ENV != 'production')
-            this.on(Events.Debug, (msg) => {
-                this.logger.debug(msg);
-            });
+        if (process.env.NODE_ENV != 'production') this.on(Events.Debug, (msg) => this.logger.debug(msg));
     }
 
     async initialize() {
