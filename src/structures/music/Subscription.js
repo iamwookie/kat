@@ -1,4 +1,4 @@
-import { SpotifyPlaylist, YouTubePlaylist } from './Track.js';
+import { YouTubePlaylist, SpotifyPlaylist } from './Playlist.js';
 import { Events } from '../interfaces/Events.js';
 export class Subscription {
     dispatcher;

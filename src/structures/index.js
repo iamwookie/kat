@@ -1,7 +1,8 @@
 export { Events } from './interfaces/Events.js';
 export { PermissionPrompts, MusicPrompts, MusicEmojis } from './interfaces/Enums.js';
 export { NodeError, PlayerError, SearchError } from './interfaces/Errors.js';
-export { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from './music/Track.js';
+export { YouTubePlaylist, SpotifyPlaylist } from './music/Playlist.js';
+export { YouTubeTrack, SpotifyTrack } from './music/Track.js';
 export { Subscription } from './music/Subscription.js';
 export { Dispatcher } from './music/Dispatcher.js';
 export { Module } from './commander/Module.js';

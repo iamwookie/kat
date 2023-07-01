@@ -1,9 +1,10 @@
 import { Shoukaku, Connectors } from 'shoukaku';
 import { Subscription } from './Subscription.js';
 import { Collection } from 'discord.js';
-import { Events } from '../interfaces/Events.js';
+import { YouTubeTrack, SpotifyTrack } from './Track.js';
+import { YouTubePlaylist, SpotifyPlaylist } from './Playlist.js';
 import { NodeError, PlayerError, SearchError } from '../interfaces/Errors.js';
-import { YouTubeTrack, SpotifyTrack, SpotifyPlaylist, YouTubePlaylist } from './Track.js';
+import { Events } from '../interfaces/Events.js';
 export class Dispatcher {
     client;
     nodes;

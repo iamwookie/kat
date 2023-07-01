@@ -40,9 +40,7 @@ export class KATClient extends Client {
             this.logger.error(err);
         });
         if (process.env.NODE_ENV != 'production')
-            this.on(Events.Debug, (msg) => {
-                this.logger.debug(msg);
-            });
+            this.on(Events.Debug, (msg) => this.logger.debug(msg));
     }
     async initialize() {
         try {
