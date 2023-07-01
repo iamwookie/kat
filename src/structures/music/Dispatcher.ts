@@ -2,9 +2,10 @@ import { KATClient as Client } from '../Client.js';
 import { Shoukaku, Connectors, Node, Player, NodeOption } from 'shoukaku';
 import { Subscription } from './Subscription.js';
 import { Collection, Guild, TextBasedChannel, User, VoiceBasedChannel } from 'discord.js';
-import { Events } from '@structures/interfaces/Events.js';
-import { NodeError, PlayerError, SearchError } from '@structures/interfaces/Errors.js';
-import { YouTubeTrack, SpotifyTrack, SpotifyPlaylist, YouTubePlaylist } from './Track.js';
+import { YouTubeTrack, SpotifyTrack } from './Track.js';
+import { YouTubePlaylist, SpotifyPlaylist } from './Playlist.js';
+import { NodeError, PlayerError, SearchError } from '../interfaces/Errors.js';
+import { Events } from '../interfaces/Events.js';
 
 declare module 'shoukaku' {
     interface LavalinkResponse {

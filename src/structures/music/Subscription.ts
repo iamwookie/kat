@@ -1,4 +1,5 @@
-import { SpotifyPlaylist, SpotifyTrack, YouTubePlaylist, YouTubeTrack } from './Track.js';
+import { YouTubeTrack, SpotifyTrack } from './Track.js';
+import { YouTubePlaylist, SpotifyPlaylist } from './Playlist.js';
 import { Guild, VoiceBasedChannel, TextBasedChannel, Message } from 'discord.js';
 import { Player, Node, TrackExceptionEvent, TrackStartEvent, TrackEndEvent } from 'shoukaku';
 import { Dispatcher } from './Dispatcher.js';
