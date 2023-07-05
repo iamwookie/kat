@@ -16,11 +16,7 @@ export class ClientReady extends Event {
         await this.client.server.initialize();
 
         // Move to a method in the future (maybe :/)
-        const res = await this.client.prisma.queue.findMany({
-            where: {
-                active: true,
-            },
-        });
+        const res = await this.client.prisma.queue.findMany({ where: { active: true } });
 
         if (res.length) {
             this.client.logger.info(`Warning ${res.length} Queue(s)`, 'Dispatcher');
@@ -41,14 +37,7 @@ export class ClientReady extends Event {
                 }
             }
 
-            await this.client.prisma.queue.updateMany({
-                where: {
-                    active: true,
-                },
-                data: {
-                    active: false,
-                },
-            });
+            await this.client.prisma.queue.updateMany({ where: { active: true }, data: { active: false } });
 
             this.client.logger.info(`Queue(s) Set To Inactive`, 'Dispatcher');
         }
