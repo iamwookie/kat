@@ -18,6 +18,9 @@ jobs:
 
             - name: Build app
               run: npm run build
+            
+            - name: Build sentry source maps
+              run: npm run sentry:ci
 
             - name: Copy Prsima files
               run: cp -r prisma dist/

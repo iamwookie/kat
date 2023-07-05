@@ -21,7 +21,10 @@
             "@events/*": ["src/events/*"],
             "@api/*": ["src/api/*"],
             "@utils/*": ["src/utils/*"]
-        }
+        },
+        "sourceMap": true,
+        "inlineSources": true,
+        "sourceRoot": "/"
     },
 
     "include": ["package.json", "index.ts", "src/**/*"]

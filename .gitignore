@@ -14,3 +14,6 @@ logs/
 # Extras
 .data/
 .archive/
+
+# Sentry Auth Token
+.sentryclirc
