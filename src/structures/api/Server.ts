@@ -41,7 +41,7 @@ export class Server {
 
             this.app.listen(this.port, () => resolve());
 
-            this.client.logger.status(`>>> Server Initialized (Port: ${this.client.server.port})`);
+            this.client.logger.status(`>>>> Server Initialized (Port: ${this.client.server.port})`);
         });
     }
 }
