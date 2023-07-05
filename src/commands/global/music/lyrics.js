@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="15ad1e26-a364-5afd-a133-24cb83c8b125")}catch(e){}}();
 import { Command, MusicPrompts } from '../../../structures/index.js';
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
@@ -49,3 +50,5 @@ export class LyricsCommand extends Command {
         }
     }
 }
+//# debugId=15ad1e26-a364-5afd-a133-24cb83c8b125
+//# sourceMappingURL=lyrics.js.map

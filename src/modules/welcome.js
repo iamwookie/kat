@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="35fa2b4e-63aa-54a5-abc7-7fd23e10d823")}catch(e){}}();
 import { Module } from '../structures/index.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, DiscordAPIError, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 export class WelcomeModule extends Module {
@@ -33,3 +34,5 @@ export class WelcomeModule extends Module {
         }
     }
 }
+//# debugId=35fa2b4e-63aa-54a5-abc7-7fd23e10d823
+//# sourceMappingURL=welcome.js.map

@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="8ee131af-456e-59a6-b03b-42bd5ddcc9fb")}catch(e){}}();
 export var Events;
 (function (Events) {
     // Subscription
@@ -24,3 +25,5 @@ export var Events;
     Events["PlayerPause"] = "playerPause";
     Events["PlayerLoop"] = "playerLoop";
 })(Events || (Events = {}));
+//# debugId=8ee131af-456e-59a6-b03b-42bd5ddcc9fb
+//# sourceMappingURL=Events.js.map

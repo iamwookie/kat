@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="595d9476-96dc-5ea7-80bb-0f854f938956")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 export class VoiceStateUpdate extends Event {
@@ -32,3 +33,5 @@ export class VoiceStateUpdate extends Event {
         }
     }
 }
+//# debugId=595d9476-96dc-5ea7-80bb-0f854f938956
+//# sourceMappingURL=VoiceStateUpdate.js.map

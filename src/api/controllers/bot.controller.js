@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="91fef742-f1db-503e-a981-0ab14d82aa8c")}catch(e){}}();
 import { formatBytes } from '../../utils/helpers.js';
 export const fetchStats = (client) => (req, res) => {
     try {
@@ -15,3 +16,5 @@ export const fetchStats = (client) => (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+//# debugId=91fef742-f1db-503e-a981-0ab14d82aa8c
+//# sourceMappingURL=bot.controller.js.map

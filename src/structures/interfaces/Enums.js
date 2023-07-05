@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="cb88089a-2d88-5b66-9a4f-8f97fe26b126")}catch(e){}}();
 export var PermissionPrompts;
 (function (PermissionPrompts) {
     PermissionPrompts["NotAllowed"] = "You do not have enough permissions!";
@@ -26,3 +27,5 @@ export var MusicEmojis;
     MusicEmojis["YouTube"] = "<:youtube:1067881972774477844>";
     MusicEmojis["Spotify"] = "<:spotify:1067881968697614476>";
 })(MusicEmojis || (MusicEmojis = {}));
+//# debugId=cb88089a-2d88-5b66-9a4f-8f97fe26b126
+//# sourceMappingURL=Enums.js.map

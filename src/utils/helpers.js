@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="e541d9e2-459c-5ae7-925a-3eed13bb44da")}catch(e){}}();
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '../structures/index.js';
 import { MusicEmojis } from '../structures/interfaces/Enums.js';
 export function formatDuration(milliseconds) {
@@ -50,3 +51,5 @@ export function getServiceIcon(item) {
         return '';
     }
 }
+//# debugId=e541d9e2-459c-5ae7-925a-3eed13bb44da
+//# sourceMappingURL=helpers.js.map

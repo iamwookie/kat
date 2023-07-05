@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="10d486f9-6597-5b5b-9575-766667640c8b")}catch(e){}}();
 import { Command } from '../../../structures/index.js';
 import { EmbedBuilder } from 'discord.js';
 import { formatBytes, formatDuration } from '../../../utils/helpers.js';
@@ -32,3 +33,5 @@ export class StatsCommand extends Command {
         this.commander.reply(int, { embeds: [embed] });
     }
 }
+//# debugId=10d486f9-6597-5b5b-9575-766667640c8b
+//# sourceMappingURL=stats.js.map

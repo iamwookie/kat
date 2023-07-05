@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="7013e79b-27f4-5e71-9641-bb8e5a99e2d5")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { EmbedBuilder, Events } from 'discord.js';
 export class GuildCreate extends Event {
@@ -20,3 +21,5 @@ export class GuildCreate extends Event {
         this.client.logger.notify(embed);
     }
 }
+//# debugId=7013e79b-27f4-5e71-9641-bb8e5a99e2d5
+//# sourceMappingURL=GuildCreate.js.map

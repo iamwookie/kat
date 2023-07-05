@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ecce6931-94ba-5f47-ab44-84a761f96704")}catch(e){}}();
 import { Event, Events, MusicPrompts, PlayerError } from '../../../structures/index.js';
 import { ActionEmbed } from '../../../utils/embeds/action.js';
 export class PlayerException extends Event {
@@ -12,3 +13,5 @@ export class PlayerException extends Event {
         subscription.textChannel.send({ embeds: [new ActionEmbed().setText(MusicPrompts.TrackError)] }).catch(() => { });
     }
 }
+//# debugId=ecce6931-94ba-5f47-ab44-84a761f96704
+//# sourceMappingURL=PlayerException.js.map

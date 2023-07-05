@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="64c10969-e93f-573c-b758-f69da77fd258")}catch(e){}}();
 import { Command, MusicPrompts } from '../../../structures/index.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
 export class SkipCommand extends Command {
@@ -27,3 +28,5 @@ export class SkipCommand extends Command {
         this.commander.react(int, '✅');
     }
 }
+//# debugId=64c10969-e93f-573c-b758-f69da77fd258
+//# sourceMappingURL=skip.js.map

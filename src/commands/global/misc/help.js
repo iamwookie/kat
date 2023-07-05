@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="84ba7127-183c-590c-9ce9-4977558f5406")}catch(e){}}();
 import { Command } from '../../../structures/index.js';
 import { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, } from 'discord.js';
 export class HelpCommand extends Command {
@@ -60,3 +61,5 @@ export class HelpCommand extends Command {
         });
     }
 }
+//# debugId=84ba7127-183c-590c-9ce9-4977558f5406
+//# sourceMappingURL=help.js.map

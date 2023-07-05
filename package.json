@@ -1,18 +1,20 @@
 {
     "name": "cat-bot",
-    "version": "8.0.2",
+    "version": "8.0.3",
     "description": "",
     "main": "index.js",
     "type": "module",
     "scripts": {
         "start": "nodemon dist/index.js",
         "build": "tsc && tsc-alias",
-        "dev": "tsc && tsc-alias && nodemon dist/index.js"
+        "dev": "tsc && tsc-alias && nodemon dist/index.js",
+        "sentry:ci": "sentry-cli sourcemaps inject --org wookie --project kat-bot ./dist && sentry-cli sourcemaps upload --org wookie --project kat-bot ./dist"
     },
     "author": "wookie",
     "license": "ISC",
     "dependencies": {
         "@prisma/client": "^4.16.1",
+        "@sentry/cli": "^2.19.4",
         "@sentry/integrations": "^7.39.0",
         "@sentry/node": "^7.39.0",
         "@sentry/tracing": "^7.28.0",

@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="3c36e378-1be8-5691-9b4f-47612814e8af")}catch(e){}}();
 import { EmbedBuilder } from 'discord.js';
 export class ActionEmbed extends EmbedBuilder {
     embedType;
@@ -26,3 +27,5 @@ export class ActionEmbed extends EmbedBuilder {
         return this;
     }
 }
+//# debugId=3c36e378-1be8-5691-9b4f-47612814e8af
+//# sourceMappingURL=action.js.map

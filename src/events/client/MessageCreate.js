@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="98b31402-5f8b-5235-9c23-3d70c6e9dfed")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ErrorEmbed } from '../../utils/embeds/index.js';
@@ -28,3 +29,5 @@ export class MessageCreate extends Event {
         }
     }
 }
+//# debugId=98b31402-5f8b-5235-9c23-3d70c6e9dfed
+//# sourceMappingURL=MessageCreate.js.map

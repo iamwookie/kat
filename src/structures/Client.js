@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="e39a0cf9-c10c-5143-9b76-23a8a760b0a2")}catch(e){}}();
 import * as Config from '../../config.js';
 import { Client, Events } from 'discord.js';
 import { Logger } from './Logger.js';
@@ -56,3 +57,5 @@ export class KATClient extends Client {
         return this.config.devs.includes(user.id);
     }
 }
+//# debugId=e39a0cf9-c10c-5143-9b76-23a8a760b0a2
+//# sourceMappingURL=Client.js.map

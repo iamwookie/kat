@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4372345b-3e21-57b4-b3ca-40e99735b258")}catch(e){}}();
 import { Event, Events, MusicPrompts } from '../../../structures/index.js';
 import { Events as DiscordEvents } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
@@ -31,3 +32,5 @@ export class SubscriptionCreate extends Event {
         }, this.client.config.music.inactiveDuration);
     }
 }
+//# debugId=4372345b-3e21-57b4-b3ca-40e99735b258
+//# sourceMappingURL=SubscriptionCreate.js.map

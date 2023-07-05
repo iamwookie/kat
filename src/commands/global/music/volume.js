@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="334c8e71-4410-5397-a963-006a945036e4")}catch(e){}}();
 import { Command, PermissionPrompts } from '../../../structures/index.js';
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
@@ -80,3 +81,5 @@ export class VolumeCommand extends Command {
         });
     }
 }
+//# debugId=334c8e71-4410-5397-a963-006a945036e4
+//# sourceMappingURL=volume.js.map

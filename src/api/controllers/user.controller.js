@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="a684e89d-ed60-5f3e-865f-18207014ebee")}catch(e){}}();
 import { formatUser } from '../../utils/helpers.js';
 export const fetchUser = (client) => async (req, res) => {
     try {
@@ -15,3 +16,5 @@ export const fetchUser = (client) => async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 };
+//# debugId=a684e89d-ed60-5f3e-865f-18207014ebee
+//# sourceMappingURL=user.controller.js.map

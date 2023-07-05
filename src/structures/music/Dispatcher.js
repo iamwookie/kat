@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="57c68985-7f15-5b4e-adef-7254f576330b")}catch(e){}}();
 import { Shoukaku, Connectors } from 'shoukaku';
 import { Subscription } from './Subscription.js';
 import { Collection } from 'discord.js';
@@ -121,3 +122,5 @@ export class Dispatcher {
             return this.subscriptions.get(guild.id);
     }
 }
+//# debugId=57c68985-7f15-5b4e-adef-7254f576330b
+//# sourceMappingURL=Dispatcher.js.map

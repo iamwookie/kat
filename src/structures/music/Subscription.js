@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="1ddcac1a-5ecf-52fe-93aa-a72711e37011")}catch(e){}}();
 import { YouTubePlaylist, SpotifyPlaylist } from './Playlist.js';
 import { Events } from '../interfaces/Events.js';
 export class Subscription {
@@ -108,3 +109,5 @@ export class Subscription {
         return this.player.paused;
     }
 }
+//# debugId=1ddcac1a-5ecf-52fe-93aa-a72711e37011
+//# sourceMappingURL=Subscription.js.map

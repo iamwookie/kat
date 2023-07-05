@@ -1,0 +1,1 @@
+{"debug_id":"43c727b3-4590-5b06-88ae-5ec38a40c014","file":"index.js","mappings":";AAAA,OAAO,EAAE,aAAa,EAAE,MAAM,cAAc,CAAC","names":[],"sourceRoot":"/","sources":["src/modules/index.ts"],"sourcesContent":["export { WelcomeModule } from './welcome.js';"],"version":3}

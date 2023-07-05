@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4b37c2f0-3860-5f3c-907d-24dbbbd959d2")}catch(e){}}();
 import { Event } from '../../../structures/index.js';
 import { Events } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
@@ -23,3 +24,5 @@ export class NodeError extends Event {
         }
     }
 }
+//# debugId=4b37c2f0-3860-5f3c-907d-24dbbbd959d2
+//# sourceMappingURL=NodeError.js.map

@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="2426ce2a-4eb8-5fa4-b96f-5e14c1cfcfd7")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 export class GuildDelete extends Event {
@@ -18,3 +19,5 @@ export class GuildDelete extends Event {
         });
     }
 }
+//# debugId=2426ce2a-4eb8-5fa4-b96f-5e14c1cfcfd7
+//# sourceMappingURL=GuildDelete.js.map

@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="0ca43edc-80df-5b03-b2da-aba34e629933")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ErrorEmbed } from '../../utils/embeds/index.js';
@@ -23,3 +24,5 @@ export class InteractionCreate extends Event {
         }
     }
 }
+//# debugId=0ca43edc-80df-5b03-b2da-aba34e629933
+//# sourceMappingURL=InteractionCreate.js.map

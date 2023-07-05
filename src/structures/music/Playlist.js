@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4889716b-6649-56e8-a9c8-99b495d60f57")}catch(e){}}();
 import { YouTubeTrack, SpotifyTrack } from "./Track.js";
 export class YouTubePlaylist {
     url;
@@ -30,3 +31,5 @@ export class SpotifyPlaylist {
         this.tracks = tracks.map((track) => new SpotifyTrack(track, requester));
     }
 }
+//# debugId=4889716b-6649-56e8-a9c8-99b495d60f57
+//# sourceMappingURL=Playlist.js.map

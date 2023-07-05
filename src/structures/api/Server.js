@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="636a7b32-472e-5896-91b5-66debf61b42f")}catch(e){}}();
 import express from 'express';
 import Sentry from '@sentry/node';
 import helmet from 'helmet';
@@ -36,3 +37,5 @@ export class Server {
         });
     }
 }
+//# debugId=636a7b32-472e-5896-91b5-66debf61b42f
+//# sourceMappingURL=Server.js.map

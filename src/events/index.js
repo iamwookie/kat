@@ -1,4 +1,5 @@
 // ----- CLIENT -----
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="a0fdee02-3114-5fa9-a445-5fde4050a99d")}catch(e){}}();
 export { ClientReady } from './client/ClientReady.js';
 export { GuildCreate } from './client/GuildCreate.js';
 export { GuildDelete } from './client/GuildDelete.js';
@@ -26,3 +27,5 @@ export { PlayerException } from './music/player/PlayerException.js';
 // Subscription
 export { SubscriptionDestroy } from './music/subscription/SubscriptionDestroy.js';
 export { SubscriptionCreate } from './music/subscription/SubscriptionCreate.js';
+//# debugId=a0fdee02-3114-5fa9-a445-5fde4050a99d
+//# sourceMappingURL=index.js.map

@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d9ff8211-e831-5fed-b0f2-72b79d98db25")}catch(e){}}();
 import { EmbedBuilder } from 'discord.js';
 import { YouTubePlaylist, SpotifyPlaylist } from '../../structures/index.js';
 import { getServiceIcon } from '../helpers.js';
@@ -55,3 +56,5 @@ export class MusicEmbed extends EmbedBuilder {
         return super.addFields({ name: 'Server Queue:', value: `${res}` });
     }
 }
+//# debugId=d9ff8211-e831-5fed-b0f2-72b79d98db25
+//# sourceMappingURL=music.js.map

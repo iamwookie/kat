@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="b397cfbc-27a9-5cb4-a910-9fd9281d5b7d")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/action.js';
@@ -50,3 +51,5 @@ export class ClientReady extends Event {
         console.log(chalk.magenta.bold.underline(`---- >>> App Loaded In: ${Date.now() - this.client.startTime}ms`));
     }
 }
+//# debugId=b397cfbc-27a9-5cb4-a910-9fd9281d5b7d
+//# sourceMappingURL=ClientReady.js.map

@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="215203bd-dbbf-5baf-9cb3-91051847274d")}catch(e){}}();
 import { Event, Events } from '../../../structures/index.js';
 import { Events as DiscordEvents } from 'discord.js';
 export class SubscriptionDestroy extends Event {
@@ -24,3 +25,5 @@ export class SubscriptionDestroy extends Event {
         this.client.emit(DiscordEvents.Debug, `DATABASE >> Set Queue To Inactive: ${subscription.guild.name} (${subscription.guild.id})`);
     }
 }
+//# debugId=215203bd-dbbf-5baf-9cb3-91051847274d
+//# sourceMappingURL=SubscriptionDestroy.js.map

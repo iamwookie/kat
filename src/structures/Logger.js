@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="29fe3308-d7c3-5b69-bf58-01699c004491")}catch(e){}}();
 import Sentry from '@sentry/node';
 import { ErrorEmbed } from '../utils/embeds/index.js';
 import chalk from 'chalk';
@@ -56,3 +57,5 @@ export class Logger {
         }
     }
 }
+//# debugId=29fe3308-d7c3-5b69-bf58-01699c004491
+//# sourceMappingURL=Logger.js.map

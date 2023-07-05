@@ -1,3 +1,4 @@
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="26551366-18a6-57e5-b0b5-a496fedd4a76")}catch(e){}}();
 import { Command } from '../../../structures/index.js';
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '../../../utils/embeds/action.js';
@@ -55,3 +56,5 @@ export class PrefixCommand extends Command {
         }
     }
 }
+//# debugId=26551366-18a6-57e5-b0b5-a496fedd4a76
+//# sourceMappingURL=prefix.js.map
