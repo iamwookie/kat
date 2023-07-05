@@ -5,11 +5,13 @@ on:
         branches:
             - staging
 
+env:
+    SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
 jobs:
     build:
         runs-on: ubuntu-latest
-        environment: staging
-
+        
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
@@ -23,10 +25,10 @@ jobs:
             - name: Build sentry source maps
               run: npm run sentry:ci
 
-            - name: Copy Prsima files
+            - name: Copy prsima files
               run: cp -r prisma dist/
 
-            - name: Copy PM2 config file
+            - name: Copy pm2 config file
               run: cp pm2.config.js dist/
 
             - name: Deploy to build branch
