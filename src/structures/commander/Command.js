@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="3d552ab8-286e-5856-9050-889984e366ed")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="dc8c2da0-05ca-54f7-9c8a-61e283b7ebba")}catch(e){}}();
 import { Module } from './Module.js';
 import { SlashCommandBuilder, Collection } from 'discord.js';
 export class Command {
@@ -53,5 +53,5 @@ export class Command {
         return `${prefix}${this.name}${aliases}${this.description?.format ? ' ' + this.description.format : ''}`;
     }
 }
-//# debugId=3d552ab8-286e-5856-9050-889984e366ed
+//# debugId=dc8c2da0-05ca-54f7-9c8a-61e283b7ebba
 //# sourceMappingURL=Command.js.map

@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="49813a46-a5c7-5db2-9e50-1ece8d02e0a3")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="fc628038-00f4-52d1-b98e-9d88a190a84d")}catch(e){}}();
 import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, PermissionFlagsBits, } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
 import { PermissionPrompts } from '../interfaces/Enums.js';
@@ -54,22 +54,20 @@ export class Commander {
     authorize(interaction, command) {
         const author = this.getAuthor(interaction);
         if (interaction.inGuild()) {
+            if (interaction instanceof ChatInputCommandInteraction && !interaction.inCachedGuild())
+                return false;
             if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id))
                 return false;
-            if (!interaction.channel?.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SendMessages)) {
+            if (!interaction.channel ||
+                !interaction.channel
+                    .permissionsFor(interaction.guild.members.me)
+                    .has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks, PermissionFlagsBits.AttachFiles])) {
                 if (!command.hidden)
-                    author
-                        .send({
-                        embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
-                    })
-                        .catch((err) => {
+                    author.send({ embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)] }).catch((err) => {
                         this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
                     });
                 return false;
             }
-        }
-        else if (!command.allowDM) {
-            return false;
         }
         if (command.users && !command.users.includes(author.id)) {
             if (!command.hidden)
@@ -93,6 +91,67 @@ export class Commander {
             }
         }
         return true;
+    }
+    getAuthor(interaction) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.user;
+        }
+        else if (interaction instanceof Message) {
+            return interaction.author;
+        }
+        else {
+            throw new Error('Invalid interaction.');
+        }
+    }
+    getArgs(interaction) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
+        }
+        else if (interaction instanceof Message) {
+            return interaction.content.split(/ +/).slice(1);
+        }
+        else {
+            return [];
+        }
+    }
+    reply(interaction, content) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply(content);
+        }
+        else if (interaction instanceof Message) {
+            return interaction.channel.send(content);
+        }
+        else {
+            return Promise.reject('Invalid interaction.');
+        }
+    }
+    edit(interaction, editable, content) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply(content);
+        }
+        else if (interaction instanceof Message) {
+            return editable.edit(content);
+        }
+        else {
+            return Promise.reject('Invalid interaction.');
+        }
+    }
+    react(interaction, emoji) {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply({ content: emoji });
+        }
+        else if (interaction instanceof Message) {
+            return interaction.react(emoji);
+        }
+        else {
+            return Promise.reject('Invalid interaction.');
+        }
     }
     initializeModules() {
         const modules = Object.values(Modules);
@@ -188,67 +247,6 @@ export class Commander {
         }
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
-    getAuthor(interaction) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.user;
-        }
-        else if (interaction instanceof Message) {
-            return interaction.author;
-        }
-        else {
-            throw new Error('Invalid interaction.');
-        }
-    }
-    getArgs(interaction) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat();
-        }
-        else if (interaction instanceof Message) {
-            return interaction.content.split(/ +/).slice(1);
-        }
-        else {
-            return [];
-        }
-    }
-    reply(interaction, content) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply(content);
-        }
-        else if (interaction instanceof Message) {
-            return interaction.channel.send(content);
-        }
-        else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
-    edit(interaction, editable, content) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply(content);
-        }
-        else if (interaction instanceof Message) {
-            return editable.edit(content);
-        }
-        else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
-    react(interaction, emoji) {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply({ content: emoji });
-        }
-        else if (interaction instanceof Message) {
-            return interaction.react(emoji);
-        }
-        else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
 }
-//# debugId=49813a46-a5c7-5db2-9e50-1ece8d02e0a3
+//# debugId=fc628038-00f4-52d1-b98e-9d88a190a84d
 //# sourceMappingURL=Commander.js.map

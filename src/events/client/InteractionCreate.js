@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="0ca43edc-80df-5b03-b2da-aba34e629933")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="0420516c-5f84-5fee-aa21-b4f995d8d2d0")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ErrorEmbed } from '../../utils/embeds/index.js';
@@ -24,5 +24,5 @@ export class InteractionCreate extends Event {
         }
     }
 }
-//# debugId=0ca43edc-80df-5b03-b2da-aba34e629933
+//# debugId=0420516c-5f84-5fee-aa21-b4f995d8d2d0
 //# sourceMappingURL=InteractionCreate.js.map

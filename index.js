@@ -1,5 +1,5 @@
 // ------------------------------------
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="0e6c0fe6-2f8b-56ec-91c9-83f8b8c77fb3")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c04e89ea-8c7d-5442-80c4-9b166698cc49")}catch(e){}}();
 import dotenv from 'dotenv';
 dotenv.config();
 // ------------------------------------
@@ -61,5 +61,5 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         client.logger.error(err);
     });
 })();
-//# debugId=0e6c0fe6-2f8b-56ec-91c9-83f8b8c77fb3
+//# debugId=c04e89ea-8c7d-5442-80c4-9b166698cc49
 //# sourceMappingURL=index.js.map
