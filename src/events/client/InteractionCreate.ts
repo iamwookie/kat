@@ -1,5 +1,5 @@
 import { Event, KATClient as Client, Commander } from '@structures/index.js';
-import { Events, BaseInteraction } from 'discord.js';
+import { BaseInteraction, Events } from 'discord.js';
 import { ErrorEmbed } from '@utils/embeds/index.js';
 
 export class InteractionCreate extends Event {

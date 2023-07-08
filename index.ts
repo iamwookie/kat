@@ -42,7 +42,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.DirectMessages,
             GatewayIntentBits.MessageContent,
-
         ],
         partials: [Partials.Message, Partials.Channel],
         presence: {

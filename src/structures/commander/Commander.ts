@@ -61,7 +61,7 @@ export class Commander {
         this.aliases = new Collection<string, string>();
     }
 
-    async initialize() {
+    public async initialize(): Promise<void> {
         this.initializeModules();
         this.initializeCommands();
 
@@ -77,24 +77,24 @@ export class Commander {
         this.client.logger.status('>>>> Commander Initialized!');
     }
 
-    authorize(interaction: ChatInputCommandInteraction | Message, command: Command): boolean {
+    public authorize(interaction: ChatInputCommandInteraction | Message, command: Command): boolean {
         const author = this.getAuthor(interaction);
 
         if (interaction.inGuild()) {
-            if (command.module.guilds && !command.module.guilds.includes(interaction.guild!.id)) return false;
-            if (!interaction.channel?.permissionsFor(interaction.guild!.members.me!).has(PermissionFlagsBits.SendMessages)) {
+            if (interaction instanceof ChatInputCommandInteraction && !interaction.inCachedGuild()) return false;
+            if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id)) return false;
+            if (
+                !interaction.channel ||
+                !interaction.channel
+                    .permissionsFor(interaction.guild.members.me!)
+                    .has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks, PermissionFlagsBits.AttachFiles])
+            ) {
                 if (!command.hidden)
-                    author
-                        .send({
-                            embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
-                        })
-                        .catch((err) => {
-                            this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                        });
+                    author.send({ embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)] }).catch((err) => {
+                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                    });
                 return false;
             }
-        } else if (!command.allowDM) {
-            return false;
         }
 
         if (command.users && !command.users.includes(author.id)) {
@@ -121,6 +121,69 @@ export class Commander {
         }
 
         return true;
+    }
+
+    public getAuthor(interaction: ChatInputCommandInteraction | Message): User {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.user;
+        } else if (interaction instanceof Message) {
+            return interaction.author;
+        } else {
+            throw new Error('Invalid interaction.');
+        }
+    }
+
+    public getArgs(interaction: ChatInputCommandInteraction | Message): (string | undefined)[] {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat() as string[];
+        } else if (interaction instanceof Message) {
+            return interaction.content.split(/ +/).slice(1);
+        } else {
+            return [];
+        }
+    }
+
+    public reply(
+        interaction: ChatInputCommandInteraction | Message,
+        content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
+    ): Promise<Message> {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
+        } else if (interaction instanceof Message) {
+            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject('Invalid interaction.');
+        }
+    }
+
+    public edit(
+        interaction: ChatInputCommandInteraction | Message,
+        editable: Message,
+        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
+    ): Promise<Message> {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
+        } else if (interaction instanceof Message) {
+            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            return Promise.reject('Invalid interaction.');
+        }
+    }
+
+    public react(interaction: ChatInputCommandInteraction | Message, emoji: string | EmojiIdentifierResolvable): Promise<Message | MessageReaction> {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.replied
+                ? Promise.reject('Interaction already replied.')
+                : interaction.editReply({ content: emoji as Exclude<typeof emoji, EmojiIdentifierResolvable> });
+        } else if (interaction instanceof Message) {
+            return interaction.react(emoji);
+        } else {
+            return Promise.reject('Invalid interaction.');
+        }
     }
 
     private initializeModules(): void {
@@ -224,68 +287,5 @@ export class Commander {
         }
 
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
-    }
-
-    getAuthor(interaction: ChatInputCommandInteraction | Message): User {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.user;
-        } else if (interaction instanceof Message) {
-            return interaction.author;
-        } else {
-            throw new Error('Invalid interaction.');
-        }
-    }
-
-    getArgs(interaction: ChatInputCommandInteraction | Message): (string | undefined)[] {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat() as string[];
-        } else if (interaction instanceof Message) {
-            return interaction.content.split(/ +/).slice(1);
-        } else {
-            return [];
-        }
-    }
-
-    reply(
-        interaction: ChatInputCommandInteraction | Message,
-        content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
-    ): Promise<Message> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
-        } else if (interaction instanceof Message) {
-            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
-        } else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
-
-    edit(
-        interaction: ChatInputCommandInteraction | Message,
-        editable: Message,
-        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
-    ): Promise<Message> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
-        } else if (interaction instanceof Message) {
-            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
-        } else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
-
-    react(interaction: ChatInputCommandInteraction | Message, emoji: string | EmojiIdentifierResolvable): Promise<Message | MessageReaction> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply({ content: emoji as Exclude<typeof emoji, EmojiIdentifierResolvable> });
-        } else if (interaction instanceof Message) {
-            return interaction.react(emoji);
-        } else {
-            return Promise.reject('Invalid interaction.');
-        }
     }
 }

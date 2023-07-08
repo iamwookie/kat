@@ -37,7 +37,7 @@ export abstract class Command {
     public disabled?: boolean;
     public cooldowns: Collection<Snowflake, number>;
 
-    abstract execute(interaction: ChatInputCommandInteraction | Message): Promise<any>;
+    abstract execute(interaction: ChatInputCommandInteraction | Message): any;
 
     constructor(public client: Client, public commander: Commander, options: CommandOptions) {
         this.name = options.name;
