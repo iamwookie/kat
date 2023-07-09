@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="3d4baec9-3362-5940-a33b-176735657da9")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="fe05708c-7944-5111-b09a-270aa6a4573f")}catch(e){}}();
 import { formatDuration } from '../../utils/helpers.js';
 class Track {
     data;
@@ -47,5 +47,5 @@ export class SpotifyTrack extends Track {
         this.title = this.title + ' - ' + this.data.info.author;
     }
 }
-//# debugId=3d4baec9-3362-5940-a33b-176735657da9
+//# debugId=fe05708c-7944-5111-b09a-270aa6a4573f
 //# sourceMappingURL=Track.js.map

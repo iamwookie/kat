@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="9384666f-d170-5cf1-beb0-e3c094e004c8")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4ebc3d84-30a4-5cfd-ac6f-8eaaffea57ac")}catch(e){}}();
 import { Command, MusicPrompts } from '../../../structures/index.js';
 import { ActionEmbed, ReviewEmbed } from '../../../utils/embeds/index.js';
 export class StopCommand extends Command {
@@ -23,9 +23,9 @@ export class StopCommand extends Command {
         this.commander.react(int, '👋');
         if (int.channel) {
             const reviewEmbed = new ReviewEmbed();
-            int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] });
+            int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] }).catch(() => { });
         }
     }
 }
-//# debugId=9384666f-d170-5cf1-beb0-e3c094e004c8
+//# debugId=4ebc3d84-30a4-5cfd-ac6f-8eaaffea57ac
 //# sourceMappingURL=stop.js.map

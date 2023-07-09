@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="0420516c-5f84-5fee-aa21-b4f995d8d2d0")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="72c1fa75-7828-5237-8e93-02b038f0e709")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ErrorEmbed } from '../../utils/embeds/index.js';
@@ -13,6 +13,8 @@ export class InteractionCreate extends Event {
         if (!command || command.disabled)
             return;
         await interaction.deferReply({ ephemeral: command.ephemeral });
+        if (!this.commander.validate(interaction, command))
+            return;
         if (!this.commander.authorize(interaction, command))
             return;
         try {
@@ -24,5 +26,5 @@ export class InteractionCreate extends Event {
         }
     }
 }
-//# debugId=0420516c-5f84-5fee-aa21-b4f995d8d2d0
+//# debugId=72c1fa75-7828-5237-8e93-02b038f0e709
 //# sourceMappingURL=InteractionCreate.js.map

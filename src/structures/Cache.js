@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="b651ace8-fafb-5c54-9a81-6536bf0a4726")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="0f9ce798-c2bc-5895-a8fd-9d85f810121d")}catch(e){}}();
 export class Cache {
     client;
     guilds;
@@ -118,5 +118,5 @@ class QueueCache {
         }
     }
 }
-//# debugId=b651ace8-fafb-5c54-9a81-6536bf0a4726
+//# debugId=0f9ce798-c2bc-5895-a8fd-9d85f810121d
 //# sourceMappingURL=Cache.js.map

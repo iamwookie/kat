@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="83912de7-5e60-568d-9bd8-26b3f9859489")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="dbd5b14a-2b5d-5e7b-81b3-60b186cfba28")}catch(e){}}();
 import { Event, Events, YouTubePlaylist, SpotifyPlaylist } from '../../../structures/index.js';
 export class TrackAdd extends Event {
     constructor(client, commander) {
@@ -31,5 +31,5 @@ export class TrackAdd extends Event {
         this.client.logger.info(`Added ${data instanceof Array ? data.length : 1} Track(s) For: ${subscription.guild.name} (${subscription.guild.id})`, 'Dispatcher');
     }
 }
-//# debugId=83912de7-5e60-568d-9bd8-26b3f9859489
+//# debugId=dbd5b14a-2b5d-5e7b-81b3-60b186cfba28
 //# sourceMappingURL=TrackAdd.js.map

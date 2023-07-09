@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="7013e79b-27f4-5e71-9641-bb8e5a99e2d5")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ff275971-690b-5a05-8e37-b1791a530581")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { EmbedBuilder, Events } from 'discord.js';
 export class GuildCreate extends Event {
@@ -6,12 +6,8 @@ export class GuildCreate extends Event {
         super(client, commander, Events.GuildCreate);
     }
     async execute(guild) {
-        this.client.logger.info(`Joined Guild ${guild.name} (${guild.id}) With ${guild.memberCount} Members`, 'DISCORD');
-        for (const module of this.commander.modules.values()) {
-            if (module.guilds && !module.guilds.includes(guild.id))
-                continue;
+        for (const module of this.commander.modules.filter((m) => m.guilds && m.guilds.includes(guild.id)).values())
             module.emit(this.name, guild);
-        }
         const owner = await guild.fetchOwner();
         const embed = new EmbedBuilder()
             .setColor('Green')
@@ -19,7 +15,8 @@ export class GuildCreate extends Event {
             .addFields({ name: 'Name', value: `\`${guild.name}\``, inline: true }, { name: 'Owner', value: `\`${owner.user.tag}\``, inline: true }, { name: 'Guild ID', value: `\`${guild.id}\``, inline: true }, { name: 'Owner ID', value: `\`${guild.ownerId}\``, inline: true }, { name: 'Members', value: `\`${guild.memberCount}\``, inline: true })
             .setTimestamp();
         this.client.logger.notify(embed);
+        this.client.logger.info(`Joined Guild ${guild.name} (${guild.id}) With ${guild.memberCount} Members`, 'DISCORD');
     }
 }
-//# debugId=7013e79b-27f4-5e71-9641-bb8e5a99e2d5
+//# debugId=ff275971-690b-5a05-8e37-b1791a530581
 //# sourceMappingURL=GuildCreate.js.map

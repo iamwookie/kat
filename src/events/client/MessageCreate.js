@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="0c040bd8-41bd-55f6-ac94-3437cd5caffe")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4e454bab-0a2f-5169-9164-baf154f1b056")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ErrorEmbed } from '../../utils/embeds/index.js';
@@ -16,9 +16,11 @@ export class MessageCreate extends Event {
             return;
         const commandName = message.content.slice(prefix.length).split(/ +/).shift()?.toLowerCase();
         const command = this.commander.commands.get(commandName) ?? this.commander.commands.get(this.commander.aliases.get(commandName));
-        if (!command || command.disabled || !command.legacy)
+        if (!command || !command.legacy || command.disabled)
             return;
         if (!command.allowDM && !message.inGuild())
+            return;
+        if (!this.commander.validate(message, command))
             return;
         if (!this.commander.authorize(message, command))
             return;
@@ -31,5 +33,5 @@ export class MessageCreate extends Event {
         }
     }
 }
-//# debugId=0c040bd8-41bd-55f6-ac94-3437cd5caffe
+//# debugId=4e454bab-0a2f-5169-9164-baf154f1b056
 //# sourceMappingURL=MessageCreate.js.map

@@ -1,16 +1,13 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="35fa2b4e-63aa-54a5-abc7-7fd23e10d823")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="bcac655d-7966-5ecc-93b4-60ebe2108fdb")}catch(e){}}();
 import { Module } from '../structures/index.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, DiscordAPIError, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 export class WelcomeModule extends Module {
     constructor(client, commander) {
-        super(client, commander, {
-            name: 'Welcome',
-        });
+        super(client, commander, { name: 'Welcome' });
         this.on('guildCreate', this.onGuildCreate.bind(this));
     }
     async onGuildCreate(guild) {
-        const channel = guild.channels.cache.find((c) => c.type == ChannelType.GuildText &&
-            c.permissionsFor(guild.members.me).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks]));
+        const channel = guild.channels.cache.find((c) => c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks]));
         if (channel && channel.isTextBased()) {
             const embed = new EmbedBuilder()
                 .setColor('White')
@@ -34,5 +31,5 @@ export class WelcomeModule extends Module {
         }
     }
 }
-//# debugId=35fa2b4e-63aa-54a5-abc7-7fd23e10d823
+//# debugId=bcac655d-7966-5ecc-93b4-60ebe2108fdb
 //# sourceMappingURL=welcome.js.map

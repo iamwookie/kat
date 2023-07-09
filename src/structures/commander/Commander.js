@@ -1,5 +1,5 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="fc628038-00f4-52d1-b98e-9d88a190a84d")}catch(e){}}();
-import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, PermissionFlagsBits, } from 'discord.js';
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="36676ac8-456e-553f-b8f3-fdc860c28ca0")}catch(e){}}();
+import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
 import { PermissionPrompts } from '../interfaces/Enums.js';
 // -----------------------------------
@@ -51,32 +51,26 @@ export class Commander {
         this.intiliazeEvents();
         this.client.logger.status('>>>> Commander Initialized!');
     }
-    authorize(interaction, command) {
+    validate(interaction, command) {
         const author = this.getAuthor(interaction);
         if (interaction.inGuild()) {
             if (interaction instanceof ChatInputCommandInteraction && !interaction.inCachedGuild())
                 return false;
             if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id))
                 return false;
-            if (!interaction.channel ||
-                !interaction.channel
-                    .permissionsFor(interaction.guild.members.me)
-                    .has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks, PermissionFlagsBits.AttachFiles])) {
-                if (!command.hidden)
-                    author.send({ embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)] }).catch((err) => {
-                        this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                    });
+            if (!interaction.channel || !interaction.channel.permissionsFor(interaction.guild.members.me).has(this.client.permissions.text)) {
+                if (!command.hidden) {
+                    const embed = new ActionEmbed('fail').setTitle('Uh Oh!').setText(PermissionPrompts.NotEnough);
+                    // prettier-ignore
+                    if (interaction instanceof ChatInputCommandInteraction) {
+                        this.reply(interaction, { embeds: [embed] }).catch((err) => this.client.logger.error(err, 'Error Sending Permissions Reply', 'Commander'));
+                    }
+                    else if (interaction instanceof Message) {
+                        author.send({ embeds: [embed] }).catch((err) => this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander'));
+                    }
+                }
                 return false;
             }
-        }
-        if (command.users && !command.users.includes(author.id)) {
-            if (!command.hidden)
-                this.reply(interaction, {
-                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-                }).catch((err) => {
-                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                });
-            return false;
         }
         if (command.cooldown && command.cooldowns) {
             if (command.cooldowns.has(author.id)) {
@@ -89,6 +83,19 @@ export class Commander {
                 });
                 return false;
             }
+        }
+        return true;
+    }
+    authorize(interaction, command) {
+        const author = this.getAuthor(interaction);
+        if (command.users && !command.users.includes(author.id)) {
+            if (!command.hidden)
+                this.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
+                }).catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
+                });
+            return false;
         }
         return true;
     }
@@ -116,41 +123,35 @@ export class Commander {
     }
     reply(interaction, content) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply(content);
+            return interaction.editReply(content);
         }
         else if (interaction instanceof Message) {
             return interaction.channel.send(content);
         }
         else {
-            return Promise.reject('Invalid interaction.');
+            throw new Error('Invalid interaction.');
         }
     }
     edit(interaction, editable, content) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply(content);
+            return interaction.editReply(content);
         }
         else if (interaction instanceof Message) {
             return editable.edit(content);
         }
         else {
-            return Promise.reject('Invalid interaction.');
+            throw new Error('Invalid interaction.');
         }
     }
     react(interaction, emoji) {
         if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply({ content: emoji });
+            return interaction.editReply({ content: emoji });
         }
         else if (interaction instanceof Message) {
             return interaction.react(emoji);
         }
         else {
-            return Promise.reject('Invalid interaction.');
+            throw new Error('Invalid interaction.');
         }
     }
     initializeModules() {
@@ -248,5 +249,5 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 }
-//# debugId=fc628038-00f4-52d1-b98e-9d88a190a84d
+//# debugId=36676ac8-456e-553f-b8f3-fdc860c28ca0
 //# sourceMappingURL=Commander.js.map

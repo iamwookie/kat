@@ -1,5 +1,5 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4889716b-6649-56e8-a9c8-99b495d60f57")}catch(e){}}();
-import { YouTubeTrack, SpotifyTrack } from "./Track.js";
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="076c87a9-90f7-58d0-bff0-685ce52bf19a")}catch(e){}}();
+import { YouTubeTrack, SpotifyTrack } from './Track.js';
 export class YouTubePlaylist {
     url;
     info;
@@ -7,6 +7,7 @@ export class YouTubePlaylist {
     title;
     thumbnail;
     tracks;
+    // prettier-ignore
     constructor(url, info, requester, tracks) {
         this.url = url;
         this.info = info;
@@ -23,6 +24,7 @@ export class SpotifyPlaylist {
     title;
     thumbnail;
     tracks;
+    // prettier-ignore
     constructor(url, info, requester, tracks) {
         this.url = url;
         this.info = info;
@@ -31,5 +33,5 @@ export class SpotifyPlaylist {
         this.tracks = tracks.map((track) => new SpotifyTrack(track, requester));
     }
 }
-//# debugId=4889716b-6649-56e8-a9c8-99b495d60f57
+//# debugId=076c87a9-90f7-58d0-bff0-685ce52bf19a
 //# sourceMappingURL=Playlist.js.map

@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="e39a0cf9-c10c-5143-9b76-23a8a760b0a2")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d61c01db-e239-501e-8110-8fa3e7a08ca4")}catch(e){}}();
 import * as Config from '../../config.js';
 import { Client, Events } from 'discord.js';
 import { Logger } from './Logger.js';
@@ -30,16 +30,14 @@ export class KATClient extends Client {
         this.devPrefix = Config.bot.devPrefix;
         this.permissions = Config.bot.permissions;
         this.logger = new Logger(this);
-        // Prisma causes an issue with circular references. Try fixing this later
         this.prisma = new PrismaClient({ log: ['warn', 'error'] });
         this.redis = Redis.fromEnv();
         this.commander = new Commander(this);
         this.dispatcher = new Dispatcher(this);
         this.cache = new Cache(this);
         this.server = new Server(this);
-        this.on(Events.Error, (err) => {
-            this.logger.error(err);
-        });
+        // @ts-expect-error - Error method returns a string but isn't necessary.
+        this.on(Events.Error, (err) => this.logger.error(err, 'An Error Has Occured', 'Client'));
         if (process.env.NODE_ENV != 'production')
             this.on(Events.Debug, (msg) => this.logger.debug(msg));
     }
@@ -57,5 +55,5 @@ export class KATClient extends Client {
         return this.config.devs.includes(user.id);
     }
 }
-//# debugId=e39a0cf9-c10c-5143-9b76-23a8a760b0a2
+//# debugId=d61c01db-e239-501e-8110-8fa3e7a08ca4
 //# sourceMappingURL=Client.js.map

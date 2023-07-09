@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d15e89a2-fe72-536d-8022-c443eb819a3c")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="05ba694f-40d3-5311-a403-790c46cdedd8")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 export class InviteCreate extends Event {
@@ -6,14 +6,11 @@ export class InviteCreate extends Event {
         super(client, commander, Events.InviteCreate);
     }
     async execute(invite) {
-        if (!invite.guild)
-            return;
-        for (const module of this.commander.modules.values()) {
-            if (module.guilds && !module.guilds.includes(invite.guild.id))
-                continue;
-            module.emit(this.name, invite);
-        }
+        if (invite.guild)
+            // @ts-expect-error - Guild is not null.
+            for (const module of this.commander.modules.filter((m) => m.guilds && m.guilds.includes(invite.guild.id)).values())
+                module.emit(this.name, invite.guild);
     }
 }
-//# debugId=d15e89a2-fe72-536d-8022-c443eb819a3c
+//# debugId=05ba694f-40d3-5311-a403-790c46cdedd8
 //# sourceMappingURL=InviteCreate.js.map

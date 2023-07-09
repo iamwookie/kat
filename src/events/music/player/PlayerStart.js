@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="8f72bad9-45f9-57d0-8095-4216c2b76b23")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="fa0c1dcc-b83e-5329-a56e-37fe319947d8")}catch(e){}}();
 import { Event } from '../../../structures/index.js';
 import { MusicEmbed } from '../../../utils/embeds/index.js';
 export class PlayerStart extends Event {
@@ -15,5 +15,5 @@ export class PlayerStart extends Event {
                 .catch(() => undefined);
     }
 }
-//# debugId=8f72bad9-45f9-57d0-8095-4216c2b76b23
+//# debugId=fa0c1dcc-b83e-5329-a56e-37fe319947d8
 //# sourceMappingURL=PlayerStart.js.map

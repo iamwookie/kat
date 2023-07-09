@@ -1,8 +1,8 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="cb88089a-2d88-5b66-9a4f-8f97fe26b126")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6f968bc8-1e4b-54b8-940a-3f0f5ebf3a7d")}catch(e){}}();
 export var PermissionPrompts;
 (function (PermissionPrompts) {
     PermissionPrompts["NotAllowed"] = "You do not have enough permissions!";
-    PermissionPrompts["CannotSend"] = "I can't send messages in that channel. Make sure I have the appropriate permissions, or if you don't want such errors in the future, give me the `Administrator` permission!";
+    PermissionPrompts["NotEnough"] = "I have insufficient permissions to function in the text channel. Make sure I have the appropriate permissions. If you don't want such errors in the future, give me the following permissions: \n - `Administrator`";
 })(PermissionPrompts || (PermissionPrompts = {}));
 export var MusicPrompts;
 (function (MusicPrompts) {
@@ -27,5 +27,5 @@ export var MusicEmojis;
     MusicEmojis["YouTube"] = "<:youtube:1067881972774477844>";
     MusicEmojis["Spotify"] = "<:spotify:1067881968697614476>";
 })(MusicEmojis || (MusicEmojis = {}));
-//# debugId=cb88089a-2d88-5b66-9a4f-8f97fe26b126
+//# debugId=6f968bc8-1e4b-54b8-940a-3f0f5ebf3a7d
 //# sourceMappingURL=Enums.js.map

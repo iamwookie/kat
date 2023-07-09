@@ -1,5 +1,5 @@
 // ------------------------------------
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c04e89ea-8c7d-5442-80c4-9b166698cc49")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="a5e4d0ca-0f7c-5591-a334-9f85674884be")}catch(e){}}();
 import dotenv from 'dotenv';
 dotenv.config();
 // ------------------------------------
@@ -50,16 +50,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             ],
         },
     });
-    process.on('unhandledRejection', (err) => {
-        client.logger.uncaught(err);
-    });
-    process.on('uncaughtException', (err) => {
-        client.logger.uncaught(err);
-    });
+    // process.on('unhandledRejection', (err) => client.logger.uncaught(err));
+    // process.on('uncaughtException', (err) => client.logger.uncaught(err));
     await client.initialize();
-    await client.login(process.env.DISCORD_TOKEN).catch((err) => {
-        client.logger.error(err);
-    });
+    await client.login(process.env.DISCORD_TOKEN).catch((err) => client.logger.error(err));
 })();
-//# debugId=c04e89ea-8c7d-5442-80c4-9b166698cc49
+//# debugId=a5e4d0ca-0f7c-5591-a334-9f85674884be
 //# sourceMappingURL=index.js.map

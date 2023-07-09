@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="85df0066-7ec6-5042-8cc8-be0d3d570d7c")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="9e20b986-becb-567d-843f-fdb113be6b19")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 export class GuildMemberAdd extends Event {
@@ -8,12 +8,9 @@ export class GuildMemberAdd extends Event {
     async execute(member) {
         if (member.user.bot)
             return;
-        for (const module of this.commander.modules.values()) {
-            if (module.guilds && !module.guilds.includes(member.guild.id))
-                continue;
+        for (const module of this.commander.modules.filter((m) => m.guilds && m.guilds.includes(member.guild.id)).values())
             module.emit(this.name, member);
-        }
     }
 }
-//# debugId=85df0066-7ec6-5042-8cc8-be0d3d570d7c
+//# debugId=9e20b986-becb-567d-843f-fdb113be6b19
 //# sourceMappingURL=GuildMemberAdd.js.map

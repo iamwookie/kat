@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="47b94fc6-389b-55ce-b153-483565e7bcd4")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6d17c791-afc7-5efd-8280-8ad1b6830d6f")}catch(e){}}();
 import { Collection } from 'discord.js';
 import { EventEmitter } from 'events';
 export class Module extends EventEmitter {
@@ -14,10 +14,8 @@ export class Module extends EventEmitter {
         this.name = options.name;
         this.guilds = options.guilds;
         this.commands = new Collection();
-        this.on('error', (err) => {
-            this.client.logger.error(err, 'An Error Has Occured', `Module ${this.name}`);
-        });
+        this.on('error', (err) => this.client.logger.error(err, 'An Error Has Occured', `Module ${this.name}`));
     }
 }
-//# debugId=47b94fc6-389b-55ce-b153-483565e7bcd4
+//# debugId=6d17c791-afc7-5efd-8280-8ad1b6830d6f
 //# sourceMappingURL=Module.js.map

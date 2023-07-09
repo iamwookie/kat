@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="92a43c76-c2d9-5c99-b2d3-9d357100646e")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4ec6a6ad-113e-57af-8cca-a98d7ca27501")}catch(e){}}();
 import { Event } from '../../../structures/index.js';
 import { ActionEmbed } from '../../../utils/embeds/index.js';
 import { MusicPrompts } from '../../../structures/interfaces/Enums.js';
@@ -20,5 +20,5 @@ export class PlayerEnd extends Event {
         }, this.client.config.music.inactiveDuration);
     }
 }
-//# debugId=92a43c76-c2d9-5c99-b2d3-9d357100646e
+//# debugId=4ec6a6ad-113e-57af-8cca-a98d7ca27501
 //# sourceMappingURL=PlayerEnd.js.map

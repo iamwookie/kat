@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="28f8ad13-4c3e-5365-8fba-f82459dea00a")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="3024b586-87a0-5b42-9cb0-de6a3f3674af")}catch(e){}}();
 import { Event } from '../../structures/index.js';
 import { Events } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/action.js';
@@ -9,9 +9,9 @@ export class ClientReady extends Event {
         super(client, commander, Events.ClientReady);
     }
     async execute(client) {
+        await this.client.server.initialize();
         for (const module of this.commander.modules.values())
             module.emit(this.name, client);
-        await this.client.server.initialize();
         // Move to a method in the future (maybe :/)
         const res = await this.client.prisma.queue.findMany({ where: { active: true } });
         if (res.length) {
@@ -40,5 +40,5 @@ export class ClientReady extends Event {
         console.log(chalk.magenta.bold.underline(`---- >>> App Loaded In: ${Date.now() - this.client.startTime}ms`));
     }
 }
-//# debugId=28f8ad13-4c3e-5365-8fba-f82459dea00a
+//# debugId=3024b586-87a0-5b42-9cb0-de6a3f3674af
 //# sourceMappingURL=ClientReady.js.map
