@@ -7,11 +7,9 @@ export class InviteCreate extends Event {
     }
 
     async execute(invite: Invite) {
-        if (!invite.guild) return;
-
-        for (const module of this.commander.modules.values()) {
-            if (module.guilds && !module.guilds.includes(invite.guild.id)) continue;
-            module.emit(this.name, invite);
-        }
+        if (invite.guild)
+            // @ts-expect-error - Guild is not null.
+            for (const module of this.commander.modules.filter((m) => m.guilds && m.guilds.includes(invite.guild.id)).values())
+                module.emit(this.name, invite.guild);
     }
 }

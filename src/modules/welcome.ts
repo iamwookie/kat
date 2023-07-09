@@ -3,9 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, DiscordAPIEr
 
 export class WelcomeModule extends Module {
     constructor(client: Client, commander: Commander) {
-        super(client, commander, {
-            name: 'Welcome',
-        });
+        super(client, commander, { name: 'Welcome' });
 
         this.on('guildCreate', this.onGuildCreate.bind(this));
     }
@@ -13,8 +11,7 @@ export class WelcomeModule extends Module {
     async onGuildCreate(guild: Guild) {
         const channel = guild.channels.cache.find(
             (c) =>
-                c.type == ChannelType.GuildText &&
-                c.permissionsFor(guild.members.me!).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])
+                c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me!).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])
         );
 
         if (channel && channel.isTextBased()) {

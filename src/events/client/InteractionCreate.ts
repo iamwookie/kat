@@ -15,6 +15,7 @@ export class InteractionCreate extends Event {
 
         await interaction.deferReply({ ephemeral: command.ephemeral });
 
+        if (!this.commander.validate(interaction, command)) return;
         if (!this.commander.authorize(interaction, command)) return;
 
         try {

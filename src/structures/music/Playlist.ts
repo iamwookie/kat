@@ -1,6 +1,6 @@
-import { LavalinkResponse, Track as ShoukakuTrack } from "shoukaku";
-import { YouTubeTrack, SpotifyTrack } from "./Track.js";
-import { User } from "discord.js";
+import { LavalinkResponse, Track as ShoukakuTrack } from 'shoukaku';
+import { YouTubeTrack, SpotifyTrack } from './Track.js';
+import { User } from 'discord.js';
 
 interface Playlist {
     url: URL;
@@ -14,6 +14,7 @@ export class YouTubePlaylist implements Playlist {
     public thumbnail?: string;
     public tracks: YouTubeTrack[];
 
+    // prettier-ignore
     constructor(
         public url: URL,
         public info: LavalinkResponse['playlistInfo'],
@@ -31,6 +32,7 @@ export class SpotifyPlaylist implements Playlist {
     public thumbnail?: string;
     public tracks: SpotifyTrack[];
 
+    // prettier-ignore
     constructor(
         public url: URL,
         public info: LavalinkResponse['playlistInfo'],

@@ -27,7 +27,7 @@ export class StopCommand extends Command {
 
         if (int.channel) {
             const reviewEmbed = new ReviewEmbed();
-            int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] });
+            int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] }).catch(() => {});
         }
     }
 }

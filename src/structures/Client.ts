@@ -14,7 +14,7 @@ export class KATClient extends Client {
     public config: typeof Config;
     public prefix: string;
     public devPrefix: string;
-    public permissions: PermissionsBitField;
+    public permissions: { [key: string]: PermissionsBitField };
     public logger: Logger;
     public prisma: PrismaClient;
     public redis: Redis;
@@ -32,7 +32,6 @@ export class KATClient extends Client {
         this.devPrefix = Config.bot.devPrefix;
         this.permissions = Config.bot.permissions;
         this.logger = new Logger(this);
-        // Prisma causes an issue with circular references. Try fixing this later
         this.prisma = new PrismaClient({ log: ['warn', 'error'] });
         this.redis = Redis.fromEnv();
         this.commander = new Commander(this);
@@ -40,9 +39,8 @@ export class KATClient extends Client {
         this.cache = new Cache(this);
         this.server = new Server(this);
 
-        this.on(Events.Error, (err) => {
-            this.logger.error(err);
-        });
+        // @ts-expect-error - Error method returns a string but isn't necessary.
+        this.on(Events.Error, (err) => this.logger.error(err, 'An Error Has Occured', 'Client'));
 
         if (process.env.NODE_ENV != 'production') this.on(Events.Debug, (msg) => this.logger.debug(msg));
     }

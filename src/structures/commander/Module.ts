@@ -21,8 +21,6 @@ export class Module extends EventEmitter {
         this.guilds = options.guilds;
         this.commands = new Collection<string, Command>();
 
-        this.on('error', (err) => {
-            this.client.logger.error(err, 'An Error Has Occured', `Module ${this.name}`);
-        });
+        this.on('error', (err) => this.client.logger.error(err, 'An Error Has Occured', `Module ${this.name}`));
     }
 }

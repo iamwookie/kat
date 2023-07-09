@@ -7,12 +7,7 @@ export class GuildCreate extends Event {
     }
 
     async execute(guild: Guild) {
-        this.client.logger.info(`Joined Guild ${guild.name} (${guild.id}) With ${guild.memberCount} Members`, 'DISCORD');
-
-        for (const module of this.commander.modules.values()) {
-            if (module.guilds && !module.guilds.includes(guild.id)) continue;
-            module.emit(this.name, guild);
-        }
+        for (const module of this.commander.modules.filter((m) => m.guilds && m.guilds.includes(guild.id)).values()) module.emit(this.name, guild);
 
         const owner = await guild.fetchOwner();
         const embed = new EmbedBuilder()
@@ -27,5 +22,7 @@ export class GuildCreate extends Event {
             )
             .setTimestamp();
         this.client.logger.notify(embed);
+
+        this.client.logger.info(`Joined Guild ${guild.name} (${guild.id}) With ${guild.memberCount} Members`, 'DISCORD');
     }
 }

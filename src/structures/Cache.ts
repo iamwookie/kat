@@ -3,7 +3,7 @@ import { Snowflake } from 'discord.js';
 import { Guild, Music } from '@prisma/client';
 
 export class Cache {
-    public guilds: GuildCache
+    public guilds: GuildCache;
     public music: MusicCache;
     public queue: QueueCache;
 
@@ -20,7 +20,7 @@ class GuildCache {
     public key: string;
 
     constructor(private client: Client) {
-        this.key = 'kat:guilds'
+        this.key = 'kat:guilds';
     }
 
     async get(guildId: Snowflake): Promise<Guild | null> {
@@ -60,7 +60,7 @@ class MusicCache {
     private key: string;
 
     constructor(private client: Client) {
-        this.key = 'kat:music'
+        this.key = 'kat:music';
     }
 
     async get(guildId: Snowflake): Promise<Music | null> {
@@ -95,10 +95,10 @@ class QueueCache {
     private key;
 
     constructor(private client: Client) {
-        this.key = 'kat:queue'
+        this.key = 'kat:queue';
     }
 
-    async count(guildId: Snowflake):  Promise<number> {
+    async count(guildId: Snowflake): Promise<number> {
         try {
             const res = await this.client.redis.hget<number>(this.key + ':counts', guildId);
             if (res) return res;

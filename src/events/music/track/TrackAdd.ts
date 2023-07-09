@@ -1,14 +1,4 @@
-import {
-    Event,
-    KATClient,
-    Commander,
-    Events,
-    Subscription,
-    YouTubeTrack,
-    SpotifyTrack,
-    YouTubePlaylist,
-    SpotifyPlaylist
-} from '@structures/index.js';
+import { Event, KATClient, Commander, Events, Subscription, YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '@structures/index.js';
 
 export class TrackAdd extends Event {
     constructor(client: KATClient, commander: Commander) {

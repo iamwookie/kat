@@ -11,9 +11,9 @@ export class ClientReady extends Event {
     }
 
     async execute(client: DiscordClient) {
-        for (const module of this.commander.modules.values()) module.emit(this.name, client);
-
         await this.client.server.initialize();
+
+        for (const module of this.commander.modules.values()) module.emit(this.name, client);
 
         // Move to a method in the future (maybe :/)
         const res = await this.client.prisma.queue.findMany({ where: { active: true } });
