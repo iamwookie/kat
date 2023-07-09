@@ -1,6 +1,6 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="7c269d74-a6ca-5b81-903d-f905ee843899")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="b25a045d-69f0-5d35-8e20-de87ca258b66")}catch(e){}}();
 import { PermissionsBitField } from 'discord.js';
-export const version = '8.0.4';
+export const version = '8.1.0';
 export const devs = ['244662779745665026'];
 export const bot = {
     prefix: process.env.NODE_ENV != 'production' ? '!' : '.',
@@ -48,5 +48,5 @@ export const lavalink = {
         },
     ],
 };
-//# debugId=7c269d74-a6ca-5b81-903d-f905ee843899
+//# debugId=b25a045d-69f0-5d35-8e20-de87ca258b66
 //# sourceMappingURL=config.js.map
