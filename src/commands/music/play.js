@@ -1,7 +1,7 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d125575a-49c3-55a4-8a25-6214f76096f0")}catch(e){}}();
-import { Command, MusicPrompts, NodeError, PlayerError, SearchError } from '../../../structures/index.js';
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="f6bfe987-dda0-54b7-94de-5dba323bb456")}catch(e){}}();
+import { Command, MusicPrompts, NodeError, PlayerError, SearchError } from '../../structures/index.js';
 import { SlashCommandBuilder, VoiceChannel } from 'discord.js';
-import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../../utils/embeds/index.js';
+import { ActionEmbed, ErrorEmbed, MusicEmbed } from '../../utils/embeds/index.js';
 export class PlayCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -70,5 +70,5 @@ export class PlayCommand extends Command {
         }
     }
 }
-//# debugId=d125575a-49c3-55a4-8a25-6214f76096f0
+//# debugId=f6bfe987-dda0-54b7-94de-5dba323bb456
 //# sourceMappingURL=play.js.map

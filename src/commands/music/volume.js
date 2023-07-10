@@ -1,7 +1,7 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="334c8e71-4410-5397-a963-006a945036e4")}catch(e){}}();
-import { Command, PermissionPrompts } from '../../../structures/index.js';
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="cb58cb78-13b2-5e54-b3bd-be0e17a6f538")}catch(e){}}();
+import { Command, PermissionPrompts } from '../../structures/index.js';
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
-import { ActionEmbed } from '../../../utils/embeds/index.js';
+import { ActionEmbed } from '../../utils/embeds/index.js';
 export class VolumeCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -81,5 +81,5 @@ export class VolumeCommand extends Command {
         });
     }
 }
-//# debugId=334c8e71-4410-5397-a963-006a945036e4
+//# debugId=cb58cb78-13b2-5e54-b3bd-be0e17a6f538
 //# sourceMappingURL=volume.js.map

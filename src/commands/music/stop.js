@@ -1,6 +1,6 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4ebc3d84-30a4-5cfd-ac6f-8eaaffea57ac")}catch(e){}}();
-import { Command, MusicPrompts } from '../../../structures/index.js';
-import { ActionEmbed, ReviewEmbed } from '../../../utils/embeds/index.js';
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c1c00779-1847-5530-be48-c546588b33d7")}catch(e){}}();
+import { Command, MusicPrompts } from '../../structures/index.js';
+import { ActionEmbed, ReviewEmbed } from '../../utils/embeds/index.js';
 export class StopCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -27,5 +27,5 @@ export class StopCommand extends Command {
         }
     }
 }
-//# debugId=4ebc3d84-30a4-5cfd-ac6f-8eaaffea57ac
+//# debugId=c1c00779-1847-5530-be48-c546588b33d7
 //# sourceMappingURL=stop.js.map

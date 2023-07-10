@@ -1,6 +1,6 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="64c10969-e93f-573c-b758-f69da77fd258")}catch(e){}}();
-import { Command, MusicPrompts } from '../../../structures/index.js';
-import { ActionEmbed } from '../../../utils/embeds/index.js';
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d50da204-de63-51bb-9864-fb99bf141d82")}catch(e){}}();
+import { Command, MusicPrompts } from '../../structures/index.js';
+import { ActionEmbed } from '../../utils/embeds/index.js';
 export class SkipCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -28,5 +28,5 @@ export class SkipCommand extends Command {
         this.commander.react(int, '✅');
     }
 }
-//# debugId=64c10969-e93f-573c-b758-f69da77fd258
+//# debugId=d50da204-de63-51bb-9864-fb99bf141d82
 //# sourceMappingURL=skip.js.map

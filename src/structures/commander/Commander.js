@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="36676ac8-456e-553f-b8f3-fdc860c28ca0")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="b420c38a-95a2-5ce8-a131-59b678105c5d")}catch(e){}}();
 import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Message, Collection, } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
 import { PermissionPrompts } from '../interfaces/Enums.js';
@@ -7,35 +7,16 @@ import * as Commands from '../../commands/index.js';
 import * as Events from '../../events/index.js';
 import * as Modules from '../../modules/index.js';
 // -----------------------------------
-const commands = [
-    // Music
-    Commands.PlayCommand,
-    Commands.LoopCommand,
-    Commands.StopCommand,
-    Commands.PauseCommand,
-    Commands.SkipCommand,
-    Commands.QueueCommand,
-    Commands.VolumeCommand,
-    Commands.LyricsCommand,
-    // Misc
-    Commands.PrefixCommand,
-    Commands.HelpCommand,
-    Commands.StatsCommand,
-];
 export class Commander {
     client;
     rest;
     commands;
-    global;
-    reserved;
     modules;
     aliases;
     constructor(client) {
         this.client = client;
         this.rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
         this.commands = new Collection();
-        this.global = new Collection();
-        this.reserved = new Collection();
         this.modules = new Collection();
         this.aliases = new Collection();
     }
@@ -44,8 +25,7 @@ export class Commander {
         this.initializeCommands();
         if (process.argv.includes('--register')) {
             this.client.logger.info('Registering Commands...', 'Commander');
-            await this.registerGlobalCommands();
-            await this.registerReservedCommands();
+            await this.registerCommands();
             this.client.logger.info('Commands Registered!', 'Commander');
         }
         this.intiliazeEvents();
@@ -168,30 +148,18 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${modules.length} Module(s)`);
     }
     initializeCommands() {
+        const commands = Object.values(Commands);
         for (const Command of commands) {
             try {
                 const command = new Command(this.client, this);
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
+                if (command.aliases)
+                    for (const alias of command.aliases)
                         this.aliases.set(alias, command.name);
-                    }
-                }
                 if (command.users)
                     command.users = command.users.concat(this.client.config.devs);
                 if (!this.modules.has(command.module.name))
                     this.modules.set(command.module.name, command.module);
                 command.module.commands.set(command.name, command);
-                // Remove reserved in the future and use modules directly for registering
-                if (command.module.guilds) {
-                    for (const guild of command.module.guilds) {
-                        const commands = this.reserved.get(guild) || new Collection();
-                        commands.set(command.name, command);
-                        this.reserved.set(guild, commands);
-                    }
-                }
-                else {
-                    this.global.set(command.name, command);
-                }
                 this.commands.set(command.name, command);
             }
             catch (err) {
@@ -213,10 +181,10 @@ export class Commander {
         }
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
-    async registerGlobalCommands() {
+    async registerCommands() {
         try {
             let body = [];
-            for (const command of this.global.values()) {
+            for (const command of this.commands.values()) {
                 if (command.disabled || command.hidden)
                     continue;
                 body.push(command.data().toJSON());
@@ -228,26 +196,6 @@ export class Commander {
             this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
         }
     }
-    async registerReservedCommands() {
-        for (const [guildId, commands] of this.reserved) {
-            if (!this.client.guilds.cache.has(guildId))
-                continue;
-            let body = [];
-            for (const command of commands.values()) {
-                if (command.disabled || command.hidden)
-                    continue;
-                body.push(command.data().toJSON());
-            }
-            try {
-                const res = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), { body });
-                this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
-            }
-            catch (err) {
-                this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
-            }
-        }
-        this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
-    }
 }
-//# debugId=36676ac8-456e-553f-b8f3-fdc860c28ca0
+//# debugId=b420c38a-95a2-5ce8-a131-59b678105c5d
 //# sourceMappingURL=Commander.js.map

@@ -1,6 +1,6 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="9fe4f77f-1ea2-5e94-999c-66782df6edc5")}catch(e){}}();
-import { Command, MusicPrompts } from '../../../structures/index.js';
-import { ActionEmbed } from '../../../utils/embeds/index.js';
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="1d05d987-c344-5d0f-a273-7012849f5f22")}catch(e){}}();
+import { Command, MusicPrompts } from '../../structures/index.js';
+import { ActionEmbed } from '../../utils/embeds/index.js';
 export class PauseCommand extends Command {
     constructor(client, commander) {
         super(client, commander, {
@@ -26,5 +26,5 @@ export class PauseCommand extends Command {
         this.commander.react(int, '⏸️');
     }
 }
-//# debugId=9fe4f77f-1ea2-5e94-999c-66782df6edc5
+//# debugId=1d05d987-c344-5d0f-a273-7012849f5f22
 //# sourceMappingURL=pause.js.map
