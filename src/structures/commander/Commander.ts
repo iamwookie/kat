@@ -1,6 +1,6 @@
 import { KATClient as Client } from '../Client.js';
-import { Command } from './Command.js';
-import { Module } from './Module.js';
+import { Command as CommanderCommand } from './Command.js';
+import { Module as CommanderModule } from './Module.js';
 import {
     Events as DiscordEvents,
     REST,
@@ -8,8 +8,6 @@ import {
     ChatInputCommandInteraction,
     Message,
     Collection,
-    Snowflake,
-    PermissionFlagsBits,
     MessagePayload,
     MessageEditOptions,
     InteractionEditReplyOptions,
@@ -27,37 +25,17 @@ import * as Events from '@events/index.js';
 import * as Modules from '@modules/index.js';
 // -----------------------------------
 
-const commands = [
-    // Music
-    Commands.PlayCommand,
-    Commands.LoopCommand,
-    Commands.StopCommand,
-    Commands.PauseCommand,
-    Commands.SkipCommand,
-    Commands.QueueCommand,
-    Commands.VolumeCommand,
-    Commands.LyricsCommand,
-    // Misc
-    Commands.PrefixCommand,
-    Commands.HelpCommand,
-    Commands.StatsCommand,
-];
-
 export class Commander {
     private rest: REST;
 
-    public commands: Collection<string, Command>;
-    public global: Collection<string, Command>;
-    public reserved: Collection<Snowflake, Collection<string, Command>>;
-    public modules: Collection<string, Module>;
+    public commands: Collection<string, CommanderCommand>;
+    public modules: Collection<string, CommanderModule>;
     public aliases: Collection<string, string>;
 
     constructor(public client: Client) {
         this.rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
-        this.commands = new Collection<string, Command>();
-        this.global = new Collection<string, Command>();
-        this.reserved = new Collection<Snowflake, Collection<string, Command>>();
-        this.modules = new Collection<string, Module>();
+        this.commands = new Collection<string, CommanderCommand>();
+        this.modules = new Collection<string, CommanderModule>();
         this.aliases = new Collection<string, string>();
     }
 
@@ -67,8 +45,7 @@ export class Commander {
 
         if (process.argv.includes('--register')) {
             this.client.logger.info('Registering Commands...', 'Commander');
-            await this.registerGlobalCommands();
-            await this.registerReservedCommands();
+            await this.registerCommands();
             this.client.logger.info('Commands Registered!', 'Commander');
         }
 
@@ -77,7 +54,7 @@ export class Commander {
         this.client.logger.status('>>>> Commander Initialized!');
     }
 
-    public validate(interaction: ChatInputCommandInteraction | Message, command: Command): boolean {
+    public validate(interaction: ChatInputCommandInteraction | Message, command: CommanderCommand): boolean {
         const author = this.getAuthor(interaction);
 
         if (interaction.inGuild()) {
@@ -117,7 +94,7 @@ export class Commander {
         return true;
     }
 
-    public authorize(interaction: ChatInputCommandInteraction | Message, command: Command): boolean {
+    public authorize(interaction: ChatInputCommandInteraction | Message, command: CommanderCommand): boolean {
         const author = this.getAuthor(interaction);
 
         if (command.users && !command.users.includes(author.id)) {
@@ -207,30 +184,16 @@ export class Commander {
     }
 
     private initializeCommands(): void {
+        const commands = Object.values(Commands);
+
         for (const Command of commands) {
             try {
                 const command = new Command(this.client, this);
 
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        this.aliases.set(alias, command.name);
-                    }
-                }
-
+                if (command.aliases) for (const alias of command.aliases) this.aliases.set(alias, command.name);
                 if (command.users) command.users = command.users.concat(this.client.config.devs);
                 if (!this.modules.has(command.module.name)) this.modules.set(command.module.name, command.module);
                 command.module.commands.set(command.name, command);
-
-                // Remove reserved in the future and use modules directly for registering
-                if (command.module.guilds) {
-                    for (const guild of command.module.guilds) {
-                        const commands = this.reserved.get(guild) || new Collection();
-                        commands.set(command.name, command);
-                        this.reserved.set(guild, commands);
-                    }
-                } else {
-                    this.global.set(command.name, command);
-                }
 
                 this.commands.set(command.name, command);
             } catch (err) {
@@ -256,11 +219,11 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
 
-    private async registerGlobalCommands(): Promise<void> {
+    private async registerCommands(): Promise<void> {
         try {
             let body = [];
 
-            for (const command of this.global.values()) {
+            for (const command of this.commands.values()) {
                 if (command.disabled || command.hidden) continue;
                 body.push(command.data().toJSON());
             }
@@ -270,27 +233,5 @@ export class Commander {
         } catch (err) {
             this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
         }
-    }
-
-    private async registerReservedCommands(): Promise<void> {
-        for (const [guildId, commands] of this.reserved) {
-            if (!this.client.guilds.cache.has(guildId)) continue;
-
-            let body = [];
-
-            for (const command of commands.values()) {
-                if (command.disabled || command.hidden) continue;
-                body.push(command.data().toJSON());
-            }
-
-            try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), { body });
-                this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
-            } catch (err) {
-                this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
-            }
-        }
-
-        this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
     }
 }

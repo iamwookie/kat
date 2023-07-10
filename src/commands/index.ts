@@ -1,16 +1,14 @@
-// ----- GLOBAL -----
-
 // Music
-export { LyricsCommand } from './global/music/lyrics.js';
-export { VolumeCommand } from './global/music/volume.js';
-export { QueueCommand } from './global/music/queue.js';
-export { SkipCommand } from './global/music/skip.js';
-export { PauseCommand } from './global/music/pause.js';
-export { StopCommand } from './global/music/stop.js';
-export { LoopCommand } from './global/music/loop.js';
-export { PlayCommand } from './global/music/play.js';
+export { LyricsCommand } from './music/lyrics.js';
+export { VolumeCommand } from './music/volume.js';
+export { QueueCommand } from './music/queue.js';
+export { SkipCommand } from './music/skip.js';
+export { PauseCommand } from './music/pause.js';
+export { StopCommand } from './music/stop.js';
+export { LoopCommand } from './music/loop.js';
+export { PlayCommand } from './music/play.js';
 
 // Misc
-export { StatsCommand } from './global/misc/stats.js';
-export { PrefixCommand } from './global/misc/prefix.js';
-export { HelpCommand } from './global/misc/help.js';
+export { StatsCommand } from './misc/stats.js';
+export { PrefixCommand } from './misc/prefix.js';
+export { HelpCommand } from './misc/help.js';
