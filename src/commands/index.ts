@@ -10,5 +10,4 @@ export { PlayCommand } from './music/play.js';
 
 // Misc
 export { StatsCommand } from './misc/stats.js';
-export { PrefixCommand } from './misc/prefix.js';
 export { HelpCommand } from './misc/help.js';

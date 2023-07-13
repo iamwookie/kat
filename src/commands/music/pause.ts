@@ -1,5 +1,5 @@
 import { Command, KATClient as Client, Commander, MusicPrompts } from '@structures/index.js';
-import { ChatInputCommandInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 
 export class PauseCommand extends Command {
@@ -7,7 +7,6 @@ export class PauseCommand extends Command {
         super(client, commander, {
             name: 'pause',
             module: 'Music',
-            legacy: true,
             description: {
                 content: 'Pause the track. Use `/play` to unpause.',
             },
@@ -16,19 +15,17 @@ export class PauseCommand extends Command {
         });
     }
 
-    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const author = this.commander.getAuthor(int);
-
+    async execute(int: ChatInputCommandInteraction<'cached'>) {
         const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
-        if (!subscription.voiceChannel.members.has(author.id))
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        if (!subscription.voiceChannel.members.has(int.user.id))
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
 
-        this.applyCooldown(author);
+        this.applyCooldown(int.user);
 
         subscription.pause();
 
-        this.commander.react(int, '⏸️');
+        int.editReply({ content: '⏸️ \u200b • \u200b Paused the track.' })
     }
 }

@@ -2,13 +2,9 @@ import { KATClient as Client } from '@structures/Client';
 import { Request, Response } from 'express';
 import { formatUser } from '@utils/helpers.js';
 
-import chalk from 'chalk';
-
-export const fetchUser = (client: Client) => async (req: Request, res: Response) => {
+export const fetchMe = (client: Client) => async (req: Request, res: Response) => {
     try {
-        const id = req.params.id;
-        if (!id) return res.status(400).send('Bad Request');
-
+        const id = client.config.devs[0];
         const user = await client.users.fetch(id, { force: true });
         if (!user) return res.status(404).send('Not Found');
 

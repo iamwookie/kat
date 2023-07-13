@@ -1,5 +1,5 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
-import { ChatInputCommandInteraction, Message, EmbedBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { formatBytes, formatDuration } from '@utils/helpers.js';
 
 export class StatsCommand extends Command {
@@ -7,17 +7,17 @@ export class StatsCommand extends Command {
         super(client, commander, {
             name: 'stats',
             module: 'Misc',
-            legacy: true,
             description: {
                 content: 'Show app statistics.',
             },
             allowDM: true,
             users: [],
             hidden: true,
+            disabled: true,
         });
     }
 
-    async execute(int: ChatInputCommandInteraction | Message) {
+    async execute(int: ChatInputCommandInteraction) {
         const embed = new EmbedBuilder()
             .setColor('Yellow')
             .setTitle('Statistics')
@@ -39,6 +39,6 @@ export class StatsCommand extends Command {
         const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (subscription) embed.addFields({ name: 'Guild Node', value: `\`${subscription.node.name}\``, inline: true });
 
-        this.commander.reply(int, { embeds: [embed] });
+        int.editReply({ embeds: [embed] });
     }
 }
