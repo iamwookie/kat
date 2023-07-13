@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c1c00779-1847-5530-be48-c546588b33d7")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="93cf0979-ba70-5e4f-a397-8531760e7221")}catch(e){}}();
 import { Command, MusicPrompts } from '../../structures/index.js';
 import { ActionEmbed, ReviewEmbed } from '../../utils/embeds/index.js';
 export class StopCommand extends Command {
@@ -6,8 +6,8 @@ export class StopCommand extends Command {
         super(client, commander, {
             name: 'stop',
             module: 'Music',
+            // Remove when shifting to slash commands.
             aliases: ['dc'],
-            legacy: true,
             description: {
                 content: 'Clear the queue and/or leave.',
             },
@@ -18,14 +18,11 @@ export class StopCommand extends Command {
     async execute(int) {
         const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!subscription)
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
         subscription.destroy();
-        this.commander.react(int, '👋');
-        if (int.channel) {
-            const reviewEmbed = new ReviewEmbed();
-            int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] }).catch(() => { });
-        }
+        const reviewEmbed = new ReviewEmbed();
+        int.editReply({ content: '👋 \u200b • \u200b Disconnected, Cya.', embeds: [reviewEmbed], components: [reviewEmbed.row] });
     }
 }
-//# debugId=c1c00779-1847-5530-be48-c546588b33d7
+//# debugId=93cf0979-ba70-5e4f-a397-8531760e7221
 //# sourceMappingURL=stop.js.map

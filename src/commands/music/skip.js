@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d50da204-de63-51bb-9864-fb99bf141d82")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ab1a0069-ba74-599d-9197-570c07b5fca5")}catch(e){}}();
 import { Command, MusicPrompts } from '../../structures/index.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
 export class SkipCommand extends Command {
@@ -6,7 +6,6 @@ export class SkipCommand extends Command {
         super(client, commander, {
             name: 'skip',
             module: 'Music',
-            legacy: true,
             description: {
                 content: 'Skip the track.',
             },
@@ -15,18 +14,17 @@ export class SkipCommand extends Command {
         });
     }
     async execute(int) {
-        const author = this.commander.getAuthor(int);
         const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
-        if (!subscription.voiceChannel.members.has(author.id))
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
+        if (!subscription.voiceChannel.members.has(int.user.id))
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
         if (subscription.queue.length == 0)
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
-        this.applyCooldown(author);
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
+        this.applyCooldown(int.user);
         subscription.stop();
-        this.commander.react(int, '✅');
+        int.editReply({ content: '⏭️ \u200b • \u200b Track Skipped.' });
     }
 }
-//# debugId=d50da204-de63-51bb-9864-fb99bf141d82
+//# debugId=ab1a0069-ba74-599d-9197-570c07b5fca5
 //# sourceMappingURL=skip.js.map

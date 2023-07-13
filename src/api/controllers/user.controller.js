@@ -1,10 +1,8 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="a684e89d-ed60-5f3e-865f-18207014ebee")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="e5cb3ab1-b808-5894-bb66-54aa141a38f1")}catch(e){}}();
 import { formatUser } from '../../utils/helpers.js';
-export const fetchUser = (client) => async (req, res) => {
+export const fetchMe = (client) => async (req, res) => {
     try {
-        const id = req.params.id;
-        if (!id)
-            return res.status(400).send('Bad Request');
+        const id = client.config.devs[0];
         const user = await client.users.fetch(id, { force: true });
         if (!user)
             return res.status(404).send('Not Found');
@@ -16,5 +14,5 @@ export const fetchUser = (client) => async (req, res) => {
         return res.status(500).send('Internal Server Error');
     }
 };
-//# debugId=a684e89d-ed60-5f3e-865f-18207014ebee
+//# debugId=e5cb3ab1-b808-5894-bb66-54aa141a38f1
 //# sourceMappingURL=user.controller.js.map

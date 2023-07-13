@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="cdce8611-5fd6-5d40-b520-d29b9e33c7b2")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="edf50fdc-08b8-50d0-8697-ecaf00d1e1c0")}catch(e){}}();
 import { Command } from '../../structures/index.js';
 import { EmbedBuilder } from 'discord.js';
 import { formatBytes, formatDuration } from '../../utils/helpers.js';
@@ -7,13 +7,13 @@ export class StatsCommand extends Command {
         super(client, commander, {
             name: 'stats',
             module: 'Misc',
-            legacy: true,
             description: {
                 content: 'Show app statistics.',
             },
             allowDM: true,
             users: [],
             hidden: true,
+            disabled: true,
         });
     }
     async execute(int) {
@@ -30,8 +30,8 @@ export class StatsCommand extends Command {
         const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (subscription)
             embed.addFields({ name: 'Guild Node', value: `\`${subscription.node.name}\``, inline: true });
-        this.commander.reply(int, { embeds: [embed] });
+        int.editReply({ embeds: [embed] });
     }
 }
-//# debugId=cdce8611-5fd6-5d40-b520-d29b9e33c7b2
+//# debugId=edf50fdc-08b8-50d0-8697-ecaf00d1e1c0
 //# sourceMappingURL=stats.js.map

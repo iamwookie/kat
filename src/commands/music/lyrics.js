@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="141feb98-505c-5418-9457-adc848a3e282")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="9c0e0ae9-ffc4-58d8-a51f-b21124454875")}catch(e){}}();
 import { Command, MusicPrompts } from '../../structures/index.js';
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
@@ -9,7 +9,6 @@ export class LyricsCommand extends Command {
         super(client, commander, {
             name: 'lyrics',
             module: 'Music',
-            legacy: true,
             description: {
                 content: 'View the current tracks lyrics or search for one.',
                 format: '<?title/url>',
@@ -24,31 +23,30 @@ export class LyricsCommand extends Command {
             .addStringOption((option) => option.setName('query').setDescription('The name or URL of the track to search for.'));
     }
     async execute(int) {
-        const author = this.commander.getAuthor(int);
-        let query = this.commander.getArgs(int).join(' ');
+        let query = int.options.getString('query');
         const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!query && subscription && subscription.active)
             query = subscription.active.title;
         if (!query)
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
-        this.applyCooldown(author);
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        this.applyCooldown(int.user);
         const noResults = new ActionEmbed('fail').setText(MusicPrompts.NoResults);
         try {
             const search = await genius.songs.search(query);
             let lyrics = search[0] ? await search[0].lyrics() : null;
             if (!lyrics)
-                return this.commander.reply(int, { embeds: [noResults] });
+                return int.editReply({ embeds: [noResults] });
             if (lyrics.length > 4000)
                 lyrics = lyrics.substring(0, 4000) + '\n...';
             const success = new EmbedBuilder();
             success.setDescription(`**Track: ${search[0].title} - ${search[0].artist.name}**\n\n\`\`\`${lyrics}\`\`\`\n**Lyrics provided by [Genius](https://genius.com)**`);
-            this.commander.reply(int, { embeds: [success] });
+            int.editReply({ embeds: [success] });
         }
         catch (err) {
             this.client.logger.error(err);
-            this.commander.reply(int, { embeds: [noResults] });
+            int.editReply({ embeds: [noResults] });
         }
     }
 }
-//# debugId=141feb98-505c-5418-9457-adc848a3e282
+//# debugId=9c0e0ae9-ffc4-58d8-a51f-b21124454875
 //# sourceMappingURL=lyrics.js.map

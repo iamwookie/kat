@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d5881735-eb73-503e-a153-ec6fd0feed15")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="fb263972-6c78-52f8-a1c0-a06c51672386")}catch(e){}}();
 import { Command, MusicPrompts } from '../../structures/index.js';
 import { ActionEmbed, MusicEmbed } from '../../utils/embeds/index.js';
 export class QueueCommand extends Command {
@@ -6,7 +6,7 @@ export class QueueCommand extends Command {
         super(client, commander, {
             name: 'queue',
             module: 'Music',
-            legacy: true,
+            // Remove when shifting to slash commands.
             aliases: ['q'],
             description: {
                 content: 'View the server queue.',
@@ -16,12 +16,11 @@ export class QueueCommand extends Command {
         });
     }
     async execute(int) {
-        const author = this.commander.getAuthor(int);
         const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!subscription || (!subscription.active && !subscription.queue.length))
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
-        this.commander.reply(int, { embeds: [new MusicEmbed(subscription).setUser(author).setPlaying(subscription.active).setQueue(subscription.queue)] });
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
+        int.editReply({ embeds: [new MusicEmbed(subscription).setUser(int.user).setPlaying(subscription.active).setQueue(subscription.queue)] });
     }
 }
-//# debugId=d5881735-eb73-503e-a153-ec6fd0feed15
+//# debugId=fb263972-6c78-52f8-a1c0-a06c51672386
 //# sourceMappingURL=queue.js.map

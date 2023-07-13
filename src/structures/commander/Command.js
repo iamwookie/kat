@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="dc8c2da0-05ca-54f7-9c8a-61e283b7ebba")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4116dc34-bf87-5106-a478-56823d54f058")}catch(e){}}();
 import { Module } from './Module.js';
 import { SlashCommandBuilder, Collection } from 'discord.js';
 export class Command {
@@ -6,11 +6,12 @@ export class Command {
     commander;
     name;
     module;
-    legacy;
+    // Remove this when implementing slash commands.
     aliases;
     description;
     cooldown;
     ephemeral;
+    // Change the name of this, pretty shit.
     allowDM;
     users;
     hidden;
@@ -20,7 +21,6 @@ export class Command {
         this.client = client;
         this.commander = commander;
         this.name = options.name;
-        this.legacy = options.legacy;
         this.aliases = options.aliases;
         this.description = options.description;
         this.cooldown = options.cooldown;
@@ -49,9 +49,8 @@ export class Command {
         setTimeout(() => this.cooldowns?.delete(user.id), cooldown);
     }
     usage(prefix) {
-        const aliases = this.aliases ? ', ' + this.aliases.map((alias) => prefix + alias).join(', ') : '';
-        return `${prefix}${this.name}${aliases}${this.description?.format ? ' ' + this.description.format : ''}`;
+        return `${prefix}${this.name}${this.description?.format ? ' ' + this.description.format : ''}`;
     }
 }
-//# debugId=dc8c2da0-05ca-54f7-9c8a-61e283b7ebba
+//# debugId=4116dc34-bf87-5106-a478-56823d54f058
 //# sourceMappingURL=Command.js.map

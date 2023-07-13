@@ -1,10 +1,13 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="f8ee85a3-49dd-5550-ad2c-c1f7fb589bae")}catch(e){}}();
+// ------------------------------------
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="687f541d-9646-5856-bf02-e36af55be9c5")}catch(e){}}();
+import dotenv from 'dotenv';
+dotenv.config();
+// ------------------------------------
 import { PermissionsBitField } from 'discord.js';
-export const version = '8.1.1';
+export const version = '8.2.0';
 export const devs = ['244662779745665026'];
 export const bot = {
     prefix: process.env.NODE_ENV != 'production' ? '!' : '.',
-    devPrefix: process.env.NODE_ENV != 'production' ? '!' : '.',
     permissions: {
         text: new PermissionsBitField([
             PermissionsBitField.Flags.ViewChannel,
@@ -48,5 +51,5 @@ export const lavalink = {
         },
     ],
 };
-//# debugId=f8ee85a3-49dd-5550-ad2c-c1f7fb589bae
+//# debugId=687f541d-9646-5856-bf02-e36af55be9c5
 //# sourceMappingURL=config.js.map

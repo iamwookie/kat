@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d61c01db-e239-501e-8110-8fa3e7a08ca4")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="e1e0fc85-6c73-564c-b18a-d574eff9af61")}catch(e){}}();
 import * as Config from '../../config.js';
 import { Client, Events } from 'discord.js';
 import { Logger } from './Logger.js';
@@ -13,7 +13,6 @@ export class KATClient extends Client {
     // Make a type for config later
     config;
     prefix;
-    devPrefix;
     permissions;
     logger;
     prisma;
@@ -27,7 +26,6 @@ export class KATClient extends Client {
         this.startTime = Date.now();
         this.config = Config;
         this.prefix = Config.bot.prefix;
-        this.devPrefix = Config.bot.devPrefix;
         this.permissions = Config.bot.permissions;
         this.logger = new Logger(this);
         this.prisma = new PrismaClient({ log: ['warn', 'error'] });
@@ -55,5 +53,5 @@ export class KATClient extends Client {
         return this.config.devs.includes(user.id);
     }
 }
-//# debugId=d61c01db-e239-501e-8110-8fa3e7a08ca4
+//# debugId=e1e0fc85-6c73-564c-b18a-d574eff9af61
 //# sourceMappingURL=Client.js.map

@@ -1,10 +1,8 @@
 // ----- CLIENT -----
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="a0fdee02-3114-5fa9-a445-5fde4050a99d")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="5f120d30-e29b-5ed0-8df4-b503b06d2996")}catch(e){}}();
 export { ClientReady } from './client/ClientReady.js';
 export { GuildCreate } from './client/GuildCreate.js';
 export { GuildDelete } from './client/GuildDelete.js';
-export { GuildMemberAdd } from './client/GuildMemberAdd.js';
-export { InviteCreate } from './client/InviteCreate.js';
 export { VoiceStateUpdate } from './client/VoiceStateUpdate.js';
 export { MessageCreate } from './client/MessageCreate.js';
 export { InteractionCreate } from './client/InteractionCreate.js';
@@ -27,5 +25,5 @@ export { PlayerException } from './music/player/PlayerException.js';
 // Subscription
 export { SubscriptionDestroy } from './music/subscription/SubscriptionDestroy.js';
 export { SubscriptionCreate } from './music/subscription/SubscriptionCreate.js';
-//# debugId=a0fdee02-3114-5fa9-a445-5fde4050a99d
+//# debugId=5f120d30-e29b-5ed0-8df4-b503b06d2996
 //# sourceMappingURL=index.js.map

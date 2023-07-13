@@ -1,6 +1,5 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d9ff8211-e831-5fed-b0f2-72b79d98db25")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="4ab178a6-634b-568a-97aa-fa706dc0b5bc")}catch(e){}}();
 import { EmbedBuilder } from 'discord.js';
-import { YouTubePlaylist, SpotifyPlaylist } from '../../structures/index.js';
 import { getServiceIcon } from '../helpers.js';
 export class MusicEmbed extends EmbedBuilder {
     subscription;
@@ -15,24 +14,6 @@ export class MusicEmbed extends EmbedBuilder {
             text: `${user.tag.replace('#0', '')} \u200b • \u200b 🎵 ${this.subscription.node.name}`,
             iconURL: user.avatarURL() ?? undefined,
         });
-    }
-    setEnqueued(item) {
-        if (!item)
-            return this;
-        if (item.thumbnail)
-            super.setThumbnail(item.thumbnail);
-        if (item instanceof YouTubePlaylist || item instanceof SpotifyPlaylist) {
-            return super.addFields({
-                name: 'Enqueued:',
-                value: `${getServiceIcon(item)} \`${item.tracks.length}\` tracks from [\`${item.title}\`](${item.url})`,
-            });
-        }
-        else {
-            return super.addFields({
-                name: 'Enqueued:',
-                value: `\`${this.subscription.position + this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${item.duration}]\`](${item.url})`,
-            });
-        }
     }
     setPlaying(item) {
         if (!item)
@@ -56,5 +37,5 @@ export class MusicEmbed extends EmbedBuilder {
         return super.addFields({ name: 'Server Queue:', value: `${res}` });
     }
 }
-//# debugId=d9ff8211-e831-5fed-b0f2-72b79d98db25
+//# debugId=4ab178a6-634b-568a-97aa-fa706dc0b5bc
 //# sourceMappingURL=music.js.map

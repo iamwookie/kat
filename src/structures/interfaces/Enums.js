@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6f968bc8-1e4b-54b8-940a-3f0f5ebf3a7d")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="19547e57-a6b4-57f2-944b-450813a96d4b")}catch(e){}}();
 export var PermissionPrompts;
 (function (PermissionPrompts) {
     PermissionPrompts["NotAllowed"] = "You do not have enough permissions!";
@@ -16,8 +16,6 @@ export var MusicPrompts;
     MusicPrompts["QueueEmpty"] = "The current queue is empty!";
     MusicPrompts["LastTrack"] = "This is the last track in the queue!";
     MusicPrompts["TrackError"] = "An error occurred while playing the track. Skipping...";
-    MusicPrompts["TrackLooped"] = "Looped the current track!";
-    MusicPrompts["TrackUnlooped"] = "Unlooped the current track!";
     MusicPrompts["Inactive"] = "I have disconnected due to inactivity!";
     MusicPrompts["NoNodes"] = "There are no available nodes to play on!";
     MusicPrompts["Restarted"] = "The bot has restarted, please replay your track!";
@@ -27,5 +25,5 @@ export var MusicEmojis;
     MusicEmojis["YouTube"] = "<:youtube:1067881972774477844>";
     MusicEmojis["Spotify"] = "<:spotify:1067881968697614476>";
 })(MusicEmojis || (MusicEmojis = {}));
-//# debugId=6f968bc8-1e4b-54b8-940a-3f0f5ebf3a7d
+//# debugId=19547e57-a6b4-57f2-944b-450813a96d4b
 //# sourceMappingURL=Enums.js.map
