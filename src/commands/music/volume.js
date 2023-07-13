@@ -1,4 +1,4 @@
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="f1ee840e-c7b6-50b1-8127-6406184000fd")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="aeecd134-55d2-5e23-8d0e-697761358c55")}catch(e){}}();
 import { Command, PermissionPrompts } from '../../structures/index.js';
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '../../utils/embeds/index.js';
@@ -80,5 +80,5 @@ export class VolumeCommand extends Command {
         });
     }
 }
-//# debugId=f1ee840e-c7b6-50b1-8127-6406184000fd
+//# debugId=aeecd134-55d2-5e23-8d0e-697761358c55
 //# sourceMappingURL=volume.js.map
