@@ -1,5 +1,5 @@
 // ------------------------------------
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="eb9fb974-05f4-5161-8c34-7ebbfcc66ce6")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="98debc3c-149f-527d-99ef-4e2f6f76f705")}catch(e){}}();
 import dotenv from 'dotenv';
 dotenv.config();
 // ------------------------------------
@@ -13,7 +13,6 @@ import { RewriteFrames } from '@sentry/integrations';
 // ------------------------------------
 import { KATClient as Client } from './src/structures/index.js';
 import { GatewayIntentBits, ActivityType, Partials } from 'discord.js';
-import { bot as config } from './config.js';
 import chalk from 'chalk';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 (async () => {
@@ -43,7 +42,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             status: 'online',
             activities: [
                 {
-                    name: `/help | ${config.prefix}help`,
+                    name: `/help`,
                     type: ActivityType.Listening,
                 },
             ],
@@ -54,5 +53,5 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     await client.initialize();
     await client.login(process.env.DISCORD_TOKEN).catch((err) => client.logger.error(err));
 })();
-//# debugId=eb9fb974-05f4-5161-8c34-7ebbfcc66ce6
+//# debugId=98debc3c-149f-527d-99ef-4e2f6f76f705
 //# sourceMappingURL=index.js.map
