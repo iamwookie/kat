@@ -9,4 +9,4 @@ const router = Router();
 export default (client: Client) => {
     router.get('/', withLimiter, UserController.fetchMe(client));
     return router;
-}
+};
