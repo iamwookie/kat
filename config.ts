@@ -4,7 +4,7 @@ dotenv.config();
 // ------------------------------------
 import { PermissionsBitField } from 'discord.js';
 
-export const version = '8.1.1';
+export const version = '8.2.0';
 
 export const devs = ['244662779745665026'];
 
