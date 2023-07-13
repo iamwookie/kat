@@ -41,7 +41,6 @@ model Track {
     url         String
     title       String
     requesterId String
-    textId      String?
     thumbnail   String?
     createdAt   DateTime @default(now())
     queue       Queue    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)

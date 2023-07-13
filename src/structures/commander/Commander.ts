@@ -1,6 +1,6 @@
 import { KATClient as Client } from '../Client.js';
-import { Command } from './Command.js';
-import { Module } from './Module.js';
+import { Command as CommanderCommand } from './Command.js';
+import { Module as CommanderModule } from './Module.js';
 import {
     Events as DiscordEvents,
     REST,
@@ -8,8 +8,6 @@ import {
     ChatInputCommandInteraction,
     Message,
     Collection,
-    Snowflake,
-    PermissionFlagsBits,
     MessagePayload,
     MessageEditOptions,
     InteractionEditReplyOptions,
@@ -19,7 +17,7 @@ import {
     MessageReaction,
 } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
-import { PermissionPrompts } from 'enums.js';
+import { PermissionPrompts } from '@structures/interfaces/Enums.js';
 
 // -----------------------------------
 import * as Commands from '@commands/index.js';
@@ -27,48 +25,27 @@ import * as Events from '@events/index.js';
 import * as Modules from '@modules/index.js';
 // -----------------------------------
 
-const commands = [
-    // Music
-    Commands.PlayCommand,
-    Commands.LoopCommand,
-    Commands.StopCommand,
-    Commands.PauseCommand,
-    Commands.SkipCommand,
-    Commands.QueueCommand,
-    Commands.VolumeCommand,
-    Commands.LyricsCommand,
-    // Misc
-    Commands.PrefixCommand,
-    Commands.HelpCommand,
-    Commands.StatsCommand,
-];
-
 export class Commander {
-    public commands: Collection<string, Command>;
-    public global: Collection<string, Command>;
-    public reserved: Collection<Snowflake, Collection<string, Command>>;
-    public modules: Collection<string, Module>;
-    public aliases: Collection<string, string>;
-
     private rest: REST;
 
-    constructor(public readonly client: Client) {
-        this.commands = new Collection<string, Command>();
-        this.global = new Collection<string, Command>();
-        this.reserved = new Collection<Snowflake, Collection<string, Command>>();
-        this.modules = new Collection<string, Module>();
+    public commands: Collection<string, CommanderCommand>;
+    public modules: Collection<string, CommanderModule>;
+    public aliases: Collection<string, string>;
+
+    constructor(public client: Client) {
+        this.rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
+        this.commands = new Collection<string, CommanderCommand>();
+        this.modules = new Collection<string, CommanderModule>();
         this.aliases = new Collection<string, string>();
-        this.rest = new REST({ version: '9' }).setToken(this.client.token!);
     }
 
-    async initialize() {
+    public async initialize(): Promise<void> {
         this.initializeModules();
         this.initializeCommands();
 
         if (process.argv.includes('--register')) {
             this.client.logger.info('Registering Commands...', 'Commander');
-            await this.registerGlobalCommands();
-            await this.registerReservedCommands();
+            await this.registerCommands();
             this.client.logger.info('Commands Registered!', 'Commander');
         }
 
@@ -77,25 +54,48 @@ export class Commander {
         this.client.logger.status('>>>> Commander Initialized!');
     }
 
-    authorize(interaction: ChatInputCommandInteraction | Message, command: Command): boolean {
+    public validate(interaction: ChatInputCommandInteraction | Message, command: CommanderCommand): boolean {
         const author = this.getAuthor(interaction);
 
         if (interaction.inGuild()) {
-            if (command.module.guilds && !command.module.guilds.includes(interaction.guild!.id)) return false;
-            if (!interaction.channel?.permissionsFor(interaction.guild!.members.me!).has(PermissionFlagsBits.SendMessages)) {
-                if (!command.hidden)
-                    author
-                        .send({
-                            embeds: [new ActionEmbed('fail').setText(PermissionPrompts.CannotSend)],
-                        })
-                        .catch((err) => {
-                            this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
-                        });
+            if (interaction instanceof ChatInputCommandInteraction && !interaction.inCachedGuild()) return false;
+            if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id)) return false;
+            if (!interaction.channel || !interaction.channel.permissionsFor(interaction.guild.members.me!).has(this.client.permissions.text)) {
+                if (!command.hidden) {
+                    const embed = new ActionEmbed('fail').setTitle('Uh Oh!').setText(PermissionPrompts.NotEnough);
+
+                    // prettier-ignore
+                    if (interaction instanceof ChatInputCommandInteraction) {
+                        this.reply(interaction, { embeds: [embed] }).catch((err) => this.client.logger.error(err, 'Error Sending Permissions Reply', 'Commander'));
+                    } else if (interaction instanceof Message) {
+                        author.send({ embeds: [embed] }).catch((err) => this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander'));
+                    }
+                }
+
                 return false;
             }
-        } else if (!command.allowDM) {
-            return false;
         }
+
+        if (command.cooldown && command.cooldowns) {
+            if (command.cooldowns.has(author.id)) {
+                const cooldown = command.cooldowns.get(author.id)!;
+                const secondsLeft = (cooldown - Date.now()) / 1000;
+
+                this.reply(interaction, {
+                    embeds: [new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)],
+                }).catch((err) => {
+                    this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
+                });
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public authorize(interaction: ChatInputCommandInteraction | Message, command: CommanderCommand): boolean {
+        const author = this.getAuthor(interaction);
 
         if (command.users && !command.users.includes(author.id)) {
             if (!command.hidden)
@@ -104,23 +104,68 @@ export class Commander {
                 }).catch((err) => {
                     this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
                 });
+
             return false;
         }
 
-        if (command.cooldown && command.cooldowns) {
-            if (command.cooldowns.has(author.id)) {
-                const cooldown = command.cooldowns.get(author.id)!;
-                const secondsLeft = (cooldown - Date.now()) / 1000;
-                this.reply(interaction, {
-                    embeds: [new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)],
-                }).catch((err) => {
-                    this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
-                });
-                return false;
-            }
-        }
-
         return true;
+    }
+
+    public getAuthor(interaction: ChatInputCommandInteraction | Message): User {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.user;
+        } else if (interaction instanceof Message) {
+            return interaction.author;
+        } else {
+            throw new Error('Invalid interaction.');
+        }
+    }
+
+    public getArgs(interaction: ChatInputCommandInteraction | Message): (string | undefined)[] {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat() as string[];
+        } else if (interaction instanceof Message) {
+            return interaction.content.split(/ +/).slice(1);
+        } else {
+            return [];
+        }
+    }
+
+    public reply(
+        interaction: ChatInputCommandInteraction | Message,
+        content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
+    ): Promise<Message> {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
+        } else if (interaction instanceof Message) {
+            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            throw new Error('Invalid interaction.');
+        }
+    }
+
+    public edit(
+        interaction: ChatInputCommandInteraction | Message,
+        editable: Message,
+        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
+    ): Promise<Message> {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
+        } else if (interaction instanceof Message) {
+            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
+        } else {
+            throw new Error('Invalid interaction.');
+        }
+    }
+
+    public react(interaction: ChatInputCommandInteraction | Message, emoji: string | EmojiIdentifierResolvable): Promise<Message | MessageReaction> {
+        if (interaction instanceof ChatInputCommandInteraction) {
+            return interaction.editReply({ content: emoji as Exclude<typeof emoji, EmojiIdentifierResolvable> });
+        } else if (interaction instanceof Message) {
+            return interaction.react(emoji);
+        } else {
+            throw new Error('Invalid interaction.');
+        }
     }
 
     private initializeModules(): void {
@@ -139,30 +184,16 @@ export class Commander {
     }
 
     private initializeCommands(): void {
+        const commands = Object.values(Commands);
+
         for (const Command of commands) {
             try {
                 const command = new Command(this.client, this);
 
-                if (command.aliases) {
-                    for (const alias of command.aliases) {
-                        this.aliases.set(alias, command.name);
-                    }
-                }
-
+                if (command.aliases) for (const alias of command.aliases) this.aliases.set(alias, command.name);
                 if (command.users) command.users = command.users.concat(this.client.config.devs);
                 if (!this.modules.has(command.module.name)) this.modules.set(command.module.name, command.module);
                 command.module.commands.set(command.name, command);
-
-                // Remove reserved in the future and use modules directly for registering
-                if (command.module.guilds) {
-                    for (const guild of command.module.guilds) {
-                        const commands = this.reserved.get(guild) || new Collection();
-                        commands.set(command.name, command);
-                        this.reserved.set(guild, commands);
-                    }
-                } else {
-                    this.global.set(command.name, command);
-                }
 
                 this.commands.set(command.name, command);
             } catch (err) {
@@ -188,11 +219,11 @@ export class Commander {
         this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Initialized ${events.length} Event(s)`);
     }
 
-    private async registerGlobalCommands(): Promise<void> {
+    private async registerCommands(): Promise<void> {
         try {
             let body = [];
 
-            for (const command of this.global.values()) {
+            for (const command of this.commands.values()) {
                 if (command.disabled || command.hidden) continue;
                 body.push(command.data().toJSON());
             }
@@ -201,91 +232,6 @@ export class Commander {
             this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Global Command(s)`);
         } catch (err) {
             this.client.logger.error(err, 'Error Registering Global Slash Commands', 'Commander');
-        }
-    }
-
-    private async registerReservedCommands(): Promise<void> {
-        for (const [guildId, commands] of this.reserved) {
-            if (!this.client.guilds.cache.has(guildId)) continue;
-
-            let body = [];
-
-            for (const command of commands.values()) {
-                if (command.disabled || command.hidden) continue;
-                body.push(command.data().toJSON());
-            }
-
-            try {
-                const res: any = await this.rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APP_ID, guildId), { body });
-                this.client.emit(DiscordEvents.Debug, `Commander >> Successfully Registered ${res.length} Guild Command(s) For Guild: ${guildId}`);
-            } catch (err) {
-                this.client.logger.error(err, `Error Registering Guild Slash Commands For Guild: ${guildId}`, 'Commander');
-            }
-        }
-
-        this.client.emit(DiscordEvents.Debug, 'Commander >> Successfully Registered All Guild Commands');
-    }
-
-    getAuthor(interaction: ChatInputCommandInteraction | Message): User {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.user;
-        } else if (interaction instanceof Message) {
-            return interaction.author;
-        } else {
-            throw new Error('Invalid interaction.');
-        }
-    }
-
-    getArgs(interaction: ChatInputCommandInteraction | Message): (string | undefined)[] {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat() as string[];
-        } else if (interaction instanceof Message) {
-            return interaction.content.split(/ +/).slice(1);
-        } else {
-            return [];
-        }
-    }
-
-    reply(
-        interaction: ChatInputCommandInteraction | Message,
-        content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
-    ): Promise<Message> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
-        } else if (interaction instanceof Message) {
-            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
-        } else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
-
-    edit(
-        interaction: ChatInputCommandInteraction | Message,
-        editable: Message,
-        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
-    ): Promise<Message> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
-        } else if (interaction instanceof Message) {
-            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
-        } else {
-            return Promise.reject('Invalid interaction.');
-        }
-    }
-
-    react(interaction: ChatInputCommandInteraction | Message, emoji: string | EmojiIdentifierResolvable): Promise<Message | MessageReaction> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.replied
-                ? Promise.reject('Interaction already replied.')
-                : interaction.editReply({ content: emoji as Exclude<typeof emoji, EmojiIdentifierResolvable> });
-        } else if (interaction instanceof Message) {
-            return interaction.react(emoji);
-        } else {
-            return Promise.reject('Invalid interaction.');
         }
     }
 }

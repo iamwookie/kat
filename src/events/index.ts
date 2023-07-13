@@ -1,4 +1,5 @@
 // ----- CLIENT -----
+
 export { ClientReady } from './client/ClientReady.js';
 export { GuildCreate } from './client/GuildCreate.js';
 export { GuildDelete } from './client/GuildDelete.js';
@@ -17,13 +18,13 @@ export { NodeReady } from './music/node/NodeReady.js';
 export { NodeError } from './music/node/NodeError.js';
 
 // Track
-export { TrackLoop } from './music/track/TrackLoop.js';
-export { TrackPause } from './music/track/TrackPause.js';
-export { TrackResume } from './music/track/TrackResume.js';
 export { TrackRemove } from './music/track/TrackRemove.js';
 export { TrackAdd } from './music/track/TrackAdd.js';
 
 // Player
+export { PlayerLoop } from './music/player/PlayerLoop.js';
+export { PlayerPause } from './music/player/PlayerPause.js';
+export { PlayerResume } from './music/player/PlayerResume.js';
 export { PlayerEnd } from './music/player/PlayerEnd.js';
 export { PlayerStart } from './music/player/PlayerStart.js';
 export { PlayerException } from './music/player/PlayerException.js';

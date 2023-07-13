@@ -19,9 +19,9 @@ export class NodeError extends Event {
         console.error(chalk.red(`Music >> Node: ${name} Has Had An Error!`));
         console.error(error);
 
-        const subscriptions = this.client.subscriptions;
-        for (const subscription of subscriptions.values()) {
-            if (subscription.node.name == name) subscription.destroy();
+        const subscriptions = this.client.dispatcher.subscriptions.values();
+        for (const subscription of subscriptions) {
+            if (name == subscription.node.name) subscription.destroy();
             subscription.textChannel
                 .send({ embeds: [new ActionEmbed('fail').setText('The voice node has disconnected. Try playing another track!')] })
                 .catch(() => {});

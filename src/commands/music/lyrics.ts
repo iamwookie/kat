@@ -1,7 +1,6 @@
-import { KATClient as Client, Commander, Command } from '@structures/index.js';
+import { Command, KATClient as Client, Commander, MusicPrompts } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, Message } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
-import { MusicPrompts } from 'enums.js';
 
 import GeniusLyrics from 'genius-lyrics';
 const genius = new GeniusLyrics.Client();
@@ -31,7 +30,7 @@ export class LyricsCommand extends Command {
         const author = this.commander.getAuthor(int);
         let query = this.commander.getArgs(int).join(' ');
 
-        const subscription = this.client.subscriptions.get(int.guildId!);
+        const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!query && subscription && subscription.active) query = subscription.active.title;
         if (!query) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
 

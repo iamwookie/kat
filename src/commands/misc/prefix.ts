@@ -1,7 +1,7 @@
 import { KATClient as Client, Commander, Command } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/action.js';
-import { PermissionPrompts } from 'enums.js';
+import { PermissionPrompts } from '@structures/interfaces/Enums.js';
 
 export class PrefixCommand extends Command {
     constructor(client: Client, commander: Commander) {

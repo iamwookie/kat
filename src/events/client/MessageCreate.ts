@@ -17,7 +17,9 @@ export class MessageCreate extends Event {
         const commandName = message.content.slice(prefix.length).split(/ +/).shift()?.toLowerCase() as string;
         const command = this.commander.commands.get(commandName) ?? this.commander.commands.get(this.commander.aliases.get(commandName)!);
         if (!command || !command.legacy || command.disabled) return;
+        if (!command.allowDM && !message.inGuild()) return;
 
+        if (!this.commander.validate(message, command)) return;
         if (!this.commander.authorize(message, command)) return;
 
         try {

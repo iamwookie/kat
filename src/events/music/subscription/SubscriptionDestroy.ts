@@ -1,15 +1,15 @@
-import { Event, KATClient as Client, Commander, Subscription as MusicSubscription } from '@structures/index.js';
-import { Events } from 'discord.js';
+import { Event, KATClient as Client, Commander, Events, Subscription } from '@structures/index.js';
+import { Events as DiscordEvents } from 'discord.js';
 
 export class SubscriptionDestroy extends Event {
     constructor(client: Client, commander: Commander) {
-        super(client, commander, 'subscriptionDestroy');
+        super(client, commander, Events.SubscriptionDestroy);
     }
 
-    async execute(subscription: MusicSubscription) {
+    async execute(subscription: Subscription) {
         this.client.logger.warn(
             `Subscription Destroyed For: ${subscription.guild.name} (${subscription.guild.id}). Node: ${subscription.node.name}`,
-            'Music'
+            'Dispatcher'
         );
 
         if (subscription.message?.deletable) subscription.message.delete().catch(() => {});
@@ -28,6 +28,6 @@ export class SubscriptionDestroy extends Event {
             },
         });
 
-        this.client.emit(Events.Debug, `DATABASE >> Set Queue To Inactive: ${subscription.guild.name} (${subscription.guild.id})`);
+        this.client.emit(DiscordEvents.Debug, `DATABASE >> Set Queue To Inactive: ${subscription.guild.name} (${subscription.guild.id})`);
     }
 }

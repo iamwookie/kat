@@ -1,6 +1,6 @@
 import { YouTubeTrack, SpotifyTrack, YouTubePlaylist, SpotifyPlaylist } from '@structures/index.js';
 import { User } from 'discord.js';
-import { MusicEmojis } from 'enums.js';
+import { MusicEmojis } from '@structures/interfaces/Enums.js';
 
 export function formatDuration(milliseconds?: number | null) {
     if (!milliseconds) return 'No Data';

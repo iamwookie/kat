@@ -1,7 +1,6 @@
-import { KATClient as Client, Commander, Command } from '@structures/index.js';
+import { Command, KATClient as Client, Commander, PermissionPrompts } from '@structures/index.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, Message, PermissionFlagsBits } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
-import { PermissionPrompts } from 'enums.js';
 
 export class VolumeCommand extends Command {
     constructor(client: Client, commander: Commander) {
@@ -76,7 +75,7 @@ export class VolumeCommand extends Command {
 
         this.client.cache.music.set(int.guildId!, res.music);
 
-        const subscription = this.client.subscriptions.get(int.guildId!);
+        const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (subscription) {
             subscription.volume = res.music.volume;
             subscription.player.setVolume(res.music.volume / 100);

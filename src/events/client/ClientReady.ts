@@ -1,7 +1,7 @@
 import { Event, KATClient as Client, Commander } from '@structures/index.js';
 import { Events, Client as DiscordClient, TextChannel } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/action.js';
-import { MusicPrompts } from 'enums.js';
+import { MusicPrompts } from '@structures/interfaces/Enums.js';
 
 import chalk from 'chalk';
 
@@ -11,19 +11,15 @@ export class ClientReady extends Event {
     }
 
     async execute(client: DiscordClient) {
-        for (const module of this.commander.modules.values()) module.emit(this.name, client);
-
         await this.client.server.initialize();
 
+        for (const module of this.commander.modules.values()) module.emit(this.name, client);
+
         // Move to a method in the future (maybe :/)
-        const res = await this.client.prisma.queue.findMany({
-            where: {
-                active: true,
-            },
-        });
+        const res = await this.client.prisma.queue.findMany({ where: { active: true } });
 
         if (res.length) {
-            this.client.logger.info(`Warning ${res.length} Queue(s)`, 'Music');
+            this.client.logger.info(`Warning ${res.length} Queue(s)`, 'Dispatcher');
 
             for (const queue of res) {
                 if (!queue.active || !queue.textId) continue;
@@ -35,22 +31,15 @@ export class ClientReady extends Event {
                     await channel.send({
                         embeds: [new ActionEmbed('warn').setText(MusicPrompts.Restarted)],
                     });
-                    this.client.logger.info(`Warning Sent To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
+                    this.client.logger.info(`Warning Sent To: ${channel.guild.name} (${channel.guild.id})`, 'Dispatcher');
                 } catch {
-                    this.client.logger.warn(`Failed To Send Warning To: ${channel.guild.name} (${channel.guild.id})`, 'Music');
+                    this.client.logger.warn(`Failed To Send Warning To: ${channel.guild.name} (${channel.guild.id})`, 'Dispatcher');
                 }
             }
 
-            await this.client.prisma.queue.updateMany({
-                where: {
-                    active: true,
-                },
-                data: {
-                    active: false,
-                },
-            });
+            await this.client.prisma.queue.updateMany({ where: { active: true }, data: { active: false } });
 
-            this.client.logger.info(`Queue(s) Set To Inactive`, 'Music');
+            this.client.logger.info(`Queue(s) Set To Inactive`, 'Dispatcher');
         }
         // ----------------------------
 

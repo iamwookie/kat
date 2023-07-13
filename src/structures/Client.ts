@@ -1,13 +1,12 @@
 import * as Config from '@config';
-import { Client, ClientOptions, Events, Collection, PermissionsBitField, Snowflake, User } from 'discord.js';
+import { Client, ClientOptions, Events, PermissionsBitField, User } from 'discord.js';
 import { Logger } from './Logger.js';
 import { PrismaClient } from '@prisma/client';
 import { Redis } from '@upstash/redis';
 import { Commander } from './commander/Commander.js';
-import { ShoukakuClient } from './music/ShoukakuClient.js';
+import { Dispatcher } from './music/Dispatcher.js';
 import { Server } from '@structures/api/Server.js';
 import { Cache } from './Cache.js';
-import { Subscription as MusicSubscription } from './music/Subscription.js';
 
 export class KATClient extends Client {
     public startTime: number;
@@ -15,15 +14,14 @@ export class KATClient extends Client {
     public config: typeof Config;
     public prefix: string;
     public devPrefix: string;
-    public permissions: PermissionsBitField;
+    public permissions: { [key: string]: PermissionsBitField };
     public logger: Logger;
     public prisma: PrismaClient;
     public redis: Redis;
     public commander: Commander;
-    public shoukaku: ShoukakuClient;
+    public dispatcher: Dispatcher;
     public cache: Cache;
     public server: Server;
-    public subscriptions: Collection<Snowflake, MusicSubscription>;
 
     constructor(options: ClientOptions) {
         super(options);
@@ -34,23 +32,17 @@ export class KATClient extends Client {
         this.devPrefix = Config.bot.devPrefix;
         this.permissions = Config.bot.permissions;
         this.logger = new Logger(this);
-        // Prisma causes an issue with circular references. Try fixing this later
         this.prisma = new PrismaClient({ log: ['warn', 'error'] });
         this.redis = Redis.fromEnv();
         this.commander = new Commander(this);
-        this.shoukaku = new ShoukakuClient(this);
+        this.dispatcher = new Dispatcher(this);
         this.cache = new Cache(this);
         this.server = new Server(this);
-        this.subscriptions = new Collection<Snowflake, MusicSubscription>();
 
-        this.on(Events.Error, (err) => {
-            this.logger.error(err);
-        });
+        // @ts-expect-error - Error method returns a string but isn't necessary.
+        this.on(Events.Error, (err) => this.logger.error(err, 'An Error Has Occured', 'Client'));
 
-        if (process.env.NODE_ENV != 'production')
-            this.on(Events.Debug, (msg) => {
-                this.logger.debug(msg);
-            });
+        if (process.env.NODE_ENV != 'production') this.on(Events.Debug, (msg) => this.logger.debug(msg));
     }
 
     async initialize() {
