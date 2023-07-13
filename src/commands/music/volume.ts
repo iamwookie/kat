@@ -44,7 +44,7 @@ export class VolumeCommand extends Command {
 
         const res = await this.client.prisma.guild.upsert({
             where: {
-                guildId: int.guildId!,
+                guildId: int.guildId,
             },
             update: {
                 music: {
