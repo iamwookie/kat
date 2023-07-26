@@ -1,5 +1,5 @@
 // ------------------------------------
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="98debc3c-149f-527d-99ef-4e2f6f76f705")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="3b816003-53cd-5aca-830c-02d76a1c0ee1")}catch(e){}}();
 import dotenv from 'dotenv';
 dotenv.config();
 // ------------------------------------
@@ -53,5 +53,5 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     await client.initialize();
     await client.login(process.env.DISCORD_TOKEN).catch((err) => client.logger.error(err));
 })();
-//# debugId=98debc3c-149f-527d-99ef-4e2f6f76f705
+//# debugId=3b816003-53cd-5aca-830c-02d76a1c0ee1
 //# sourceMappingURL=index.js.map
