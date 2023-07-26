@@ -10,7 +10,6 @@ datasource db {
 model Guild {
     id        Int      @id @default(autoincrement())
     guildId   String   @unique
-    prefix    String   @default(".")
     createdAt DateTime @default(now())
     music     Music?
 }

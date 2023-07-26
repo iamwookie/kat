@@ -1,5 +1,5 @@
 import { Command, KATClient as Client, Commander, MusicPrompts } from '@structures/index.js';
-import { ChatInputCommandInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { ActionEmbed, ReviewEmbed } from '@utils/embeds/index.js';
 
 export class StopCommand extends Command {
@@ -7,8 +7,8 @@ export class StopCommand extends Command {
         super(client, commander, {
             name: 'stop',
             module: 'Music',
+            // Remove when shifting to slash commands.
             aliases: ['dc'],
-            legacy: true,
             description: {
                 content: 'Clear the queue and/or leave.',
             },
@@ -17,17 +17,13 @@ export class StopCommand extends Command {
         });
     }
 
-    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
+    async execute(int: ChatInputCommandInteraction<'cached'>) {
         const subscription = this.client.dispatcher.getSubscription(int.guild);
-        if (!subscription) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        if (!subscription) return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
 
         subscription.destroy();
 
-        this.commander.react(int, '👋');
-
-        if (int.channel) {
-            const reviewEmbed = new ReviewEmbed();
-            int.channel.send({ embeds: [reviewEmbed], components: [reviewEmbed.row] }).catch(() => {});
-        }
+        const reviewEmbed = new ReviewEmbed();
+        int.editReply({ content: '👋 \u200b • \u200b Disconnected, Cya.', embeds: [reviewEmbed], components: [reviewEmbed.row] })
     }
 }

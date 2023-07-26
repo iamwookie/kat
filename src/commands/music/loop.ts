@@ -1,30 +1,29 @@
 import { Command, KATClient as Client, Commander, MusicPrompts } from '@structures/index.js';
-import { ChatInputCommandInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
+import { PromptBuilder } from '@utils/prompt.js';
 
 export class LoopCommand extends Command {
     constructor(client: Client, commander: Commander) {
         super(client, commander, {
             name: 'loop',
             module: 'Music',
-            legacy: true,
+            // Remove when shifting to slash commands.
             aliases: ['repeat'],
             description: {
-                content: 'Loop the currently playing track.',
+                content: 'Loop / unloop the currently playing track.',
             },
             ephemeral: true,
         });
     }
 
-    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const author = this.commander.getAuthor(int);
-
+    async execute(int: ChatInputCommandInteraction<'cached'>) {
         const subscription = this.client.dispatcher.getSubscription(int.guild);
-        if (!subscription || !subscription.active) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
-        if (!subscription.voiceChannel.members.has(author.id))
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
+        if (!subscription || !subscription.active) return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotPlaying)] });
+        if (!subscription.voiceChannel.members.has(int.user.id)) return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
 
         const looped = subscription.loop();
-        this.commander.reply(int, { embeds: [new ActionEmbed('success').setText(looped ? MusicPrompts.TrackLooped : MusicPrompts.TrackUnlooped)] });
+
+        int.editReply({ content: new PromptBuilder(subscription).setLooped(looped) });
     }
 }

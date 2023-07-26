@@ -1,5 +1,5 @@
 import { Command, KATClient as Client, Commander, MusicPrompts } from '@structures/index.js';
-import { ChatInputCommandInteraction, Message } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 
 export class SkipCommand extends Command {
@@ -7,7 +7,6 @@ export class SkipCommand extends Command {
         super(client, commander, {
             name: 'skip',
             module: 'Music',
-            legacy: true,
             description: {
                 content: 'Skip the track.',
             },
@@ -16,20 +15,18 @@ export class SkipCommand extends Command {
         });
     }
 
-    async execute(int: ChatInputCommandInteraction<'cached'> | Message<true>) {
-        const author = this.commander.getAuthor(int);
-
+    async execute(int: ChatInputCommandInteraction<'cached'>) {
         const subscription = this.client.dispatcher.getSubscription(int.guild);
         if (!subscription || !subscription.active || subscription.paused)
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
-        if (!subscription.voiceChannel.members.has(author.id))
-            return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
-        if (subscription.queue.length == 0) return this.commander.reply(int, { embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.QueueEmpty)] });
+        if (!subscription.voiceChannel.members.has(int.user.id))
+            return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.NotInMyVoice)] });
+        if (subscription.queue.length == 0) return int.editReply({ embeds: [new ActionEmbed('fail').setText(MusicPrompts.LastTrack)] });
 
-        this.applyCooldown(author);
+        this.applyCooldown(int.user);
 
         subscription.stop();
 
-        this.commander.react(int, '✅');
+        int.editReply({ content: '⏭️ \u200b • \u200b Track Skipped.' })
     }
 }

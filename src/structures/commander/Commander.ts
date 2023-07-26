@@ -1,21 +1,7 @@
 import { KATClient as Client } from '../Client.js';
 import { Command as CommanderCommand } from './Command.js';
 import { Module as CommanderModule } from './Module.js';
-import {
-    Events as DiscordEvents,
-    REST,
-    Routes,
-    ChatInputCommandInteraction,
-    Message,
-    Collection,
-    MessagePayload,
-    MessageEditOptions,
-    InteractionEditReplyOptions,
-    MessageCreateOptions,
-    EmojiIdentifierResolvable,
-    User,
-    MessageReaction,
-} from 'discord.js';
+import { Events as DiscordEvents, REST, Routes, ChatInputCommandInteraction, Collection } from 'discord.js';
 import { ActionEmbed } from '@utils/embeds/index.js';
 import { PermissionPrompts } from '@structures/interfaces/Enums.js';
 
@@ -36,6 +22,7 @@ export class Commander {
         this.rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
         this.commands = new Collection<string, CommanderCommand>();
         this.modules = new Collection<string, CommanderModule>();
+        // Remove when shifting to slash commands.
         this.aliases = new Collection<string, string>();
     }
 
@@ -54,22 +41,14 @@ export class Commander {
         this.client.logger.status('>>>> Commander Initialized!');
     }
 
-    public validate(interaction: ChatInputCommandInteraction | Message, command: CommanderCommand): boolean {
-        const author = this.getAuthor(interaction);
-
+    public validate(interaction: ChatInputCommandInteraction, command: CommanderCommand): boolean {
         if (interaction.inGuild()) {
-            if (interaction instanceof ChatInputCommandInteraction && !interaction.inCachedGuild()) return false;
+            if (!interaction.inCachedGuild()) return false;
             if (command.module.guilds && !command.module.guilds.includes(interaction.guild.id)) return false;
             if (!interaction.channel || !interaction.channel.permissionsFor(interaction.guild.members.me!).has(this.client.permissions.text)) {
                 if (!command.hidden) {
                     const embed = new ActionEmbed('fail').setTitle('Uh Oh!').setText(PermissionPrompts.NotEnough);
-
-                    // prettier-ignore
-                    if (interaction instanceof ChatInputCommandInteraction) {
-                        this.reply(interaction, { embeds: [embed] }).catch((err) => this.client.logger.error(err, 'Error Sending Permissions Reply', 'Commander'));
-                    } else if (interaction instanceof Message) {
-                        author.send({ embeds: [embed] }).catch((err) => this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander'));
-                    }
+                    interaction.editReply({ embeds: [embed] }).catch((err) => this.client.logger.error(err, 'Error Sending Permissions Reply', 'Commander'));
                 }
 
                 return false;
@@ -77,15 +56,17 @@ export class Commander {
         }
 
         if (command.cooldown && command.cooldowns) {
-            if (command.cooldowns.has(author.id)) {
-                const cooldown = command.cooldowns.get(author.id)!;
+            if (command.cooldowns.has(interaction.user.id)) {
+                const cooldown = command.cooldowns.get(interaction.user.id)!;
                 const secondsLeft = (cooldown - Date.now()) / 1000;
 
-                this.reply(interaction, {
-                    embeds: [new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)],
-                }).catch((err) => {
-                    this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
-                });
+                interaction
+                    .editReply({
+                        embeds: [new ActionEmbed('fail').setText(`Please wait \`${secondsLeft.toFixed(1)}\` seconds before using that command again!`)],
+                    })
+                    .catch((err) => {
+                        this.client.logger.error(err, 'Error Sending Cooldown Prompt', 'Commander');
+                    });
 
                 return false;
             }
@@ -94,14 +75,10 @@ export class Commander {
         return true;
     }
 
-    public authorize(interaction: ChatInputCommandInteraction | Message, command: CommanderCommand): boolean {
-        const author = this.getAuthor(interaction);
-
-        if (command.users && !command.users.includes(author.id)) {
+    public authorize(interaction: ChatInputCommandInteraction, command: CommanderCommand): boolean {
+        if (command.users && !command.users.includes(interaction.user.id)) {
             if (!command.hidden)
-                this.reply(interaction, {
-                    embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)],
-                }).catch((err) => {
+                interaction.editReply({ embeds: [new ActionEmbed('fail').setText(PermissionPrompts.NotAllowed)] }).catch((err) => {
                     this.client.logger.error(err, 'Error Sending Permissions Prompt', 'Commander');
                 });
 
@@ -109,63 +86,6 @@ export class Commander {
         }
 
         return true;
-    }
-
-    public getAuthor(interaction: ChatInputCommandInteraction | Message): User {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.user;
-        } else if (interaction instanceof Message) {
-            return interaction.author;
-        } else {
-            throw new Error('Invalid interaction.');
-        }
-    }
-
-    public getArgs(interaction: ChatInputCommandInteraction | Message): (string | undefined)[] {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.options.data.map((option) => (typeof option.value == 'string' ? option.value.split(/ +/) : option.options)).flat() as string[];
-        } else if (interaction instanceof Message) {
-            return interaction.content.split(/ +/).slice(1);
-        } else {
-            return [];
-        }
-    }
-
-    public reply(
-        interaction: ChatInputCommandInteraction | Message,
-        content: string | MessagePayload | MessageCreateOptions | InteractionEditReplyOptions
-    ): Promise<Message> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content as Exclude<typeof content, MessageCreateOptions>);
-        } else if (interaction instanceof Message) {
-            return interaction.channel.send(content as Exclude<typeof content, InteractionEditReplyOptions>);
-        } else {
-            throw new Error('Invalid interaction.');
-        }
-    }
-
-    public edit(
-        interaction: ChatInputCommandInteraction | Message,
-        editable: Message,
-        content: string | MessagePayload | MessageEditOptions | InteractionEditReplyOptions
-    ): Promise<Message> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply(content as Exclude<typeof content, MessageEditOptions>);
-        } else if (interaction instanceof Message) {
-            return editable.edit(content as Exclude<typeof content, InteractionEditReplyOptions>);
-        } else {
-            throw new Error('Invalid interaction.');
-        }
-    }
-
-    public react(interaction: ChatInputCommandInteraction | Message, emoji: string | EmojiIdentifierResolvable): Promise<Message | MessageReaction> {
-        if (interaction instanceof ChatInputCommandInteraction) {
-            return interaction.editReply({ content: emoji as Exclude<typeof emoji, EmojiIdentifierResolvable> });
-        } else if (interaction instanceof Message) {
-            return interaction.react(emoji);
-        } else {
-            throw new Error('Invalid interaction.');
-        }
     }
 
     private initializeModules(): void {

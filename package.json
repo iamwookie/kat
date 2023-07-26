@@ -1,6 +1,6 @@
 {
   "name": "cat-bot",
-  "version": "8.1.1",
+  "version": "8.2.0",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -13,7 +13,7 @@
   "author": "wookie",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^4.16.1",
+    "@prisma/client": "^5.0.0",
     "@sentry/cli": "^2.19.4",
     "@sentry/integrations": "^7.39.0",
     "@sentry/node": "^7.39.0",
@@ -26,9 +26,9 @@
     "chalk": "^5.2.0",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
-    "express": "^4.18.1",
-    "express-rate-limit": "^6.5.1",
-    "genius-lyrics": "^4.3.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.1",
+    "genius-lyrics": "^4.4.3",
     "helmet": "^5.1.1",
     "morgan": "^1.10.0",
     "redis": "^4.0.2",
@@ -38,7 +38,7 @@
     "@types/body-parser": "^1.19.2",
     "@types/express": "^4.17.17",
     "@types/morgan": "^1.9.4",
-    "prisma": "^4.16.1",
+    "prisma": "^5.0.0",
     "tsc-alias": "^1.8.5",
     "typescript": "^4.9.5"
   }

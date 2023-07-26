@@ -12,7 +12,6 @@ import { RewriteFrames } from '@sentry/integrations';
 // ------------------------------------
 import { KATClient as Client } from '@structures/index.js';
 import { GatewayIntentBits, ActivityType, Partials } from 'discord.js';
-import { bot as config } from './config.js';
 
 import chalk from 'chalk';
 
@@ -37,7 +36,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     const client = new Client({
         intents: [
             GatewayIntentBits.Guilds,
-            GatewayIntentBits.GuildMembers,
             GatewayIntentBits.GuildVoiceStates,
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.DirectMessages,
@@ -48,15 +46,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
             status: 'online',
             activities: [
                 {
-                    name: `/help | ${config.prefix}help`,
+                    name: `/help`,
                     type: ActivityType.Listening,
                 },
             ],
         },
     });
-
-    // process.on('unhandledRejection', (err) => client.logger.uncaught(err));
-    // process.on('uncaughtException', (err) => client.logger.uncaught(err));
+    
+    process.on('unhandledRejection', (err) => client.logger.uncaught(err));
+    process.on('uncaughtException', (err) => client.logger.uncaught(err));
 
     await client.initialize();
     await client.login(process.env.DISCORD_TOKEN).catch((err) => client.logger.error(err));

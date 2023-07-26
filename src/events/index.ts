@@ -3,8 +3,6 @@
 export { ClientReady } from './client/ClientReady.js';
 export { GuildCreate } from './client/GuildCreate.js';
 export { GuildDelete } from './client/GuildDelete.js';
-export { GuildMemberAdd } from './client/GuildMemberAdd.js';
-export { InviteCreate } from './client/InviteCreate.js';
 export { VoiceStateUpdate } from './client/VoiceStateUpdate.js';
 export { MessageCreate } from './client/MessageCreate.js';
 export { InteractionCreate } from './client/InteractionCreate.js';

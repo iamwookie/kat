@@ -1,7 +1,7 @@
 import { KATClient as Client } from '../Client.js';
 import { Commander } from './Commander.js';
 import { Module } from './Module.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, User, Message, Collection, Snowflake } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, User, Collection, Snowflake } from 'discord.js';
 
 interface CommandOptions {
     name: string;
@@ -23,7 +23,7 @@ interface CommandOptions {
 export abstract class Command {
     public name: string;
     public module: Module;
-    public legacy?: boolean;
+    // Remove this when implementing slash commands.
     public aliases?: string[];
     public description?: {
         content?: string;
@@ -31,17 +31,17 @@ export abstract class Command {
     };
     public cooldown?: number;
     public ephemeral?: boolean;
+    // Change the name of this, pretty shit.
     public allowDM?: boolean;
     public users?: Snowflake[];
     public hidden?: boolean;
     public disabled?: boolean;
     public cooldowns: Collection<Snowflake, number>;
 
-    abstract execute(interaction: ChatInputCommandInteraction | Message): any;
+    abstract execute(interaction: ChatInputCommandInteraction): any;
 
     constructor(public client: Client, public commander: Commander, options: CommandOptions) {
         this.name = options.name;
-        this.legacy = options.legacy;
         this.aliases = options.aliases;
         this.description = options.description;
         this.cooldown = options.cooldown;
@@ -74,7 +74,6 @@ export abstract class Command {
     }
 
     usage(prefix: string) {
-        const aliases = this.aliases ? ', ' + this.aliases.map((alias) => prefix + alias).join(', ') : '';
-        return `${prefix}${this.name}${aliases}${this.description?.format ? ' ' + this.description.format : ''}`;
+        return `${prefix}${this.name}${this.description?.format ? ' ' + this.description.format : ''}`;
     }
 }

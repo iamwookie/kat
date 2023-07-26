@@ -17,25 +17,6 @@ export class MusicEmbed extends EmbedBuilder {
         });
     }
 
-    setEnqueued(item: YouTubeTrack | SpotifyTrack | YouTubePlaylist | SpotifyPlaylist | null) {
-        if (!item) return this;
-
-        if (item.thumbnail) super.setThumbnail(item.thumbnail);
-        if (item instanceof YouTubePlaylist || item instanceof SpotifyPlaylist) {
-            return super.addFields({
-                name: 'Enqueued:',
-                value: `${getServiceIcon(item)} \`${item.tracks.length}\` tracks from [\`${item.title}\`](${item.url})`,
-            });
-        } else {
-            return super.addFields({
-                name: 'Enqueued:',
-                value: `\`${this.subscription.position + this.subscription.queue.length}.\` - ${getServiceIcon(item)} [\`${item.title} [${
-                    item.duration
-                }]\`](${item.url})`,
-            });
-        }
-    }
-
     setPlaying(item: YouTubeTrack | SpotifyTrack | null) {
         if (!item) return this;
 

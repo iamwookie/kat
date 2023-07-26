@@ -13,7 +13,6 @@ export class KATClient extends Client {
     // Make a type for config later
     public config: typeof Config;
     public prefix: string;
-    public devPrefix: string;
     public permissions: { [key: string]: PermissionsBitField };
     public logger: Logger;
     public prisma: PrismaClient;
@@ -29,7 +28,6 @@ export class KATClient extends Client {
         this.startTime = Date.now();
         this.config = Config;
         this.prefix = Config.bot.prefix;
-        this.devPrefix = Config.bot.devPrefix;
         this.permissions = Config.bot.permissions;
         this.logger = new Logger(this);
         this.prisma = new PrismaClient({ log: ['warn', 'error'] });

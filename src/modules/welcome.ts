@@ -10,8 +10,7 @@ export class WelcomeModule extends Module {
 
     async onGuildCreate(guild: Guild) {
         const channel = guild.channels.cache.find(
-            (c) =>
-                c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me!).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])
+            (c) => c.type == ChannelType.GuildText && c.permissionsFor(guild.members.me!).has(this.client.permissions.text)
         );
 
         if (channel && channel.isTextBased()) {

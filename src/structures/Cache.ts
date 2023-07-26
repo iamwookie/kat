@@ -1,61 +1,18 @@
 import { KATClient as Client } from './Client';
 import { Snowflake } from 'discord.js';
-import { Guild, Music } from '@prisma/client';
+import { Music } from '@prisma/client';
 
 export class Cache {
-    public guilds: GuildCache;
     public music: MusicCache;
     public queue: QueueCache;
 
     constructor(public client: Client) {
-        this.guilds = new GuildCache(client);
         this.music = new MusicCache(client);
         this.queue = new QueueCache(client);
 
         this.client.logger.status('>>>> Cache Initialized!');
     }
 }
-
-class GuildCache {
-    public key: string;
-
-    constructor(private client: Client) {
-        this.key = 'kat:guilds';
-    }
-
-    async get(guildId: Snowflake): Promise<Guild | null> {
-        try {
-            const res = await this.client.redis.hget<Guild>(this.key, guildId);
-            if (res) return res;
-
-            const data = await this.client.prisma.guild.findUnique({ where: { guildId } });
-            if (data) {
-                await this.client.redis.hset(this.key, { guildId: data });
-                await this.client.redis.expire(this.key, this.client.config.cache.guildTimeout);
-            }
-
-            return data;
-        } catch (err) {
-            this.client.logger.error(err, 'Error Getting Guild Data', 'GuildCache');
-            return null;
-        }
-    }
-
-    async set(guildId: Snowflake, data: Guild): Promise<void> {
-        try {
-            await this.client.redis.hset(this.key, { [guildId]: data });
-            await this.client.redis.expire(this.key, this.client.config.cache.guildTimeout);
-        } catch (err) {
-            this.client.logger.error(err, 'Error Setting Music Data', 'MusicCache');
-        }
-    }
-
-    async prefix(guildId: Snowflake): Promise<string> {
-        const res = await this.get(guildId);
-        return res?.prefix ?? this.client.prefix;
-    }
-}
-
 class MusicCache {
     private key: string;
 
